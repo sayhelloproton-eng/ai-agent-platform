@@ -18,6 +18,14 @@ retrieval:
 
 paths:
   docs_root: docs
+  project_context: docs/00-context/CTX-001-project-context.md
+  current_state: docs/00-context/CTX-002-current-state.md
+  current_task: docs/00-context/current-task.md
+  project_outline: docs/00-context/CTX-003-project-outline.md
+  roadmap: docs/00-context/CTX-004-roadmap-6-months.md
+  platform_vision: docs/01-product/PRD-001-platform-vision.md
+  target_architecture: docs/02-architecture/ARC-001-platform-target-architecture.md
+  delivery_architecture: docs/02-architecture/ARC-003-six-month-delivery-architecture.md
   asset_index: docs/_index/assets.yaml
   relation_index: docs/_index/relations.yaml
   feishu_map: docs/_index/feishu-map.yaml

@@ -46,6 +46,21 @@ secrets/
 .local-state/
 runtime-state/
 
+# =============================================================================
+# Local private context
+#
+# AI agents may read task-relevant context from this directory.
+# Actual private content must never be committed or published.
+# README.md files remain trackable as directory documentation.
+#
+# Never store tokens, passwords, cookies, private keys, API keys,
+# OAuth credentials or authentication caches here.
+# =============================================================================
+
+
+.private-context
+
+
 # Feishu/Lark local authentication
 lark-cli-auth/
 auth-cache/

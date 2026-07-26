@@ -8,14 +8,77 @@ space:
     docx_token: <FEISHU_HOME_DOCX_TOKEN>
 
 mappings:
+  - asset_id: CTX-001
+    logical_path: 01_Context/Project Context
+    sync_mode: mirror
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: not_published
+
   - asset_id: CTX-002
-    logical_path: 01_Context/项目当前状态与上下文恢复入口
+    logical_path: 01_Context/Project Status
     sync_mode: projection
     wiki_node_token: <FEISHU_PROJECT_STATUS_WIKI_TOKEN>
     docx_token: <FEISHU_PROJECT_STATUS_DOCX_TOKEN>
-    last_synced_commit: c5ea37bb14a724798ff8628fc6b2d367135d02e3
+    last_synced_commit: null
     content_hash: null
-    sync_status: drift_expected
+    sync_status: pending_update
+
+  - asset_id: CTX-003
+    logical_path: 01_Context/Project Outline
+    sync_mode: mirror
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: not_published
+
+  - asset_id: CTX-004
+    logical_path: 01_Context/Six-Month Roadmap
+    sync_mode: mirror
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: not_published
+
+  - asset_id: PRD-001
+    logical_path: 02_Product/Platform Vision
+    sync_mode: mirror
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: not_published
+
+  - asset_id: PRD-002
+    logical_path: 02_Product/Portfolio Outcomes
+    sync_mode: mirror
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: not_published
+
+  - asset_id: ARC-001
+    logical_path: 03_Architecture/Platform Target Architecture
+    sync_mode: mirror
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: not_published
+
+  - asset_id: ARC-003
+    logical_path: 03_Architecture/Six-Month Delivery Architecture
+    sync_mode: mirror
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: not_published
 
   - asset_id: ADR-001
     logical_path: 10_ADR/ADR-001 GitHub 与飞书双源事实架构

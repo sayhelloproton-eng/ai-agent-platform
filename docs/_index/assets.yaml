@@ -7,29 +7,79 @@ assets:
     asset_type: context
     status: accepted
     evidence_level: decided
-    canonical_path: docs/context/project-context.md
-    migration_state: keep_then_migrate
-    target_path: docs/00-context/CTX-001-project-context.md
+    canonical_path: docs/00-context/CTX-001-project-context.md
+    migration_state: complete
     feishu_mode: mirror
 
   - asset_id: CTX-002
-    title: Current Task and State
+    title: Current State
     asset_type: status
     status: implemented
     evidence_level: verified
-    canonical_path: docs/context/current-task.md
-    migration_state: keep_then_migrate
-    target_path: docs/00-context/CTX-002-current-state.md
+    canonical_path: docs/00-context/CTX-002-current-state.md
+    supporting_paths:
+      - docs/00-context/current-task.md
+      - docs/00-context/recovery-map.md
+    migration_state: complete
     feishu_mode: projection
 
+  - asset_id: CTX-003
+    title: Project Outline
+    asset_type: context
+    status: accepted
+    evidence_level: decided
+    canonical_path: docs/00-context/CTX-003-project-outline.md
+    migration_state: complete
+    feishu_mode: mirror
+
+  - asset_id: CTX-004
+    title: Six-Month Roadmap
+    asset_type: roadmap
+    status: accepted
+    evidence_level: decided
+    canonical_path: docs/00-context/CTX-004-roadmap-6-months.md
+    migration_state: complete
+    feishu_mode: mirror
+
+  - asset_id: PRD-001
+    title: Platform Vision
+    asset_type: product
+    status: accepted
+    evidence_level: decided
+    canonical_path: docs/01-product/PRD-001-platform-vision.md
+    migration_state: complete
+    feishu_mode: mirror
+
+  - asset_id: PRD-002
+    title: Portfolio Outcomes
+    asset_type: product
+    status: accepted
+    evidence_level: decided
+    canonical_path: docs/01-product/PRD-002-portfolio-outcomes.md
+    migration_state: complete
+    feishu_mode: mirror
+
   - asset_id: ARC-001
-    title: Feishu Knowledge Skill Architecture
+    title: Platform Target Architecture
     asset_type: architecture
     status: accepted
     evidence_level: decided
-    canonical_path: docs/Feishu_Knowledge_Skill_Architecture_v1.0.md
-    migration_state: rewrite
-    target_path: docs/06-knowledge-system/ARC-001-ai-knowledge-architecture.md
+    canonical_path: docs/02-architecture/ARC-001-platform-target-architecture.md
+    supporting_paths:
+      - docs/02-architecture/diagrams/platform-target-architecture-v1.mmd
+      - docs/02-architecture/diagrams/platform-target-architecture-v1.png
+    migration_state: complete
+    feishu_mode: mirror
+
+  - asset_id: ARC-003
+    title: Six-Month Delivery Architecture
+    asset_type: architecture
+    status: accepted
+    evidence_level: decided
+    canonical_path: docs/02-architecture/ARC-003-six-month-delivery-architecture.md
+    supporting_paths:
+      - docs/02-architecture/diagrams/six-month-delivery-architecture.mmd
+    migration_state: complete
     feishu_mode: mirror
 
   - asset_id: ARC-002

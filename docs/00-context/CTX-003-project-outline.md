@@ -1,0 +1,93 @@
+# CTX-003 Project Outline
+
+- Asset ID: `CTX-003`
+- Status: `accepted`
+- Evidence: `decided`
+- Canonical Path: `docs/00-context/CTX-003-project-outline.md`
+
+## 项目定位
+
+`ai-agent-platform` 是一个以 AI Agent 工程学习为路径、以可运行系统为验证、以求职 Portfolio 为外部成果的长期项目。平台不以单个模型或单个工具为中心，而以稳定领域、能力接口、知识资产和工作流为核心。
+
+## 目标
+
+### 学习目标
+
+- 掌握 Agent、Skill、Tool Calling、MCP 与 Workflow。
+- 实践 DDD、Gateway、Adapter、契约和可观测性。
+- 建立 Knowledge、RAG、Context 管理和证据治理能力。
+
+### 工程目标
+
+- 形成 Git 驱动、飞书投影、Agent 可恢复的知识基础。
+- 实现可追踪的 ChatGPT → Task → Codex → Git 闭环。
+- 以 AI Video Workflow 验证复杂业务编排和可替换 Provider。
+
+### Portfolio 目标
+
+- 展示可运行 Demo、结构清晰的 GitHub 仓库和工程验证。
+- 展示 Architecture、ADR、Skill、Experiment、Workflow 与评估证据。
+- 形成事实一致、可在简历与面试中解释的工程故事。
+
+## 核心领域
+
+- `Task`：目标、约束、输入、交付物和验收。
+- `Agent`：承担判断或执行职责的参与者。
+- `Capability`：模型、工具和外部服务可提供的能力。
+- `Workflow`：任务步骤、路由、状态与补偿。
+- `Knowledge` / `Knowledge Asset`：可索引、可追溯的上下文和正式资产。
+- `Execution` / `Result`：运行证据、状态、产物和错误。
+- `Decision` / `Experiment`：架构取舍与可复现验证。
+
+## 平台能力
+
+- Knowledge discovery、retrieval、capture 与 maintenance。
+- Task schema、校验、路由、执行和结果追踪。
+- Agent / Skill / Tool 编排与 Provider 适配。
+- Git、Feishu、Local File、Web 等知识 Provider。
+- 模型、图像、视频、语音等外部能力适配。
+- 安全门禁、审计、评估、成本与可观测性。
+
+## 三阶段优先级与交付物
+
+### Now — Phase 1: Git + Feishu + AI Knowledge Skill
+
+交付物：
+
+- 正式 Context、Product、Architecture、ADR、Research 和 Experiment 资产。
+- Git 唯一真源与 Feishu Projection 规则。
+- AI Knowledge Skill、索引优先检索和最小上下文机制。
+
+### Next — Phase 2: ChatGPT → Task → Codex → Git
+
+交付物：
+
+- Task / Result Schema 与状态机。
+- 薄 Gateway / Bridge。
+- Codex Adapter、Execution Tracking、日志和失败恢复。
+- 从需求到 Git 变更的可审计闭环。
+
+### Later — Phase 3: AI Video Workflow
+
+交付物：
+
+- Story、Character、Scene、Shot 和 Asset 领域模型。
+- 文本拆解、分镜、Prompt、生成与一致性检查 Workflow。
+- 可替换的视频与音频 Provider。
+- 可演示 MVP、评估指标和成本记录。
+
+## 六个月范围
+
+- Month 1–2：完成 Knowledge Foundation。
+- Month 3–4：完成 AI Coding Workflow 的最薄可用闭环。
+- Month 5–6：完成 AI Video Workflow MVP 与 Portfolio 整理。
+
+具体退出条件见 [CTX-004 Six-Month Roadmap](CTX-004-roadmap-6-months.md)。
+
+## 长期演进方向
+
+- 从单 Agent 执行演进到受治理的多 Agent 协作。
+- 从文件与 CLI 集成演进到稳定 API 和事件驱动工作流。
+- 从单一 Feishu Provider 扩展到 Git、Local File、Web 和其他知识源。
+- 从文本前处理扩展到图片、视频、音频生成和一致性治理。
+- 从个人工程验证演进到可部署、可观测、可评估的平台能力。

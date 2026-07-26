@@ -1,0 +1,28 @@
+flowchart LR
+  subgraph NOW["Now — Month 1–2"]
+    ASSETS["Git Knowledge Assets"]
+    TYPES["Context / ADR / Research / Experiment / Solution"]
+    SKILL["AI Knowledge Skill"]
+    FEISHU["Feishu Projection"]
+    TYPES --> ASSETS
+    ASSETS --> SKILL
+    ASSETS --> FEISHU
+  end
+
+  subgraph NEXT["Next — Month 3–4"]
+    TASK["Task Contract"]
+    BRIDGE["Gateway / Bridge"]
+    CODEX["Codex Adapter"]
+    TRACK["Result / Execution Tracking"]
+    TASK --> BRIDGE --> CODEX --> TRACK
+  end
+
+  subgraph LATER["Later — Month 5–6"]
+    VIDEO["AI Video Workflow MVP"]
+    PROVIDERS["Video Model Adapters"]
+    ORCH["Advanced Workflow Orchestration"]
+    ORCH --> VIDEO --> PROVIDERS
+  end
+
+  NOW -. foundation .-> NEXT
+  NEXT -. reusable execution .-> LATER

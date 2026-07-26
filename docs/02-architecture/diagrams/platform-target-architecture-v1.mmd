@@ -1,0 +1,77 @@
+flowchart TB
+  subgraph ACCESS["User Access Layer"]
+    USER["User / Agent"]
+    CLIENT["Chat / Web / CLI / IDE / Mobile"]
+    USER --> CLIENT
+  end
+
+  subgraph ENTRY["Gateway / Entry Layer"]
+    GATEWAY["API Gateway / Task Intake"]
+    AUTH["Identity / Policy / Validation"]
+    CLIENT --> GATEWAY
+    AUTH --> GATEWAY
+  end
+
+  subgraph APP["Application Layer"]
+    TASKSVC["Task Service"]
+    KNOWSVC["Knowledge Service"]
+    WORKSVC["Workflow Service"]
+    EXECSVC["Execution / Result Service"]
+    GATEWAY --> TASKSVC
+    GATEWAY --> KNOWSVC
+    TASKSVC --> WORKSVC
+    WORKSVC --> EXECSVC
+  end
+
+  subgraph DOMAIN["DDD Core Domain"]
+    TASK["Task"]
+    AGENT["Agent"]
+    CAP["Capability"]
+    FLOW["Workflow"]
+    KNOW["Knowledge / Knowledge Asset"]
+    EXEC["Execution / Result"]
+    GOV["Decision / Experiment"]
+  end
+
+  APP --> DOMAIN
+
+  subgraph PORTS["Capability Ports"]
+    KNOWPORT["Knowledge Provider Port"]
+    EXECIR["Execution Provider Port"]
+    MEDIAPORT["Media Provider Port"]
+  end
+
+  DOMAIN --> PORTS
+
+  subgraph ADAPTERS["Infrastructure Adapters"]
+    GIT["Git Adapter"]
+    FEISHU["Feishu Adapter"]
+    CODEX["Codex Adapter"]
+    MODEL["Model / Tool Adapter"]
+    VIDEO["Video / Voice Adapter"]
+  end
+
+  PORTS --> ADAPTERS
+
+  subgraph STORAGE["Data and Storage"]
+    REPO["Git Canonical Assets"]
+    INDEX["Asset / Relation Index"]
+    RUNS["Execution Store"]
+    ART["Artifact Store"]
+  end
+
+  ADAPTERS --> STORAGE
+
+  subgraph EXTERNAL["External Capabilities"]
+    GITHUB["GitHub"]
+    LARK["lark-cli / Feishu OpenAPI"]
+    CODEXEXT["Codex"]
+    MODELS["LLM / MCP / Tools"]
+    MEDIA["Image / Video / Voice Providers"]
+  end
+
+  ADAPTERS --> EXTERNAL
+
+  CROSS["Security / Observability / Evaluation / Cost"] -. cross-cutting .-> ENTRY
+  CROSS -.-> APP
+  CROSS -.-> ADAPTERS

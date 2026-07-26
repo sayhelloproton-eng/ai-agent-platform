@@ -1,35 +1,80 @@
 # ai-agent-platform
 
-`ai-agent-platform` 是一个围绕 AI Agent、Workflow、Knowledge System、Tool / Skill 和长期上下文管理展开的工程实践项目。
+一个面向 AI Agent 工程学习、长期实践和求职 Portfolio 的平台项目：先建设可恢复的 Knowledge Foundation，再打通 AI Coding Workflow，最终以 AI Video Workflow 验证业务编排能力。
 
-## 当前阶段
+## Why
 
-当前正在建设 Knowledge System Foundation，目标是建立 ChatGPT、飞书与 Git/GitHub 之间可恢复、可追溯的上下文与工程资产闭环。
+AI 工程需要的不只是模型调用，还需要稳定上下文、任务契约、可替换能力、执行证据和可持续演进的知识资产。本项目把讨论、决策、Skill、代码、实验和状态连接到 Git 中，降低 Agent 接手成本与重复推理。
 
-## 知识资产模型
+## 当前状态
 
-- Git/GitHub 是项目正式事实的唯一真源，保存代码、Skill、Schema、脚本、测试、架构、ADR、状态和正式知识。
-- 飞书是 Git 知识资产的阅读投影、协作空间和补充知识层。
-- Feishu Native 内容不是项目正式事实；影响项目的结论必须通过 Review 晋升到 Git。
-- ChatGPT Project 是需求讨论、分析和方案推演入口。
-- 飞书投影通过 Asset ID、Git Path、Commit、Hash 和 Node Token 关联，不做无治理的双向同步。
+当前阶段是 **Knowledge Foundation**。已完成规则分层、Private Context 边界、Git 唯一真源决策、AI Knowledge Skill 和部分飞书 CLI 调研；正在建立正式 Context、Product 与 Architecture 入口。
 
-该决策由 [ADR-002](docs/09-adr/ADR-002-git-single-source-feishu-projection.md) 记录，并替代早期的双源事实模型。
+平台服务、Agent Runtime、Codex Bridge 和 AI Video Workflow 尚未实现。真实状态见 [CTX-002 Current State](docs/00-context/CTX-002-current-state.md)。
 
-## 目录
+## 三阶段
 
-- `skills/ai-knowledge/`：AI Knowledge Skill v1.0.0 源包。
-- `docs/`：项目设计、飞书验证结果与工程上下文。
-- `docs/_index/`：Agent 的资产、关系和飞书映射检索入口。
-- `docs/_templates/`：正式知识资产模板。
-- `docs/context/`：新设备或新 Agent 的恢复入口。
-- `docs/research/`：调研报告、元数据和实验资产。
+1. **Now — Git + Feishu + AI Knowledge Skill**：知识资产、索引、上下文恢复与飞书投影。
+2. **Next — ChatGPT → Task → Codex → Git**：Task Contract、薄 Bridge、Codex Adapter 与执行追踪。
+3. **Later — AI Video Workflow**：故事拆解、分镜、生成 Provider 和工作流 MVP。
 
-## 本地运行
+## 简化架构
 
-当前仓库尚未实现可运行的平台服务。现阶段可验证资产主要是架构文档、AI Knowledge Skill 和飞书 CLI 调研成果。
+```mermaid
+flowchart LR
+  U[User / Agent] --> G[Gateway / Entry]
+  G --> A[Application Services]
+  A --> D[DDD Core Domain]
+  D --> P[Capability Ports]
+  P --> I[Infrastructure Adapters]
+  I --> X[Git / Feishu / Codex / Models / Media]
+```
 
-AI Knowledge Skill 自检：
+长期目标与交付边界分别见 [ARC-001](docs/02-architecture/ARC-001-platform-target-architecture.md) 和 [ARC-003](docs/02-architecture/ARC-003-six-month-delivery-architecture.md)。
+
+## 当前已有成果
+
+- 分层 `AGENTS.md` 与文档治理规则。
+- Git 唯一真源、Feishu Projection 的 ADR。
+- AI Knowledge Skill v1.0.0 及确定性自检。
+- Feishu CLI、公开 Wiki 读取和递归导出验证资产。
+- Asset、Relation、Feishu Map 与 Migration Inventory 索引。
+
+## 尚未实现
+
+- 可运行的平台 API / Gateway。
+- Agent Runtime 与 Codex Bridge。
+- Task / Result 的运行时闭环。
+- AI Video Workflow 和视频模型 Adapter。
+- Git → Feishu 自动投影服务。
+
+## Repository Navigation
+
+- [`docs/00-context/`](docs/00-context/)：项目上下文、当前状态和 Roadmap。
+- [`docs/01-product/`](docs/01-product/)：平台愿景与 Portfolio 结果。
+- [`docs/02-architecture/`](docs/02-architecture/)：目标与六个月交付架构。
+- [`docs/06-knowledge-system/`](docs/06-knowledge-system/)：Knowledge Asset Architecture。
+- [`docs/09-adr/`](docs/09-adr/)：架构决策。
+- [`docs/_index/`](docs/_index/)：Agent 的资产、关系和飞书映射入口。
+- [`skills/ai-knowledge/`](skills/ai-knowledge/)：AI Knowledge Skill 源包。
+
+完整文档导航见 [`docs/README.md`](docs/README.md)。
+
+## Knowledge System
+
+- Git / GitHub 保存正式项目事实。
+- 飞书是阅读投影、协作空间和补充知识层。
+- Feishu Native 内容影响项目时，必须经 Review 晋升到 Git。
+- 检索采用索引优先、最小上下文和只读优先。
+- 投影通过 Asset ID、Canonical Path、Commit / Hash 与 Node Token 关联；尚未同步的资产明确标记为 pending。
+
+## AI 可读 Private Context 边界
+
+`.private-context/` 保存不进入 Public Git 的本地执行背景。Agent 不得默认扫描；只有公开资产不足、任务明确需要且权限允许时，才读取相关文件。该目录中只有说明性 `README.md` 可跟踪。
+
+## Development Status
+
+仓库目前以 Markdown、Schema、Skill、脚本和测试资产为主，不应被描述为已完成平台。AI Knowledge Skill 可执行既有验证：
 
 ```bash
 cd skills/ai-knowledge
@@ -37,22 +82,23 @@ node scripts/validate_bundle.mjs
 node tests/self-test.mjs
 ```
 
-## 远程知识入口
+本批次未修改 Skill，因此不重复运行 Skill 测试。
 
-- 飞书知识库：首页《智能体工程探索录》
-- URL：https://<FEISHU_TENANT>.feishu.cn/docx/<FEISHU_HOME_DOCX_TOKEN>
-- Space ID：`<FEISHU_SPACE_ID>`
+## Portfolio 目标
 
-## 安全与第三方内容
+最终以真实证据展示可运行 Demo、GitHub 工程质量、Architecture、ADR、Skill、Experiment、Workflow、测试与评估。计划成果和已交付成果必须分开记录，详见 [PRD-002](docs/01-product/PRD-002-portfolio-outcomes.md)。
 
-- 不提交 Token、Cookie、密钥、`.env` 或本地认证缓存。
-- `docs/research/waytoagi-feishu-cli-export/pages/` 是第三方公开知识库的本地研究镜像，默认不进入 Git。
-- 删除、权限修改、公开分享、强制推送和历史重写不由自动流程执行。
+## 文档入口
 
-## Next Actions
+1. [Project Context](docs/00-context/CTX-001-project-context.md)
+2. [Current State](docs/00-context/CTX-002-current-state.md)
+3. [Current Task](docs/00-context/current-task.md)
+4. [Project Outline](docs/00-context/CTX-003-project-outline.md)
+5. [Six-Month Roadmap](docs/00-context/CTX-004-roadmap-6-months.md)
+6. [Platform Vision](docs/01-product/PRD-001-platform-vision.md)
+7. [Target Architecture](docs/02-architecture/ARC-001-platform-target-architecture.md)
+8. [Recovery Map](docs/00-context/recovery-map.md)
 
-1. 按 `docs/_index/migration-inventory.yaml` 迁移核心 Context。
-2. 将 Architecture、Research、Experiment 和 Skill 拆分为稳定 Asset ID。
-3. 设计飞书 Git 对齐区与 `90_Feishu_Native` 的迁移预览。
-4. 实现 Git → Feishu 单向投影 MVP。
-5. 实现 `query_context` 只读 MVP。
+## 安全底线
+
+不提交 Token、Cookie、密钥、`.env`、认证缓存、私人材料或未授权第三方全文；不自动删除、改权限、公开分享、Force Push 或改写历史。

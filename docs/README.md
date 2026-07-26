@@ -2,6 +2,21 @@
 
 `docs/` 保存 `ai-agent-platform` 的正式知识资产、索引、模板和迁移期历史材料。Git 是项目正式事实的唯一真源。
 
+## 规则与治理入口
+
+- [`AGENTS.md`](AGENTS.md)：修改 `docs/**` 时必须遵守的目录级规则；
+- [`governance/README.md`](governance/README.md)：详细治理文档导航；
+- [`governance/agent-working-protocol.md`](governance/agent-working-protocol.md)：Agent 执行、验证和交付流程；
+- [`governance/git-feishu-governance.md`](governance/git-feishu-governance.md)：Git 与飞书知识边界；
+- [`governance/documentation-rules.md`](governance/documentation-rules.md)：README、正式资产、状态、链接和索引规范。
+
+## 当前正式入口
+
+- [`00-context/`](00-context/)：项目背景、当前状态、当前任务、恢复路径和 Roadmap；
+- [`01-product/`](01-product/)：平台愿景与 Portfolio 结果；
+- [`02-architecture/`](02-architecture/)：长期目标架构与六个月交付架构；
+- [`_index/assets.yaml`](_index/assets.yaml)：按稳定 Asset ID 检索正式资产。
+
 ## 资产类型与目录
 
 | 目录 | 资产 |
@@ -23,7 +38,7 @@
 | `_templates/` | 正式资产模板 |
 | `_archive/` | 已废弃但需保留的历史 |
 
-迁移期间，既有 `docs/context/` 和根层文档继续保留；迁移必须经过资产盘点，不做批量移动或删除。
+迁移期间，既有 `docs/context/` 和根层历史文档继续保留，但新的 Context Canonical Path 已指向 `docs/00-context/`。后续资产迁移必须经过资产盘点，不做批量移动或删除。
 
 ## 生命周期
 

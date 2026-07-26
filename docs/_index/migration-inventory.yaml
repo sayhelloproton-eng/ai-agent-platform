@@ -21,7 +21,7 @@ items:
     target_git_path: README.md
     target_feishu_path: 00_Home
     action: rewrite
-    migration_status: in_progress
+    migration_status: complete
 
   - current_path: docs/context/project-context.md
     content_type: project_context
@@ -32,7 +32,7 @@ items:
     target_git_path: docs/00-context/CTX-001-project-context.md
     target_feishu_path: 01_Context/Project Context
     action: rewrite
-    migration_status: pending
+    migration_status: canonical_replacement_created_source_retained
 
   - current_path: docs/context/current-task.md
     content_type: project_status
@@ -43,14 +43,36 @@ items:
     target_git_path: docs/00-context/CTX-002-current-state.md
     target_feishu_path: 01_Context/Project Status
     action: rewrite
-    migration_status: pending
+    migration_status: canonical_replacement_created_source_retained
+
+  - current_path: .private-context/project-origin/AI项目大纲-原始上下文.md
+    content_type: private_project_origin
+    duplicate: false
+    outdated: partially
+    formal_project_fact: false
+    target_asset_id: CTX-003
+    target_git_path: docs/00-context/CTX-003-project-outline.md
+    target_feishu_path: 01_Context/Project Outline
+    action: rewrite
+    migration_status: public_sanitized_asset_created_private_source_retained
+
+  - current_path: init/架构图.png
+    content_type: architecture_diagram
+    duplicate: false
+    outdated: unknown
+    formal_project_fact: true
+    target_asset_id: ARC-001
+    target_git_path: docs/02-architecture/diagrams/platform-target-architecture-v1.png
+    target_feishu_path: 03_Architecture/Platform Target Architecture
+    action: keep
+    migration_status: moved_hash_verified
 
   - current_path: docs/Feishu_Knowledge_Skill_Architecture_v1.0.md
     content_type: architecture
     duplicate: false
     outdated: partially
     formal_project_fact: true
-    target_asset_id: ARC-001
+    target_asset_id: SKL-001
     target_git_path: docs/06-knowledge-system/ARC-001-ai-knowledge-architecture.md
     target_feishu_path: 07_Knowledge_System/AI Knowledge Architecture
     action: rewrite

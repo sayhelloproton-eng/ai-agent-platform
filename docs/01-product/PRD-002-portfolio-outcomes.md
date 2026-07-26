@@ -1,0 +1,36 @@
+# PRD-002 Portfolio Outcomes
+
+- Asset ID: `PRD-002`
+- Status: `accepted`
+- Evidence: `decided`
+- Canonical Path: `docs/01-product/PRD-002-portfolio-outcomes.md`
+
+## 结果原则
+
+Portfolio 只展示可由 Git、运行记录、测试或评审证据支持的成果。所有条目明确区分 `Delivered` 与 `Planned`。
+
+## Outcomes
+
+| 维度 | Delivered | Planned |
+|---|---|---|
+| 可运行 Demo | AI Knowledge Skill 的 bundle 校验与 self-test | Coding Workflow、AI Video Workflow MVP |
+| GitHub 工程质量 | 规则分层、私有边界、资产索引、ADR 与文档治理 | CI、发布流程、运行时工程规范 |
+| Architecture | Knowledge Asset Architecture、Git / Feishu 真源决策 | Platform Target 与 Delivery Architecture 的实现验证 |
+| ADR | ADR-001 历史与 ADR-002 当前决策 | Runtime、Task、Provider 和 Workflow 的后续决策 |
+| Skill | AI Knowledge Skill v1.0.0 源资产 | 真实项目查询、沉淀和同步的持续评估 |
+| Experiment | Feishu CLI 和公开 Wiki 读取/导出验证 | Coding / Video Workflow 对照实验 |
+| Workflow | 尚未交付运行时 Workflow | ChatGPT → Codex 与 Story → Video Workflow |
+| 测试和评估 | Skill 现有确定性自检 | 契约测试、集成测试、质量/成本评估 |
+
+## 可量化成果
+
+当前不预设或编造业务指标。未来只记录真实测得的成功率、耗时、调用次数、Token / 成本、重试次数、覆盖率和质量评分，并附测量方法与样本范围。
+
+## 简历与面试叙事
+
+采用“问题 → 判断 → 本人方案 → 工程结果 → 业务价值”的结构，展示：
+
+- 为什么选择 Git 唯一真源和 Feishu Projection。
+- 如何用 Asset Index 和最小上下文降低 Agent 恢复成本。
+- 如何通过契约、Adapter 和 Workflow 避免模型与工具锁定。
+- 哪些成果已运行验证，哪些仍处于设计或计划阶段。
