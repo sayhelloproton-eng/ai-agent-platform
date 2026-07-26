@@ -1,0 +1,18 @@
+{
+  "tree_node_count": 53,
+  "pages_markdown_count": 53,
+  "counts_match": true,
+  "pages_with_required_metadata_and_markdown": 53,
+  "invalid_pages": [],
+  "duplicate_filenames": [],
+  "duplicate_node_tokens": [],
+  "pages_with_source_markdown": 50,
+  "pages_with_error_placeholder": 3,
+  "error_placeholder_files": [
+    "006-飞书CLI设计问卷：🐾 ／buddy 电子宠物征集展.md",
+    "011-通往AGI之路-群聊内容收录.md",
+    "023-sheet-AolhwFoc.md"
+  ],
+  "failed_nodes": 3,
+  "complete": false
+}

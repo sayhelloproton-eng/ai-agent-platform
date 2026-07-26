@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KnowledgeEvent",
+  "type": "object",
+  "required": [
+    "event_id",
+    "event_type",
+    "project",
+    "occurred_at",
+    "summary",
+    "evidence"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "event_type": {
+      "enum": [
+        "task_completed",
+        "experiment_concluded",
+        "decision_made",
+        "status_changed",
+        "problem_resolved",
+        "external_source_imported"
+      ]
+    },
+    "project": {
+      "type": "string"
+    },
+    "occurred_at": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "details": {
+      "type": "object"
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "title",
+          "source"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "requested_output": {
+      "enum": [
+        "experiment",
+        "adr",
+        "status",
+        "knowledge-note",
+        "learning-path"
+      ]
+    }
+  }
+}

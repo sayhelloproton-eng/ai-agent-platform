@@ -1,0 +1,59 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+coverage/
+.next/
+.turbo/
+
+# Logs, caches, and temporary files
+*.log
+logs/
+tmp/
+temp/
+.cache/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.enc
+credentials.json
+secrets/
+.private/
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.example.json
+.idea/
+
+# Local agent/runtime state
+.codex/
+.claude/
+.opencode/
+.omo/
+.local-state/
+runtime-state/
+
+# Feishu/Lark local authentication
+lark-cli-auth/
+auth-cache/
+token-cache/
+
+# Generated distribution archives
+/ai-knowledge-skill-v1.0.0.zip
+/docs/research/waytoagi-feishu-cli-export.zip
+
+# Third-party full content export: keep local, do not republish by default
+/docs/research/waytoagi-feishu-cli-export/pages/

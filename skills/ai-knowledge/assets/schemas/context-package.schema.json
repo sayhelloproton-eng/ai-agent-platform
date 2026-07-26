@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ContextPackage",
+  "type": "object",
+  "required": [
+    "task",
+    "selected_sources",
+    "facts",
+    "gaps"
+  ],
+  "properties": {
+    "task": {
+      "type": "string"
+    },
+    "intent": {
+      "type": "string"
+    },
+    "selected_sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "title",
+          "source"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "facts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "statement",
+          "confidence"
+        ],
+        "properties": {
+          "statement": {
+            "type": "string"
+          },
+          "confidence": {
+            "enum": [
+              "confirmed",
+              "inferred",
+              "unknown"
+            ]
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "decisions": {
+      "type": "array"
+    },
+    "current_status": {
+      "type": "object"
+    },
+    "constraints": {
+      "type": "array"
+    },
+    "gaps": {
+      "type": "array"
+    },
+    "token_budget": {
+      "type": "object",
+      "properties": {
+        "max_chars": {
+          "type": "integer"
+        },
+        "used_chars": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}

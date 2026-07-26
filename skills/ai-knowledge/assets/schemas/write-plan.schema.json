@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WritePlan",
+  "type": "object",
+  "required": [
+    "operation",
+    "target",
+    "risk",
+    "preview_file",
+    "acceptance"
+  ],
+  "properties": {
+    "operation": {
+      "enum": [
+        "create",
+        "append",
+        "overwrite",
+        "str_replace"
+      ]
+    },
+    "target": {
+      "type": "object",
+      "required": [
+        "provider"
+      ],
+      "properties": {
+        "provider": {
+          "const": "feishu"
+        },
+        "space_id": {
+          "type": "string"
+        },
+        "parent_node_token": {
+          "type": "string"
+        },
+        "doc_token": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      }
+    },
+    "risk": {
+      "enum": [
+        "G2",
+        "G3",
+        "G4"
+      ]
+    },
+    "idempotency_key": {
+      "type": "string"
+    },
+    "expected_revision": {
+      "type": [
+        "string",
+        "integer",
+        "null"
+      ]
+    },
+    "preview_file": {
+      "type": "string"
+    },
+    "acceptance": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "rollback": {
+      "type": "string"
+    },
+    "confirmed": {
+      "type": "boolean"
+    }
+  }
+}

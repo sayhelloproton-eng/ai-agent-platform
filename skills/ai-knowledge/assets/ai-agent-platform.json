@@ -1,0 +1,109 @@
+{
+  "schema_version": "1.0",
+  "project": {
+    "id": "ai-agent-platform",
+    "display_name": "智能体工程探索",
+    "knowledge_role": "public learning knowledge base + Agent long-term context provider"
+  },
+  "feishu": {
+    "space_id": "<FEISHU_SPACE_ID>",
+    "space_display_name": "智能体工程探索",
+    "homepage": {
+      "title": "智能体工程探索录",
+      "doc_token": "<FEISHU_HOME_DOCX_TOKEN>",
+      "wiki_node_token": "<FEISHU_HOME_WIKI_TOKEN>"
+    },
+    "root_nodes": {
+      "00_Context": {
+        "token": "<FEISHU_NODE_00_CONTEXT>",
+        "label": "项目上下文"
+      },
+      "01_Product": {
+        "token": "<FEISHU_NODE_01_PRODUCT>",
+        "label": "产品与业务目标"
+      },
+      "02_Architecture": {
+        "token": "<FEISHU_NODE_02_ARCHITECTURE>",
+        "label": "系统架构"
+      },
+      "03_Domain_Model": {
+        "token": "<FEISHU_NODE_03_DOMAIN_MODEL>",
+        "label": "领域模型"
+      },
+      "04_Agent_System": {
+        "token": "<FEISHU_NODE_04_AGENT_SYSTEM>",
+        "label": "Agent系统"
+      },
+      "05_Workflow": {
+        "token": "<FEISHU_NODE_05_WORKFLOW>",
+        "label": "工作流设计"
+      },
+      "06_Knowledge_System": {
+        "token": "<FEISHU_NODE_06_KNOWLEDGE_SYSTEM>",
+        "label": "知识系统"
+      },
+      "07_Model_Runtime": {
+        "token": "<FEISHU_NODE_07_MODEL_RUNTIME>",
+        "label": "模型与运行环境"
+      },
+      "08_Tool_Integration": {
+        "token": "<FEISHU_NODE_08_TOOL_INTEGRATION>",
+        "label": "工具与外部能力"
+      },
+      "09_Engineering": {
+        "token": "<FEISHU_NODE_09_ENGINEERING>",
+        "label": "工程实现"
+      },
+      "10_Research_Experiment": {
+        "token": "<FEISHU_NODE_10_RESEARCH_EXPERIMENT>",
+        "label": "研究与实验"
+      },
+      "11_ADR": {
+        "token": "<FEISHU_NODE_11_ADR>",
+        "label": "架构决策"
+      },
+      "12_Learning_Path": {
+        "token": "<FEISHU_NODE_12_LEARNING_PATH>",
+        "label": "学习路线"
+      },
+      "13_Portfolio": {
+        "token": "<FEISHU_NODE_13_PORTFOLIO>",
+        "label": "成果展示"
+      },
+      "14_Agent_Log": {
+        "token": "<FEISHU_NODE_14_AGENT_LOG>",
+        "label": "Agent运行记录"
+      }
+    },
+    "dynamic_documents": {
+      "project_status": {
+        "title": "Project_Status（项目状态）",
+        "parent_node_token": "<FEISHU_NODE_00_CONTEXT>",
+        "doc_token": null,
+        "wiki_node_token": null,
+        "canonical": true
+      },
+      "knowledge_index": {
+        "title": "Knowledge_Index（知识索引）",
+        "parent_node_token": "<FEISHU_NODE_00_CONTEXT>",
+        "doc_token": null,
+        "wiki_node_token": null,
+        "canonical": false
+      }
+    }
+  },
+  "policies": {
+    "default_identity": "user",
+    "default_read_budget_chars": 12000,
+    "max_full_documents": 3,
+    "max_candidates": 8,
+    "write_default": "dry-run",
+    "forbidden_automatic_operations": [
+      "delete",
+      "move",
+      "permission_change",
+      "member_change",
+      "internet_publish"
+    ]
+  }
+}

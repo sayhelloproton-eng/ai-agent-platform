@@ -1,0 +1,48 @@
+version: 1
+project: ai-agent-platform
+
+canonical_source: git
+
+governance:
+  asset_id_required: true
+  formal_asset_requires_review: true
+  accepted_adr_requires_human_approval: true
+  preserve_superseded_history: true
+  default_evidence_level: hypothesis
+
+retrieval:
+  strategy: index_first
+  default_full_documents_limit: 3
+  allow_implicit_full_repository_scan: false
+  allow_implicit_full_feishu_scan: false
+
+paths:
+  docs_root: docs
+  asset_index: docs/_index/assets.yaml
+  relation_index: docs/_index/relations.yaml
+  feishu_map: docs/_index/feishu-map.yaml
+  migration_inventory: docs/_index/migration-inventory.yaml
+  templates: docs/_templates
+  archive: docs/_archive
+
+feishu:
+  role: projection_and_native
+  space_id: "<FEISHU_SPACE_ID>"
+  conflict_policy: git_wins_for_projection
+  native_root: 90_Feishu_Native
+  archive_root: 99_Archive
+  allow_reverse_sync: false
+  require_write_preview: true
+  require_human_confirmation: true
+
+runtime_evidence:
+  store_full_agent_logs_in_docs: false
+  store_full_traces_in_docs: false
+  store_reproducible_config_and_summary: true
+
+security:
+  auto_delete: false
+  auto_move: false
+  auto_permission_change: false
+  auto_public_share: false
+  auto_force_push: false

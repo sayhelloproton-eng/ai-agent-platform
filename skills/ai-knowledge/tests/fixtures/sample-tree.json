@@ -1,0 +1,61 @@
+{
+  "root": {
+    "title": "智能体工程探索",
+    "node_token": "root",
+    "space_id": "1",
+    "has_child": true
+  },
+  "count": 4,
+  "nodes": [
+    {
+      "title": "02_Architecture（系统架构）",
+      "node_token": "arch",
+      "obj_token": "doc-arch",
+      "obj_type": "docx",
+      "path": [
+        "智能体工程探索",
+        "02_Architecture（系统架构）"
+      ],
+      "depth": 1,
+      "has_child": true
+    },
+    {
+      "title": "Gateway 总体架构",
+      "node_token": "gateway",
+      "obj_token": "doc-gateway",
+      "obj_type": "docx",
+      "path": [
+        "智能体工程探索",
+        "02_Architecture（系统架构）",
+        "Gateway 总体架构"
+      ],
+      "depth": 2,
+      "has_child": false
+    },
+    {
+      "title": "11_ADR（架构决策）",
+      "node_token": "adr",
+      "obj_token": "doc-adr",
+      "obj_type": "docx",
+      "path": [
+        "智能体工程探索",
+        "11_ADR（架构决策）"
+      ],
+      "depth": 1,
+      "has_child": false
+    },
+    {
+      "title": "AI 视频工作流",
+      "node_token": "video",
+      "obj_token": "doc-video",
+      "obj_type": "docx",
+      "path": [
+        "智能体工程探索",
+        "05_Workflow",
+        "AI 视频工作流"
+      ],
+      "depth": 2,
+      "has_child": false
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KnowledgeItem",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "type",
+    "project",
+    "status",
+    "source"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "project": {
+      "type": "string"
+    },
+    "domain": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "reviewed",
+        "accepted",
+        "deprecated",
+        "archived"
+      ]
+    },
+    "summary": {
+      "type": "string"
+    },
+    "keywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "relations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "provider"
+      ],
+      "properties": {
+        "provider": {
+          "enum": [
+            "feishu",
+            "git",
+            "local",
+            "web"
+          ]
+        },
+        "url": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string"
+        }
+      }
+    },
+    "confidence": {
+      "enum": [
+        "confirmed",
+        "inferred",
+        "unknown"
+      ]
+    },
+    "visibility": {
+      "enum": [
+        "public",
+        "internal",
+        "private"
+      ]
+    },
+    "sensitivity": {
+      "enum": [
+        "none",
+        "low",
+        "high"
+      ]
+    }
+  }
+}

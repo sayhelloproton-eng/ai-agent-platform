@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "project": {
+    "id": "your-project",
+    "display_name": "Your Project"
+  },
+  "feishu": {
+    "space_id": "",
+    "homepage": {
+      "doc_token": "",
+      "wiki_node_token": ""
+    },
+    "root_nodes": {},
+    "dynamic_documents": {}
+  },
+  "policies": {
+    "write_default": "dry-run"
+  }
+}

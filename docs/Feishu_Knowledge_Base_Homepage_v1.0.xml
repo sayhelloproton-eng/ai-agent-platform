@@ -1,0 +1,157 @@
+<title>智能体工程探索录</title>
+
+<p align="center"><b>AI Agent Platform 长期工程实践知识库</b></p>
+
+<blockquote>以真实项目为载体，持续沉淀从学习、架构设计、工程实现到实践验证的智能体工程方法与成果。</blockquote>
+
+<h1>1. 项目简介</h1>
+
+<p>“智能体工程探索录”是一个围绕 AI Agent、Workflow、Knowledge System 与智能应用构建的长期工程实践项目。内部工程载体为 <code>ai-agent-platform</code>，知识库用于统一承载项目上下文、架构决策、技术实验、工程记录与阶段成果。</p>
+
+<p>项目的核心目标，是探索如何构建一个具备以下特征的 AI Agent 平台：</p>
+
+<ul>
+  <li><b>多模型可替换：</b>通过清晰的抽象边界降低对单一模型供应商的依赖。</li>
+  <li><b>Agent 驱动：</b>以目标、角色、能力、记忆和反馈机制组织智能体行为。</li>
+  <li><b>Workflow 编排：</b>把复杂任务拆解为可观察、可复用、可恢复的执行流程。</li>
+  <li><b>Knowledge 增强：</b>通过知识库、上下文管理与 RAG 提升结果的准确性和连续性。</li>
+  <li><b>API 化扩展：</b>以 Gateway、Adapter 和 Tool 接口连接模型、数据与外部能力。</li>
+</ul>
+
+<h1>2. 项目背景</h1>
+
+<p>AI 技术正在快速改变软件的设计、开发和交付方式。模型能力不再只是独立功能，而逐步进入需求分析、代码生成、工具调用、知识检索和自动化执行等工程环节。软件开发由“人直接完成全部操作”，转向“人定义目标与边界，Agent 协同规划和执行”的新模式。</p>
+
+<p>本项目源于个人技术能力转型的长期需求：在既有前端工程经验之上，逐步建立面向 AI Agent 的系统设计与工程实践能力。从单点使用模型，走向理解 Agent、Workflow、Knowledge、Tool Integration 和 Runtime 等核心要素，并通过可运行项目验证这些能力如何组合成稳定、可扩展的智能应用系统。</p>
+
+<p>知识库不是聊天记录归档，而是这一转型过程中的长期上下文中心。它负责保存稳定事实、架构设计、实验结论和决策依据，使人和未来 AI Agent 都能够基于同一套可信上下文持续推进项目。</p>
+
+<h1>3. 当前目标</h1>
+
+<p><code>ai-agent-platform</code> 当前阶段聚焦基础能力建设，目标是从“能够使用 AI 工具”走向“能够设计并实现 AI Agent 工程系统”。主要任务包括：</p>
+
+<ul>
+  <li>建立 AI Agent 平台的基础架构，明确 Gateway、Domain、Application、Infrastructure 与 Workflow 的职责边界。</li>
+  <li>建立 Knowledge Layer，使项目事实、设计与实验结果能够被持续维护和检索。</li>
+  <li>探索 ChatGPT × Codex 的协作开发方式，形成适合真实工程任务的上下文、计划、执行与验收流程。</li>
+  <li>构建可复用的 AI Workflow，验证任务拆解、工具调用、状态管理和失败恢复机制。</li>
+  <li>实践 AI 视频工作流，以具体应用场景检验平台的编排、模型接入和外部工具集成能力。</li>
+</ul>
+
+<h1>4. 核心技术方向</h1>
+
+<h2>Agent</h2>
+
+<ul>
+  <li>Agent 设计与角色边界</li>
+  <li>Skill 的定义、组合与治理</li>
+  <li>Tool Calling 的参数契约与安全执行</li>
+  <li>MCP 能力接入与上下文交换</li>
+</ul>
+
+<h2>Workflow</h2>
+
+<ul>
+  <li>Coding Workflow：面向研发任务的计划、实现、验证和交付流程</li>
+  <li>AI 视频 Workflow：从创意、素材到生成与交付的自动化链路</li>
+  <li>自动化 Workflow：多步骤任务编排、状态跟踪与异常恢复</li>
+</ul>
+
+<h2>Knowledge</h2>
+
+<ul>
+  <li>飞书知识库作为长期项目上下文入口</li>
+  <li>RAG 的召回、筛选、引用与质量评估</li>
+  <li>Context 的分层、更新、压缩与生命周期管理</li>
+</ul>
+
+<h2>Engineering</h2>
+
+<ul>
+  <li>Monorepo 工程组织与模块边界</li>
+  <li>API Gateway 的统一入口与治理能力</li>
+  <li>Adapter 模式下的模型、存储和工具解耦</li>
+  <li>面向 Agent 和外部系统的 API 契约设计</li>
+</ul>
+
+<h1>5. 系统架构</h1>
+
+<p><code>ai-agent-platform</code> 采用分层与适配器思想组织系统。用户请求经统一入口进入 API Gateway，由 Application Service 编排用例，DDD Domain 承载核心业务规则，Workflow 负责长流程和多步骤任务，Infrastructure Adapter 连接模型、工具和数据存储。</p>
+
+<whiteboard type="mermaid">
+flowchart TB
+    U["用户入口层"]
+    G["API Gateway"]
+    A["Application Service"]
+    D["DDD Domain"]
+    W["Workflow"]
+    I["Infrastructure Adapter"]
+    S["Data Storage"]
+
+    U --> G
+    G --> A
+    A --> D
+    A --> W
+    D --> I
+    W --> I
+    I --> S
+</whiteboard>
+
+<p>该架构以稳定的领域与应用边界隔离快速变化的模型和外部服务，使模型、工具、存储和工作流可以独立演进。架构细节将在后续 ADR 与系统设计文档中持续验证，而不是在早期阶段固化为不可调整的实现。</p>
+
+<h1>6. 知识库导航</h1>
+
+<p>知识库按项目生命周期与系统能力组织。一级目录承担稳定职责，具体文档在对应目录下持续演进。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>目录</th>
+      <th>用途</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td><code>00_Context</code></td><td>项目背景、目标、原则和长期上下文入口</td></tr>
+    <tr><td><code>01_Product</code></td><td>产品定位、业务目标、用户场景与 MVP 规划</td></tr>
+    <tr><td><code>02_Architecture</code></td><td>总体架构、分层设计、接口与安全设计</td></tr>
+    <tr><td><code>03_Domain_Model</code></td><td>DDD 领域模型、聚合、实体、值对象与领域事件</td></tr>
+    <tr><td><code>04_Agent_System</code></td><td>Agent 生命周期、角色、Skill、Tool、MCP 与评估</td></tr>
+    <tr><td><code>05_Workflow</code></td><td>Coding、AI 视频、RAG 与自动化工作流设计</td></tr>
+    <tr><td><code>06_Knowledge_System</code></td><td>飞书知识库、RAG、文档规范与上下文治理</td></tr>
+    <tr><td><code>07_Model_Runtime</code></td><td>模型选型、本地与云端运行环境、评估及成本</td></tr>
+    <tr><td><code>08_Tool_Integration</code></td><td>CLI、Codex、MCP、Browser、GitHub 与第三方 API</td></tr>
+    <tr><td><code>09_Engineering</code></td><td>工程初始化、前后端、Gateway、Skill、API 与部署</td></tr>
+    <tr><td><code>10_Research_Experiment</code></td><td>技术验证、成功与失败案例、Prompt 与模型实验</td></tr>
+    <tr><td><code>11_ADR</code></td><td>重要架构决策、背景、选项、结论与影响</td></tr>
+    <tr><td><code>12_Learning_Path</code></td><td>AI 基础、知识系统、Agent、Workflow 与全栈学习路线</td></tr>
+    <tr><td><code>13_Portfolio</code></td><td>项目介绍、技术亮点、Demo、简历与面试材料</td></tr>
+    <tr><td><code>14_Agent_Log</code></td><td>未来 Agent 的任务记录、成本统计、错误分析与总结</td></tr>
+  </tbody>
+</table>
+
+<h1>7. 当前阶段</h1>
+
+<callout emoji="📌" background-color="light-blue" border-color="blue">
+  <p><b>Phase 1：Knowledge Layer 建设</b></p>
+  <p>当前重点是建立可信、可维护、可供 Agent 检索的项目上下文基础。</p>
+</callout>
+
+<h2>已完成</h2>
+
+<checkbox done="true">飞书 CLI 安装、登录与基础能力验证</checkbox>
+<checkbox done="true">Knowledge Base 创建与 Space 初始化</checkbox>
+<checkbox done="true">15 个一级目录初始化与结构验收</checkbox>
+
+<h2>下一阶段</h2>
+
+<ul>
+  <li>导入经过整理和脱敏的项目上下文。</li>
+  <li>建立统一的知识文档结构、元数据和维护规范。</li>
+  <li>验证飞书问问对知识库内容的检索与回答能力。</li>
+  <li>创建受控的 Feishu Skill，明确只读、写入与治理边界。</li>
+  <li>实现 Agent 查询上下文、引用来源和更新知识的基础闭环。</li>
+</ul>
+
+<hr/>
+
+<p><b>维护原则：</b>本知识库只沉淀可复用的项目事实、设计、决策与实验结论；不直接复制聊天记录，不保存凭证和敏感信息，不以临时任务替代长期知识结构。</p>
