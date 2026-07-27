@@ -242,3 +242,43 @@ assets:
     evidence_level: hypothesis
     canonical_path: docs/knowledge/作品集/PRT-002-Demo路线图.md
     migration_state: complete
+
+  - asset_id: EXP-003
+    title: Knowledge System Initialization Retrospective
+    asset_type: experiment
+    status: validated
+    evidence_level: verified
+    canonical_path: docs/knowledge/实验与复盘/EXP-003-知识系统初始化阶段复盘.md
+    migration_state: complete
+
+  - asset_id: ARC-005
+    title: Single Source and Knowledge Projection Architecture
+    asset_type: architecture
+    status: accepted
+    evidence_level: decided
+    canonical_path: docs/knowledge/知识系统/ARC-005-单一真源与知识投影架构.md
+    migration_state: complete
+
+  - asset_id: ARC-006
+    title: Project Knowledge Layering and Agent Context Architecture
+    asset_type: architecture
+    status: proposed
+    evidence_level: decided
+    canonical_path: docs/knowledge/知识系统/ARC-006-项目知识分层与Agent上下文架构.md
+    migration_state: complete
+
+  - asset_id: SOL-004
+    title: Cross-Platform Document Portability and Publishing Adapter
+    asset_type: solution
+    status: adopted
+    evidence_level: verified
+    canonical_path: docs/knowledge/技术方案/SOL-004-跨平台文档可移植性与发布适配.md
+    migration_state: complete
+
+  - asset_id: WFL-004
+    title: Multi-Model Agent Execution Governance and Token Budget
+    asset_type: workflow
+    status: proposed
+    evidence_level: decided
+    canonical_path: docs/knowledge/工作流/WFL-004-多模型Agent执行治理与Token预算.md
+    migration_state: complete
