@@ -17,14 +17,23 @@
 
 ## 写入确认
 
-写入前必须展示：
+Git 写入前必须展示：
+
+- 目标 Layer 和 Git 路径；
+- 来源证据、完整 Draft 或 Diff；
+- 影响范围、风险和验收方式；
+- 是否改变 Context、Knowledge、Technical 或 ADR。
+
+Feishu Projection Publish 只能使用 `docs/knowledge/` 中已经 Review 的 Git 内容。发布前还必须展示：
 
 - 目标 Space / Node / Doc token 和标题。
-- 写入类型：create、append、overwrite 或局部替换。
+- 发布类型：create、append、overwrite 或局部替换。
 - 完整内容预览或可审阅文件。
 - 影响范围、幂等策略和验收步骤。
 
-用户明确同意后才能真实执行。`lark_write.mjs` 默认 dry-run；`--apply` 需要确认短语。
+Git 写入确认不等于 Feishu 发布确认。用户分别明确同意后才能执行对应动作。`lark_write.mjs` 默认 dry-run；`--apply` 需要确认短语。
+
+禁止从 `context/`、`docs/technical/`、`docs/learning/`、`docs/adr/` 或 `skills/` 直接生成项目 Feishu Knowledge Projection。
 
 ## CLI 高风险确认
 
@@ -42,3 +51,5 @@
 - 需要删除、权限、公开分享或批量移动。
 - 无法验证事实来源，却要求写成已确认结论。
 - 请求要求把整个大型知识库无筛选塞给模型。
+- 要求 Feishu 覆盖或自动反写 Git、执行双向同步或自动合并 Drift。
+- 项目投影来源不在 `docs/knowledge/`。

@@ -1,7 +1,7 @@
 ---
 name: ai-knowledge
-version: 1.0.0
-description: "管理 ai-agent-platform 的长期项目知识。当 Agent 需要查询项目上下文、从飞书知识库获取最小必要证据、沉淀实验或 ADR、同步项目进度、导入公开飞书 Wiki、维护知识索引或生成学习路径时使用。默认索引优先、最小上下文、只读优先；飞书只是 Provider，底层复用官方 lark-cli/OpenAPI；任何写入先生成预览并遵循人工确认门禁。"
+version: 1.2.0
+description: "管理 ai-agent-platform 的长期项目知识。当 Agent 需要从 Git Context 和正式资产获取最小必要证据、更新 Git 知识、记录 ADR、导入外部资料或为 docs/knowledge 生成受控 Feishu Projection 时使用。Git Repository 是唯一真源；默认索引优先、最小上下文、只读优先。"
 metadata:
   requires:
     bins: ["lark-cli", "node"]
@@ -15,8 +15,21 @@ metadata:
 
 1. [`references/00-shared-rules.md`](references/00-shared-rules.md)：认证、安全、确认门禁和停止条件。
 2. [`references/01-architecture-and-boundaries.md`](references/01-architecture-and-boundaries.md)：Skill、Provider、Agent、Codex 的职责边界。
-3. [`references/02-project-profile.md`](references/02-project-profile.md)：当前 `ai-agent-platform` 飞书空间、目录和动态状态策略。
+3. [`references/02-project-profile.md`](references/02-project-profile.md)：当前 `ai-agent-platform` Git 资产、飞书投影和动态状态策略。
 4. 涉及飞书读取或写入时，再读取 [`references/06-feishu-provider.md`](references/06-feishu-provider.md)。
+5. 发布 `docs/knowledge/` 时，必须读取 [`references/11-feishu-publishing.md`](references/11-feishu-publishing.md)。
+
+## Knowledge Boundary
+
+| Layer | Canonical Path | Role | Projection |
+|---|---|---|---|
+| Context | `context/` | Agent Runtime Context：状态、任务、约束、规则 | 禁止 |
+| Knowledge | `docs/knowledge/` | Human Knowledge Base：可阅读、可展示、可发布 | 唯一允许的 Feishu 发布源 |
+| Technical | `docs/technical/` | 工程设计、方案、调研、规范和 Operations | 默认禁止 |
+| Learning | `docs/learning/` | 学习资产 | 禁止 |
+| Decision | `docs/adr/` | 架构决策及其上下文、备选和后果 | 禁止作为知识库正文 |
+
+Git Repository 是所有正式项目事实的 Canonical Source。Feishu 只能是 `docs/knowledge/` 的 Human Readable Projection，或未经晋升的外部证据来源。
 
 ## 触发场景
 
@@ -35,30 +48,37 @@ metadata:
 
 ## 总流程
 
-1. **识别知识意图**：查询、沉淀、状态同步、ADR、导入、索引、学习路径。
-2. **确定信息来源**：项目配置、Knowledge Index、飞书、Git、本地文件；不要默认全库扫描。
+1. **识别知识意图**：查询、Git 变更、状态更新、ADR、导入、索引、学习路径或 Projection Publish。
+2. **确定 Git Layer**：Context、Knowledge、Technical、Learning 或 ADR；不要先按 Provider 分类。
 3. **读取最小证据**：先目录/索引，再 outline/section，最后才是完整正文。
 4. **生成 Context Package 或 Draft**：列出来源、范围、缺口和置信度；不得编造项目事实。
-5. **执行动作**：只读可直接执行；写入先输出 Write Plan 和内容预览，得到明确同意后再执行。
-6. **验收**：回读目标资源，核对 token、标题、revision、父节点和正文关键段落。
-7. **维护闭环**：成功写入后更新索引；只有达到里程碑时才同步项目状态。
+5. **更新 Git**：先输出 Change Plan、目标范围和 Diff；确认后写入 Git 并验证。
+6. **可选发布**：仅当来源位于 `docs/knowledge/` 且任务明确需要时，另生成 Projection Plan。
+7. **验收**：Git 变更验证优先；若获授权发布，再回读 Feishu 目标并验证。
 
 ## 意图路由
 
 | 意图 | 必读参考 | 首选产物 |
 |---|---|---|
 | 查询项目上下文 | `04-retrieval-policy.md`、`07-workflows.md#query-context` | Context Package |
-| 沉淀知识 | `03-knowledge-model.md`、`05-write-governance.md` | Knowledge Draft + Write Plan |
-| 同步项目状态 | `05-write-governance.md`、`07-workflows.md#sync-project-status` | Project Status Draft |
+| 沉淀知识 | `03-knowledge-model.md`、`05-write-governance.md` | 分层 Git Draft + Change Plan |
+| 更新项目状态 | `05-write-governance.md`、`07-workflows.md#update-project-status` | Context Draft + Diff |
 | 记录 ADR | `03-knowledge-model.md`、`07-workflows.md#record-adr` | ADR Draft |
 | 导入公开 Wiki | `06-feishu-provider.md`、`07-workflows.md#import-public-wiki` | Tree + Index + Import Report |
 | 生成学习路径 | `07-workflows.md#build-learning-path` | Learning Path |
 | 重建/查询索引 | `04-retrieval-policy.md` | Index / Ranked Candidates |
+| 发布知识投影 | `05-write-governance.md`、`06-feishu-provider.md`、`07-workflows.md#publish-knowledge-projection`、`11-feishu-publishing.md` | Publishing Manifest + Projection Plan + Read-back Report |
 
 ## 强制行为规则
 
 - **内容作者与执行器分离**：Codex 可以读取、创建、更新和验收；不得在缺少依据时自行宣布项目阶段、技术决策或完成状态。
-- **动态状态单一真源**：`Project_Status（项目状态）` 是规范状态源；首页“当前阶段”只是可选快照，不能作为唯一真源。
+- **Git 唯一真源**：所有正式事实必须经过 Review 并进入 Git；Feishu、聊天和 Provider 输出都不是独立真源。
+- **动态 Context**：项目状态从 `context/current-status.md` 读取；`context/` 不参与 Feishu Projection。
+- **唯一发布源**：只有 `docs/knowledge/` 可以生成项目 Feishu Knowledge Projection。
+- **文本化投影**：正文不得由 AI 总结或改写；按 `11-feishu-publishing.md` 过滤 Git frontmatter、图片、Mermaid 和二进制资源引用，只发布可阅读的文本 Markdown。
+- **图形边界**：飞书不接收图片或图形资源。重要图形必须先在 Git 中经 Review 转成文字说明和 `text` 代码块图；Publisher 不在发布时临时解释或重绘。
+- **README 边界**：只把 `docs/knowledge/README.md` 作为首页发布；其他目录 README 不发布正文。
+- **禁止反向和双向同步**：Feishu 不得覆盖或自动反写 Git，也不得自动合并差异。
 - **只读优先**：读取、索引和生成草稿默认不需要确认；创建/更新飞书文档必须先预览。
 - **索引优先**：先查询本地 Knowledge Index；没有索引时先构建目录级索引，不要把整个 Wiki 正文发送给模型。
 - **局部读取**：优先 outline/section/fragment；只有在需要跨全文综合且预算允许时读取完整 Markdown。
@@ -77,12 +97,13 @@ metadata:
 
 先返回：
 
-1. 知识类型与目标目录。
-2. 完整内容草稿。
-3. Write Plan（目标 token、命令类别、风险、幂等键、验收步骤）。
-4. 明确询问是否执行。
+1. Git Layer、目标路径与来源证据。
+2. 完整内容草稿或 Diff。
+3. Change Plan（目标范围、风险、验收和回滚）。
+4. 明确询问是否更新 Git。
+5. 只有 `docs/knowledge/` 需要发布时，另行生成 Projection Plan 并再次确认。
 
-没有明确同意时，不执行真实写入。
+没有明确同意时，不执行 Git 写入或 Feishu 发布。Git 写入授权不自动授权 Feishu 发布。
 
 ## 可用脚本
 

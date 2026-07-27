@@ -1,0 +1,5 @@
+# Solutions
+
+Solution 面向一个明确工程问题，组合约束、候选方案、推荐设计、接口、实施、失败处理和验证。它不是外部调研，也不自动代表已接受 ADR。
+
+状态：`draft`、`proposed`、`validated`、`adopted`、`implemented`、`deprecated`、`superseded`。

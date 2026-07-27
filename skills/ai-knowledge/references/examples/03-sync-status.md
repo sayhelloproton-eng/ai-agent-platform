@@ -1,5 +1,3 @@
-# 示例：同步状态
+# 示例：更新项目状态
 
-条件：Skill v1 实现并通过自测、用户验收。
-
-预期：把“Skill v1 完成”加入 completed 并附验收报告；更新 next；不因只生成草稿而提前完成。首页快照可选。
+先根据已验收 Task Result 生成 `context/current-status.md` Draft 和 Diff；Review 后更新 Git 并验证。Context 不发布到 Feishu，也不从 Feishu 状态页反向更新。

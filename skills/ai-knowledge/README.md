@@ -1,78 +1,92 @@
 # ai-knowledge Skill
 
-面向 Codex / Agent Skills 标准的长期项目知识管理 Skill。包内只有一个 `SKILL.md`，其余内容按官方推荐放在 `references/`、`assets/` 和 `scripts/` 中。
+面向 Agent 的长期项目知识 Skill。它负责从 Git 获取最小必要上下文、组织知识变更，并为允许发布的 Knowledge 资产生成受控 Projection Plan。
 
-## 解决的问题
+本文件描述规则层合同。配置、脚本和测试将在后续任务中对齐；当前合同更新不代表执行逻辑已经调整。
 
-- Agent 在执行开发任务前，如何只读取最相关的项目上下文。
-- Chat 负责内容与决策、Codex 负责本地执行时，如何避免 Codex 在上下文不足时自行发挥。
-- 飞书首页的“当前进度”由谁维护、依据什么更新。
-- 如何把飞书作为可替换 Knowledge Provider，而不是把上层能力写死成飞书 CRUD。
-- 如何通过官方 `lark-cli` 读取跨租户公开 Wiki，而不使用网页抓取和大段 HTML 消耗 token。
+## Source Of Truth
 
-## 安装
+**Git Repository is the canonical source and the only source of truth.**
 
-将整个 `ai-knowledge` 文件夹放到 Agent Skills 目录。当前通用约定优先使用：
+聊天、Feishu 页面、Provider 返回和运行输出都只能作为输入、证据或候选变更。只有经过 Review 并进入 Git 的内容才是正式项目事实。
+
+Feishu 的定位是 **Human Readable Knowledge Projection**，不是与 Git 并列的知识源。
+它面向人和 AI 阅读，不追求对 Git 文件、元数据和资源目录做仓库镜像。
+
+## Knowledge Layers
+
+| Layer | Path | Responsibility | Feishu Projection |
+|---|---|---|---|
+| Context Layer | [`context/`](../../context/) | 项目状态、当前任务、架构约束和执行规则；动态、精简、面向 Agent | 禁止 |
+| Knowledge Layer | [`docs/knowledge/`](../../docs/knowledge/) | 项目、架构、Agent、Workflow、实验和 Portfolio；面向人类阅读 | 唯一允许的发布源 |
+| Technical Layer | [`docs/technical/`](../../docs/technical/) | Runtime、Provider、Adapter、技术方案、调研和工程规范 | 默认禁止 |
+| Learning Layer | [`docs/learning/`](../../docs/learning/) | 学习路线、笔记和学习资料 | 禁止 |
+| Decision Layer | [`docs/adr/`](../../docs/adr/) | Decision、Context、Alternatives 和 Consequences | 禁止作为知识库正文 |
+
+`skills/ai-knowledge/` 保存可执行能力及其规则，不是 Feishu 发布源。
+
+## Projection Direction
+
+唯一允许的项目知识发布方向：
 
 ```text
-~/.agents/skills/ai-knowledge/
+Git docs/knowledge/
+        ↓
+Feishu Knowledge
 ```
 
-团队仓库可将其纳入共享的 `.agents/skills/ai-knowledge/`（以当前 Codex 版本的发现规则为准）。不要只复制 `SKILL.md`，脚本、参考资料、模板和 Schema 都是 Skill 的组成部分。
+禁止：
 
-## 前置条件
+- Feishu 覆盖 Git；
+- Feishu 自动反写 Git；
+- Git 与 Feishu 双向同步；
+- 将 `context/`、`docs/technical/`、`docs/learning/` 或 `docs/adr/` 默认发布到 Feishu；
+- 自动合并 Git 与 Feishu 的差异。
+
+## Capabilities
+
+- 从 `context/` 和 Git 正式资产选择最小上下文。
+- 生成带来源、状态和缺口的 Context Package。
+- 将已确认事件分类为 Context、Knowledge、Technical 或 ADR Draft。
+- 更新 Git Draft、验证路径和关系。
+- 仅为 `docs/knowledge/` 生成 Feishu Projection Plan。
+- 导入授权的外部 Wiki 元数据和证据，但不把外部内容直接视为项目事实。
+
+## Feishu Knowledge Publisher
+
+Feishu Knowledge Publisher 将已 Review 的 `docs/knowledge/**` 确定性发布到飞书知识库“智能体工程探索”。
+
+- `docs/knowledge/README.md` 发布为首页；
+- 普通 Markdown 使用首个 H1 作为飞书标题；
+- 目录 README 不发布正文；
+- Git frontmatter 只服务 Git，在 Projection payload 中过滤；
+- 只发布标题、正文、列表、表格、引用、代码块和普通链接；
+- 图片、Mermaid、draw.io 和二进制资源不进入飞书；
+- 重要图形必须先在 Git 中经 Review 转成文字说明和 `text` 代码块图；
+- Git 相对文档链接转换为飞书文档链接或不可变 GitHub URL；
+- 不发布代码、Skill、Schema 或其他 Git Layer；
+- 不允许 AI 改写正文、飞书反写 Git 或双向同步。
+
+完整合同见 [`references/11-feishu-publishing.md`](references/11-feishu-publishing.md)。
+
+## Canonical Status
+
+项目动态状态入口是 Git [`context/current-status.md`](../../context/current-status.md)。Feishu 状态页只能是从允许的 Knowledge 资产生成的阅读投影，不能覆盖 Context。
+
+## Requirements and Validation
 
 - Node.js 20+
-- `@larksuite/cli` / `lark-cli` 1.0.77 或更高
-- 已完成 `lark-cli config init` 和最小权限 OAuth
-- 读取/写入对应飞书资源所需 scope
-
-检查：
+- `lark-cli` 1.0.77+（仅在显式使用 Feishu Provider 时）
 
 ```bash
-node --version
-lark-cli --version
-lark-cli auth status --json --verify
 node scripts/validate_bundle.mjs
 node tests/self-test.mjs
 ```
 
-## 使用方式
+上述脚本和测试本次未修改；其路径和行为将在后续配置层与执行层任务中对齐。
 
-显式调用：
+## Safety
 
-```text
-使用 $ai-knowledge，为“实现 Feishu Knowledge Skill MVP”加载最小项目上下文。
-```
+默认只读。Git 写入前必须有 Change Plan 和目标范围；写入后必须验证。Feishu Projection Publish 必须另行预览、确认和回读。
 
-或自然语言触发：
-
-```text
-读取项目架构、ADR 和当前阶段，给这次 Gateway 修改生成 Context Package。
-```
-
-## 项目配置
-
-`assets/ai-agent-platform.json` 已包含当前知识库的非密钥标识，包括 Space ID、首页 token 和 15 个一级节点。任何凭证都不得写入此文件。
-
-动态状态文档尚未创建时，Skill 会先生成创建草稿和 Write Plan；创建后再把 token 写回项目配置。首页的阶段信息只作为展示快照。
-
-## 目录
-
-```text
-ai-knowledge/
-├── SKILL.md
-├── README.md
-├── CHANGELOG.md
-├── references/
-├── assets/
-├── scripts/
-└── tests/
-```
-
-## 安全
-
-- 默认只读，写入脚本默认 `--dry-run`。
-- `--apply` 仍要求固定确认短语；CLI 要求高风险确认时必须再次向用户确认，不能自动加 `--yes`。
-- 本 Skill 不自动删除、移动 Wiki 节点、修改成员/权限或切换互联网公开。
-- 对外部知识仅处理用户有权读取的公开/授权资源，并保留来源。
+Skill 不自动删除、移动、修改成员/权限、互联网公开、接受 ADR、覆盖 Git 或执行双向同步。

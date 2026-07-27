@@ -1,0 +1,44 @@
+# Skills
+
+## What
+
+`skills/` 保存可复用的 Agent 能力工程资产。
+
+## Why
+
+Skill 将稳定的领域能力、运行时规则、Schema、示例和测试组织为可独立验证和演进的单元。
+
+## Contains
+
+- [`AGENTS.md`](AGENTS.md)：所有 Skill 共同遵守的工程规则；
+- `ai-knowledge/`：AI Knowledge Skill 源包。
+
+## Boundary
+
+本目录允许 Skill 实现、最小运行说明、契约、示例和测试。
+
+完整架构思想、ADR 和跨 Skill 治理应放入 `docs/`；真实凭据、运行缓存和与 Skill 无关的业务代码不得进入本目录。
+
+## Structure
+
+每个长期 Skill 至少应提供：
+
+- `README.md`：面向人类开发者；
+- `SKILL.md`：面向 Agent Runtime；
+- Schema、Example 和 Test；
+- 必要的 Provider / Adapter 或 References。
+
+## Usage
+
+修改任何 Skill 前，先读取根 `AGENTS.md`、本目录 [`AGENTS.md`](AGENTS.md) 和目标 Skill 自身说明。
+
+## Maintenance
+
+能力、输入输出、安全边界或 Provider 行为变化时，同步更新 README、SKILL、Schema、Example 和测试。
+
+## Related Docs
+
+- [项目宪法](../AGENTS.md)
+- [Agent 工作协议](../docs/governance/agent-working-protocol.md)
+- [Git / Feishu 治理](../docs/governance/git-feishu-governance.md)
+- [文档规范](../docs/governance/documentation-rules.md)

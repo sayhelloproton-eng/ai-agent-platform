@@ -1,0 +1,158 @@
+version: 2
+project: ai-agent-platform
+relations:
+  - from: CTX-002
+    type: depends_on
+    to: CTX-001
+
+  - from: CTX-002
+    type: decided_by
+    to: ADR-002
+
+  - from: CTX-002
+    type: validated_by
+    to: MIG-001
+
+  - from: CTX-003
+    type: explains
+    to: CTX-001
+
+  - from: CTX-004
+    type: implements
+    to: CTX-003
+
+  - from: PRD-001
+    type: derived_from
+    to: CTX-001
+
+  - from: PRD-002
+    type: depends_on
+    to: PRD-001
+
+  - from: ARC-001
+    type: implements
+    to: PRD-001
+
+  - from: ARC-001
+    type: decided_by
+    to: ADR-002
+
+  - from: ARC-003
+    type: implements
+    to: ARC-001
+
+  - from: ARC-003
+    type: depends_on
+    to: CTX-004
+
+  - from: DOM-001
+    type: explains
+    to: ARC-001
+
+  - from: SKL-001
+    type: implements
+    to: ARC-002
+
+  - from: SKL-001
+    type: depends_on
+    to: ARC-004
+
+  - from: SKL-001
+    type: validated_by
+    to: EXP-001
+
+  - from: SKL-001
+    type: validated_by
+    to: EXP-002
+
+  - from: WFL-001
+    type: implements
+    to: ARC-002
+
+  - from: WFL-001
+    type: depends_on
+    to: SKL-001
+
+  - from: WFL-002
+    type: implements
+    to: ARC-003
+
+  - from: WFL-002
+    type: depends_on
+    to: DOM-001
+
+  - from: WFL-003
+    type: implements
+    to: ARC-003
+
+  - from: WFL-003
+    type: depends_on
+    to: DOM-001
+
+  - from: ARC-002
+    type: decided_by
+    to: ADR-002
+
+  - from: ARC-004
+    type: explains
+    to: SKL-001
+
+  - from: SOL-001
+    type: derived_from
+    to: RSH-001
+
+  - from: OPS-001
+    type: implements
+    to: SOL-001
+
+  - from: OPS-002
+    type: depends_on
+    to: OPS-001
+
+  - from: OPS-003
+    type: derived_from
+    to: RSH-001
+
+  - from: SOL-002
+    type: decided_by
+    to: ADR-002
+
+  - from: SOL-002
+    type: implements
+    to: ARC-002
+
+  - from: SOL-003
+    type: decided_by
+    to: ADR-002
+
+  - from: RSH-001
+    type: validated_by
+    to: EXP-001
+
+  - from: RSH-001
+    type: validated_by
+    to: EXP-002
+
+  - from: ADR-002
+    type: supersedes
+    to: ADR-001
+
+  - from: ENG-001
+    type: implements
+    to: ADR-002
+
+  - from: ENG-001
+    type: implements
+    to: SOL-003
+
+  - from: MIG-001
+    type: implements
+    to: ENG-001
+
+  - from: PRT-001
+    type: depends_on
+    to: PRD-002
+
+  - from: PRT-002
+    type: depends_on
+    to: CTX-004

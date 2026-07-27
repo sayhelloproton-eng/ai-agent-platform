@@ -1,3 +1,9 @@
+---
+asset_id: {{asset_id}}
+asset_layer: knowledge
+canonical_root: docs/knowledge/
+projection_eligible: true
+---
 # {{title}}
 
 - 类型：{{knowledge_type}}

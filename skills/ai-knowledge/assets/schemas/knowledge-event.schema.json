@@ -1,12 +1,15 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "KnowledgeEvent",
+  "description": "An evidenced change or publication event for a canonical Git asset.",
   "type": "object",
+  "additionalProperties": false,
   "required": [
     "event_id",
     "event_type",
     "project",
     "occurred_at",
+    "asset",
     "summary",
     "evidence"
   ],
@@ -17,19 +20,45 @@
     },
     "event_type": {
       "enum": [
-        "task_completed",
-        "experiment_concluded",
-        "decision_made",
-        "status_changed",
-        "problem_resolved",
-        "external_source_imported"
+        "create",
+        "update",
+        "publish_projection",
+        "export"
       ]
     },
     "project": {
-      "type": "string"
+      "type": "string",
+      "minLength": 1
     },
     "occurred_at": {
-      "type": "string"
+      "type": "string",
+      "format": "date-time"
+    },
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "layer",
+        "source_path"
+      ],
+      "properties": {
+        "asset_id": {
+          "type": "string"
+        },
+        "layer": {
+          "enum": [
+            "context",
+            "knowledge",
+            "technical",
+            "learning",
+            "decision"
+          ]
+        },
+        "source_path": {
+          "type": "string",
+          "pattern": "^(context|docs/knowledge|docs/technical|docs/learning|docs/adr)/"
+        }
+      }
     },
     "summary": {
       "type": "string",
@@ -43,15 +72,16 @@
       "minItems": 1,
       "items": {
         "type": "object",
+        "additionalProperties": false,
         "required": [
           "title",
-          "source"
+          "source_path"
         ],
         "properties": {
           "title": {
             "type": "string"
           },
-          "source": {
+          "source_path": {
             "type": "string"
           },
           "kind": {
@@ -60,14 +90,52 @@
         }
       }
     },
-    "requested_output": {
-      "enum": [
-        "experiment",
-        "adr",
-        "status",
-        "knowledge-note",
-        "learning-path"
-      ]
+    "projection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "direction"
+      ],
+      "properties": {
+        "target": {
+          "const": "feishu"
+        },
+        "direction": {
+          "const": "git_to_feishu"
+        }
+      }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "publish_projection"
+          }
+        },
+        "required": [
+          "event_type"
+        ]
+      },
+      "then": {
+        "required": [
+          "projection"
+        ],
+        "properties": {
+          "asset": {
+            "properties": {
+              "layer": {
+                "const": "knowledge"
+              },
+              "source_path": {
+                "pattern": "^docs/knowledge/"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }

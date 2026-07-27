@@ -1,0 +1,203 @@
+# Documentation and README Rules
+
+## 1. 目的
+
+本规范定义长期目录 README、关键模块说明、正式知识资产、Asset ID、命名、状态、历史、归档、链接和索引检查。
+
+## 2. 长期目录 README
+
+每个进入 Git、具有长期职责的目录必须有 `README.md`。
+
+README 至少包含：
+
+```markdown
+# Directory Name
+
+## What
+## Why
+## Contains
+## Boundary
+## Structure
+## Usage
+## Maintenance
+## Related Docs
+```
+
+含义：
+
+- **What**：目录是什么；
+- **Why**：为什么独立存在；
+- **Contains**：允许的资产和文件；
+- **Boundary**：允许与禁止内容；
+- **Structure**：关键子目录和文件；
+- **Usage**：人和 Agent 如何使用；
+- **Maintenance**：更新时机和维护责任；
+- **Related Docs**：Architecture、ADR、Skill、Workflow 和飞书逻辑路径。
+
+机器生成、第三方镜像或固定格式目录若不适合 README，父目录 README 必须记录例外和原因。
+
+## 3. README 与 AGENTS 的区别
+
+- README 解释目录和资产；
+- `AGENTS.md` 约束 Agent 如何修改；
+- 不是每个目录都需要 `AGENTS.md`；
+- 只有特殊执行、验证、Provider 或安全规则才增加目录级 `AGENTS.md`；
+- 下层 `AGENTS.md` 不得复制或推翻上层规则。
+
+## 4. 关键代码模块 README
+
+关键模块至少说明：
+
+- Purpose；
+- Why；
+- Boundary；
+- Interfaces；
+- Dependencies；
+- Data and State；
+- Usage；
+- Configuration；
+- Error Handling；
+- Tests；
+- Observability；
+- Related Docs。
+
+README 中的命令必须能在注明的工作目录运行；计划能力不得写成已实现接口。
+
+## 5. 正式知识资产
+
+根据类型选择适用章节：
+
+- What；
+- Why；
+- Problem；
+- Context；
+- Decision；
+- Alternatives；
+- How；
+- Implementation；
+- Result；
+- Lessons；
+- Next；
+- Relations / Related Assets；
+- Change History。
+
+不得为补齐模板编造事实。没有结果时标记 Proposed、Draft 或 Not Verified。
+
+## 6. Research、Experiment 与 ADR
+
+### Research
+
+回答：
+
+- 查到了什么；
+- 来源是什么；
+- 有哪些候选方案；
+- 结论的可信度和限制。
+
+### Experiment
+
+回答：
+
+- 验证什么假设；
+- 环境和方法是什么；
+- 实际观察和证据是什么；
+- 结果、限制和可复现资产是什么。
+
+### ADR
+
+回答：
+
+- 为什么需要决定；
+- 比较了哪些方案；
+- 最终选择什么；
+- 权衡、后果和实施影响是什么。
+
+Research 不能冒充 Experiment；Experiment 观察不能自动成为 Accepted ADR。ADR 接受需要 Project Owner 确认。
+
+## 7. Asset ID
+
+正式、长期、需要关联或投影的资产使用稳定 ID，例如：
+
+- `CTX`：Context；
+- `ARC`：Architecture；
+- `DOM`：Domain；
+- `ADR`：Decision；
+- `RSH`：Research；
+- `EXP`：Experiment；
+- `SKL`：Skill；
+- `WFL`：Workflow；
+- `ENG`：Engineering。
+
+规则：
+
+- 分配前查询 Asset Index；
+- 不复用已占用编号；
+- 移动或重命名原则上保持 ID；
+- 拆分或合并时记录 derived / supersedes 关系；
+- 资产正文、文件名、Index 和 Feishu Mapping 保持一致。
+
+## 8. 文件命名
+
+- 使用稳定、可读、与 Asset ID 对齐的名称；
+- 避免 `final-final`、无日期临时名和模糊缩写；
+- 日期型实验或记录使用 `YYYY-MM-DD`；
+- 文件名变化不能替代正式状态变化；
+- 不为了目录整齐删除历史决策。
+
+## 9. 状态与证据
+
+常用状态：
+
+- `draft`
+- `proposed`
+- `accepted`
+- `implemented`
+- `validated`
+- `superseded`
+- `archived`
+
+证据等级：
+
+- `hypothesis`
+- `observed`
+- `verified`
+- `decided`
+
+状态必须与正文和实际验证一致。`implemented` 不等于 `validated`，`observed` 不等于 `decided`。
+
+## 10. Change History 与关系
+
+重要资产记录：
+
+- 创建和重要变更日期；
+- 决策或状态变化；
+- 替代与被替代资产；
+- 相关代码、测试、实验和 ADR；
+- 飞书投影状态。
+
+关系使用明确语义：`implements`、`depends_on`、`decided_by`、`validated_by`、`derived_from`、`supersedes`、`published_as` 或 `related_to`。
+
+## 11. 归档与 Superseded
+
+- 被替代内容保留历史；
+- ADR 使用 Superseded 和 Superseded By；
+- 归档前更新索引、关系和引用；
+- 不自动删除正式资产；
+- 迁移期重复内容先盘点，再由明确方案处理；
+- Archived 内容不能继续作为当前执行依据。
+
+## 12. 链接和索引检查
+
+文档变更后按范围检查：
+
+- Markdown 链接目标存在；
+- 相对路径基于当前文件位置正确；
+- 代码块闭合；
+- 标题层级合理；
+- Asset ID 无重复；
+- Asset Index、Relation Index 和 Feishu Mapping 一致；
+- 重命名未留下失效链接；
+- Current State 和 Current Task 未引用过时事实；
+- 不包含凭据、隐私或未授权内容。
+
+如果仓库已有链接检查工具，优先使用；不得为单次文档任务擅自引入新依赖。

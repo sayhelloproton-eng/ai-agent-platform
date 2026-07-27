@@ -2,7 +2,9 @@
 
 ## 定位
 
-Feishu Provider 实现 Knowledge Provider Port；底层复用官方 `lark-cli` / OpenAPI。它提供资源解析和 I/O，不做语义决策。
+Feishu Provider 实现外部证据读取与 Knowledge Projection 发布 Port；底层复用官方 `lark-cli` / OpenAPI。它提供资源解析和 I/O，不做语义决策，也不是 Canonical Source。
+
+项目内容发布时，它只接受来自 `docs/knowledge/` 的已审查 Git 内容。读取 Feishu 得到的内容只能作为外部证据或 Git Change Proposal 输入，不能覆盖 Git。
 
 ## 经过真实验证的能力
 
@@ -25,7 +27,9 @@ lark-cli docs +fetch --doc '<url-or-token>' --doc-format markdown --detail simpl
 
 只读脚本见 `scripts/lark_read.mjs`。
 
-## 写入命令
+## Projection 发布命令
+
+以下命令只能在 Projection Plan 已确认、来源文件位于 `docs/knowledge/` 时使用。
 
 创建：
 
@@ -40,6 +44,8 @@ lark-cli docs +update --doc '<url-or-token>' --command overwrite --content '@rel
 ```
 
 实际参数以本机 `lark-cli docs +create/+update --help` 和官方 `lark-doc` Skill 为准；脚本执行前会保留 dry-run 和人工确认。
+
+Git 变更确认不自动授权这些发布命令。禁止将 `context/`、`docs/technical/`、`docs/learning/`、`docs/adr/` 或 `skills/` 作为项目知识发布源。
 
 ## 类型路由
 
@@ -62,8 +68,11 @@ Wiki domain 没有独立 `wiki.search`。资源发现优先：
 2. `docs +search` / `drive +search`。
 3. 精确目录遍历。
 
+搜索结果不因来自 Feishu 而自动成为正式事实。项目回答优先使用 Git；外部结果必须保留来源并标记证据状态。
+
 ## 身份
 
 - 项目个人文档默认 user identity。
 - 服务端/多用户场景未来可用 bot，但权限和审计要独立设计。
 - 不把 token 写入仓库或 Wiki。
+- 不从 Feishu 自动反写 Git，不执行双向同步或 Drift 自动合并。

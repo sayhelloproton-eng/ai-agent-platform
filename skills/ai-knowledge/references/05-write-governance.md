@@ -1,55 +1,54 @@
-# 写入治理与项目状态同步
+# Write Governance
 
-## 内容责任
+## Authority
 
-正式内容由拥有完整项目上下文的 Agent 生成或审核；Codex 只根据明确草稿执行。缺失事实时，保留 `待确认`，不得补写合理但未经证实的结论。
+Git Repository 是唯一真源。正式项目内容先形成 Git Draft，经 Review 后进入正确 Layer。
 
-## 写入级别
+Feishu 是 Human Readable Knowledge Projection。它不能成为独立规范源，不能自动反写或覆盖 Git，也不能与 Git 双向同步。
 
-- G0：本地生成草稿、索引、预览。自动允许。
-- G1：读取飞书、回读验收。自动允许。
-- G2：创建新知识文档、更新指定状态文档。需要一次明确确认。
-- G3：覆盖大段既有正文、批量更新。需要变更摘要和二次确认。
-- G4：删除、移动、权限、成员、互联网公开。Skill 不执行。
+## Before Git Write
 
-## Project Status 规则
+1. 读取 Git 来源和当前 Context。
+2. 确定目标 Layer 与目标路径。
+3. 生成 Change Plan、完整 Draft 或 Diff。
+4. 检查 Asset ID、关系、敏感信息和范围。
+5. 获得 Git 变更所需确认。
 
-### 规范源
+## After Git Write
 
-创建独立 `Project_Status（项目状态）` 文档，位于 `00_Context`。首页只展示摘要并链接该文档。
+1. 验证 Git 文件、路径、链接、状态和关系。
+2. 更新适用的 Git Index。
+3. 只有目标位于 `docs/knowledge/` 且任务需要发布时，生成独立 Projection Plan。
+4. 获得独立发布确认后才可 Publish。
+5. Publish 后回读；失败标记 Projection Pending，不回滚或覆盖 Git。
 
-### 何时更新
+## Levels
 
-- Phase 或 objective 改变。
-- 一个任务达到验收标准。
-- 阻塞出现/解除。
-- 下一步优先级被用户确认。
+- G0：只读查询、本地 Draft、Index、Change Plan 和 Preview。
+- G1：经授权更新指定 Git 文件并验证。
+- P0：为 `docs/knowledge/` 生成 Projection Preview，不执行发布。
+- P1：发布指定 Feishu Projection，需要独立明确确认和回读。
+- P2：批量或大段覆盖，需要变更摘要和二次确认。
+- X：删除、移动、权限、成员、互联网公开；Skill 不执行。
 
-普通聊天、尝试命令、生成草稿不更新。
+## Layer Write Rules
 
-### 更新流程
+- `context/`：只保存动态 Agent Context；禁止发布。
+- `docs/knowledge/`：保存人类可读知识；唯一可发布 Layer。
+- `docs/technical/`：保存工程内容；默认禁止发布。
+- `docs/learning/`：保存学习内容；禁止发布。
+- `docs/adr/`：保存决策原文；禁止作为知识库正文发布。
 
-1. 读取当前 Project Status 和 revision。
-2. 收集 Task Result / 报告 / 用户决定。
-3. 生成新状态全文和差异摘要。
-4. 校验 completed 项均有 evidence。
-5. 用户确认。
-6. 使用 overwrite 或精准替换更新状态文档。
-7. 回读验收。
-8. 可选：将简短快照同步到首页；失败不影响状态真源。
-9. 更新 Knowledge Index。
+## Current State Update
 
-## ADR
+1. 读取 Git `context/current-status.md` 和已验收证据。
+2. 生成完整 Context Draft 与 Diff。
+3. Project Owner Review 后更新 Git。
+4. 验证状态与证据。
+5. 不从 Feishu 状态页反向更新 Context。
 
-只有形成真实取舍且状态明确时创建：Proposed、Accepted、Superseded、Rejected。设计建议不等于 Accepted。
+## ADR and Experiment
 
-## 实验
+只有真实取舍并经确认才能 Accepted。ADR 写入 `docs/adr/`，不作为知识库正文。
 
-实验文档必须区分：目标、环境、步骤、观察、结论、限制、后续。失败实验同样保存，但不能写成能力已支持。
-
-## 幂等
-
-- title + parent token + knowledge event id 作为幂等线索。
-- 创建前列出目标父节点子节点并精确查重。
-- 更新前检查 revision/更新时间。
-- 写入后回读，不因 `_notice` 字段误判失败而重复创建。
+Experiment 必须包含环境、步骤、观察、结果和限制；面向人类发布的实验总结可进入 `docs/knowledge/实验与复盘/`。

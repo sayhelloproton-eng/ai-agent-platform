@@ -1,7 +1,20 @@
-version: 1
+version: 3
 project: ai-agent-platform
 
-canonical_source: git
+source_of_truth:
+  type: git
+
+knowledge_source:
+  path: docs/knowledge/
+
+projection:
+  target: feishu
+  mode: overwrite
+  direction: one_way
+  structure: one_to_one
+  require_write_preview: true
+  require_human_confirmation: true
+  require_read_back_verification: true
 
 governance:
   asset_id_required: true
@@ -15,25 +28,40 @@ retrieval:
   default_full_documents_limit: 3
   allow_implicit_full_repository_scan: false
   allow_implicit_full_feishu_scan: false
+  private_context_requires_task_need: true
 
 paths:
   docs_root: docs
-  asset_index: docs/_index/assets.yaml
-  relation_index: docs/_index/relations.yaml
-  feishu_map: docs/_index/feishu-map.yaml
-  migration_inventory: docs/_index/migration-inventory.yaml
-  templates: docs/_templates
-  archive: docs/_archive
-
-feishu:
-  role: projection_and_native
-  space_id: "<FEISHU_SPACE_ID>"
-  conflict_policy: git_wins_for_projection
-  native_root: 90_Feishu_Native
-  archive_root: 99_Archive
-  allow_reverse_sync: false
-  require_write_preview: true
-  require_human_confirmation: true
+  context_root: context
+  knowledge_root: docs/knowledge
+  technical_root: docs/technical
+  learning_root: docs/learning
+  adr_root: docs/adr
+  project_context: context/project-context.md
+  current_state: context/current-status.md
+  current_task: null
+  project_outline: docs/knowledge/项目与产品/CTX-003-project-outline.md
+  roadmap: context/roadmap.md
+  platform_vision: docs/knowledge/项目与产品/PRD-001-platform-vision.md
+  target_architecture: docs/knowledge/架构与领域/平台架构/ARC-001-platform-target-architecture.md
+  delivery_architecture: docs/knowledge/架构与领域/平台架构/ARC-003-six-month-delivery-architecture.md
+  domain_model: docs/knowledge/架构与领域/领域模型/DOM-001-core-domain-model.md
+  skill_design: docs/knowledge/Agent与能力/Skill设计/SKL-001-ai-knowledge.md
+  workflows: docs/knowledge/工作流
+  knowledge_system: docs/knowledge/架构与领域/知识架构
+  runtime_architecture: docs/technical/架构实现
+  solutions: docs/technical/技术方案
+  research: docs/technical/技术调研
+  experiments: docs/knowledge/实验与复盘
+  adr: docs/adr
+  engineering: docs/technical/工程规范
+  operations: docs/technical/运维与迁移
+  portfolio: docs/knowledge/Portfolio
+  asset_index: docs/technical/元数据/assets.yaml
+  relation_index: docs/technical/元数据/relations.yaml
+  migration_inventory: docs/technical/元数据/migration-inventory.yaml
+  templates: docs/technical/工程规范/模板
+  archive: docs/technical/Archive
 
 runtime_evidence:
   store_full_agent_logs_in_docs: false
@@ -46,3 +74,4 @@ security:
   auto_permission_change: false
   auto_public_share: false
   auto_force_push: false
+  private_context_is_secret_vault: false

@@ -1,96 +1,67 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "3.0",
   "project": {
     "id": "ai-agent-platform",
     "display_name": "智能体工程探索",
-    "knowledge_role": "public learning knowledge base + Agent long-term context provider"
+    "canonical_source": "git"
   },
-  "feishu": {
-    "space_id": "<FEISHU_SPACE_ID>",
-    "space_display_name": "智能体工程探索",
-    "homepage": {
-      "title": "智能体工程探索录",
-      "doc_token": "<FEISHU_HOME_DOCX_TOKEN>",
-      "wiki_node_token": "<FEISHU_HOME_WIKI_TOKEN>"
+  "canonical_entries": {
+    "context_root": "context/",
+    "project_context": "context/project-context.md",
+    "architecture_context": "context/architecture-context.md",
+    "current_status": "context/current-status.md",
+    "current_task_source": "context/current-status.md",
+    "roadmap": "context/roadmap.md",
+    "knowledge_strategy": "context/knowledge-strategy.md",
+    "knowledge_root": "docs/knowledge/",
+    "technical_root": "docs/technical/",
+    "learning_root": "docs/learning/",
+    "decision_root": "docs/adr/",
+    "asset_index": "docs/technical/元数据/assets.yaml",
+    "relation_index": "docs/technical/元数据/relations.yaml"
+  },
+  "layers": {
+    "context": {
+      "root": "context/",
+      "role": "agent_runtime_context",
+      "dynamic": true,
+      "projection_eligible": false
     },
-    "root_nodes": {
-      "00_Context": {
-        "token": "<FEISHU_NODE_00_CONTEXT>",
-        "label": "项目上下文"
-      },
-      "01_Product": {
-        "token": "<FEISHU_NODE_01_PRODUCT>",
-        "label": "产品与业务目标"
-      },
-      "02_Architecture": {
-        "token": "<FEISHU_NODE_02_ARCHITECTURE>",
-        "label": "系统架构"
-      },
-      "03_Domain_Model": {
-        "token": "<FEISHU_NODE_03_DOMAIN_MODEL>",
-        "label": "领域模型"
-      },
-      "04_Agent_System": {
-        "token": "<FEISHU_NODE_04_AGENT_SYSTEM>",
-        "label": "Agent系统"
-      },
-      "05_Workflow": {
-        "token": "<FEISHU_NODE_05_WORKFLOW>",
-        "label": "工作流设计"
-      },
-      "06_Knowledge_System": {
-        "token": "<FEISHU_NODE_06_KNOWLEDGE_SYSTEM>",
-        "label": "知识系统"
-      },
-      "07_Model_Runtime": {
-        "token": "<FEISHU_NODE_07_MODEL_RUNTIME>",
-        "label": "模型与运行环境"
-      },
-      "08_Tool_Integration": {
-        "token": "<FEISHU_NODE_08_TOOL_INTEGRATION>",
-        "label": "工具与外部能力"
-      },
-      "09_Engineering": {
-        "token": "<FEISHU_NODE_09_ENGINEERING>",
-        "label": "工程实现"
-      },
-      "10_Research_Experiment": {
-        "token": "<FEISHU_NODE_10_RESEARCH_EXPERIMENT>",
-        "label": "研究与实验"
-      },
-      "11_ADR": {
-        "token": "<FEISHU_NODE_11_ADR>",
-        "label": "架构决策"
-      },
-      "12_Learning_Path": {
-        "token": "<FEISHU_NODE_12_LEARNING_PATH>",
-        "label": "学习路线"
-      },
-      "13_Portfolio": {
-        "token": "<FEISHU_NODE_13_PORTFOLIO>",
-        "label": "成果展示"
-      },
-      "14_Agent_Log": {
-        "token": "<FEISHU_NODE_14_AGENT_LOG>",
-        "label": "Agent运行记录"
-      }
+    "knowledge": {
+      "root": "docs/knowledge/",
+      "role": "human_knowledge",
+      "dynamic": false,
+      "projection_eligible": true
     },
-    "dynamic_documents": {
-      "project_status": {
-        "title": "Project_Status（项目状态）",
-        "parent_node_token": "<FEISHU_NODE_00_CONTEXT>",
-        "doc_token": null,
-        "wiki_node_token": null,
-        "canonical": true
-      },
-      "knowledge_index": {
-        "title": "Knowledge_Index（知识索引）",
-        "parent_node_token": "<FEISHU_NODE_00_CONTEXT>",
-        "doc_token": null,
-        "wiki_node_token": null,
-        "canonical": false
-      }
+    "technical": {
+      "root": "docs/technical/",
+      "role": "engineering_documentation",
+      "dynamic": false,
+      "projection_eligible": false
+    },
+    "learning": {
+      "root": "docs/learning/",
+      "role": "learning_assets",
+      "dynamic": false,
+      "projection_eligible": false
+    },
+    "decision": {
+      "root": "docs/adr/",
+      "role": "architecture_decisions",
+      "dynamic": false,
+      "projection_eligible": false
     }
+  },
+  "projection": {
+    "source_root": "docs/knowledge/",
+    "target_provider": "feishu",
+    "target_role": "human_readable_projection",
+    "direction": "git_to_feishu",
+    "mode": "overwrite",
+    "structure": "one_to_one",
+    "publish_requires_reviewed_git": true,
+    "publish_requires_confirmation": true,
+    "reverse_write_allowed": false
   },
   "policies": {
     "default_identity": "user",
@@ -98,12 +69,15 @@
     "max_full_documents": 3,
     "max_candidates": 8,
     "write_default": "dry-run",
+    "git_review_required": true,
     "forbidden_automatic_operations": [
       "delete",
       "move",
       "permission_change",
       "member_change",
-      "internet_publish"
+      "internet_publish",
+      "force_push",
+      "feishu_to_git_write"
     ]
   }
 }

@@ -32,6 +32,8 @@ lark-cli docs +fetch --doc '<url-or-token>' --doc-format markdown --detail simpl
 
 ## 创建与更新（先 dry-run）
 
+以下命令只用于经过独立确认的 Projection Publish，项目内容来源必须位于 `docs/knowledge/`。Git 写入确认不授权 Feishu 发布。
+
 ```bash
 lark-cli docs +create --content '@relative-file' --parent-token '<parent-token>' --as user --format json --dry-run
 lark-cli docs +update --doc '<doc-url-or-token>' --command overwrite --content '@relative-file' --as user --format json --dry-run

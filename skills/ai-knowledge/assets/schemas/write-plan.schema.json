@@ -1,78 +1,220 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "WritePlan",
-  "type": "object",
-  "required": [
-    "operation",
-    "target",
-    "risk",
-    "preview_file",
-    "acceptance"
-  ],
-  "properties": {
-    "operation": {
-      "enum": [
-        "create",
-        "append",
-        "overwrite",
-        "str_replace"
-      ]
+  "description": "A plan for exactly one Git Update or one Projection Publish operation.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/gitUpdatePlan"
     },
-    "target": {
+    {
+      "$ref": "#/$defs/projectionPublishPlan"
+    }
+  ],
+  "$defs": {
+    "commonProperties": {
+      "plan_id": {
+        "type": "string",
+        "minLength": 1
+      },
+      "risk": {
+        "enum": [
+          "G1",
+          "P0",
+          "P1",
+          "P2"
+        ]
+      },
+      "preview_file": {
+        "type": "string"
+      },
+      "acceptance": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "string"
+        }
+      },
+      "rollback": {
+        "type": "string"
+      },
+      "confirmed": {
+        "type": "boolean"
+      }
+    },
+    "gitUpdatePlan": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
-        "provider"
+        "plan_id",
+        "plan_type",
+        "operation",
+        "target",
+        "risk",
+        "preview_file",
+        "acceptance",
+        "confirmed"
       ],
       "properties": {
-        "provider": {
-          "const": "feishu"
+        "plan_id": {
+          "$ref": "#/$defs/commonProperties/plan_id"
         },
-        "space_id": {
-          "type": "string"
+        "plan_type": {
+          "const": "git_update"
         },
-        "parent_node_token": {
-          "type": "string"
+        "operation": {
+          "enum": [
+            "create",
+            "update"
+          ]
         },
-        "doc_token": {
-          "type": "string"
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "repository",
+            "layer",
+            "path"
+          ],
+          "properties": {
+            "repository": {
+              "const": "git"
+            },
+            "layer": {
+              "enum": [
+                "context",
+                "knowledge",
+                "technical",
+                "learning",
+                "decision"
+              ]
+            },
+            "path": {
+              "type": "string",
+              "pattern": "^(context|docs/knowledge|docs/technical|docs/learning|docs/adr)/"
+            }
+          }
         },
-        "title": {
-          "type": "string"
+        "risk": {
+          "const": "G1"
+        },
+        "preview_file": {
+          "$ref": "#/$defs/commonProperties/preview_file"
+        },
+        "acceptance": {
+          "$ref": "#/$defs/commonProperties/acceptance"
+        },
+        "rollback": {
+          "$ref": "#/$defs/commonProperties/rollback"
+        },
+        "confirmed": {
+          "$ref": "#/$defs/commonProperties/confirmed"
         }
       }
     },
-    "risk": {
-      "enum": [
-        "G2",
-        "G3",
-        "G4"
-      ]
-    },
-    "idempotency_key": {
-      "type": "string"
-    },
-    "expected_revision": {
-      "type": [
-        "string",
-        "integer",
-        "null"
-      ]
-    },
-    "preview_file": {
-      "type": "string"
-    },
-    "acceptance": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "string"
+    "projectionPublishPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "plan_id",
+        "plan_type",
+        "operation",
+        "source",
+        "target",
+        "risk",
+        "preview_file",
+        "acceptance",
+        "confirmed"
+      ],
+      "properties": {
+        "plan_id": {
+          "$ref": "#/$defs/commonProperties/plan_id"
+        },
+        "plan_type": {
+          "const": "projection_publish"
+        },
+        "operation": {
+          "const": "publish_projection"
+        },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "repository",
+            "layer",
+            "path",
+            "revision"
+          ],
+          "properties": {
+            "repository": {
+              "const": "git"
+            },
+            "layer": {
+              "const": "knowledge"
+            },
+            "path": {
+              "type": "string",
+              "pattern": "^docs/knowledge/"
+            },
+            "revision": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "provider"
+          ],
+          "properties": {
+            "provider": {
+              "const": "feishu"
+            },
+            "space_id": {
+              "type": "string"
+            },
+            "parent_node_token": {
+              "type": "string"
+            },
+            "doc_token": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            }
+          }
+        },
+        "risk": {
+          "enum": [
+            "P0",
+            "P1",
+            "P2"
+          ]
+        },
+        "idempotency_key": {
+          "type": "string"
+        },
+        "expected_revision": {
+          "type": [
+            "string",
+            "integer",
+            "null"
+          ]
+        },
+        "preview_file": {
+          "$ref": "#/$defs/commonProperties/preview_file"
+        },
+        "acceptance": {
+          "$ref": "#/$defs/commonProperties/acceptance"
+        },
+        "rollback": {
+          "$ref": "#/$defs/commonProperties/rollback"
+        },
+        "confirmed": {
+          "$ref": "#/$defs/commonProperties/confirmed"
+        }
       }
-    },
-    "rollback": {
-      "type": "string"
-    },
-    "confirmed": {
-      "type": "boolean"
     }
   }
 }

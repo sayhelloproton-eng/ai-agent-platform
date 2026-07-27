@@ -1,70 +1,50 @@
-# Knowledge Assets
+# Documentation
 
-`docs/` 保存 `ai-agent-platform` 的正式知识资产、索引、模板和迁移期历史材料。Git 是项目正式事实的唯一真源。
+`docs/` 保存 `ai-agent-platform` 的长期文档资产。Git Repository 是唯一真源；本目录按受众和职责分为 Knowledge、Technical、Learning 与 ADR 四类。
 
-## 资产类型与目录
-
-| 目录 | 资产 |
-|---|---|
-| `00-context/` | 项目背景、当前状态、Roadmap |
-| `01-product/` | 产品愿景、目标和非目标 |
-| `02-architecture/` | 总体架构、视图与图源 |
-| `03-domain/` | DDD 领域模型 |
-| `04-agent-system/` | Agent 与 Skill 设计 |
-| `05-workflows/` | Workflow 设计 |
-| `06-knowledge-system/` | Knowledge Layer 与知识治理 |
-| `07-research/` | 证据化调研 |
-| `08-experiments/` | 可复现实验结论 |
-| `09-adr/` | 正式架构决策 |
-| `10-engineering/` | 工程规范 |
-| `11-operations/` | 运行、事故与复盘 |
-| `12-portfolio/` | 成果展示 |
-| `_index/` | Agent 检索入口与映射 |
-| `_templates/` | 正式资产模板 |
-| `_archive/` | 已废弃但需保留的历史 |
-
-迁移期间，既有 `docs/context/` 和根层文档继续保留；迁移必须经过资产盘点，不做批量移动或删除。
-
-## 生命周期
+## Structure
 
 ```text
-Capture → Classify → Draft → Review → Accepted → Implemented
-        → Validated → Published → Superseded / Archived
+docs/
+├── README.md
+├── AGENTS.md
+├── knowledge/
+├── technical/
+├── learning/
+└── adr/
 ```
 
-资产状态：
+## Boundaries
 
-- `draft`
-- `proposed`
-- `accepted`
-- `implemented`
-- `validated`
-- `superseded`
-- `archived`
+| 目录 | 受众与职责 | Feishu Projection |
+|---|---|---|
+| [`knowledge/`](./knowledge) | 面向人阅读的项目、架构、Agent、Workflow、实验和 Portfolio 知识 | 唯一允许的发布源 |
+| [`technical/`](./technical) | 工程实现、技术方案、调研、规范、运维、治理和机器元数据 | 禁止 |
+| [`learning/`](./learning) | 学习路线、笔记、资料与学习模板 | 禁止 |
+| [`adr/`](./adr) | 架构决策、备选方案、权衡和后果 | 禁止 |
 
-证据等级：
+Agent 的启动与执行上下文位于根 [`context/`](../context)，不属于 `docs/`，也不参与 Feishu Projection。可执行 Agent 能力位于根 [`skills/`](../skills)。
 
-- `hypothesis`
-- `observed`
-- `verified`
-- `decided`
+## Source of Truth
 
-## 创建正式资产
+- Git 是正式项目事实的唯一真源。
+- 只允许 `docs/knowledge/ → Feishu`。
+- 禁止 `context/ → Feishu`。
+- 禁止 Feishu 自动反写 Git。
+- 禁止双向同步。
+- 本次目录迁移不代表已经实现任何发布或同步能力。
 
-1. 从 `docs/_templates/` 选择模板。
-2. 分配稳定 `asset_id`。
-3. 填写状态、证据等级、Canonical Path 和关系。
-4. 更新 `docs/_index/assets.yaml`。
-5. 更新 `docs/_index/relations.yaml`。
-6. 完成人工 Review 后再接受决策或合并正式结论。
-7. 如需飞书阅读版，根据 `docs/_index/feishu-map.yaml` 生成投影并回读验收。
+## Usage
 
-## 飞书规则
+1. Agent 启动先读取根 `README.md`、`AGENTS.md` 和 `context/`。
+2. 面向人类发布的知识只从 `knowledge/` 选择。
+3. 工程执行按任务读取 `technical/` 中的最小相关资料。
+4. 学习资料与正式技术结论分开维护。
+5. 架构决定必须进入 `adr/`，并保留状态和历史关系。
 
-- `mirror`：一个 Git 文档对应一个飞书文档。
-- `projection`：飞书页面由多个 Git 资产汇总。
-- `index`：飞书仅显示目录、摘要和链接。
-- `native`：仅在飞书维护，且不是正式项目事实。
-- `capture`：临时捕获，后续晋升、转 Native 或归档。
+## Maintenance
 
-Git 与飞书投影冲突时，以 Git 为准；有价值的飞书修改应转换为 Git Change Proposal，而不是自动反写。
+- 修改 `docs/**` 前读取 [`AGENTS.md`](./AGENTS.md)。
+- 移动正式资产时保留 Asset ID，并同步 Canonical Path、索引、关系和内部链接。
+- 不把 Technical、Learning、ADR 或 Context 内容加入 Knowledge 发布输入。
+- 不自动删除历史资产；废弃材料进入 `technical/Archive/`。

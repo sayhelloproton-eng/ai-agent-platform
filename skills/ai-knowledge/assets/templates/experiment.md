@@ -1,3 +1,9 @@
+---
+asset_id: {{asset_id}}
+asset_layer: knowledge
+canonical_root: docs/knowledge/实验与复盘/
+projection_eligible: true
+---
 # {{title}}
 
 - 日期：{{date}}

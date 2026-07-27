@@ -1,3 +1,9 @@
+---
+asset_id: {{asset_id}}
+asset_layer: decision
+canonical_root: docs/adr/
+projection_eligible: false
+---
 # ADR-{{number}}：{{title}}
 
 - 状态：{{status}}

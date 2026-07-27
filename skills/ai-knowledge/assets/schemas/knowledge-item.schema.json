@@ -1,100 +1,115 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "KnowledgeItem",
+  "description": "A canonical human-readable Knowledge asset stored under docs/knowledge/.",
   "type": "object",
+  "additionalProperties": false,
   "required": [
-    "id",
+    "asset_id",
     "title",
-    "type",
-    "project",
-    "status",
-    "source"
+    "category",
+    "source_path",
+    "content",
+    "metadata"
   ],
   "properties": {
-    "id": {
-      "type": "string"
+    "asset_id": {
+      "type": "string",
+      "minLength": 1
     },
     "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "category": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_path": {
+      "type": "string",
+      "pattern": "^docs/knowledge/"
+    },
+    "content": {
       "type": "string"
     },
-    "type": {
-      "type": "string"
-    },
-    "project": {
-      "type": "string"
-    },
-    "domain": {
-      "type": "string"
-    },
-    "status": {
-      "enum": [
-        "draft",
-        "reviewed",
-        "accepted",
-        "deprecated",
-        "archived"
-      ]
-    },
-    "summary": {
-      "type": "string"
-    },
-    "keywords": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "relations": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "source": {
+    "metadata": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
-        "provider"
+        "status"
       ],
       "properties": {
-        "provider": {
+        "status": {
           "enum": [
-            "feishu",
-            "git",
-            "local",
-            "web"
+            "draft",
+            "reviewed",
+            "accepted",
+            "deprecated",
+            "archived"
           ]
         },
-        "url": {
+        "summary": {
           "type": "string"
         },
-        "token": {
-          "type": "string"
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "relations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "visibility": {
+          "enum": [
+            "public",
+            "internal",
+            "private"
+          ]
+        },
+        "sensitivity": {
+          "enum": [
+            "none",
+            "low",
+            "high"
+          ]
         },
         "updated_at": {
-          "type": "string"
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
-    "confidence": {
-      "enum": [
-        "confirmed",
-        "inferred",
-        "unknown"
-      ]
-    },
-    "visibility": {
-      "enum": [
-        "public",
-        "internal",
-        "private"
-      ]
-    },
-    "sensitivity": {
-      "enum": [
-        "none",
-        "low",
-        "high"
-      ]
+    "projection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "status"
+      ],
+      "properties": {
+        "target": {
+          "const": "feishu"
+        },
+        "status": {
+          "enum": [
+            "not_published",
+            "pending",
+            "published",
+            "failed"
+          ]
+        },
+        "source_revision": {
+          "type": "string"
+        },
+        "published_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
     }
   }
 }

@@ -1,58 +1,90 @@
-# ai-agent-platform
+# AI Agent Platform
 
-`ai-agent-platform` 是一个围绕 AI Agent、Workflow、Knowledge System、Tool / Skill 和长期上下文管理展开的工程实践项目。
+`ai-agent-platform` 是面向个人学习、工程实践和求职 Portfolio 的长期 AI Agent 工程平台。本文件是仓库的 **Project Context Root**：新的 Codex / Agent 会话应从这里开始，并继续读取根 [`AGENTS.md`](AGENTS.md) 与 [`context/`](context/)。
 
-## 当前阶段
+## Project Vision
 
-当前正在建设 Knowledge System Foundation，目标是建立 ChatGPT、飞书与 Git/GitHub 之间可恢复、可追溯的上下文与工程资产闭环。
+构建一个可持续演进的 AI Agent 工程平台，让人、ChatGPT、Codex、模型、工具、知识与基础设施能够通过清晰边界协作，并把过程沉淀为可运行、可解释、可验证的工程成果。
 
-## 知识资产模型
+平台长期保留模型、工具、设备与 Provider 可替换的能力，但不会在当前阶段一次性实现所有模块。
 
-- Git/GitHub 是项目正式事实的唯一真源，保存代码、Skill、Schema、脚本、测试、架构、ADR、状态和正式知识。
-- 飞书是 Git 知识资产的阅读投影、协作空间和补充知识层。
-- Feishu Native 内容不是项目正式事实；影响项目的结论必须通过 Review 晋升到 Git。
-- ChatGPT Project 是需求讨论、分析和方案推演入口。
-- 飞书投影通过 Asset ID、Git Path、Commit、Hash 和 Node Token 关联，不做无治理的双向同步。
+## Project Goal
 
-该决策由 [ADR-002](docs/09-adr/ADR-002-git-single-source-feishu-projection.md) 记录，并替代早期的双源事实模型。
+当前目标是建立 **Knowledge Layer / Context Foundation**：
 
-## 目录
+- 让新会话只读取 Git 仓库即可理解项目；
+- 固化项目愿景、架构方向、当前状态、路线图和知识策略；
+- 为后续 AI Knowledge Skill 与工程工作流提供稳定上下文；
+- 明确 Agent 的工作范围、验证责任与安全边界。
 
-- `skills/ai-knowledge/`：AI Knowledge Skill v1.0.0 源包。
-- `docs/`：项目设计、飞书验证结果与工程上下文。
-- `docs/_index/`：Agent 的资产、关系和飞书映射检索入口。
-- `docs/_templates/`：正式知识资产模板。
-- `docs/context/`：新设备或新 Agent 的恢复入口。
-- `docs/research/`：调研报告、元数据和实验资产。
+## Architecture Overview
 
-## 本地运行
+长期架构方向：
 
-当前仓库尚未实现可运行的平台服务。现阶段可验证资产主要是架构文档、AI Knowledge Skill 和飞书 CLI 调研成果。
-
-AI Knowledge Skill 自检：
-
-```bash
-cd skills/ai-knowledge
-node scripts/validate_bundle.mjs
-node tests/self-test.mjs
+```text
+User
+  ↓
+ChatGPT Interface
+  ↓
+Agent Brain
+  ↓
+Agent Runtime
+  ↓
+Tool Layer
+  ↓
+Knowledge Layer
+  ↓
+Infrastructure
 ```
 
-## 远程知识入口
+这是演进方向，不代表所有层已经实现。当前只建设 Context Foundation，不实现 Gateway、MCP、Runtime 或业务工作流。详见 [`context/architecture-context.md`](context/architecture-context.md)。
 
-- 飞书知识库：首页《智能体工程探索录》
-- URL：https://<FEISHU_TENANT>.feishu.cn/docx/<FEISHU_HOME_DOCX_TOKEN>
-- Space ID：`<FEISHU_SPACE_ID>`
+## Source Of Truth
 
-## 安全与第三方内容
+**Git Repository is the only source of truth.**
 
-- 不提交 Token、Cookie、密钥、`.env` 或本地认证缓存。
-- `docs/research/waytoagi-feishu-cli-export/pages/` 是第三方公开知识库的本地研究镜像，默认不进入 Git。
-- 删除、权限修改、公开分享、强制推送和历史重写不由自动流程执行。
+项目愿景、状态、架构、规则、知识、代码和已验证结论，只有经过 Review 并进入 Git 后，才是正式项目事实。聊天记录、工具输出或外部知识平台不能替代 Git。
 
-## Next Actions
+## Knowledge Strategy
 
-1. 按 `docs/_index/migration-inventory.yaml` 迁移核心 Context。
-2. 将 Architecture、Research、Experiment 和 Skill 拆分为稳定 Asset ID。
-3. 设计飞书 Git 对齐区与 `90_Feishu_Native` 的迁移预览。
-4. 实现 Git → Feishu 单向投影 MVP。
-5. 实现 `query_context` 只读 MVP。
+知识流向是单向的：
+
+```text
+Git → Feishu
+```
+
+Git 保存正式工程事实；Feishu 只提供便于人阅读的知识投影。禁止 Feishu 自动反写 Git，也禁止双向同步。详见 [`context/knowledge-strategy.md`](context/knowledge-strategy.md)。
+
+## Current Phase
+
+当前阶段：**Knowledge Layer / Context Foundation**。
+
+本阶段只建立项目级 Context 基础，不处理 Feishu 实施、MCP、Gateway、Action、Runtime 或业务代码。当前状态与下一步见 [`context/current-status.md`](context/current-status.md)。
+
+## Development Rules
+
+所有人类协作者、ChatGPT、Codex 和其他 Agent 必须遵守根 [`AGENTS.md`](AGENTS.md)。
+
+核心要求：
+
+- 开始前读取授权范围与最小必要上下文；
+- 修改前锁定允许范围、禁止范围和验收方式；
+- 一次只完成一个任务，不顺手扩大范围；
+- 不把规划描述为已实现，不把未验证结果描述为已完成；
+- 不自动执行删除、权限修改、公开范围变更、Force Push 或历史重写；
+- 修改后提供文件清单、Diff 范围与实际验证证据。
+
+## Context Navigation
+
+新会话按以下顺序恢复上下文：
+
+1. [`README.md`](README.md)：项目入口与当前方向；
+2. [`AGENTS.md`](AGENTS.md)：Agent 工作规则与安全边界；
+3. [`context/README.md`](context/README.md)：Context 目录职责和阅读顺序；
+4. [`context/project-context.md`](context/project-context.md)：项目是什么、为何存在；
+5. [`context/architecture-context.md`](context/architecture-context.md)：长期架构方向与当前边界；
+6. [`context/current-status.md`](context/current-status.md)：当前阶段、完成项和下一步；
+7. [`context/roadmap.md`](context/roadmap.md)：后续阶段；
+8. [`context/knowledge-strategy.md`](context/knowledge-strategy.md)：Git 与 Feishu 的关系。
+
+`docs/` 和 `skills/` 是现有详细资产；本次 Context Foundation 不迁移、不重构它们。需要执行具体任务时，再按 [`AGENTS.md`](AGENTS.md) 读取最小相关资料。

@@ -1,30 +1,19 @@
-# Project Status（项目状态）
+---
+asset_id: CTX-002
+asset_layer: context
+source_mode: git-canonical
+canonical_path: context/current-status.md
+projection_eligible: false
+---
+# Project Status
 
-> 这是动态项目状态的规范源。首页只展示此文档的摘要快照。
+## Phase
+## Objective
+## Completed
+## In Progress
+## Next
+## Blockers
+## Evidence
+## Updated At
 
-## 当前阶段
-
-- Phase：{{phase}}
-- 目标：{{objective}}
-- 更新时间：{{updated_at}}
-- 更新依据：{{evidence_summary}}
-
-## 已完成
-
-{{completed}}
-
-## 进行中
-
-{{in_progress}}
-
-## 下一步
-
-{{next}}
-
-## 阻塞
-
-{{blockers}}
-
-## 证据
-
-{{evidence}}
+> 本资产仅供 Agent Runtime Context 使用，不发布到 Feishu。

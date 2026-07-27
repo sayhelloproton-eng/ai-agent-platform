@@ -2,57 +2,57 @@
 
 ## Knowledge Item
 
-稳定、可复用、可追踪的知识单元。核心字段：
+字段：`id`、`title`、`type`、`status`、`evidence_level`、`canonical_path`、`summary`、`relations`、`source`、`visibility`、`sensitivity`。
 
-- `id`、`title`、`type`
-- `project`、`domain`、`status`
-- `summary`、`keywords`、`relations`
-- `source.provider`、`source.url/token`、`source.updated_at`
-- `evidence`、`confidence`
-- `visibility`、`sensitivity`
+`canonical_path` 必须指向 Git。只有位于 `docs/knowledge/` 的 Item 具有项目 Feishu Projection 资格；资格不等于已发布或已授权。
 
-类型建议：`context`、`product`、`architecture`、`domain-model`、`agent-design`、`workflow`、`experiment`、`adr`、`learning-path`、`portfolio`、`status`。
+## Git Layer
+
+| Layer | Path | Typical Content |
+|---|---|---|
+| Context | `context/` | status、task、constraints、rules |
+| Knowledge | `docs/knowledge/` | human-readable project knowledge |
+| Technical | `docs/technical/` | implementation and engineering docs |
+| Learning | `docs/learning/` | learning assets |
+| Decision | `docs/adr/` | decisions and consequences |
+
+分类发生在 Git 写入前。Provider 类型不能决定 Git Layer。
 
 ## Knowledge Event
 
-触发知识维护的事实事件，而不是任意聊天消息：
-
-- Task 通过验收。
-- 实验得到可复现结论。
-- 架构决策被用户接受或废弃。
-- 项目阶段、阻塞或下一步发生变化。
-- 外部知识源被显式导入。
-
-事件必须带来源和证据；详见 Schema。
+Task 验收、实验结论、决策、状态变化或显式外部导入。事件必须带证据；聊天消息、Feishu 页面和 Provider 输出本身不是正式事件。
 
 ## Context Package
 
-Agent 为当前任务选择的最小知识集合：
+当前任务的最小知识集合：sources、facts、decisions、current_status、constraints、gaps、budget 和 confidence。它是任务输入，不是长期存储格式。
 
-- task / intent
-- selected_sources
-- facts
-- decisions
-- current_status
-- constraints
-- gaps
-- token_budget
-- confidence
+## Project State
 
-它是任务输入，不是长期存储格式。
+规范源是 Git `context/current-status.md`。字段包括 phase、objective、completed、in_progress、next、blockers、evidence 和 updated_at。
 
-## Project Status
+Feishu 状态页只能是面向人的 Projection，不得替代或覆盖 Context。
 
-字段：phase、objective、completed、in_progress、next、blockers、evidence、updated_at、updated_by。完成项必须有 evidence。
+## Change Plan
 
-## Write Plan
+Git 写入前记录目标 Layer、路径、来源、Diff、风险、验收、回滚和范围门禁。
 
-写入前的受控操作计划：目标、风险、命令类别、幂等键、revision 前置条件、预览文件、验收和回滚说明。
+## Projection Plan
 
-## 生命周期
+仅针对 `docs/knowledge/`，记录目标、渲染内容、Git 来源、Commit/Hash、发布模式、revision 前置条件、确认和回读验收。
+
+## Lifecycle
 
 ```text
-Raw Source → Normalize → Classify → Review → Store → Index → Retrieve → Evolve / Archive
+Evidence
+  → Classify Git Layer
+  → Git Draft
+  → Review
+  → Git Merge
+  → Validate / Index
+  → Optional docs/knowledge Projection Plan
+  → Separate Confirmation
+  → Publish
+  → Read-back Verify
 ```
 
-聊天、日志和执行输出默认是 Raw Source；只有经过分类和事实审查才成为 Knowledge Item。
+外部 Feishu 内容进入流程时从 Evidence 开始，不能跳过 Git Draft / Review。

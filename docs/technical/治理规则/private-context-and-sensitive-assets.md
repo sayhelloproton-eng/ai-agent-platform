@@ -1,0 +1,19 @@
+# Private Context and Sensitive Assets
+
+## Scope
+
+定义 Public Git、AI 可读 Private Context 和 Secret 的边界。
+
+## Classification
+
+- **Public Project Asset**：可公开代码、文档、Schema、测试和脱敏证据。
+- **Private Context**：Agent 可按任务读取，但不提交、不投影的背景和原始输入。
+- **Secret**：Token、Cookie、密码、私钥、认证缓存；不得存放在仓库或 `.private-context/`。
+
+## Promotion
+
+Private Context 进入 Public Git 前必须完成最小化、脱敏、来源与知识产权检查、事实确认和人工 Review。不得把私人原文放入日志、Fixture、报告或 Feishu Projection。
+
+## Incident Response
+
+发现敏感内容时先停止发布并报告路径、范围和风险。删除当前树不等于清理历史；历史重写与 Force Push 必须单独授权。

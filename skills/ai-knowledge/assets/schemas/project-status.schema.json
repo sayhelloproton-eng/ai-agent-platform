@@ -3,6 +3,8 @@
   "title": "ProjectStatus",
   "type": "object",
   "required": [
+    "asset_layer",
+    "source_path",
     "project",
     "phase",
     "objective",
@@ -14,6 +16,12 @@
     "updated_at"
   ],
   "properties": {
+    "asset_layer": {
+      "const": "context"
+    },
+    "source_path": {
+      "const": "context/current-status.md"
+    },
     "project": {
       "type": "string"
     },
@@ -70,7 +78,7 @@
         "required": [
           "id",
           "title",
-          "source"
+          "source_path"
         ],
         "properties": {
           "id": {
@@ -79,8 +87,9 @@
           "title": {
             "type": "string"
           },
-          "source": {
-            "type": "string"
+          "source_path": {
+            "type": "string",
+            "pattern": "^(context|docs/knowledge|docs/technical|docs/learning|docs/adr|skills)/"
           }
         }
       }

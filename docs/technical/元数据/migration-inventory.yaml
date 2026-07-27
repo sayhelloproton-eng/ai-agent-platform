@@ -1,0 +1,51 @@
+version: 2
+project: ai-agent-platform
+completed_at: 2026-07-27
+history_rewrite_performed: false
+items:
+  - source: docs/context/**
+    action: delete_after_merge
+    target: docs/00-context/** and docs/12-operations/**
+    status: complete
+    note: stale private-repository and dual-source state removed from active tree; Git history retains originals
+  - source: docs/09-adr/**
+    action: move
+    target: docs/10-adr/**
+    status: complete
+  - source: docs/research/waytoagi-feishu-cli-export/**
+    action: move
+    target: docs/08-research/external/waytoagi-feishu-cli-export/**
+    status: complete
+    note: pages remains local and ignored
+  - source: docs/Feishu_Knowledge_Skill_Architecture_v1.0.md
+    action: split_and_rewrite
+    target: docs/knowledge/Agent与能力/Skill设计/SKL-001-AI知识技能.md; docs/06-knowledge-system/ARC-004-ai-knowledge-runtime-boundaries.md
+    status: complete
+  - source: docs/Feishu_Public_Wiki_Read_Test_Report.md; docs/Feishu_Wiki_Public_Access_Capability_Report.md
+    action: merge_and_split
+    target: docs/08-research/RSH-001-feishu-cli-capabilities.md; docs/knowledge/实验与复盘/EXP-001-公开飞书知识库读取实验.md
+    status: complete
+  - source: docs/research/waytoagi-feishu-cli-export/export-report.md
+    action: summarize
+    target: docs/knowledge/实验与复盘/EXP-002-公开飞书知识库递归导出实验.md
+    status: complete
+  - source: docs/feishu-wiki-init-plan.md
+    action: rewrite
+    target: docs/07-solutions/knowledge-system/SOL-001-feishu-wiki-initialization.md
+    status: complete
+  - source: docs/Feishu_Knowledge_Base_*_Result_v1.0.md
+    action: rewrite
+    target: docs/12-operations/feishu/OPS-001..OPS-003
+    status: complete
+  - source: docs/Feishu_Knowledge_Base_Homepage_v1.0.xml
+    action: move
+    target: docs/12-operations/feishu/snapshots/homepage-v1.0.xml
+    status: complete
+  - source: .private-context/**
+    action: ignore_content_track_readmes
+    target: .private-context/**/README.md
+    status: complete
+  - source: skills/ai-knowledge Project_Status canonical rules
+    action: rewrite
+    target: Git CTX-002 canonical; Feishu Project Status projection
+    status: complete
