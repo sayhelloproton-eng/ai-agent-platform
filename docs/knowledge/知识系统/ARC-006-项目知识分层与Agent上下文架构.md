@@ -1,117 +1,158 @@
----
-asset_id: ARC-006
-asset_type: architecture
-title: 项目知识分层与 Agent 上下文架构
-status: proposed
-evidence_level: decided
-owners:
-  - project-owner
-created_at: 2026-07-27
-updated_at: 2026-07-27
-canonical_source: git
-canonical_path: docs/knowledge/知识系统/ARC-006-项目知识分层与Agent上下文架构.md
-related_assets:
-  - ARC-002
-  - ARC-004
-  - ARC-005
-  - CTX-001
-  - CTX-003
-  - SKL-001
-  - WFL-001
-  - WFL-004
-  - EXP-003
-tags:
-  - context-engineering
-  - knowledge-layer
-  - retrieval
-  - agent-instructions
----
-
 # ARC-006 项目知识分层与 Agent 上下文架构
 
-## 1. 问题定义
+## 一句话结论
 
-项目拥有大量知识，不代表 Agent 应该把它们全部加载进上下文。
-
-需要区分：
+仓库中所有资料合起来是“项目知识”，但 Agent 每次执行任务只应该拿到其中一小部分。
 
 ```text
-Knowledge Universe
-≠
-Task Context
+项目全部知识
+      |
+      | 按任务筛选
+      v
+本次任务上下文
 ```
 
-知识系统回答“项目长期知道什么”。
+Agent 的能力不是来自“读得越多”，而是来自“在正确的时候读到正确的东西”。
 
-Context 系统回答“当前任务此刻必须知道什么”。
+## 1. 为什么会有这篇文档
 
-两者混在一起会导致：
+这个项目开始依赖多个 Agent 工作：
 
-- 新 Agent 每次读取整个仓库；
-- Token 被无关文档占满；
-- Current Status 与稳定知识重复；
-- 同一事实多处修改；
-- 旧决策干扰当前任务；
-- 弱模型无法从大量上下文中稳定执行。
+- ChatGPT 讨论需求和架构；
+- Codex 修改仓库；
+- OpenCode / DeepSeek 执行低成本任务；
+- 后续还会有 Gateway、Skill 和更多自动化能力。
 
-## 2. 市面方案的共同方向
+但每次新 Agent 进入仓库，都需要先回答：
 
-### 2.1 Diátaxis：按用户需求组织文档
+- 这个项目到底要做什么？
+- 当前阶段是什么？
+- 哪些决策已经确定？
+- 哪些文件是正式知识？
+- 哪些只是历史实验？
+- 这次允许改什么？
+- 做完以后如何验证？
+
+早期这些信息主要存在于长聊天里。后来虽然建立了 `context/`，但又出现了新的问题：
+
+- `context/current-status.md` 还写着 Task 001 进行中；
+- 实际 Skill 和飞书投影已经完成；
+- `context/` 与 `docs/knowledge/` 重复描述项目目标和路线图；
+- 历史 Context 放在 Archive 中，但没有明确标记失效；
+- Agent 读取了过期状态后，可能按照旧阶段继续工作。
+
+这类问题叫 Context Drift：给 Agent 的项目说明和仓库现实已经不一致。
+
+## 2. 项目中实际遇到的三个矛盾
+
+### 2.1 全部读，Token 太贵；少读，又怕漏关键信息
+
+让 Agent 扫描整个仓库，能够减少遗漏，但代价是：
+
+- 上下文窗口被无关内容占用；
+- 旧方案和新方案同时进入推理；
+- 弱模型难以判断哪些内容有效；
+- 每次任务都重复消耗 Token；
+- Agent 容易顺手修改任务之外的文件。
+
+完全不提供上下文又会导致：
+
+- 重新发明已经确定的架构；
+- 重复调查；
+- 使用旧路径；
+- 忽略项目约束。
+
+问题不在于“读多还是读少”，而在于缺少一套选择规则。
+
+### 2.2 动态状态和长期知识混在一起
+
+`current-status.md` 应该回答：
+
+> 现在做到哪里，下一步是什么？
+
+而知识文档应该回答：
+
+> 为什么这样设计，这套方案如何工作？
+
+如果二者互相复制，状态每变化一次就要修改多篇文档，最终一定漂移。
+
+### 2.3 规则、知识、证据和私人信息没有完全分开
+
+项目中同时存在：
+
+- Agent 启动规则；
+- 正式知识；
+- 技术证据；
+- 学习材料；
+- 历史实验；
+- 私人背景；
+- Secret 和本地运行状态。
+
+它们的生命周期、读者和安全边界不同，不能因为都是 Markdown 就放进同一层。
+
+## 3. 市面上的成熟思路
+
+### 3.1 Diátaxis：先区分文档服务的目的
 
 Diátaxis 将文档分为：
 
-- Tutorial；
-- How-to Guide；
-- Reference；
-- Explanation。
+- Tutorial：带人学习；
+- How-to：帮助完成具体任务；
+- Reference：准确查询；
+- Explanation：解释概念与原因。
 
-核心价值是：
+它给本项目的启发不是照搬四个目录，而是：
 
-> 文档类别应服务不同用户任务，而不是把所有内容写成同一种“说明文档”。
+> 不同文档解决不同问题，不能把教程、操作步骤、参考资料和架构解释写成同一种文件。
 
-对本项目的启发：
+因此，学习路线、工程规范、实验记录、正式架构和当前状态需要分开。
 
-- 学习路线不等于正式架构；
-- 技术参考不等于当前任务；
-- 实验结果不等于最终 Solution；
-- 解释性知识不应混入运行日志。
-
-### 2.2 Backstage TechDocs：文档和软件实体关联
-
-Backstage 将文档和代码托管源、软件实体和发布流程关联，说明知识应与项目对象和版本绑定，而不是脱离代码形成孤立页面。
-
-### 2.3 GitHub Copilot：仓库级和路径级指令
+### 3.2 GitHub Copilot：仓库级规则和路径级规则分开
 
 GitHub Copilot 支持：
 
-- Repository-wide Instructions；
-- Path-specific Instructions；
+- 仓库级自定义指令；
+- 路径级指令；
 - `AGENTS.md`；
-- 最近目录优先的作用域。
+- 不同目录应用不同规则。
 
-说明 Agent 指令应具有范围，不应把所有规则都放进一个根文件。
+这说明 Agent 规则应该有作用域。
 
-### 2.4 Claude Code：项目记忆与按需主题文件
+例如：
 
-Claude Code 使用 `CLAUDE.md` 提供持久指令，并将详细记忆拆到按需读取的主题文件。官方文档也建议保持启动内容简洁。
+- 根 `AGENTS.md` 只放全仓通用规则；
+- `docs/AGENTS.md` 只规定文档资产；
+- Skill 目录可以有 Skill 专属规则；
+- 不应该把所有细节都塞进一个根文件。
 
-### 2.5 Cursor：Rules 与 Surgical Context
+### 3.3 Claude Code：启动时自动加载核心记忆，详细内容按需读取
 
-Cursor 支持项目 Rules，并建议通过明确文件、目录或上下文引用引导 Agent，而不是完全依赖自动全仓搜索。
+Claude Code 使用项目级 `CLAUDE.md` 保存共享规则，并支持导入其他文件。其文档强调：
 
-### 2.6 MCP：Context 与 Tool 分离
+- 核心项目规则可以持久化；
+- 详细主题可以拆分；
+- 启动内容应具体；
+- 项目演进后要定期更新。
 
-MCP 区分 Resources、Prompts 和 Tools。它说明：
+这和本项目的 `AGENTS.md + context/ + 按需知识` 思路一致。
 
-- 可读取知识；
-- 执行工具；
-- 工作模板；
+### 3.4 MCP：上下文、操作和模板不是一回事
 
-应该是不同接口，不应让知识 Skill 退化为工具 CRUD。
+MCP 将能力分为：
 
-## 3. 四层项目知识模型
+- Resources：上下文数据；
+- Tools：可以执行的动作；
+- Prompts：可复用交互模板。
 
-### 3.1 Startup Context
+这个划分提醒我们：
+
+> 知识不应该和执行动作、任务模板混成一个概念。
+
+`docs/knowledge` 是知识，Skill 是能力规则，Gateway / Tool 才负责操作。
+
+## 4. 本项目的四层知识与上下文模型
+
+### 4.1 第一层：启动上下文
 
 位置：
 
@@ -119,378 +160,277 @@ MCP 区分 Resources、Prompts 和 Tools。它说明：
 README.md
 AGENTS.md
 context/
+knowledge.config.yaml
 ```
 
-职责：
+作用：
+
+让一个第一次进入仓库的 Agent 在最小成本下知道：
 
 - 项目是什么；
-- 当前阶段；
-- 当前限制；
-- 恢复顺序；
-- 关键路径；
-- 下一步。
+- 当前做到哪里；
+- 当前路线图；
+- 全仓规则；
+- 正式知识源在哪里。
 
 特点：
 
-- 小；
-- 动态；
-- 启动时读取；
-- 不复制完整知识正文。
+- 内容短；
+- 变化较快；
+- 每个任务开始都可能读取；
+- 不讲完整历史；
+- 不复制所有知识正文。
 
-建议启动预算：
-
-- 根 README；
-- 根 AGENTS；
-- `context/current-status.md`；
-- 与任务直接相关的一个 Context 文件。
-
-### 3.2 Human Knowledge
+### 4.2 第二层：长期知识
 
 位置：
 
 ```text
-docs/knowledge/
+docs/knowledge/**
 ```
 
-职责：
+作用：
 
-- 产品和项目叙事；
-- 架构解释；
-- 领域模型；
+保存适合人和 Agent 长期阅读的知识资产：
+
+- 项目与产品；
+- 架构与领域；
+- Agent 与能力；
 - 工作流；
 - 知识系统；
-- 复盘；
+- 技术方案；
+- 实验与复盘；
+- 学习路线；
 - 作品集。
 
 特点：
 
-- 稳定；
-- 面向人和 Agent 阅读；
-- 可投影飞书；
-- 不承担实时任务状态。
+- 解释 What、Why、How；
+- 经过整理；
+- 能发布到飞书；
+- 不承担实时任务状态；
+- 不放 Secret、本地状态和大量运行日志。
 
-### 3.3 Engineering Evidence
+### 4.3 第三层：工程证据
 
 位置：
 
 ```text
-docs/technical/
-docs/adr/
-skills/
-schemas/
+docs/technical/**
+docs/adr/**
+docs/learning/**
 tests/
 scripts/
+schemas/
 ```
 
-职责：
+作用：
+
+保存能够支撑正式知识的工程材料：
 
 - ADR；
-- Research；
-- Experiment Evidence；
-- Solution 实现细节；
-- OPS；
-- Migration；
-- Contract；
-- 测试和脚本。
+- 治理规则；
+- 调研证据；
+- 迁移记录；
+- 运维记录；
+- Schema；
+- 校验脚本；
+- 测试结果。
 
 特点：
 
-- 精确；
-- 可审计；
-- 默认不发布飞书；
-- Agent 按任务读取。
+- 面向工程审计；
+- 不一定全部发布飞书；
+- 比长期知识更详细；
+- 可以证明“为什么相信这个结论”。
 
-### 3.4 Runtime and Private Context
+### 4.4 第四层：运行与私人上下文
 
-位置：
+位置示例：
 
 ```text
-.private-context/
-本地运行目录
-Agent Session
-外部连接器
+.private-context/**
+本地 Worktree
+临时任务输入
+Agent 运行状态
+Secret
+认证信息
 ```
 
-职责：
+作用：
 
-- 私人资料；
-- 临时任务输入；
-- 本地环境；
-- 未公开证据；
-- 运行 Trace。
+支持当前用户和本地环境工作。
 
 特点：
 
-- 按需；
-- 默认不提交；
-- 默认不进入正式知识；
-- 需要明确安全边界。
+- 不进入公开仓库；
+- 不发布飞书；
+- 不成为正式项目事实；
+- 需要清楚的 `.gitignore` 和目录说明。
 
-## 4. 同一事实只能有一个 Owner
+## 5. 同一个事实由谁负责
 
-为避免 Drift，每类事实定义唯一 Owner。
+为了避免重复，项目需要给常见事实指定唯一 Owner。
 
-| 事实 | Owner |
-|---|---|
-| 项目当前阶段 | `context/current-status.md` |
-| 项目稳定背景 | `docs/knowledge/项目与产品/` |
-| 正式架构解释 | `docs/knowledge/架构与领域/` |
-| 架构决策原因 | `docs/adr/` |
-| 实现边界 | `docs/technical/架构实现/` |
-| Skill 行为合同 | `skills/<skill>/` |
-| 飞书阅读内容 | Git Projection |
-| 私人资料 | `.private-context/` 本地正文 |
+| 事实 | 唯一 Owner | 其他位置如何处理 |
+|---|---|---|
+| 项目当前阶段 | `context/current-status.md` | 知识文档只描述稳定阶段成果 |
+| 路线图状态 | `context/roadmap.md` | 产品文档解释路线原因，不复制实时状态 |
+| Git / 飞书权威关系 | ADR + ARC-005 | README 只做简短引用 |
+| 正式知识路径 | `knowledge.config.yaml` | AGENTS 和 Skill 引用配置 |
+| 发布规则 | `skills/ai-knowledge/**` | SOL-004 解释原因，不重复实现细节 |
+| 项目长期叙事 | `docs/knowledge/**` | Context 只提供摘要 |
+| 私人信息 | `.private-context/**` | 正式知识不得复制 |
 
-其他文件只能引用 Owner，不应复制后独立维护。
+原则：
 
-## 5. Context 与 Knowledge 的边界
+> 一个事实只在一个位置完整维护，其他位置只链接或摘要。
 
-### Context 应包含
+## 6. Agent 如何组装本次任务上下文
 
-- 当前阶段；
-- 当前目标；
-- 当前限制；
-- 已知 Drift；
-- 入口文件；
-- 下一步；
-- 恢复指令。
+Agent 启动不应该读取全部仓库，而应分两步。
 
-### Context 不应包含
+### 6.1 固定启动包
 
-- 完整架构论文；
-- 所有 ADR 正文；
-- 所有历史执行日志；
-- 大量教程；
-- 飞书页面 Token；
-- 可通过索引查到的详细知识。
-
-### Knowledge 应包含
-
-- 经 Review 的稳定解释；
-- 可供人类长期阅读的项目知识；
-- 架构和工作流的 Why；
-- 经过提炼的实验与复盘。
-
-### Knowledge 不应包含
-
-- 每小时变化的任务状态；
-- 未验证计划；
-- 私人数据；
-- 全量 Agent Trace；
-- 每次命令输出。
-
-## 6. Index-first Retrieval
-
-推荐检索过程：
+每次先读：
 
 ```text
-Task Intent
-    |
-    v
-Read Startup Context
-    |
-    v
-Query Asset Index
-    |
-    v
-Select 1-3 Primary Assets
-    |
-    v
-Expand Related Evidence
-    |
-    v
-Build Context Package
+README.md
+AGENTS.md
+context/current-status.md
+context/roadmap.md
+knowledge.config.yaml
 ```
 
-默认禁止：
+确认：
+
+- 任务是否与当前阶段一致；
+- 配置路径是否真实存在；
+- 仓库是否存在 Context Drift；
+- 本次任务属于哪个知识领域。
+
+### 6.2 按任务补充
+
+然后根据任务读取最小集合。
+
+例如：
+
+#### 修改飞书 Publisher
 
 ```text
-Read Entire Repository
-Read Entire Feishu Space
-Load All ADRs
-Load All Agent Logs
+ARC-005
+SOL-004
+SKL-001
+skills/ai-knowledge/**
+相关测试
 ```
 
-只有全仓审计或迁移任务才允许受控扫描。
-
-## 7. Context Package
-
-一个任务上下文包至少包含：
-
-```json
-{
-  "task": {
-    "goal": "",
-    "non_goals": [],
-    "deliverables": []
-  },
-  "project": {
-    "phase": "",
-    "source_commit": ""
-  },
-  "scope": {
-    "allowed_files": [],
-    "forbidden_files": []
-  },
-  "knowledge": {
-    "primary_assets": [],
-    "supporting_evidence": []
-  },
-  "constraints": [],
-  "validation": [],
-  "stop_conditions": []
-}
-```
-
-Context Package 是临时任务输入，不是新的正式知识副本。
-
-## 8. Instruction Hierarchy
-
-建议顺序：
+#### 设计 Gateway
 
 ```text
-System / Platform Policy
-        |
-        v
-Root AGENTS.md
-        |
-        v
-Nearest Directory AGENTS.md
-        |
-        v
-Task Contract
-        |
-        v
-Selected Knowledge and Evidence
+CTX-001
+ARC-001
+ARC-003
+相关 ADR
+Gateway 目标代码
 ```
 
-冲突规则：
-
-1. 上层安全和平台规则优先；
-2. 更近路径的工程规则覆盖更通用规则；
-3. Task Contract 不能违反 Accepted ADR；
-4. 历史资产不能覆盖当前状态；
-5. 发现冲突时停止，不自动拼接结论。
-
-## 9. 控制指令体积
-
-仓库指令越多不一定越好。
-
-2026 年关于 `AGENTS.md` 的实证研究出现不同结论：
-
-- 有研究观察到运行时间和输出 Token 下降；
-- 也有研究发现自动生成或包含多余要求的 Context 文件会降低成功率并增加成本。
-
-因此本项目不追求“把所有知识写进 AGENTS”，而采用：
+#### 写阶段复盘
 
 ```text
-Minimal Rules
-+
-On-demand Knowledge
-+
-Deterministic Validation
+current-status
+Git 历史
+EXP 证据
+相关 ADR / SOL
 ```
 
-AGENTS 只保存必须始终遵守的规则。
-
-详细理论、历史和示例按任务检索。
-
-## 10. Drift 检测
-
-### 10.1 Drift 类型
+最终形成 Context Package：
 
 ```text
-Status Drift
-Path Drift
-Contract Drift
-Projection Drift
-Instruction Drift
-Relation Drift
+任务目标
+当前状态
+已确定决策
+相关知识
+目标文件
+允许范围
+禁止范围
+验收方式
+停止条件
 ```
 
-### 10.2 阶段结束触发器
+## 7. Context Drift 如何处理
 
-每个阶段结束必须检查：
+Context Drift 不是发现后什么都不能做。
 
-- `context/current-status.md`；
-- Roadmap；
-- 相关 README；
-- Asset Index；
-- Accepted ADR；
-- Skill Profile；
-- Projection Manifest。
+正确规则是：
 
-### 10.3 自动检查
+1. 停止基于不确定事实继续写入；
+2. 允许只读检查、Git 历史核对和证据收集；
+3. 列出冲突的文件与事实；
+4. 由 Project Owner 确认真实状态；
+5. 先修复启动上下文，再继续原任务；
+6. 任务关闭前检查状态文件是否需要更新。
 
-机器可以验证：
+不允许：
 
-- 路径存在；
-- 链接有效；
-- Asset ID 唯一；
-- Canonical Path 一致；
-- Relation 目标存在；
-- 配置与目录匹配；
-- Context 更新时间和阶段标识。
+- 静默忽略 Drift；
+- 自行猜测哪个状态是真的；
+- 把计划写成已完成；
+- 因为修复状态而顺手重构其他文件。
 
-机器不能决定：
+## 8. 从这次实践抽象出的理论
 
-- 架构是否应改变；
-- ADR 是否接受；
-- 哪个失败经验值得进入知识库；
-- 是否公开私人内容。
+### 8.1 知识库和上下文不是一回事
 
-## 11. 当前项目建议
+知识库追求长期完整。
 
-### 保留
+任务上下文追求当前相关。
 
-```text
-context/
-docs/knowledge/
-docs/technical/
-docs/learning/
-docs/adr/
-skills/
-.private-context/
-```
+将两者等同，要么 Token 失控，要么关键信息缺失。
 
-### 收敛
+### 8.2 上下文设计的核心是选择，不是堆积
 
-- `context/current-status.md` 只维护动态阶段；
-- `docs/knowledge` 不复制实时状态；
-- ADR 保存决策；
-- Technical 保存证据和实现；
-- Feishu 只消费 `docs/knowledge`；
-- Agent 通过索引和关系按需扩展。
+Context Engineering 不是把所有信息都保存起来，而是设计：
 
-### 新增 ADR 建议
+- 什么必须常驻；
+- 什么按需读取；
+- 什么只用于审计；
+- 什么永远不能进入公开上下文。
 
-建立：
+### 8.3 动态事实必须有明确 Owner
 
-```text
-ADR-003 Context Runtime 与 Human Knowledge 的边界
-```
+越经常变化的信息，越不能到处复制。
 
-明确两者的 Owner、更新触发器和冲突处理。
+当前状态、版本和路径应尽量由一个文件或配置负责。
 
-## 12. 参考资料
+### 8.4 Agent 规则需要作用域
+
+根规则只放全局约束，细节下沉到相关目录。
+
+这样既减少上下文，也避免不同领域规则互相冲突。
+
+## 9. 下一步落地
+
+当前最重要的不是增加更多文档，而是建立一致性检查：
+
+- `knowledge.config.yaml` 中的路径必须存在；
+- Markdown 相对链接必须有效；
+- Asset ID 和 Canonical Path 必须一致；
+- `current-status.md` 和 Roadmap 的阶段不能冲突；
+- Archive 资产必须明确 `superseded`；
+- `.private-context` 跟踪规则必须可测试。
+
+这些能够由脚本判断的事情，不再让模型反复阅读判断。
+
+## 10. 参考资料
 
 - Diátaxis  
-  https://diataxis.fr/
-- Backstage TechDocs Concepts  
-  https://backstage.io/docs/features/techdocs/concepts/
+  https://diataxis.fr/start-here/
 - GitHub Copilot Repository Instructions  
   https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/add-custom-instructions/add-repository-instructions
-- Claude Code Project Memory  
-  https://code.claude.com/docs/en/memory
-- Cursor Rules  
-  https://docs.cursor.com/context/rules
-- Cursor Working with Context  
-  https://docs.cursor.com/en/guides/working-with-context
-- Codex AGENTS.md  
-  https://github.com/openai/codex/blob/main/docs/agents_md.md
+- GitHub Copilot CLI Custom Instructions  
+  https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions
+- Anthropic Claude Code Memory  
+  https://docs.anthropic.com/zh-CN/docs/claude-code/memory
 - Model Context Protocol Architecture  
   https://modelcontextprotocol.io/docs/learn/architecture
-- On the Impact of AGENTS.md Files on the Efficiency of AI Coding Agents  
-  https://arxiv.org/abs/2601.20404
-- Evaluating AGENTS.md: Are Repository-Level Context Files Helpful  
-  https://arxiv.org/abs/2602.11988
