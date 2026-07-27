@@ -1,15 +1,15 @@
-version: 1
+version: 2
 project: ai-agent-platform
 space:
   name: 智能体工程探索
   space_id: "<FEISHU_SPACE_ID>"
   homepage:
-    wiki_node_token: <FEISHU_HOME_WIKI_TOKEN>
-    docx_token: <FEISHU_HOME_DOCX_TOKEN>
+    wiki_node_token: null
+    docx_token: null
 
 mappings:
   - asset_id: CTX-001
-    logical_path: 01_Context/Project Context
+    logical_path: 00_Context/Project Context
     sync_mode: mirror
     wiki_node_token: null
     docx_token: null
@@ -18,16 +18,16 @@ mappings:
     sync_status: not_published
 
   - asset_id: CTX-002
-    logical_path: 01_Context/Project Status
+    logical_path: 00_Context/Current State
     sync_mode: projection
-    wiki_node_token: <FEISHU_PROJECT_STATUS_WIKI_TOKEN>
-    docx_token: <FEISHU_PROJECT_STATUS_DOCX_TOKEN>
+    wiki_node_token: null
+    docx_token: null
     last_synced_commit: null
     content_hash: null
-    sync_status: pending_update
+    sync_status: pending_alignment
 
   - asset_id: CTX-003
-    logical_path: 01_Context/Project Outline
+    logical_path: 00_Context/Project Outline
     sync_mode: mirror
     wiki_node_token: null
     docx_token: null
@@ -36,7 +36,7 @@ mappings:
     sync_status: not_published
 
   - asset_id: CTX-004
-    logical_path: 01_Context/Six-Month Roadmap
+    logical_path: 00_Context/Six-Month Roadmap
     sync_mode: mirror
     wiki_node_token: null
     docx_token: null
@@ -45,7 +45,7 @@ mappings:
     sync_status: not_published
 
   - asset_id: PRD-001
-    logical_path: 02_Product/Platform Vision
+    logical_path: 01_Product/Platform Vision
     sync_mode: mirror
     wiki_node_token: null
     docx_token: null
@@ -54,7 +54,7 @@ mappings:
     sync_status: not_published
 
   - asset_id: PRD-002
-    logical_path: 02_Product/Portfolio Outcomes
+    logical_path: 01_Product/Portfolio Outcomes
     sync_mode: mirror
     wiki_node_token: null
     docx_token: null
@@ -63,7 +63,7 @@ mappings:
     sync_status: not_published
 
   - asset_id: ARC-001
-    logical_path: 03_Architecture/Platform Target Architecture
+    logical_path: 02_Architecture/Platform Target Architecture
     sync_mode: mirror
     wiki_node_token: null
     docx_token: null
@@ -72,7 +72,7 @@ mappings:
     sync_status: not_published
 
   - asset_id: ARC-003
-    logical_path: 03_Architecture/Six-Month Delivery Architecture
+    logical_path: 02_Architecture/Six-Month Delivery Architecture
     sync_mode: mirror
     wiki_node_token: null
     docx_token: null
@@ -80,55 +80,206 @@ mappings:
     content_hash: null
     sync_status: not_published
 
-  - asset_id: ADR-001
-    logical_path: 10_ADR/ADR-001 GitHub 与飞书双源事实架构
-    sync_mode: mirror
-    wiki_node_token: <FEISHU_ADR_001_WIKI_TOKEN>
-    docx_token: <FEISHU_ADR_001_DOCX_TOKEN>
-    last_synced_commit: c5ea37bb14a724798ff8628fc6b2d367135d02e3
-    content_hash: null
-    sync_status: pending_superseded_projection
-
-  - asset_id: ENG-001
-    logical_path: 11_Engineering/GitHub 仓库初始化与工程资产管理规范
-    sync_mode: mirror
-    wiki_node_token: <FEISHU_ENGINEERING_WIKI_TOKEN>
-    docx_token: <FEISHU_ENGINEERING_DOCX_TOKEN>
-    last_synced_commit: c5ea37bb14a724798ff8628fc6b2d367135d02e3
-    content_hash: null
-    sync_status: pending
-
-  - asset_id: ARC-002
-    logical_path: 07_Knowledge_System/Knowledge Asset Architecture
+  - asset_id: DOM-001
+    logical_path: 03_Domain_Model/Core Domain Model
     sync_mode: mirror
     wiki_node_token: null
     docx_token: null
     last_synced_commit: null
     content_hash: null
-    sync_status: pending
-
-  - asset_id: ADR-002
-    logical_path: 10_ADR/ADR-002 Git 唯一真源与飞书投影模型
-    sync_mode: mirror
-    wiki_node_token: null
-    docx_token: null
-    last_synced_commit: null
-    content_hash: null
-    sync_status: pending
+    sync_status: not_published
 
   - asset_id: SKL-001
-    logical_path: 07_Knowledge_System/AI Knowledge Skill
+    logical_path: 04_Agent_System/AI Knowledge Skill
     sync_mode: projection
     wiki_node_token: null
     docx_token: null
     last_synced_commit: null
     content_hash: null
-    sync_status: pending
+    sync_status: not_published
+
+  - asset_id: WFL-001
+    logical_path: 05_Workflow/Knowledge Lifecycle
+    sync_mode: mirror
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: not_published
+
+  - asset_id: WFL-002
+    logical_path: 05_Workflow/ChatGPT Task Codex Git
+    sync_mode: mirror
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: not_published
+
+  - asset_id: WFL-003
+    logical_path: 05_Workflow/AI Video Workflow
+    sync_mode: mirror
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: not_published
+
+  - asset_id: ARC-002
+    logical_path: 02_Architecture/Knowledge Asset Architecture
+    sync_mode: mirror
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: not_published
+
+  - asset_id: ARC-004
+    logical_path: 02_Architecture/AI Knowledge Runtime Boundaries
+    sync_mode: mirror
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: not_published
+
+  - asset_id: SOL-001
+    logical_path: 06_Knowledge_System/Feishu Wiki Initialization
+    sync_mode: mirror
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: not_published
+
+  - asset_id: SOL-002
+    logical_path: 06_Knowledge_System/Git to Feishu Projection
+    sync_mode: mirror
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: not_published
+
+  - asset_id: SOL-003
+    logical_path: 06_Knowledge_System/Local Private Context
+    sync_mode: mirror
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: not_published
+
+  - asset_id: RSH-001
+    logical_path: 10_Research_Experiment/Feishu CLI Capabilities
+    sync_mode: mirror
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: not_published
+
+  - asset_id: EXP-001
+    logical_path: 10_Research_Experiment/Public Feishu Wiki Read
+    sync_mode: mirror
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: not_published
+
+  - asset_id: EXP-002
+    logical_path: 10_Research_Experiment/Public Feishu Wiki Export
+    sync_mode: index
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: not_published
+
+  - asset_id: ADR-001
+    logical_path: 11_ADR/GitHub and Feishu Dual Source
+    sync_mode: mirror
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: pending_alignment
+
+  - asset_id: ADR-002
+    logical_path: 11_ADR/Git Single Source and Feishu Projection
+    sync_mode: mirror
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: not_published
+
+  - asset_id: ENG-001
+    logical_path: 09_Engineering/Public Repository Standard
+    sync_mode: mirror
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: not_published
+
+  - asset_id: MIG-001
+    logical_path: 14_Agent_Log/Repository Audit and Migration
+    sync_mode: index
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: not_published
+
+  - asset_id: OPS-001
+    logical_path: 14_Agent_Log/Feishu Knowledge Base Initialization
+    sync_mode: index
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: pending_alignment
+
+  - asset_id: OPS-002
+    logical_path: 14_Agent_Log/Feishu Homepage Publication
+    sync_mode: index
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: pending_alignment
+
+  - asset_id: OPS-003
+    logical_path: 14_Agent_Log/Feishu Knowledge Base Rename Check
+    sync_mode: index
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: pending_alignment
+
+  - asset_id: PRT-001
+    logical_path: 13_Portfolio/Project Story
+    sync_mode: mirror
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: not_published
+
+  - asset_id: PRT-002
+    logical_path: 13_Portfolio/Demo Roadmap
+    sync_mode: mirror
+    wiki_node_token: null
+    docx_token: null
+    last_synced_commit: null
+    content_hash: null
+    sync_status: not_published
 
 native_policy:
   root: 90_Feishu_Native
   canonical_project_asset: false
-  promotion_status_values:
-    - not_required
-    - candidate
-    - promoted
+  allow_reverse_sync: false
+  promotion_status_values: [not_required, candidate, promoted]

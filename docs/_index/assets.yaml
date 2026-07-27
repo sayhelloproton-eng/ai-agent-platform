@@ -1,4 +1,4 @@
-version: 1
+version: 2
 project: ai-agent-platform
 canonical_source: git
 assets:
@@ -17,9 +17,6 @@ assets:
     status: implemented
     evidence_level: verified
     canonical_path: docs/00-context/CTX-002-current-state.md
-    supporting_paths:
-      - docs/00-context/current-task.md
-      - docs/00-context/recovery-map.md
     migration_state: complete
     feishu_mode: projection
 
@@ -65,9 +62,6 @@ assets:
     status: accepted
     evidence_level: decided
     canonical_path: docs/02-architecture/ARC-001-platform-target-architecture.md
-    supporting_paths:
-      - docs/02-architecture/diagrams/platform-target-architecture-v1.mmd
-      - docs/02-architecture/diagrams/platform-target-architecture-v1.png
     migration_state: complete
     feishu_mode: mirror
 
@@ -77,35 +71,15 @@ assets:
     status: accepted
     evidence_level: decided
     canonical_path: docs/02-architecture/ARC-003-six-month-delivery-architecture.md
-    supporting_paths:
-      - docs/02-architecture/diagrams/six-month-delivery-architecture.mmd
     migration_state: complete
     feishu_mode: mirror
 
-  - asset_id: ARC-002
-    title: AI Agent Platform Knowledge Asset Architecture
-    asset_type: architecture
-    status: accepted
-    evidence_level: decided
-    canonical_path: docs/06-knowledge-system/ARC-002-knowledge-asset-architecture.md
-    migration_state: complete
-    feishu_mode: mirror
-
-  - asset_id: ADR-001
-    title: GitHub and Feishu Dual Source Architecture
-    asset_type: adr
-    status: superseded
-    evidence_level: decided
-    canonical_path: docs/09-adr/ADR-001-github-feishu-dual-source.md
-    migration_state: complete
-    feishu_mode: mirror
-
-  - asset_id: ADR-002
-    title: Git Single Source of Truth and Feishu Projection Model
-    asset_type: adr
-    status: accepted
-    evidence_level: decided
-    canonical_path: docs/09-adr/ADR-002-git-single-source-feishu-projection.md
+  - asset_id: DOM-001
+    title: Core Domain Model
+    asset_type: domain
+    status: proposed
+    evidence_level: observed
+    canonical_path: docs/03-domain/DOM-001-core-domain-model.md
     migration_state: complete
     feishu_mode: mirror
 
@@ -114,46 +88,186 @@ assets:
     asset_type: skill
     status: implemented
     evidence_level: verified
-    canonical_path: skills/ai-knowledge/SKILL.md
-    supporting_paths:
-      - skills/ai-knowledge/README.md
-      - skills/ai-knowledge/tests/self-test.mjs
-      - docs/Feishu_Knowledge_Skill_Architecture_v1.0.md
-    migration_state: split
-    target_path: docs/04-agent-system/skills/SKL-001-ai-knowledge.md
+    canonical_path: docs/04-agent-system/skills/SKL-001-ai-knowledge.md
+    migration_state: complete
     feishu_mode: projection
 
+  - asset_id: WFL-001
+    title: Knowledge Lifecycle
+    asset_type: workflow
+    status: implemented
+    evidence_level: observed
+    canonical_path: docs/05-workflows/WFL-001-knowledge-lifecycle.md
+    migration_state: complete
+    feishu_mode: mirror
+
+  - asset_id: WFL-002
+    title: ChatGPT Task Codex Git
+    asset_type: workflow
+    status: proposed
+    evidence_level: hypothesis
+    canonical_path: docs/05-workflows/WFL-002-chatgpt-task-codex-git.md
+    migration_state: complete
+    feishu_mode: mirror
+
+  - asset_id: WFL-003
+    title: AI Video Workflow
+    asset_type: workflow
+    status: proposed
+    evidence_level: hypothesis
+    canonical_path: docs/05-workflows/WFL-003-ai-video-workflow.md
+    migration_state: complete
+    feishu_mode: mirror
+
+  - asset_id: ARC-002
+    title: Knowledge Asset Architecture
+    asset_type: architecture
+    status: accepted
+    evidence_level: decided
+    canonical_path: docs/06-knowledge-system/ARC-002-knowledge-asset-architecture.md
+    migration_state: complete
+    feishu_mode: mirror
+
+  - asset_id: ARC-004
+    title: AI Knowledge Runtime Boundaries
+    asset_type: architecture
+    status: accepted
+    evidence_level: decided
+    canonical_path: docs/06-knowledge-system/ARC-004-ai-knowledge-runtime-boundaries.md
+    migration_state: complete
+    feishu_mode: mirror
+
+  - asset_id: SOL-001
+    title: Feishu Wiki Initialization
+    asset_type: solution
+    status: implemented
+    evidence_level: verified
+    canonical_path: docs/07-solutions/knowledge-system/SOL-001-feishu-wiki-initialization.md
+    migration_state: complete
+    feishu_mode: mirror
+
+  - asset_id: SOL-002
+    title: Git to Feishu Projection
+    asset_type: solution
+    status: adopted
+    evidence_level: decided
+    canonical_path: docs/07-solutions/knowledge-system/SOL-002-git-feishu-projection.md
+    migration_state: complete
+    feishu_mode: mirror
+
+  - asset_id: SOL-003
+    title: Local Private Context
+    asset_type: solution
+    status: implemented
+    evidence_level: verified
+    canonical_path: docs/07-solutions/security/SOL-003-local-private-context.md
+    migration_state: complete
+    feishu_mode: mirror
+
   - asset_id: RSH-001
-    title: Feishu CLI Capability Research
+    title: Feishu CLI Capabilities
     asset_type: research
     status: validated
     evidence_level: verified
-    canonical_path: docs/Feishu_Public_Wiki_Read_Test_Report.md
-    supporting_paths:
-      - docs/Feishu_Wiki_Public_Access_Capability_Report.md
-    migration_state: merge
-    target_path: docs/07-research/RSH-001-feishu-cli-capabilities.md
-    feishu_mode: projection
+    canonical_path: docs/08-research/RSH-001-feishu-cli-capabilities.md
+    migration_state: complete
+    feishu_mode: mirror
 
   - asset_id: EXP-001
-    title: Public Feishu Wiki Recursive Export
+    title: Public Feishu Wiki Read
     asset_type: experiment
     status: validated
     evidence_level: verified
-    canonical_path: docs/research/waytoagi-feishu-cli-export/export-report.md
-    supporting_paths:
-      - docs/research/waytoagi-feishu-cli-export/export-waytoagi-wiki.mjs
-      - docs/research/waytoagi-feishu-cli-export/integrity-check.json
-    migration_state: rewrite
-    target_path: docs/08-experiments/EXP-001-public-feishu-wiki-export.md
+    canonical_path: docs/09-experiments/EXP-001-public-feishu-wiki-read.md
+    migration_state: complete
+    feishu_mode: mirror
+
+  - asset_id: EXP-002
+    title: Public Feishu Wiki Export
+    asset_type: experiment
+    status: validated
+    evidence_level: verified
+    canonical_path: docs/09-experiments/EXP-002-public-feishu-wiki-export.md
+    migration_state: complete
     feishu_mode: index
 
+  - asset_id: ADR-001
+    title: GitHub and Feishu Dual Source
+    asset_type: adr
+    status: superseded
+    evidence_level: decided
+    canonical_path: docs/10-adr/ADR-001-github-feishu-dual-source.md
+    migration_state: complete
+    feishu_mode: mirror
+
+  - asset_id: ADR-002
+    title: Git Single Source and Feishu Projection
+    asset_type: adr
+    status: accepted
+    evidence_level: decided
+    canonical_path: docs/10-adr/ADR-002-git-single-source-feishu-projection.md
+    migration_state: complete
+    feishu_mode: mirror
+
   - asset_id: ENG-001
-    title: GitHub Repository Initialization Standard
+    title: Public Repository Standard
     asset_type: engineering
     status: implemented
     evidence_level: verified
-    canonical_path: docs/context/feishu-sync-pending/D-github-initialization-standard.md
-    migration_state: rewrite
-    target_path: docs/10-engineering/ENG-001-github-repository-standard.md
+    canonical_path: docs/11-engineering/ENG-001-public-repository-standard.md
+    migration_state: complete
+    feishu_mode: mirror
+
+  - asset_id: MIG-001
+    title: Repository Audit and Migration
+    asset_type: migration
+    status: implemented
+    evidence_level: verified
+    canonical_path: docs/12-operations/migration/MIG-001-repository-audit-and-migration-2026-07-27.md
+    migration_state: complete
+    feishu_mode: index
+
+  - asset_id: OPS-001
+    title: Feishu Knowledge Base Initialization
+    asset_type: operation
+    status: validated
+    evidence_level: verified
+    canonical_path: docs/12-operations/feishu/OPS-001-knowledge-base-initialization.md
+    migration_state: complete
+    feishu_mode: index
+
+  - asset_id: OPS-002
+    title: Feishu Homepage Publication
+    asset_type: operation
+    status: validated
+    evidence_level: verified
+    canonical_path: docs/12-operations/feishu/OPS-002-homepage-publication.md
+    migration_state: complete
+    feishu_mode: index
+
+  - asset_id: OPS-003
+    title: Feishu Knowledge Base Rename Check
+    asset_type: operation
+    status: validated
+    evidence_level: verified
+    canonical_path: docs/12-operations/feishu/OPS-003-knowledge-base-rename.md
+    migration_state: complete
+    feishu_mode: index
+
+  - asset_id: PRT-001
+    title: Project Story
+    asset_type: portfolio
+    status: proposed
+    evidence_level: observed
+    canonical_path: docs/13-portfolio/project-story.md
+    migration_state: complete
+    feishu_mode: mirror
+
+  - asset_id: PRT-002
+    title: Demo Roadmap
+    asset_type: portfolio
+    status: proposed
+    evidence_level: hypothesis
+    canonical_path: docs/13-portfolio/demo-roadmap.md
+    migration_state: complete
     feishu_mode: mirror

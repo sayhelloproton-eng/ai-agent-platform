@@ -1,11 +1,20 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "project": {
     "id": "ai-agent-platform",
     "display_name": "智能体工程探索",
-    "knowledge_role": "public learning knowledge base + Agent long-term context provider"
+    "canonical_source": "git"
+  },
+  "git": {
+    "project_context": "docs/00-context/CTX-001-project-context.md",
+    "current_state": "docs/00-context/CTX-002-current-state.md",
+    "current_task": "docs/00-context/current-task.md",
+    "asset_index": "docs/_index/assets.yaml",
+    "relation_index": "docs/_index/relations.yaml",
+    "feishu_map": "docs/_index/feishu-map.yaml"
   },
   "feishu": {
+    "role": "projection_and_native",
     "space_id": "<FEISHU_SPACE_ID>",
     "space_display_name": "智能体工程探索",
     "homepage": {
@@ -78,14 +87,14 @@
     "dynamic_documents": {
       "project_status": {
         "title": "Project_Status（项目状态）",
-        "parent_node_token": "<FEISHU_NODE_00_CONTEXT>",
+        "projection_of": "CTX-002",
         "doc_token": null,
         "wiki_node_token": null,
-        "canonical": true
+        "canonical": false
       },
       "knowledge_index": {
         "title": "Knowledge_Index（知识索引）",
-        "parent_node_token": "<FEISHU_NODE_00_CONTEXT>",
+        "projection_of": "docs/_index/assets.yaml",
         "doc_token": null,
         "wiki_node_token": null,
         "canonical": false
@@ -98,12 +107,15 @@
     "max_full_documents": 3,
     "max_candidates": 8,
     "write_default": "dry-run",
+    "git_review_required": true,
+    "allow_reverse_sync": false,
     "forbidden_automatic_operations": [
       "delete",
       "move",
       "permission_change",
       "member_change",
-      "internet_publish"
+      "internet_publish",
+      "force_push"
     ]
   }
 }

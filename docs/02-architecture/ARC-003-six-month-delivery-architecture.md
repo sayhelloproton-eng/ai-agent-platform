@@ -1,9 +1,16 @@
-# ARC-003 Six-Month Delivery Architecture
+---
+asset_id: ARC-003
+asset_type: architecture
+title: Six-Month Delivery Architecture
+status: accepted
+evidence_level: decided
+updated_at: 2026-07-27
+canonical_source: git
+canonical_path: docs/02-architecture/ARC-003-six-month-delivery-architecture.md
+related_assets: [ARC-001, CTX-004, WFL-002, WFL-003]
+---
 
-- Asset ID: `ARC-003`
-- Status: `accepted`
-- Evidence: `decided`
-- Canonical Path: `docs/02-architecture/ARC-003-six-month-delivery-architecture.md`
+# ARC-003 Six-Month Delivery Architecture
 
 ## Purpose
 

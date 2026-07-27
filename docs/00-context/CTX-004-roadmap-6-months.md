@@ -1,9 +1,16 @@
-# CTX-004 Six-Month Roadmap
+---
+asset_id: CTX-004
+asset_type: roadmap
+title: Six-Month Roadmap
+status: accepted
+evidence_level: decided
+updated_at: 2026-07-27
+canonical_source: git
+canonical_path: docs/00-context/CTX-004-roadmap-6-months.md
+related_assets: [CTX-003, ARC-003]
+---
 
-- Asset ID: `CTX-004`
-- Status: `accepted`
-- Evidence: `decided`
-- Canonical Path: `docs/00-context/CTX-004-roadmap-6-months.md`
+# CTX-004 Six-Month Roadmap
 
 ## Month 1–2: Knowledge Foundation
 

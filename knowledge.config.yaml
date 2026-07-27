@@ -1,6 +1,5 @@
-version: 1
+version: 2
 project: ai-agent-platform
-
 canonical_source: git
 
 governance:
@@ -15,6 +14,7 @@ retrieval:
   default_full_documents_limit: 3
   allow_implicit_full_repository_scan: false
   allow_implicit_full_feishu_scan: false
+  private_context_requires_task_need: true
 
 paths:
   docs_root: docs
@@ -26,6 +26,17 @@ paths:
   platform_vision: docs/01-product/PRD-001-platform-vision.md
   target_architecture: docs/02-architecture/ARC-001-platform-target-architecture.md
   delivery_architecture: docs/02-architecture/ARC-003-six-month-delivery-architecture.md
+  domain_model: docs/03-domain/DOM-001-core-domain-model.md
+  skill_design: docs/04-agent-system/skills/SKL-001-ai-knowledge.md
+  workflows: docs/05-workflows
+  knowledge_system: docs/06-knowledge-system
+  solutions: docs/07-solutions
+  research: docs/08-research
+  experiments: docs/09-experiments
+  adr: docs/10-adr
+  engineering: docs/11-engineering
+  operations: docs/12-operations
+  portfolio: docs/13-portfolio
   asset_index: docs/_index/assets.yaml
   relation_index: docs/_index/relations.yaml
   feishu_map: docs/_index/feishu-map.yaml
@@ -37,11 +48,13 @@ feishu:
   role: projection_and_native
   space_id: "<FEISHU_SPACE_ID>"
   conflict_policy: git_wins_for_projection
+  project_status_projection_of: CTX-002
   native_root: 90_Feishu_Native
   archive_root: 99_Archive
   allow_reverse_sync: false
   require_write_preview: true
   require_human_confirmation: true
+  require_read_back_verification: true
 
 runtime_evidence:
   store_full_agent_logs_in_docs: false
@@ -54,3 +67,4 @@ security:
   auto_permission_change: false
   auto_public_share: false
   auto_force_push: false
+  private_context_is_secret_vault: false

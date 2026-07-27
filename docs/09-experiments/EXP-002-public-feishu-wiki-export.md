@@ -1,0 +1,32 @@
+---
+asset_id: EXP-002
+asset_type: experiment
+status: validated
+evidence_level: verified
+canonical_path: docs/09-experiments/EXP-002-public-feishu-wiki-export.md
+related_assets: [RSH-001, SKL-001]
+---
+
+# EXP-002 Public Feishu Wiki Recursive Export
+
+## Goal
+
+验证递归枚举公开 Wiki、按对象类型抓取正文并生成本地目录和完整性报告。
+
+## Result
+
+- 节点总数：53。
+- 正文成功：50。
+- 失败占位：3（2 个 bitable、1 个 sheet）。
+- `wiki-tree.json` 与本地页面文件数均为 53，重复 Node Token 为 0。
+- 完整镜像状态：否，因为非 docx 对象不能导出为 Markdown。
+
+## Evidence
+
+脚本、目录树、元数据和完整性检查位于 [`docs/08-research/external/waytoagi-feishu-cli-export/`](../08-research/external/waytoagi-feishu-cli-export/)。第三方全文 `pages/` 仅本地保存并被 Git 忽略。
+
+## Lessons
+
+- 必须按 `obj_type` 路由到 Docs、Sheets 或 Base。
+- 失败应生成结构化占位并保留错误，不得伪装成功。
+- 外部全文镜像不应默认公开再发布。

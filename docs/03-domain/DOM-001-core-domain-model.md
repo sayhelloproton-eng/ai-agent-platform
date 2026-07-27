@@ -1,0 +1,48 @@
+---
+asset_id: DOM-001
+asset_type: domain
+status: proposed
+evidence_level: observed
+canonical_source: git
+canonical_path: docs/03-domain/DOM-001-core-domain-model.md
+related_assets: [ARC-001, ARC-003, WFL-001, WFL-002, WFL-003]
+---
+
+# DOM-001 Core Domain Model
+
+## Purpose
+
+定义长期平台的稳定业务语言，使 Knowledge、Coding 和 Video 三类工作流可以共享 Task、Capability、Execution 和 Result，而不绑定具体模型或 Provider。
+
+## Core Concepts
+
+| Concept | Responsibility |
+|---|---|
+| `Task` | 用户目标、约束、输入、验收与风险 |
+| `Agent` | 根据角色和策略处理 Task 的协作者 |
+| `Capability` | 可被 Agent 调用的稳定能力契约 |
+| `Workflow` | 多步骤状态、路由、失败与恢复 |
+| `KnowledgeAsset` | 有 ID、状态、证据、来源和关系的长期知识 |
+| `Decision` | 已评审取舍，对应 ADR |
+| `Experiment` | 可复现验证及其观察和限制 |
+| `Execution` | 一次运行的状态、输入、工具调用和证据索引 |
+| `Result` | 对 Task 验收可判断的输出与后续动作 |
+
+## Aggregate Boundaries
+
+- **Task Aggregate**：Task、Acceptance、Constraint、Risk。
+- **Execution Aggregate**：Execution、Step、ToolCallReference、Failure、Retry。
+- **Knowledge Aggregate**：KnowledgeAsset、Relation、Evidence、ProjectionState。
+- **Workflow Aggregate**：WorkflowDefinition、Stage、Transition、RecoveryPolicy。
+
+## Invariants
+
+- Result 不能在缺少验收证据时标记完成。
+- Provider Token、SDK 类型和设备细节不得进入 Domain。
+- Accepted Decision 必须关联 ADR；Experiment 不能自动变成 Decision。
+- Feishu Projection 不得覆盖 Git Canonical Asset。
+- Private Context 不能成为公开 KnowledgeAsset，除非脱敏并 Review。
+
+## Evolution
+
+Now 只实现 Knowledge 相关模型；Next 引入 Task / Execution / Result Contract；Later 将 Video Story、Character、Scene、Shot 作为业务子域扩展，而不是污染通用核心。

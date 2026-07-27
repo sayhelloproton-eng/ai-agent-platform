@@ -182,5 +182,6 @@
 - Agent 工作协议：[`docs/governance/agent-working-protocol.md`](docs/governance/agent-working-protocol.md)
 - Git / Feishu 治理：[`docs/governance/git-feishu-governance.md`](docs/governance/git-feishu-governance.md)
 - 文档与 README 规范：[`docs/governance/documentation-rules.md`](docs/governance/documentation-rules.md)
+- 私有上下文与敏感资产：[`docs/governance/private-context-and-sensitive-assets.md`](docs/governance/private-context-and-sensitive-assets.md)
 
 修改本宪法必须说明原因和受影响规则，检查是否需要 ADR，并由 Project Owner 确认。

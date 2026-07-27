@@ -1,9 +1,16 @@
-# CTX-001 Project Context
+---
+asset_id: CTX-001
+asset_type: context
+title: Project Context
+status: accepted
+evidence_level: decided
+updated_at: 2026-07-27
+canonical_source: git
+canonical_path: docs/00-context/CTX-001-project-context.md
+related_assets: [PRD-001, ARC-001, ADR-002]
+---
 
-- Asset ID: `CTX-001`
-- Status: `accepted`
-- Evidence: `decided`
-- Canonical Path: `docs/00-context/CTX-001-project-context.md`
+# CTX-001 Project Context
 
 ## What
 
@@ -81,4 +88,4 @@ AI 正在改变软件研发方式。项目需要把零散讨论、实验与工�
 - [CTX-004 Six-Month Roadmap](CTX-004-roadmap-6-months.md)
 - [PRD-001 Platform Vision](../01-product/PRD-001-platform-vision.md)
 - [ARC-001 Platform Target Architecture](../02-architecture/ARC-001-platform-target-architecture.md)
-- [ADR-002 Git Single Source of Truth](../09-adr/ADR-002-git-single-source-feishu-projection.md)
+- [ADR-002 Git Single Source of Truth](../10-adr/ADR-002-git-single-source-feishu-projection.md)

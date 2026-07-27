@@ -1,5 +1,3 @@
 # 示例：同步状态
 
-条件：Skill v1 实现并通过自测、用户验收。
-
-预期：把“Skill v1 完成”加入 completed 并附验收报告；更新 next；不因只生成草稿而提前完成。首页快照可选。
+先根据 Task Result 生成 Git CTX-002 Draft 和 Diff；Merge 后再生成飞书 Project Status Projection Plan，确认并回读。

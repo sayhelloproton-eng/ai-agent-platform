@@ -52,5 +52,5 @@
 - [项目宪法](../../AGENTS.md)
 - [文档目录规则](../AGENTS.md)
 - [Skill 工程规则](../../skills/AGENTS.md)
-- [Git 唯一真源 ADR](../09-adr/ADR-002-git-single-source-feishu-projection.md)
+- [Git 唯一真源 ADR](../10-adr/ADR-002-git-single-source-feishu-projection.md)
 - [Knowledge Asset Architecture](../06-knowledge-system/ARC-002-knowledge-asset-architecture.md)

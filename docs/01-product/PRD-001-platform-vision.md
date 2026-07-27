@@ -1,9 +1,16 @@
-# PRD-001 Platform Vision
+---
+asset_id: PRD-001
+asset_type: product
+title: Platform Vision
+status: accepted
+evidence_level: decided
+updated_at: 2026-07-27
+canonical_source: git
+canonical_path: docs/01-product/PRD-001-platform-vision.md
+related_assets: [CTX-001, ARC-001, PRD-002]
+---
 
-- Asset ID: `PRD-001`
-- Status: `accepted`
-- Evidence: `decided`
-- Canonical Path: `docs/01-product/PRD-001-platform-vision.md`
+# PRD-001 Platform Vision
 
 ## 平台价值
 

@@ -1,55 +1,26 @@
-# 写入治理与项目状态同步
+# Write Governance
 
-## 内容责任
+## Authority
 
-正式内容由拥有完整项目上下文的 Agent 生成或审核；Codex 只根据明确草稿执行。缺失事实时，保留 `待确认`，不得补写合理但未经证实的结论。
+正式项目内容先写 Git Draft 并 Review。Feishu Projection 不能成为独立规范源；Feishu Native 影响项目时先晋升到 Git。
 
-## 写入级别
+## Levels
 
-- G0：本地生成草稿、索引、预览。自动允许。
-- G1：读取飞书、回读验收。自动允许。
-- G2：创建新知识文档、更新指定状态文档。需要一次明确确认。
-- G3：覆盖大段既有正文、批量更新。需要变更摘要和二次确认。
-- G4：删除、移动、权限、成员、互联网公开。Skill 不执行。
+- G0：本地 Draft、Index、Preview。
+- G1：只读 Provider、回读验收。
+- G2：创建/更新指定 Feishu Projection，需要明确确认。
+- G3：批量或大段覆盖，需要变更摘要和二次确认。
+- G4：删除、移动、权限、成员、互联网公开；Skill 不执行。
 
-## Project Status 规则
+## Current State Update
 
-### 规范源
+1. 读取 Git `CTX-002` 和证据。
+2. 生成完整 Git Draft 与 Diff。
+3. Project Owner Review 后 Merge。
+4. 更新 Asset Index。
+5. 可选生成 Feishu Project Status Projection Plan。
+6. 确认后写入并回读；失败只标记 Projection Pending，不回滚 Git 正式状态。
 
-创建独立 `Project_Status（项目状态）` 文档，位于 `00_Context`。首页只展示摘要并链接该文档。
+## ADR and Experiment
 
-### 何时更新
-
-- Phase 或 objective 改变。
-- 一个任务达到验收标准。
-- 阻塞出现/解除。
-- 下一步优先级被用户确认。
-
-普通聊天、尝试命令、生成草稿不更新。
-
-### 更新流程
-
-1. 读取当前 Project Status 和 revision。
-2. 收集 Task Result / 报告 / 用户决定。
-3. 生成新状态全文和差异摘要。
-4. 校验 completed 项均有 evidence。
-5. 用户确认。
-6. 使用 overwrite 或精准替换更新状态文档。
-7. 回读验收。
-8. 可选：将简短快照同步到首页；失败不影响状态真源。
-9. 更新 Knowledge Index。
-
-## ADR
-
-只有形成真实取舍且状态明确时创建：Proposed、Accepted、Superseded、Rejected。设计建议不等于 Accepted。
-
-## 实验
-
-实验文档必须区分：目标、环境、步骤、观察、结论、限制、后续。失败实验同样保存，但不能写成能力已支持。
-
-## 幂等
-
-- title + parent token + knowledge event id 作为幂等线索。
-- 创建前列出目标父节点子节点并精确查重。
-- 更新前检查 revision/更新时间。
-- 写入后回读，不因 `_notice` 字段误判失败而重复创建。
+只有真实取舍并经确认才能 Accepted。Experiment 必须包含环境、步骤、观察、结果和限制；验证不自动等于采用。

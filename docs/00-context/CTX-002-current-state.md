@@ -1,55 +1,59 @@
-# CTX-002 Current State
+---
+asset_id: CTX-002
+asset_type: status
+title: Current State
+status: implemented
+evidence_level: verified
+updated_at: 2026-07-27
+canonical_source: git
+canonical_path: docs/00-context/CTX-002-current-state.md
+related_assets: [CTX-001, CTX-003, CTX-004, ADR-002, MIG-001]
+---
 
-- Asset ID: `CTX-002`
-- Status: `implemented`
-- Evidence: `verified`
-- Canonical Path: `docs/00-context/CTX-002-current-state.md`
-- Updated: `2026-07-27`
+# CTX-002 Current State
 
 ## Current Phase
 
-**Knowledge Foundation**。当前正在执行仓库整体调整的 Batch 2，建立公开 Context、Product 与 Architecture 入口，完成后等待 Review。
+**Knowledge Foundation — repository normalization and Git-first knowledge governance.**
 
-## Completed
+## Completed in the Current Tree
 
-- 根与子目录 `AGENTS.md` 分层规则体系已完成。
-- Batch 1 Private Context 边界与 `.gitignore` 已完成并推送。
-- Git 已确认为正式项目事实的唯一真源；飞书定位为投影与补充知识层。
-- AI Knowledge Skill v1.0.0 已存在并通过既有自检。
-- 飞书 CLI、公开 Wiki 读取与导出能力已有验证资产。
+- 分层 `AGENTS.md` 与 Governance 规则。
+- Public Git、`.private-context/` 和 Secret 三类边界。
+- Context、Product、Architecture、Domain、Agent、Workflow、Knowledge、Solution、Research、Experiment、ADR、Engineering、Operations、Portfolio 的正式目录。
+- Git 唯一真源与 Feishu Projection 决策。
+- AI Knowledge Skill 的 Git-first 状态模型、索引优先检索和受控飞书写入边界。
+- 旧 `docs/context/`、根层历史文档和错误编号目录的迁移或删除。
+- WaytoAGI 第三方全文继续作为本地忽略内容，只保留脚本、元数据和实验摘要。
 
 ## In Progress
 
-- Batch 2：Context、Product、Target Architecture 和 Six-Month Delivery Architecture。
-- 知识资产索引、关系、迁移清单与飞书映射对齐。
+- 项目所有者 Review 本次迁移并决定 Commit / Push。
+- 依据新 Feishu Map 生成只读对齐与 Write Plan。
+- 设计 Git → Feishu 投影、回读和 Drift Detection MVP。
 
-## Blocked
+## Not Implemented
 
-- 当前无阻塞项。
-- 飞书投影迁移需单独 Write Plan 与人工确认，不在本批次执行。
+- 平台 API / Gateway 与 Agent Runtime。
+- Task Contract、Codex Bridge、Result / Execution Tracking。
+- 自动 Git → Feishu 发布服务。
+- AI Video Workflow 和模型 Adapter。
 
-## Current Evidence
+## Known Limits
 
-- `AGENTS.md` 及目录级规则。
-- `docs/_index/` 中的资产与关系索引。
-- `docs/09-adr/ADR-002-git-single-source-feishu-projection.md`。
-- `skills/ai-knowledge/` 的 Skill、Schema、脚本与测试。
-- Batch 1 Git 提交与当前工作树差异。
+- 当前 Git 历史仍可能保留已经从最新树删除的早期私人或过时文件；未执行历史重写。
+- 飞书已有目录和页面尚未按新 Git 结构重新对齐。
+- Mermaid 需要在具备 `mmdc` 的环境中做渲染级验证。
 
-## Current Commit
+## Evidence
 
-Batch 2 执行基线：`4ad7afba1bc20a682f415f611ceae79183d94457` (`chore: add local private context boundary`)。本批次尚未 Commit。
+- 迁移审计：[`MIG-001`](../12-operations/migration/MIG-001-repository-audit-and-migration-2026-07-27.md)
+- Skill 验证：`node scripts/validate_bundle.mjs`、`node tests/self-test.mjs`
+- 索引：[`docs/_index/`](../_index/)
 
 ## Next Actions
 
-1. Review Batch 2 新增资产与索引。
-2. 获得确认后单独 Commit / Push Batch 2。
-3. 再按计划进入后续资产迁移，不提前执行 Batch 3。
-4. 另行规划旧飞书状态页面和规则的投影迁移。
-
-## Known Drift
-
-- 旧 `docs/context/**` 尚保留，已不作为新 Canonical Path，后续批次再治理。
-- 飞书中的旧项目状态与双源表述可能落后于 ADR-002，当前未同步。
-- Agent Runtime、Codex Bridge 和 AI Video Workflow 均尚未实现。
-- 长期 Target Architecture 中多数运行组件仍属于 Next 或 Later。
+1. Review 迁移 Diff、审计报告和敏感信息扫描。
+2. Commit / Push 本次迁移。
+3. 只读检查飞书当前结构并生成对齐 Write Plan。
+4. 实现投影 MVP 前先建立 Contract、幂等和回读验收。

@@ -1,9 +1,16 @@
-# ARC-001 Platform Target Architecture
+---
+asset_id: ARC-001
+asset_type: architecture
+title: Platform Target Architecture
+status: accepted
+evidence_level: decided
+updated_at: 2026-07-27
+canonical_source: git
+canonical_path: docs/02-architecture/ARC-001-platform-target-architecture.md
+related_assets: [PRD-001, DOM-001, ARC-003]
+---
 
-- Asset ID: `ARC-001`
-- Status: `accepted`
-- Evidence: `decided`
-- Canonical Path: `docs/02-architecture/ARC-001-platform-target-architecture.md`
+# ARC-001 Platform Target Architecture
 
 > 本文描述长期目标架构，不代表全部已经实现。当前代码和可执行资产主要集中在 AI Knowledge Skill 与 Knowledge Foundation；Gateway、Runtime、Coding Workflow 和 Video Workflow 分属 Next 或 Later。
 

@@ -7,7 +7,7 @@ evidence_level: decided
 owners:
   - project-owner
 created_at: 2026-07-26
-updated_at: 2026-07-26
+updated_at: 2026-07-27
 canonical_source: git
 canonical_path: docs/06-knowledge-system/ARC-002-knowledge-asset-architecture.md
 feishu:
@@ -210,14 +210,9 @@ Agent 可以生成草稿、建议分类、创建 PR、检查模板和关系、�
 
 ## Evolution Strategy
 
-1. Phase 0：盘点，不移动、不删除。
-2. Phase 1：建立治理配置、索引、模板和 ADR-002。
-3. Phase 2：迁移 Context 与 Roadmap。
-4. Phase 3：迁移 Architecture 与 Domain。
-5. Phase 4：拆分 Skill 设计资产和工程资产。
-6. Phase 5：区分 Research、Experiment 和 ADR。
-7. Phase 6：调整飞书逻辑目录，新增 Feishu Native。
-8. Phase 7：实现 Git → Feishu 单向同步 MVP。
+1. 已完成：治理配置、Context、Architecture、Domain、Skill、Workflow、Solution、Research、Experiment、ADR 与 Operations 迁移。
+2. Next：生成 Feishu 对齐 Write Plan，并实现单资产 Git → Feishu Projection MVP。
+3. Later：加入 Drift 调度、Runtime Evidence 外部存储和跨 Provider 检索。
 
 ## Acceptance Criteria
 

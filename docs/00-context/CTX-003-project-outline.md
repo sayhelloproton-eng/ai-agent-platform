@@ -1,9 +1,16 @@
-# CTX-003 Project Outline
+---
+asset_id: CTX-003
+asset_type: context
+title: Project Outline
+status: accepted
+evidence_level: decided
+updated_at: 2026-07-27
+canonical_source: git
+canonical_path: docs/00-context/CTX-003-project-outline.md
+related_assets: [CTX-001, CTX-004, PRD-001]
+---
 
-- Asset ID: `CTX-003`
-- Status: `accepted`
-- Evidence: `decided`
-- Canonical Path: `docs/00-context/CTX-003-project-outline.md`
+# CTX-003 Project Outline
 
 ## 项目定位
 

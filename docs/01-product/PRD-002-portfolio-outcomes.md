@@ -1,9 +1,16 @@
-# PRD-002 Portfolio Outcomes
+---
+asset_id: PRD-002
+asset_type: product
+title: Portfolio Outcomes
+status: accepted
+evidence_level: decided
+updated_at: 2026-07-27
+canonical_source: git
+canonical_path: docs/01-product/PRD-002-portfolio-outcomes.md
+related_assets: [PRD-001, PRT-001, PRT-002]
+---
 
-- Asset ID: `PRD-002`
-- Status: `accepted`
-- Evidence: `decided`
-- Canonical Path: `docs/01-product/PRD-002-portfolio-outcomes.md`
+# PRD-002 Portfolio Outcomes
 
 ## 结果原则
 
@@ -17,7 +24,7 @@ Portfolio 只展示可由 Git、运行记录、测试或评审证据支持的成
 | GitHub 工程质量 | 规则分层、私有边界、资产索引、ADR 与文档治理 | CI、发布流程、运行时工程规范 |
 | Architecture | Knowledge Asset Architecture、Git / Feishu 真源决策 | Platform Target 与 Delivery Architecture 的实现验证 |
 | ADR | ADR-001 历史与 ADR-002 当前决策 | Runtime、Task、Provider 和 Workflow 的后续决策 |
-| Skill | AI Knowledge Skill v1.0.0 源资产 | 真实项目查询、沉淀和同步的持续评估 |
+| Skill | AI Knowledge Skill v1.1.0 源资产 | 真实项目查询、沉淀和同步的持续评估 |
 | Experiment | Feishu CLI 和公开 Wiki 读取/导出验证 | Coding / Video Workflow 对照实验 |
 | Workflow | 尚未交付运行时 Workflow | ChatGPT → Codex 与 Story → Video Workflow |
 | 测试和评估 | Skill 现有确定性自检 | 契约测试、集成测试、质量/成本评估 |

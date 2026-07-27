@@ -1,7 +1,7 @@
 ---
 name: ai-knowledge
-version: 1.0.0
-description: "管理 ai-agent-platform 的长期项目知识。当 Agent 需要查询项目上下文、从飞书知识库获取最小必要证据、沉淀实验或 ADR、同步项目进度、导入公开飞书 Wiki、维护知识索引或生成学习路径时使用。默认索引优先、最小上下文、只读优先；飞书只是 Provider，底层复用官方 lark-cli/OpenAPI；任何写入先生成预览并遵循人工确认门禁。"
+version: 1.1.0
+description: "管理 ai-agent-platform 的长期项目知识。当 Agent 需要查询项目上下文、从 Git 正式资产和可选知识 Provider 获取最小必要证据、沉淀实验或 ADR、同步项目进度、导入公开飞书 Wiki、维护知识索引或生成学习路径时使用。默认索引优先、最小上下文、只读优先；飞书只是 Provider，底层复用官方 lark-cli/OpenAPI；任何写入先生成预览并遵循人工确认门禁。"
 metadata:
   requires:
     bins: ["lark-cli", "node"]
@@ -15,7 +15,7 @@ metadata:
 
 1. [`references/00-shared-rules.md`](references/00-shared-rules.md)：认证、安全、确认门禁和停止条件。
 2. [`references/01-architecture-and-boundaries.md`](references/01-architecture-and-boundaries.md)：Skill、Provider、Agent、Codex 的职责边界。
-3. [`references/02-project-profile.md`](references/02-project-profile.md)：当前 `ai-agent-platform` 飞书空间、目录和动态状态策略。
+3. [`references/02-project-profile.md`](references/02-project-profile.md)：当前 `ai-agent-platform` Git 资产、飞书投影和动态状态策略。
 4. 涉及飞书读取或写入时，再读取 [`references/06-feishu-provider.md`](references/06-feishu-provider.md)。
 
 ## 触发场景
@@ -49,7 +49,7 @@ metadata:
 |---|---|---|
 | 查询项目上下文 | `04-retrieval-policy.md`、`07-workflows.md#query-context` | Context Package |
 | 沉淀知识 | `03-knowledge-model.md`、`05-write-governance.md` | Knowledge Draft + Write Plan |
-| 同步项目状态 | `05-write-governance.md`、`07-workflows.md#sync-project-status` | Project Status Draft |
+| 同步项目状态 | `05-write-governance.md`、`07-workflows.md#sync-project-status` | Git Current State Draft + Projection Plan |
 | 记录 ADR | `03-knowledge-model.md`、`07-workflows.md#record-adr` | ADR Draft |
 | 导入公开 Wiki | `06-feishu-provider.md`、`07-workflows.md#import-public-wiki` | Tree + Index + Import Report |
 | 生成学习路径 | `07-workflows.md#build-learning-path` | Learning Path |
@@ -58,7 +58,7 @@ metadata:
 ## 强制行为规则
 
 - **内容作者与执行器分离**：Codex 可以读取、创建、更新和验收；不得在缺少依据时自行宣布项目阶段、技术决策或完成状态。
-- **动态状态单一真源**：`Project_Status（项目状态）` 是规范状态源；首页“当前阶段”只是可选快照，不能作为唯一真源。
+- **动态状态单一真源**：Git `docs/00-context/CTX-002-current-state.md` 是规范状态源；飞书 Project Status 和首页阶段信息都是可选 Projection。
 - **只读优先**：读取、索引和生成草稿默认不需要确认；创建/更新飞书文档必须先预览。
 - **索引优先**：先查询本地 Knowledge Index；没有索引时先构建目录级索引，不要把整个 Wiki 正文发送给模型。
 - **局部读取**：优先 outline/section/fragment；只有在需要跨全文综合且预算允许时读取完整 Markdown。

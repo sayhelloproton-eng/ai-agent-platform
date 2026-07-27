@@ -1,112 +1,51 @@
-version: 1
+version: 2
 project: ai-agent-platform
-policy:
-  destructive_changes: prohibited_in_phase_0
-  allowed_actions:
-    - keep
-    - split
-    - merge
-    - rewrite
-    - supersede
-    - archive
-    - delete_candidate
-
+completed_at: 2026-07-27
+history_rewrite_performed: false
 items:
-  - current_path: README.md
-    content_type: project_entry
-    duplicate: false
-    outdated: true
-    formal_project_fact: true
-    target_asset_id: CTX-001
-    target_git_path: README.md
-    target_feishu_path: 00_Home
+  - source: docs/context/**
+    action: delete_after_merge
+    target: docs/00-context/** and docs/12-operations/**
+    status: complete
+    note: stale private-repository and dual-source state removed from active tree; Git history retains originals
+  - source: docs/09-adr/**
+    action: move
+    target: docs/10-adr/**
+    status: complete
+  - source: docs/research/waytoagi-feishu-cli-export/**
+    action: move
+    target: docs/08-research/external/waytoagi-feishu-cli-export/**
+    status: complete
+    note: pages remains local and ignored
+  - source: docs/Feishu_Knowledge_Skill_Architecture_v1.0.md
+    action: split_and_rewrite
+    target: docs/04-agent-system/skills/SKL-001-ai-knowledge.md; docs/06-knowledge-system/ARC-004-ai-knowledge-runtime-boundaries.md
+    status: complete
+  - source: docs/Feishu_Public_Wiki_Read_Test_Report.md; docs/Feishu_Wiki_Public_Access_Capability_Report.md
+    action: merge_and_split
+    target: docs/08-research/RSH-001-feishu-cli-capabilities.md; docs/09-experiments/EXP-001-public-feishu-wiki-read.md
+    status: complete
+  - source: docs/research/waytoagi-feishu-cli-export/export-report.md
+    action: summarize
+    target: docs/09-experiments/EXP-002-public-feishu-wiki-export.md
+    status: complete
+  - source: docs/feishu-wiki-init-plan.md
     action: rewrite
-    migration_status: complete
-
-  - current_path: docs/context/project-context.md
-    content_type: project_context
-    duplicate: false
-    outdated: false
-    formal_project_fact: true
-    target_asset_id: CTX-001
-    target_git_path: docs/00-context/CTX-001-project-context.md
-    target_feishu_path: 01_Context/Project Context
+    target: docs/07-solutions/knowledge-system/SOL-001-feishu-wiki-initialization.md
+    status: complete
+  - source: docs/Feishu_Knowledge_Base_*_Result_v1.0.md
     action: rewrite
-    migration_status: canonical_replacement_created_source_retained
-
-  - current_path: docs/context/current-task.md
-    content_type: project_status
-    duplicate: false
-    outdated: false
-    formal_project_fact: true
-    target_asset_id: CTX-002
-    target_git_path: docs/00-context/CTX-002-current-state.md
-    target_feishu_path: 01_Context/Project Status
+    target: docs/12-operations/feishu/OPS-001..OPS-003
+    status: complete
+  - source: docs/Feishu_Knowledge_Base_Homepage_v1.0.xml
+    action: move
+    target: docs/12-operations/feishu/snapshots/homepage-v1.0.xml
+    status: complete
+  - source: .private-context/**
+    action: ignore_content_track_readmes
+    target: .private-context/**/README.md
+    status: complete
+  - source: skills/ai-knowledge Project_Status canonical rules
     action: rewrite
-    migration_status: canonical_replacement_created_source_retained
-
-  - current_path: .private-context/project-origin/AI项目大纲-原始上下文.md
-    content_type: private_project_origin
-    duplicate: false
-    outdated: partially
-    formal_project_fact: false
-    target_asset_id: CTX-003
-    target_git_path: docs/00-context/CTX-003-project-outline.md
-    target_feishu_path: 01_Context/Project Outline
-    action: rewrite
-    migration_status: public_sanitized_asset_created_private_source_retained
-
-  - current_path: init/架构图.png
-    content_type: architecture_diagram
-    duplicate: false
-    outdated: unknown
-    formal_project_fact: true
-    target_asset_id: ARC-001
-    target_git_path: docs/02-architecture/diagrams/platform-target-architecture-v1.png
-    target_feishu_path: 03_Architecture/Platform Target Architecture
-    action: keep
-    migration_status: moved_hash_verified
-
-  - current_path: docs/Feishu_Knowledge_Skill_Architecture_v1.0.md
-    content_type: architecture
-    duplicate: false
-    outdated: partially
-    formal_project_fact: true
-    target_asset_id: SKL-001
-    target_git_path: docs/06-knowledge-system/ARC-001-ai-knowledge-architecture.md
-    target_feishu_path: 07_Knowledge_System/AI Knowledge Architecture
-    action: rewrite
-    migration_status: pending
-
-  - current_path: docs/context/feishu-sync-pending/C-adr-001-dual-source.md
-    content_type: adr
-    duplicate: false
-    outdated: true
-    formal_project_fact: true
-    target_asset_id: ADR-001
-    target_git_path: docs/09-adr/ADR-001-github-feishu-dual-source.md
-    target_feishu_path: 10_ADR/ADR-001 GitHub 与飞书双源事实架构
-    action: supersede
-    migration_status: complete
-
-  - current_path: skills/ai-knowledge
-    content_type: skill_engineering_asset
-    duplicate: false
-    outdated: false
-    formal_project_fact: true
-    target_asset_id: SKL-001
-    target_git_path: skills/ai-knowledge
-    target_feishu_path: 07_Knowledge_System/AI Knowledge Skill
-    action: split
-    migration_status: pending
-
-  - current_path: docs/research/waytoagi-feishu-cli-export/pages
-    content_type: third_party_full_text
-    duplicate: false
-    outdated: unknown
-    formal_project_fact: false
-    target_asset_id: null
-    target_git_path: null
-    target_feishu_path: null
-    action: archive
-    migration_status: excluded_from_git
+    target: Git CTX-002 canonical; Feishu Project Status projection
+    status: complete
