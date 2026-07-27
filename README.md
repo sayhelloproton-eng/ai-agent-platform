@@ -57,9 +57,15 @@ Git 保存正式工程事实；Feishu 只提供便于人阅读的知识投影。
 
 ## Current Phase
 
-当前阶段：**Knowledge Layer / Context Foundation**。
+当前阶段：**Phase 1: Knowledge Foundation — 已交付**
 
-本阶段只建立项目级 Context 基础，不处理 Feishu 实施、MCP、Gateway、Action、Runtime 或业务代码。当前状态与下一步见 [`context/current-status.md`](context/current-status.md)。
+已完成：
+- Git 唯一真源与四层文档架构（`docs/knowledge/`、`docs/technical/`、`docs/learning/`、`docs/adr/`）
+- AI Knowledge Skill v1.2.0（Git → Feishu 受控投影）
+- `context/` 项目级 Agent 启动上下文
+- 17 个知识页面发布至飞书知识库"智能体工程探索"
+
+当前：仓库一致性修复。下一步见 [`context/current-status.md`](context/current-status.md)。
 
 ## Development Rules
 

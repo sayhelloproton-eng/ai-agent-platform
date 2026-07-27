@@ -16,7 +16,7 @@ Knowledge Layer 基础建设已交付：Context Foundation、知识资产组织�
 
 ## Next
 
-- AI Knowledge Skill Runtime Script Alignment（`validate_bundle.mjs` 当前 exit code 1）；
+- 仓库一致性修复（过期链接、Context Drift、状态文件同步）；
 - Phase 2（AI Coding Workflow）待 Project Owner 启动。
 
 ## Not Started
@@ -33,6 +33,4 @@ Knowledge Layer 基础建设已交付：Context Foundation、知识资产组织�
 - 不修改业务代码；
 - 不把后续计划描述为当前已实现。
 
-## Known Issues
-
-- `skills/ai-knowledge/scripts/validate_bundle.mjs` 运行时 exit code 1，因 validator 仍读取旧 `profile.git.current_state` 和 `docs/00-context/CTX-002-current-state.md`，与 Profile 3.0 不兼容。
+当前无 Known Issues。

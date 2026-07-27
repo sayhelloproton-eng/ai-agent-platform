@@ -14,7 +14,8 @@ assets:
   - asset_id: CTX-002
     title: Current State
     asset_type: status
-    status: implemented
+    status: superseded
+    superseded_by: context/current-status.md
     evidence_level: verified
     canonical_path: docs/technical/Archive/历史Context/CTX-002-current-state.md
     migration_state: complete
@@ -30,7 +31,8 @@ assets:
   - asset_id: CTX-004
     title: Six-Month Roadmap
     asset_type: roadmap
-    status: accepted
+    status: superseded
+    superseded_by: context/roadmap.md
     evidence_level: decided
     canonical_path: docs/technical/Archive/历史Context/CTX-004-roadmap-6-months.md
     migration_state: complete

@@ -40,15 +40,15 @@ paths:
   project_context: context/project-context.md
   current_state: context/current-status.md
   current_task: null
-  project_outline: docs/knowledge/项目与产品/CTX-003-project-outline.md
+  project_outline: docs/knowledge/项目与产品/CTX-003-项目总览.md
   roadmap: context/roadmap.md
-  platform_vision: docs/knowledge/项目与产品/PRD-001-platform-vision.md
-  target_architecture: docs/knowledge/架构与领域/平台架构/ARC-001-platform-target-architecture.md
-  delivery_architecture: docs/knowledge/架构与领域/平台架构/ARC-003-six-month-delivery-architecture.md
-  domain_model: docs/knowledge/架构与领域/领域模型/DOM-001-core-domain-model.md
-  skill_design: docs/knowledge/Agent与能力/Skill设计/SKL-001-ai-knowledge.md
+  platform_vision: docs/knowledge/项目与产品/PRD-001-平台愿景.md
+  target_architecture: docs/knowledge/架构与领域/平台架构/ARC-001-平台目标架构.md
+  delivery_architecture: docs/knowledge/架构与领域/平台架构/ARC-003-六个月交付架构.md
+  domain_model: docs/knowledge/架构与领域/领域模型/DOM-001-核心领域模型.md
+  skill_design: docs/knowledge/Agent与能力/Skill设计/SKL-001-AI知识技能.md
   workflows: docs/knowledge/工作流
-  knowledge_system: docs/knowledge/架构与领域/知识架构
+  knowledge_system: docs/knowledge/知识系统
   runtime_architecture: docs/technical/架构实现
   solutions: docs/technical/技术方案
   research: docs/technical/技术调研
@@ -56,7 +56,7 @@ paths:
   adr: docs/adr
   engineering: docs/technical/工程规范
   operations: docs/technical/运维与迁移
-  portfolio: docs/knowledge/Portfolio
+  portfolio: docs/knowledge/作品集
   asset_index: docs/technical/元数据/assets.yaml
   relation_index: docs/technical/元数据/relations.yaml
   migration_inventory: docs/technical/元数据/migration-inventory.yaml

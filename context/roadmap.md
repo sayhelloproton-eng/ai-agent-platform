@@ -14,9 +14,9 @@
 
 建立面向 Agent 的知识能力，用于最小上下文检索、知识组织、状态维护和受控知识生命周期。
 
-当前状态：**In Progress — Skill 已建成，v3.0 迁移中**
+当前状态：**Completed / Delivered**
 
-> `skills/ai-knowledge/` v1.0.0 已完成交付。当前工作：Runtime Script Alignment（`validate_bundle.mjs` exit code 1 待修复）和 Knowledge System Redesign v3.0 目录迁移。
+> `skills/ai-knowledge/` v1.2.0 已完成交付并通过 `validate_bundle.mjs` 和 `self-test.mjs` 验证。当前活动：Knowledge Foundation 仓库一致性修复。
 
 ## Phase 3: ChatGPT Action + Gateway
 
