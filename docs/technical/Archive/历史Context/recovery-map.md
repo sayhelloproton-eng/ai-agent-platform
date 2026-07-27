@@ -1,6 +1,8 @@
 # Recovery Map
 
-新 Agent 按以下顺序恢复项目：
+> ⛔ **ARCHIVED / SUPERSEDED** — 此恢复路径已过期。当前恢复入口见 [`context/README.md`](../../../context/README.md) 和 [项目宪法](../../../AGENTS.md) §12。
+
+旧恢复顺序（不再有效）：
 
 1. `/AGENTS.md`
 2. `/README.md`

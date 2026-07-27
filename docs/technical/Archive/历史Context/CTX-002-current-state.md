@@ -2,7 +2,8 @@
 asset_id: CTX-002
 asset_type: status
 title: Current State
-status: implemented
+status: superseded
+superseded_by: context/current-status.md
 evidence_level: verified
 updated_at: 2026-07-27
 canonical_source: git

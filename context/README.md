@@ -19,7 +19,7 @@
 
 - [`project-context.md`](project-context.md)：项目定义、问题与最终目标；
 - [`architecture-context.md`](architecture-context.md)：长期分层方向与渐进式建设原则；
-- [`current-status.md`](current-status.md)：Task 001 当前状态、下一步和禁止事项；
+- [`current-status.md`](current-status.md)：当前阶段、已完成项和下一步；
 - [`roadmap.md`](roadmap.md)：阶段路线图；
 - [`knowledge-strategy.md`](knowledge-strategy.md)：Git 唯一真源与 Feishu 单向投影规则。
 
@@ -33,7 +33,7 @@
 - 临时讨论、完整执行日志或未经确认的结论；
 - 详细设计、实验、ADR 或历史资产。
 
-详细资产继续保留在 `docs/` 与 `skills/`；本目录不在 Task 001 中迁移或重写这些历史资产。
+详细资产继续保留在 `docs/` 与 `skills/`；本目录不在当前任务中迁移或重写这些历史资产。
 
 ## Structure
 

@@ -2,7 +2,7 @@
 
 ## What
 
-`docs/governance/` 保存项目宪法之下的详细治理和操作规范。
+`docs/technical/治理规则/` 保存项目宪法之下的详细治理和操作规范。
 
 ## Why
 

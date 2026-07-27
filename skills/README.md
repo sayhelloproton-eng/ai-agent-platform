@@ -39,6 +39,6 @@ Skill 将稳定的领域能力、运行时规则、Schema、示例和测试组�
 ## Related Docs
 
 - [项目宪法](../AGENTS.md)
-- [Agent 工作协议](../docs/governance/agent-working-protocol.md)
-- [Git / Feishu 治理](../docs/governance/git-feishu-governance.md)
-- [文档规范](../docs/governance/documentation-rules.md)
+- [Agent 工作协议](../docs/technical/治理规则/agent-working-protocol.md)
+- [Git / Feishu 治理](../docs/technical/治理规则/git-feishu-governance.md)
+- [文档规范](../docs/technical/治理规则/documentation-rules.md)

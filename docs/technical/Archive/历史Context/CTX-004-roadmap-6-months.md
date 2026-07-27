@@ -2,7 +2,8 @@
 asset_id: CTX-004
 asset_type: roadmap
 title: Six-Month Roadmap
-status: accepted
+status: superseded
+superseded_by: context/roadmap.md
 evidence_level: decided
 updated_at: 2026-07-27
 canonical_source: git

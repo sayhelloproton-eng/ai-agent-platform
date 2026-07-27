@@ -23,9 +23,13 @@
 
 ## 2. 六个月优先级
 
-### Phase 1：Knowledge Foundation
+> 本节目的是高层优先级概述。详细分阶段路线图见 [`context/roadmap.md`](context/roadmap.md)，两文件必须保持一致，冲突时 Agent 报告 Drift。
+
+### Phase 1：Knowledge Foundation（已交付）
 
 完成 Git + Feishu + AI Knowledge Skill：项目知识、索引、受控投影、回读验收和 Drift 检测。
+
+当前状态：Context Foundation（Task 001）、知识资产组织（Task 002）、知识配置与治理（Task 003A/B/C）已交付。
 
 ### Phase 2：AI Coding Workflow
 
@@ -73,7 +77,7 @@
 
 负责最小上下文查询、Context Package、Knowledge Draft、Write Plan、Git / 飞书映射、受控投影和回读验收；不替 Project Owner 做最终决策。
 
-详细职责见 [`docs/governance/agent-working-protocol.md`](docs/governance/agent-working-protocol.md)。
+详细职责见 [`docs/technical/治理规则/agent-working-protocol.md`](docs/technical/治理规则/agent-working-protocol.md)。
 
 ## 5. Agent 开始任务前
 
@@ -81,7 +85,7 @@
 
 1. 根 `AGENTS.md`；
 2. 根 `README.md`；
-3. Git 中的 Current State 和 Current Task；
+3. `context/current-status.md`、`context/roadmap.md` 和 `knowledge.config.yaml`；
 4. 与任务直接相关的目录 `AGENTS.md`、README、Architecture、ADR、Skill、Workflow、Research 或 Experiment；
 5. 目标文件和工作区状态。
 
@@ -115,7 +119,7 @@
 - 未运行的验证不得声称通过；
 - 发现规则、事实或实现冲突时停止静默合并并报告。
 
-详细流程见 [`docs/governance/agent-working-protocol.md`](docs/governance/agent-working-protocol.md)。
+详细流程见 [`docs/technical/治理规则/agent-working-protocol.md`](docs/technical/治理规则/agent-working-protocol.md)。
 
 ## 7. README 与目录级规则
 
@@ -127,7 +131,7 @@
 - 只有存在特殊执行、验证或安全规则的目录才增加目录级 `AGENTS.md`；
 - 机器生成或固定格式目录若不适合 README，必须由父目录 README 记录例外。
 
-详细规则见 [`docs/governance/documentation-rules.md`](docs/governance/documentation-rules.md)。
+详细规则见 [`docs/technical/治理规则/documentation-rules.md`](docs/technical/治理规则/documentation-rules.md)。
 
 ## 8. Git、飞书与正式事实
 
@@ -139,7 +143,7 @@
 - 飞书写入必须先有 Write Plan 和人工确认，写入后回读验收；
 - 删除、移动、权限和公开分享不得自动执行。
 
-详细规则见 [`docs/governance/git-feishu-governance.md`](docs/governance/git-feishu-governance.md)。
+详细规则见 [`docs/technical/治理规则/git-feishu-governance.md`](docs/technical/治理规则/git-feishu-governance.md)。
 
 ## 9. 公共仓库安全底线
 
@@ -175,14 +179,54 @@
 
 ## 12. 正式规则导航
 
-- 项目恢复入口：[`docs/00-context/recovery-map.md`](docs/00-context/recovery-map.md)
-- 当前项目状态：[`docs/00-context/CTX-002-current-state.md`](docs/00-context/CTX-002-current-state.md)
-- 当前任务：[`docs/00-context/current-task.md`](docs/00-context/current-task.md)
+- 项目恢复入口：[`docs/technical/Archive/历史Context/recovery-map.md`](docs/technical/Archive/历史Context/recovery-map.md)
+- 当前项目状态：[`context/current-status.md`](context/current-status.md)
+- 项目上下文：[`context/project-context.md`](context/project-context.md)
+- 路线图：[`context/roadmap.md`](context/roadmap.md)
+- 知识策略：[`context/knowledge-strategy.md`](context/knowledge-strategy.md)
 - 文档目录规则：[`docs/AGENTS.md`](docs/AGENTS.md)
 - Skill 通用规则：[`skills/AGENTS.md`](skills/AGENTS.md)
-- Agent 工作协议：[`docs/governance/agent-working-protocol.md`](docs/governance/agent-working-protocol.md)
-- Git / Feishu 治理：[`docs/governance/git-feishu-governance.md`](docs/governance/git-feishu-governance.md)
-- 文档与 README 规范：[`docs/governance/documentation-rules.md`](docs/governance/documentation-rules.md)
-- 私有上下文与敏感资产：[`docs/governance/private-context-and-sensitive-assets.md`](docs/governance/private-context-and-sensitive-assets.md)
+- Agent 工作协议：[`docs/technical/治理规则/agent-working-protocol.md`](docs/technical/治理规则/agent-working-protocol.md)
+- Git / Feishu 治理：[`docs/technical/治理规则/git-feishu-governance.md`](docs/technical/治理规则/git-feishu-governance.md)
+- 文档与 README 规范：[`docs/technical/治理规则/documentation-rules.md`](docs/technical/治理规则/documentation-rules.md)
+- 私有上下文与敏感资产：[`docs/technical/治理规则/private-context-and-sensitive-assets.md`](docs/technical/治理规则/private-context-and-sensitive-assets.md)
+- 知识配置：[`knowledge.config.yaml`](knowledge.config.yaml)
 
 修改本宪法必须说明原因和受影响规则，检查是否需要 ADR，并由 Project Owner 确认。
+
+## 13. 状态同步规则（强制）
+
+### 13.1 任务关闭前置检查
+
+任何任务关闭前，Agent 必须检查以下三个文件是否需要更新。只要有一项需要更新而未更新，任务视为 **未完成**，不得标记 Done：
+
+| 文件 | 当发生以下情况时必须更新 |
+|---|---|
+| `context/current-status.md` | 当前阶段、已完成项、进行中项或下一步发生变化 |
+| `context/roadmap.md` | 阶段推进、路线图新增或调整 |
+| `README.md` | 项目当前方向、架构或 Context Navigation 引用发生变化 |
+
+此检查不属于"建议"，不属于"顺手做一下"。不通过此检查 = 任务未关闭。
+
+### 13.2 Agent 启动阻断规则
+
+Agent 启动时，完成最小上下文读取后，必须交叉验证以下事实是否自洽，任一项不成立即为 **Context Drift**：
+
+- `context/current-status.md` 描述的阶段 vs. 仓库实际文件结构和 commit 历史
+- `knowledge.config.yaml` 中的 `version` 和路径引用 vs. 仓库实际文件存在性
+- `context/roadmap.md` 的阶段顺序 vs. `context/current-status.md` 的当前阶段
+
+**检测到 Context Drift 时**：
+1. **立即停止执行**，不得继续任务；
+2. 向 Project Owner 报告：哪个文件与哪个事实冲突、偏差是什么；
+3. **等待 Project Owner 指令**，不得自行选择"哪一方正确"并继续工作。
+
+此规则覆盖任何场景，包括但不限于：用户请求探索代码、执行修改、回答问题、生成计划。Drift 未解决前，Agent 不执行任何实质性工作。
+
+### 13.3 禁止行为
+
+- 基于过期 `current-status.md` 直接执行任务
+- 发现 drift 后自行"推测真实状态"并继续
+- 更新状态文件时把计划、假设或期望写成已完成事实
+- 任务关闭时以"这个文件和我的任务无关"为由跳过 13.1 检查
+- 以"用户指令优先级更高"为由绕过 Drift 阻断继续执行

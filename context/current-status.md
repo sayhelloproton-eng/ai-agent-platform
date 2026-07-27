@@ -2,49 +2,36 @@
 
 ## Current Phase
 
-**Knowledge Layer / Context Foundation**
+**Phase 1: Knowledge Foundation — Completed**
 
-Task 001 的当前目标是建立项目级 AI Context 基础，使新的 Codex / Agent 会话只读取 Git 仓库即可理解项目、阶段、架构方向、知识策略和工作规则。
+Knowledge Layer 基础建设已交付：Context Foundation、知识资产组织、知识配置 v3.0、治理规则对齐均已完成。`knowledge.config.yaml` 为 version 3，`docs/` 采用四层结构（knowledge/technical/learning/adr）。
 
 ## Completed
 
-- 项目初始化；
-- Git Source of Truth 确认；
-- Knowledge Strategy 确认。
-
-## In Progress
-
-- Context Foundation；
-- 将根 `README.md` 定位为 Project Context Root；
-- 建立根 `context/` 最小启动上下文。
-
-## Not Started
-
-- Gateway；
-- MCP；
-- AI Video Workflow。
-
-这些项目属于后续阶段；“未开始”不授权当前 Task 创建占位模块或提前实现。
+- Task 001：Context Foundation — 根 `context/` 六文件、`README.md` Project Context Root、Git 唯一真源与 Feishu 单向投影策略；
+- Task 002：知识资产组织 — `docs/knowledge/`、`docs/technical/`、`docs/learning/`、`docs/adr/` 四层结构；
+- Task 003-A/B/C：知识配置 v3.0、Project Profile 3.0、治理规则对齐；
+- 仓库清理：删除过期的 `feat/feishu-knowledge-projection-v1` 分支，修复全仓过期链接和导航，Archive 文件标记 superseded。
 
 ## Next
 
-本 Task 完成并由人工确认后，下一步是进入 Roadmap 的 Phase 2：**AI Knowledge Skill**。
+- AI Knowledge Skill Runtime Script Alignment（`validate_bundle.mjs` 当前 exit code 1）；
+- Phase 2（AI Coding Workflow）待 Project Owner 启动。
 
-在人工确认前，不继续执行 Phase 2。
+## Not Started
+
+- Feishu 飞书操作（写入、节点创建、部署）；
+- MCP、Gateway、Action、Runtime 实现；
+- AI Coding Workflow (Phase 2)；
+- AI Video Workflow (Phase 3)。
 
 ## Current Restrictions
 
-- 不处理 Feishu；
-- 不处理 MCP；
-- 不处理 Gateway；
-- 不处理 Action；
-- 不处理 Runtime；
+- 不处理 Feishu 写入或部署；
+- 不处理 MCP、Gateway、Action、Runtime；
 - 不修改业务代码；
-- 不调整技术架构；
-- 不优化依赖；
-- 不执行大规模重构；
 - 不把后续计划描述为当前已实现。
 
-## Known Context Drift
+## Known Issues
 
-仓库中已有 `docs/` 与 `skills/` 历史资产。本 Task 不迁移、不删除、不重写这些资产。若它们与本启动上下文对当前阶段或下一步的描述不一致，Agent 必须报告 Drift，不得静默合并或自行扩大 Task 001 范围。
+- `skills/ai-knowledge/scripts/validate_bundle.mjs` 运行时 exit code 1，因 validator 仍读取旧 `profile.git.current_state` 和 `docs/00-context/CTX-002-current-state.md`，与 Profile 3.0 不兼容。

@@ -6,13 +6,17 @@
 
 建立 Project Context Root、项目级 Context、Git 唯一真源和 Knowledge Strategy，使新 Agent 能从仓库恢复项目方向和当前任务。
 
-当前状态：**In Progress — Context Foundation**
+当前状态：**Completed**
+
+> Task 001（Context Foundation）、Task 002（知识资产组织）、Task 003-A/B/C（知识配置 v3.0、Project Profile、治理规则对齐）已完成。当前进入 Knowledge System Redesign v3.0 迁移阶段（详见 `repository-analysis.md`）。
 
 ## Phase 2: AI Knowledge Skill
 
 建立面向 Agent 的知识能力，用于最小上下文检索、知识组织、状态维护和受控知识生命周期。
 
-当前状态：**Next — 等待 Phase 1 人工确认**
+当前状态：**In Progress — Skill 已建成，v3.0 迁移中**
+
+> `skills/ai-knowledge/` v1.0.0 已完成交付。当前工作：Runtime Script Alignment（`validate_bundle.mjs` exit code 1 待修复）和 Knowledge System Redesign v3.0 目录迁移。
 
 ## Phase 3: ChatGPT Action + Gateway
 
