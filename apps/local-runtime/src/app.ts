@@ -1,7 +1,11 @@
 import {
+  verifyBearerAuthorization,
+} from "@ai-agent-platform/auth";
+import {
   CONTRACT_VERSION,
   validateTaskRequest,
 } from "@ai-agent-platform/contracts";
+import type { CapabilityPolicy } from "@ai-agent-platform/policy";
 import {
   createServer,
   type IncomingMessage,
@@ -11,7 +15,6 @@ import {
 
 import {
   createRuntimeExecutor,
-  type RuntimeExecutorOptions,
 } from "./executor.js";
 import {
   resolveRequestId,
@@ -96,12 +99,17 @@ function readRequestBody(request: IncomingMessage): Promise<BodyReadResult> {
   });
 }
 
-export type RuntimeAppOptions = RuntimeExecutorOptions;
+export interface LocalRuntimeOptions {
+  readonly apiKey: string;
+  readonly policy?: CapabilityPolicy;
+}
 
 export function createRuntimeHandler(
-  options: RuntimeAppOptions = {},
+  options: LocalRuntimeOptions,
 ): RequestListener {
-  const executor = createRuntimeExecutor(options);
+  const executor = createRuntimeExecutor(
+    options.policy === undefined ? {} : { policy: options.policy },
+  );
 
   return (request, response) => {
     const requestId = resolveRequestId(request);
@@ -122,6 +130,26 @@ export function createRuntimeHandler(
           "Route not found.",
         );
         return;
+      }
+
+      if (pathname === TASKS_ROUTE) {
+        const verification = verifyBearerAuthorization(
+          request.headers.authorization,
+          options.apiKey,
+        );
+
+        if (!verification.ok) {
+          writeError(
+            response,
+            401,
+            requestId,
+            "UNAUTHENTICATED",
+            "Authentication required.",
+            { "www-authenticate": "Bearer" },
+          );
+          request.resume();
+          return;
+        }
       }
 
       if (request.method !== allowedMethod) {
@@ -237,7 +265,7 @@ export function createRuntimeHandler(
 }
 
 export function createRuntimeServer(
-  options: RuntimeAppOptions = {},
+  options: LocalRuntimeOptions,
 ): Server {
   return createServer(createRuntimeHandler(options));
 }

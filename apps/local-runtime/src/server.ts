@@ -1,3 +1,6 @@
+import { isValidApiKeyFormat } from "@ai-agent-platform/auth";
+import { pathToFileURL } from "node:url";
+
 import { createRuntimeServer } from "./app.js";
 
 const DEFAULT_HOST = "127.0.0.1";
@@ -30,22 +33,59 @@ function resolvePort(input: string | undefined): number {
   return port;
 }
 
-try {
-  const host = resolveHost(process.env.LOCAL_RUNTIME_HOST);
-  const port = resolvePort(process.env.LOCAL_RUNTIME_PORT);
-  const server = createRuntimeServer();
+function resolveApiKey(input: string | undefined): string {
+  if (!isValidApiKeyFormat(input)) {
+    throw new Error(
+      "Runtime API key must contain 32 to 256 non-whitespace characters.",
+    );
+  }
 
-  server.once("error", () => {
-    console.error("Local Runtime failed to start.");
+  return input;
+}
+
+export interface LocalRuntimeConfiguration {
+  readonly host: string;
+  readonly port: number;
+  readonly apiKey: string;
+}
+
+export function resolveLocalRuntimeConfiguration(
+  environment: Readonly<Record<string, string | undefined>>,
+): LocalRuntimeConfiguration {
+  return {
+    host: resolveHost(environment.LOCAL_RUNTIME_HOST),
+    port: resolvePort(environment.LOCAL_RUNTIME_PORT),
+    apiKey: resolveApiKey(environment.LOCAL_RUNTIME_API_KEY),
+  };
+}
+
+function startLocalRuntime(): void {
+  try {
+    const configuration = resolveLocalRuntimeConfiguration(process.env);
+    const server = createRuntimeServer({ apiKey: configuration.apiKey });
+
+    server.once("error", () => {
+      console.error("Local Runtime failed to start.");
+      process.exitCode = 1;
+    });
+
+    server.listen(configuration.port, configuration.host, () => {
+      console.log(
+        `Local Runtime listening on http://${configuration.host}:${configuration.port}`,
+      );
+    });
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Invalid server configuration.";
+    console.error(`Local Runtime failed to start: ${message}`);
     process.exitCode = 1;
-  });
+  }
+}
 
-  server.listen(port, host, () => {
-    console.log(`Local Runtime listening on http://${host}:${port}`);
-  });
-} catch (error: unknown) {
-  const message =
-    error instanceof Error ? error.message : "Invalid server configuration.";
-  console.error(`Local Runtime failed to start: ${message}`);
-  process.exitCode = 1;
+const entryPath = process.argv[1];
+if (
+  entryPath !== undefined &&
+  import.meta.url === pathToFileURL(entryPath).href
+) {
+  startLocalRuntime();
 }

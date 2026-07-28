@@ -22,7 +22,7 @@
 
 当前阶段：**设计与渐进实施阶段**。
 
-`SOL-005` 已定义完整路线图（Phase 0 至 Phase 14）。Monorepo 工程基础、Contracts v1、Auth、Capability Policy、Action Gateway 静态 API Key 认证和 Local Runtime 最小任务执行闭环已落地并通过测试；动态策略、Gateway → Runtime 通信与公网 Action 链路尚未实现。每阶段遵循“一步一任务、一步一自检、一步一反馈、一步一审核”原则。
+`SOL-005` 已定义完整路线图（Phase 0 至 Phase 14）。Monorepo 工程基础、Contracts v1、Auth、Capability Policy、Action Gateway → Local Runtime 本地任务链路已落地并通过测试；动态策略、启动编排、Tunnel 与公网 Action 链路尚未实现。每阶段遵循“一步一任务、一步一自检、一步一反馈、一步一审核”原则。
 
 ## 当前代码
 
@@ -33,14 +33,20 @@
 - 已通过 `packages/auth/` 实现 API Key 格式检查、SHA-256 固定长度摘要与恒定时间比较；
 - 已实现受保护的 `GET /v1/capabilities`；
 - 已通过 `packages/policy/` 实现 Capability 级 Deny by default 与明确允许；
-- Gateway 默认只展示 `gateway.ping`；
+- Gateway 默认展示并允许 `gateway.ping` 与 `runtime.status`；
 - 当前没有动态策略管理；
 - Authorization Header 脱敏工具已存在，但正式日志系统尚未建立；
 - Local Runtime 已实现 `GET /health`、`GET /ready` 与 `POST /v1/tasks`；
 - Runtime 已实现 Task Contract 校验、Policy 二次校验和 Contract v1 `TaskResult`；
 - Runtime 当前执行 `gateway.ping` 与 `runtime.status`，仅监听 Loopback；
-- Gateway 尚未连接 Runtime，Runtime 暂无内部 API Key；
+- Gateway 已新增受外部 API Key 保护的 `POST /v1/tasks`；
+- Gateway Runtime Client 只连接 Loopback HTTP，并验证 Runtime `TaskResult`；
+- Gateway 与 Runtime 使用分离的两套 API Key，并分别执行 Capability Policy；
+- Runtime `/v1/tasks` 已增加内部 API Key，health 与 ready 保持公开；
+- 本地 Gateway → Runtime 链路已通过真实双服务测试；
 - 公网链路尚未建立。
+
+下一步是建立本地启动编排、配置 Cloudflare Named Tunnel，并生成 Custom GPT OpenAPI Schema。
 
 ## 代码落位边界
 

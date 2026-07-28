@@ -4,7 +4,7 @@
 
 **Phase 2: AI Coding Workflow — In Progress**
 
-Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gateway MVP 设计基线、Monorepo 根级工程基线、Contracts v1、Auth、Capability Policy、Action Gateway 静态 API Key 认证和 Local Runtime 最小任务执行闭环；Gateway 尚未连接 Runtime。
+Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gateway MVP 设计基线、Monorepo 根级工程基线、Contracts v1、Auth、Capability Policy，以及 Action Gateway → Local Runtime 本地任务执行链路；公网链路尚未建立。
 
 ## Completed
 
@@ -28,24 +28,28 @@ Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gatewa
 - Local Runtime workspace：`/health`、`/ready`、`/v1/tasks` 和 65536 字节 Body 限制已实现，仅监听 Loopback；
 - Runtime Task Contract 校验、Policy 二次校验、Capability 调度与 Contract v1 `TaskResult` 已实现；
 - Runtime 默认实现 `gateway.ping` 与 `runtime.status`，`system.info.safe` 未实现且默认拒绝；
-- Runtime 26/26、Policy 12/12、Gateway 30/30、Contracts 17/17、Auth 12/12 通过，Repo Check 与 Knowledge Skill 回归通过。
+- Gateway 新增受保护的 `POST /v1/tasks`，只接受 `custom-gpt` requester，并覆盖不可信 Task Request ID；
+- Gateway → Runtime HTTP Client 已实现，仅允许 Loopback HTTP，具有 3000 ms 默认 Timeout、65536 字节响应上限和 `TaskResult` 校验；
+- 外部 `ACTION_GATEWAY_API_KEY` 与内部 Runtime Key 分离，Runtime `/v1/tasks` 已增加内部 Bearer 认证；
+- Gateway 与 Runtime 分别执行 Capability Policy，`system.info.safe` 默认在 Gateway 被拒绝；
+- Local Chain 5/5、Runtime 38/38、Gateway 60/60、Policy 12/12、Contracts 17/17、Auth 12/12 通过，Repo Check 与 Knowledge Skill 回归通过。
 
 ## Next
 
-- 连接 Action Gateway 与 Local Runtime，新增受保护的 `POST /v1/tasks`。
+- 建立本地一键启动脚本，并配置 Cloudflare Named Tunnel 与固定 HTTPS 域名。
 
 ## Not Started
 
 - Feishu 飞书操作（写入、节点创建、部署）；
 - 动态权限策略、Cloudflare Tunnel 和 Custom GPT Action Schema；
-- Gateway → Runtime 通信与 Runtime 内部认证；
+- 本地一键启动与公网端到端验证；
 - AI Video Workflow (Phase 3)。
 
 ## Current Restrictions
 
 - 不处理 Feishu 写入或部署；
 - 不把 Monorepo 工程基线描述为 Gateway MVP 已完成；
-- 未经后续任务授权不提前连接 Gateway 与 Runtime，或创建后续 Capability 和基础设施；
+- 未经后续任务授权不提前配置 Tunnel、OpenAPI、后续 Capability 或基础设施；
 - 不把后续计划描述为当前已实现。
 
-当前限制：Action Gateway 尚未连接 Runtime；Runtime 暂无内部认证；公网 Tunnel 与 Custom GPT Action 尚未建立。
+当前限制：Cloudflare Tunnel 尚未配置；Custom GPT OpenAPI 尚未生成；公网端到端链路尚未验证。

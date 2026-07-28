@@ -1,9 +1,12 @@
 import { isValidApiKeyFormat } from "@ai-agent-platform/auth";
 
 import { createGatewayServer } from "./app.js";
+import { createHttpRuntimeClient } from "./runtime-client.js";
 
 const DEFAULT_HOST = "127.0.0.1";
 const DEFAULT_PORT = 8787;
+const DEFAULT_RUNTIME_URL = "http://127.0.0.1:8790";
+const DEFAULT_RUNTIME_TIMEOUT_MS = 3_000;
 const LOOPBACK_HOSTS = new Set(["127.0.0.1", "localhost", "::1"]);
 
 function resolveHost(input: string | undefined): string {
@@ -44,11 +47,34 @@ function resolveApiKey(input: string | undefined): string {
   return input;
 }
 
+function resolveRuntimeTimeout(input: string | undefined): number {
+  if (input === undefined) {
+    return DEFAULT_RUNTIME_TIMEOUT_MS;
+  }
+
+  if (!/^\d+$/.test(input)) {
+    throw new Error("Runtime timeout must be an integer from 100 to 30000 ms.");
+  }
+
+  return Number(input);
+}
+
 try {
   const host = resolveHost(process.env.ACTION_GATEWAY_HOST);
   const port = resolvePort(process.env.ACTION_GATEWAY_PORT);
   const apiKey = resolveApiKey(process.env.ACTION_GATEWAY_API_KEY);
-  const server = createGatewayServer({ apiKey });
+  const runtimeApiKey = resolveApiKey(
+    process.env.ACTION_GATEWAY_RUNTIME_API_KEY,
+  );
+  const runtimeClient = createHttpRuntimeClient({
+    baseUrl:
+      process.env.ACTION_GATEWAY_RUNTIME_URL ?? DEFAULT_RUNTIME_URL,
+    apiKey: runtimeApiKey,
+    timeoutMs: resolveRuntimeTimeout(
+      process.env.ACTION_GATEWAY_RUNTIME_TIMEOUT_MS,
+    ),
+  });
+  const server = createGatewayServer({ apiKey, runtimeClient });
 
   server.once("error", () => {
     console.error("Action Gateway failed to start.");

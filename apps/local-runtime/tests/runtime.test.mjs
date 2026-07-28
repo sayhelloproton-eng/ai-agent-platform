@@ -8,6 +8,12 @@ import {
 } from "@ai-agent-platform/contracts";
 import { createCapabilityPolicy } from "@ai-agent-platform/policy";
 import { createRuntimeServer } from "../dist/app.js";
+import {
+  resolveLocalRuntimeConfiguration,
+} from "../dist/server.js";
+
+const API_KEY = "runtime-test-key-0123456789abcdef-xyz";
+const WRONG_API_KEY = "wrong-runtime-key-0123456789abcdef-xyz";
 
 function createTask(overrides = {}) {
   return {
@@ -27,7 +33,7 @@ function createTask(overrides = {}) {
 }
 
 async function withRuntime(run, options = {}) {
-  const server = createRuntimeServer(options);
+  const server = createRuntimeServer({ apiKey: API_KEY, ...options });
 
   await new Promise((resolve, reject) => {
     server.once("error", reject);
@@ -56,6 +62,7 @@ async function submitTask(baseUrl, task, headers = {}) {
   return fetch(`${baseUrl}/v1/tasks`, {
     method: "POST",
     headers: {
+      authorization: `Bearer ${API_KEY}`,
       "content-type": "application/json",
       ...headers,
     },
@@ -73,6 +80,7 @@ async function sendChunkedOversizedBody(port) {
         method: "POST",
         headers: {
           "content-type": "application/json",
+          authorization: `Bearer ${API_KEY}`,
           "transfer-encoding": "chunked",
         },
       },
@@ -106,6 +114,7 @@ async function sendDeclaredOversizedBody(port) {
         headers: {
           "content-type": "application/json",
           "content-length": "65537",
+          authorization: `Bearer ${API_KEY}`,
         },
       },
       (response) => {
@@ -194,7 +203,13 @@ test("405 responses include the route-specific Allow header", async () => {
     ];
 
     for (const [path, method, allow] of cases) {
-      const response = await fetch(`${baseUrl}${path}`, { method });
+      const response = await fetch(`${baseUrl}${path}`, {
+        method,
+        headers:
+          path === "/v1/tasks"
+            ? { authorization: `Bearer ${API_KEY}` }
+            : {},
+      });
       assert.equal(response.status, 405);
       assert.equal(response.headers.get("allow"), allow);
     }
@@ -230,7 +245,10 @@ test("invalid JSON returns 400 INVALID_TASK", async () => {
   await withRuntime(async (baseUrl) => {
     const response = await fetch(`${baseUrl}/v1/tasks`, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: {
+        authorization: `Bearer ${API_KEY}`,
+        "content-type": "application/json",
+      },
       body: "{invalid",
     });
     const body = await response.json();
@@ -244,7 +262,10 @@ test("a non-JSON Content-Type returns 415", async () => {
   await withRuntime(async (baseUrl) => {
     const response = await fetch(`${baseUrl}/v1/tasks`, {
       method: "POST",
-      headers: { "content-type": "text/plain" },
+      headers: {
+        authorization: `Bearer ${API_KEY}`,
+        "content-type": "text/plain",
+      },
       body: "{}",
     });
     const body = await response.json();
@@ -483,4 +504,128 @@ test("an allowed Capability without a handler fails safely", async () => {
     });
     assert.equal(validateTaskResult(result).ok, true);
   }, { policy });
+});
+
+test("GET /health remains public without internal authentication", async () => {
+  await withRuntime(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/health`);
+    assert.equal(response.status, 200);
+  });
+});
+
+test("GET /ready remains public without internal authentication", async () => {
+  await withRuntime(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/ready`);
+    assert.equal(response.status, 200);
+  });
+});
+
+test("POST /v1/tasks without an internal key returns 401", async () => {
+  await withRuntime(async (baseUrl) => {
+    const response = await submitTask(baseUrl, createTask(), {
+      authorization: "",
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 401);
+    assert.deepEqual(body.error, {
+      code: "UNAUTHENTICATED",
+      message: "Authentication required.",
+    });
+  });
+});
+
+test("POST /v1/tasks rejects an incorrect internal key", async () => {
+  await withRuntime(async (baseUrl) => {
+    const response = await submitTask(baseUrl, createTask(), {
+      authorization: `Bearer ${WRONG_API_KEY}`,
+    });
+    assert.equal(response.status, 401);
+  });
+});
+
+test("POST /v1/tasks rejects a malformed Bearer header", async () => {
+  await withRuntime(async (baseUrl) => {
+    const response = await submitTask(baseUrl, createTask(), {
+      authorization: `Basic ${API_KEY}`,
+    });
+    assert.equal(response.status, 401);
+  });
+});
+
+test("Runtime 401 advertises Bearer authentication", async () => {
+  await withRuntime(async (baseUrl) => {
+    const response = await submitTask(baseUrl, createTask(), {
+      authorization: "",
+    });
+    assert.equal(response.headers.get("www-authenticate"), "Bearer");
+  });
+});
+
+test("Runtime 401 does not expose either internal key", async () => {
+  await withRuntime(async (baseUrl) => {
+    const response = await submitTask(baseUrl, createTask(), {
+      authorization: `Bearer ${WRONG_API_KEY}`,
+    });
+    const bodyText = await response.text();
+
+    assert.equal(bodyText.includes(API_KEY), false);
+    assert.equal(bodyText.includes(WRONG_API_KEY), false);
+  });
+});
+
+test("the correct internal key executes gateway.ping", async () => {
+  await withRuntime(async (baseUrl) => {
+    const response = await submitTask(baseUrl, createTask());
+    const result = await response.json();
+
+    assert.equal(result.status, "succeeded");
+    assert.equal(result.output.capability, "gateway.ping");
+  });
+});
+
+test("the correct internal key executes runtime.status", async () => {
+  await withRuntime(async (baseUrl) => {
+    const response = await submitTask(
+      baseUrl,
+      createTask({ capability: "runtime.status" }),
+    );
+    const result = await response.json();
+
+    assert.equal(result.status, "succeeded");
+    assert.equal(result.output.runtime, "local-runtime");
+  });
+});
+
+test("unauthenticated GET /v1/tasks returns 401 before method handling", async () => {
+  await withRuntime(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/v1/tasks`);
+
+    assert.equal(response.status, 401);
+    assert.equal(response.headers.get("allow"), null);
+  });
+});
+
+test("authenticated GET /v1/tasks returns 405", async () => {
+  await withRuntime(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/v1/tasks`, {
+      headers: { authorization: `Bearer ${API_KEY}` },
+    });
+
+    assert.equal(response.status, 405);
+    assert.equal(response.headers.get("allow"), "POST");
+  });
+});
+
+test("missing LOCAL_RUNTIME_API_KEY fails configuration safely", () => {
+  assert.throws(
+    () => resolveLocalRuntimeConfiguration({}),
+    (error) => {
+      assert.ok(error instanceof Error);
+      assert.equal(error.message.includes(API_KEY), false);
+      assert.equal(error.message.includes("undefined"), false);
+      assert.match(error.message, /Runtime API key/);
+      return true;
+    },
+  );
 });

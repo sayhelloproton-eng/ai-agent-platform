@@ -4,8 +4,9 @@
 
 | 文件 | 职责 |
 |---|---|
-| `app.ts` | HTTP 路由、Request Listener 和 Server 创建 |
+| `app.ts` | HTTP 路由、外部认证、Task Contract、Gateway Policy 和 Server 创建 |
 | `response.ts` | JSON Envelope、响应 Header 和 Request ID |
-| `server.ts` | 本地启动入口与 Host、Port 校验 |
+| `runtime-client.ts` | 连接 Loopback Local Runtime、内部认证、Timeout、响应限制和 `TaskResult` 校验 |
+| `server.ts` | 本地启动入口、Host / Port 与 Runtime Client 配置 |
 
-当前源码只实现本地 HTTP 外壳，不包含认证、Runtime 或执行能力。
+当前源码已实现本地 Gateway → Runtime 任务链路，不包含 Tunnel、OpenAPI 或危险 Capability。
