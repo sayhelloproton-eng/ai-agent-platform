@@ -22,11 +22,12 @@
 - npm workspaces 根级工程基础，包括 Node.js 版本约束、lock 文件和统一验证入口；
 - `packages/contracts`：Task / Result / Error Contract v1、Capability 白名单、运行时校验和测试；
 - `apps/action-gateway`：本地 `/health`、`/ready`、Request ID 与统一安全响应格式；
-- `packages/auth` 与 Gateway API Key 认证：安全密钥比较、Header 脱敏和受保护 Capability 查询。
+- `packages/auth` 与 Gateway API Key 认证：安全密钥比较、Header 脱敏和受保护 Capability 查询；
+- `packages/policy`：Capability 级默认拒绝、明确允许和 Gateway 可见能力过滤。
 
 下一项：
 
-- 创建 `packages/policy`，定义 Capability 级允许与拒绝决策。
+- 创建 `apps/local-runtime`，实现本地 health、Task Contract 校验和安全 Capability 调度。
 
 ## Phase 3: AI Video Workflow
 

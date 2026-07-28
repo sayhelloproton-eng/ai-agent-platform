@@ -20,6 +20,14 @@ Authorization: Bearer <api-key>
 
 未认证请求统一返回 HTTP 401。
 
+Gateway 使用 `@ai-agent-platform/policy` 控制可见 Capability。`/ready` 与认证后的 `/v1/capabilities` 只返回策略允许的能力；默认只允许：
+
+```text
+gateway.ping
+```
+
+`runtime.status` 和 `system.info.safe` 当前尚未开放。Capability 出现在 Contract 中不代表自动允许。
+
 ## 当前安全边界
 
 - 默认只监听 `127.0.0.1`；
@@ -40,7 +48,8 @@ npm run start --workspace @ai-agent-platform/action-gateway
 ## 当前限制
 
 - 仅支持单一静态 API Key；
-- 无权限策略；
+- 无动态策略管理；
 - 无 Local Runtime；
+- 无任务执行接口；
 - 无 Cloudflare Tunnel；
 - 无 Custom GPT OpenAPI Schema。

@@ -19,8 +19,9 @@
     "check:knowledge": "node skills/ai-knowledge/tests/self-test.mjs",
     "check:contracts": "npm run verify --workspace @ai-agent-platform/contracts",
     "check:auth": "npm run verify --workspace @ai-agent-platform/auth",
+    "check:policy": "npm run verify --workspace @ai-agent-platform/policy",
     "check:gateway": "npm run verify --workspace @ai-agent-platform/action-gateway",
-    "verify": "npm run check:repo && npm run check:knowledge && npm run check:contracts && npm run check:auth && npm run check:gateway"
+    "verify": "npm run check:repo && npm run check:knowledge && npm run check:contracts && npm run check:auth && npm run check:policy && npm run check:gateway"
   },
   "devDependencies": {
     "@types/node": "^20.19.43",

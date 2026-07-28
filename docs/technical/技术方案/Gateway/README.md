@@ -22,7 +22,7 @@
 
 当前阶段：**设计与渐进实施阶段**。
 
-`SOL-005` 已定义完整路线图（Phase 0 至 Phase 14）。Monorepo 工程基础、Contracts v1、Auth 基础包和 Action Gateway 静态 API Key 认证已落地并通过测试；权限策略、Runtime 与公网 Action 链路尚未实现。每阶段遵循“一步一任务、一步一自检、一步一反馈、一步一审核”原则。
+`SOL-005` 已定义完整路线图（Phase 0 至 Phase 14）。Monorepo 工程基础、Contracts v1、Auth、Capability Policy 和 Action Gateway 静态 API Key 认证已落地并通过测试；动态策略、Runtime 与公网 Action 链路尚未实现。每阶段遵循“一步一任务、一步一自检、一步一反馈、一步一审核”原则。
 
 ## 当前代码
 
@@ -32,9 +32,11 @@
 - 已实现 `GET /health` 和 `GET /ready`；
 - 已通过 `packages/auth/` 实现 API Key 格式检查、SHA-256 固定长度摘要与恒定时间比较；
 - 已实现受保护的 `GET /v1/capabilities`；
-- 当前只有认证，没有 Capability 权限决策；
+- 已通过 `packages/policy/` 实现 Capability 级 Deny by default 与明确允许；
+- Gateway 默认只展示 `gateway.ping`；
+- 当前没有动态策略管理；
 - Authorization Header 脱敏工具已存在，但正式日志系统尚未建立；
-- 尚未实现 Local Runtime 和公网链路。
+- 尚未实现 Local Runtime、任务执行和公网链路。
 
 ## 代码落位边界
 
@@ -50,7 +52,7 @@
 | 基础设施 | `infra/cloudflare/`、`infra/launchd/` | Tunnel、进程管理 |
 | 运维脚本 | `scripts/` | 一键启动/停止/验证 |
 
-当前 `packages/contracts/`、`packages/auth/` 与 `apps/action-gateway/` 已创建；其他运行时代码目录尚未创建。
+当前 `packages/contracts/`、`packages/auth/`、`packages/policy/` 与 `apps/action-gateway/` 已创建；其他运行时代码目录尚未创建。
 
 ## 使用规则
 

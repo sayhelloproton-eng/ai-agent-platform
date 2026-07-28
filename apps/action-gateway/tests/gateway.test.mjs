@@ -1,13 +1,14 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
+import { createCapabilityPolicy } from "@ai-agent-platform/policy";
 import { createGatewayServer } from "../dist/app.js";
 
 const API_KEY = "test-api-key-0123456789abcdef-xyz";
 const WRONG_API_KEY = "wrong-api-key-0123456789abcdef-xyz";
 
-async function withGateway(run) {
-  const server = createGatewayServer({ apiKey: API_KEY });
+async function withGateway(run, options = {}) {
+  const server = createGatewayServer({ apiKey: API_KEY, ...options });
 
   await new Promise((resolve, reject) => {
     server.once("error", reject);
@@ -60,11 +61,7 @@ test("GET /ready exposes the Contracts capability allowlist", async () => {
     const response = await fetch(`${baseUrl}/ready`);
     const body = await response.json();
 
-    assert.deepEqual(body.data.capabilities, [
-      "gateway.ping",
-      "runtime.status",
-      "system.info.safe",
-    ]);
+    assert.deepEqual(body.data.capabilities, ["gateway.ping"]);
     assert.equal(new Date(body.data.timestamp).toISOString(), body.data.timestamp);
   });
 });
@@ -273,11 +270,7 @@ test("the protected route exposes the Capability allowlist", async () => {
     });
     const body = await response.json();
 
-    assert.deepEqual(body.data.capabilities, [
-      "gateway.ping",
-      "runtime.status",
-      "system.info.safe",
-    ]);
+    assert.deepEqual(body.data.capabilities, ["gateway.ping"]);
   });
 });
 
@@ -315,4 +308,81 @@ test("a 401 response preserves a valid request id", async () => {
     assert.equal(body.requestId, requestId);
     assert.equal(response.headers.get("x-request-id"), requestId);
   });
+});
+
+test("the default Policy excludes runtime.status", async () => {
+  await withGateway(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/ready`);
+    const body = await response.json();
+
+    assert.equal(body.data.capabilities.includes("runtime.status"), false);
+  });
+});
+
+test("the default Policy excludes system.info.safe", async () => {
+  await withGateway(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/ready`);
+    const body = await response.json();
+
+    assert.equal(body.data.capabilities.includes("system.info.safe"), false);
+  });
+});
+
+test("a custom Policy can allow system.info.safe", async () => {
+  const policy = createCapabilityPolicy(["system.info.safe"]);
+
+  await withGateway(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/ready`);
+    const body = await response.json();
+
+    assert.deepEqual(body.data.capabilities, ["system.info.safe"]);
+  }, { policy });
+});
+
+test("/ready and /v1/capabilities use the same Policy", async () => {
+  const policy = createCapabilityPolicy([
+    "gateway.ping",
+    "system.info.safe",
+  ]);
+
+  await withGateway(async (baseUrl) => {
+    const readyResponse = await fetch(`${baseUrl}/ready`);
+    const readyBody = await readyResponse.json();
+    const capabilitiesResponse = await fetch(
+      `${baseUrl}/v1/capabilities`,
+      { headers: { authorization: `Bearer ${API_KEY}` } },
+    );
+    const capabilitiesBody = await capabilitiesResponse.json();
+
+    assert.deepEqual(
+      readyBody.data.capabilities,
+      capabilitiesBody.data.capabilities,
+    );
+  }, { policy });
+});
+
+test("a custom Policy does not bypass protected-route authentication", async () => {
+  const policy = createCapabilityPolicy([
+    "gateway.ping",
+    "runtime.status",
+    "system.info.safe",
+  ]);
+
+  await withGateway(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/v1/capabilities`);
+
+    assert.equal(response.status, 401);
+  }, { policy });
+});
+
+test("Policy changes do not affect /health", async () => {
+  const policy = createCapabilityPolicy([]);
+
+  await withGateway(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/health`);
+    const body = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(body.data.status, "ok");
+  }, { policy });
 });

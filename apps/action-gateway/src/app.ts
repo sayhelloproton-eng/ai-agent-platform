@@ -2,9 +2,13 @@ import {
   verifyBearerAuthorization,
 } from "@ai-agent-platform/auth";
 import {
-  CAPABILITY_NAMES,
   CONTRACT_VERSION,
 } from "@ai-agent-platform/contracts";
+import {
+  createCapabilityPolicy,
+  listAllowedCapabilities,
+  type CapabilityPolicy,
+} from "@ai-agent-platform/policy";
 import {
   createServer,
   type RequestListener,
@@ -20,12 +24,17 @@ import {
 const SERVICE_NAME = "action-gateway";
 const PUBLIC_ROUTES = new Set(["/health", "/ready"]);
 const CAPABILITIES_ROUTE = "/v1/capabilities";
+const DEFAULT_POLICY = createCapabilityPolicy(["gateway.ping"]);
 
 export interface GatewayOptions {
   readonly apiKey: string;
+  readonly policy?: CapabilityPolicy;
 }
 
 export function createGatewayHandler(options: GatewayOptions): RequestListener {
+  const policy = options.policy ?? DEFAULT_POLICY;
+  const allowedCapabilities = listAllowedCapabilities(policy);
+
   return (request, response) => {
     const requestId = resolveRequestId(request);
 
@@ -80,7 +89,7 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
       if (pathname === CAPABILITIES_ROUTE) {
         writeSuccess(response, 200, requestId, {
           contractVersion: CONTRACT_VERSION,
-          capabilities: CAPABILITY_NAMES,
+          capabilities: allowedCapabilities,
         });
         return;
       }
@@ -100,7 +109,7 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
         service: SERVICE_NAME,
         status: "ready",
         contractVersion: CONTRACT_VERSION,
-        capabilities: CAPABILITY_NAMES,
+        capabilities: allowedCapabilities,
         timestamp,
       });
     } catch {
