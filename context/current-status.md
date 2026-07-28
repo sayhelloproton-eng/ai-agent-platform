@@ -13,7 +13,7 @@ Knowledge Layer 基础建设已交付：Context Foundation、知识资产组织�
 - Task 003-A/B/C：知识配置 v3.0、Project Profile 3.0、治理规则对齐；
 - 仓库清理：删除过期的 `feat/feishu-knowledge-projection-v1` 分支，修复全仓过期链接和导航，Archive 文件标记 superseded；
 - 知识体系理论文档（5 篇）：EXP-003、ARC-005、ARC-006、SOL-004、WFL-004；
-- 图片资源方案：新建 `knowledge-assets` 分支，配置分支保护，更新发布合同允许 GitHub Raw URL 图片。
+- 图片资源方案：`knowledge-assets` 分支 + `asset://` 引用 + Publisher 上传 Feishu 图片资源。
 
 ## Next
 

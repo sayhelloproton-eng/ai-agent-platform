@@ -52,24 +52,33 @@ Feishu Knowledge Base
 
 ### 允许发布
 
-以下图片引用**保留原文进入飞书**，Publisher 不处理、不上传、不转换：
+以下图片引用由 Publisher 处理：
 
-- GitHub Raw URL：`https://raw.githubusercontent.com/{owner}/{repo}/{branch}/...`
-- 其他公开 HTTPS URL（经 Review 确认稳定可用）
+- `asset://` 内部引用：`![图名](asset://文档名/图片文件名.png)`
 
-图片统一存储在 `knowledge-assets` 分支：
+Publisher 处理流程：
 
 ```text
-main 分支（Markdown）
-  └── ![](https://raw.githubusercontent.com/sayhelloproton-eng/ai-agent-platform/knowledge-assets/images/...)
-
-knowledge-assets 分支（只存图片）
-  └── images/architecture/
-  └── images/workflow/
-  └── images/screenshots/
+Markdown 中发现 asset://
+        ↓
+定位 knowledge-assets 对应文件
+  images/{docs/knowledge 子路径}/{文档名}/
+        ↓
+上传至 Feishu 图片资源
+        ↓
+生成 image block 替换 asset://
+        ↓
+发布文档
+        ↓
+read back 验证
 ```
 
-Publisher 不需要判断图片是否存在、是否需要上传或是否覆盖 — GitHub Raw URL 是确定性的，直接透传。
+Publisher 负责图片转换。LLM 不判断图片处理逻辑。
+
+### 禁止发布
+
+- 外部图床链接（GitHub Raw URL、Imgur、OSS 等）；
+- 本地相对路径（`./images/arch.png`）；
 
 ## 3. Projection Filter
 
@@ -82,8 +91,10 @@ Git Markdown
 移除 Git frontmatter
       |
       v
+解析 asset:// → 上传图片 → 生成 image block
+      |
+      v
 移除本地相对路径图片、Mermaid、draw.io、二进制资源引用
-（保留 GitHub Raw URL 和公开 HTTPS URL 图片）
       |
       v
 处理普通文档链接

@@ -120,8 +120,11 @@ Git Repository 是所有正式项目事实的 Canonical Source。Feishu 只能�
 
 Agent 在编写或修改 `docs/knowledge/` 下的 Markdown 文档时：
 
-- 图片引用**必须**使用 GitHub Raw URL：
-  `https://raw.githubusercontent.com/sayhelloproton-eng/ai-agent-platform/knowledge-assets/images/{path}/{file}`
-- **禁止**使用本地相对路径（`./images/arch.png`、`../diagrams/flow.jpg`）
-- 图片统一存储在 `knowledge-assets` 分支的 `images/` 目录
-- Publisher 不做图片上传、下载、转换处理 — 飞书直接渲染 URL
+- 图片**必须**存储在 `knowledge-assets` 分支的对应文档目录：
+  `images/{docs/knowledge 子路径}/{文档名}/`
+- Markdown 引用**必须**使用 `asset://` 格式：
+  `![图名](asset://文档名/图片文件名.png)`
+- **禁止**使用本地相对路径（`./images/arch.png`）
+- **禁止**使用外部图床链接（GitHub Raw URL、Imgur、OSS 等）
+- **禁止**在飞书手动上传图片
+- Publisher 负责 `asset://` → 飞书图片资源的转换

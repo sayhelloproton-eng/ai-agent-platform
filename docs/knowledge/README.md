@@ -20,7 +20,7 @@ AI 正在改变软件研发方式。项目从 AI Agent、内容创作和多端�
 
 ## 项目架构
 
-![平台架构大纲](https://raw.githubusercontent.com/sayhelloproton-eng/ai-agent-platform/knowledge-assets/images/architecture/platform-architecture-overview.jpg)
+![平台架构大纲](asset://README/架构大纲.jpg)
 
 平台长期以 Task、Agent、Capability、Workflow、Knowledge、Result 为核心领域，通过 Gateway、Application Service、Capability Port 和 Infrastructure Adapter 接入模型、工具、知识库、代码平台与存储。
 
