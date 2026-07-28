@@ -42,16 +42,34 @@ Feishu Knowledge Base
 
 ### 禁止发布
 
-以下资产和语法不得进入 Feishu payload：
+以下资产不得进入 Feishu payload：
 
-- 图片引用；
-- PNG、JPG、JPEG、SVG；
+- 图片本地相对路径（`./images/arch.png`、`../diagrams/flow.jpg`）；
 - Mermaid 源码或代码块；
 - draw.io 文件；
-- 其他二进制文件；
-- 指向上述资源的本地路径、附件或资源引用。
+- 内嵌二进制附件；
+- 未经 Review 的第三方图片 URL。
 
-Publisher 不上传、不下载、不转换这些资源，也不创建附件、图片 Block、白板或独立资源页面。
+### 允许发布
+
+以下图片引用**保留原文进入飞书**，Publisher 不处理、不上传、不转换：
+
+- GitHub Raw URL：`https://raw.githubusercontent.com/{owner}/{repo}/{branch}/...`
+- 其他公开 HTTPS URL（经 Review 确认稳定可用）
+
+图片统一存储在 `knowledge-assets` 分支：
+
+```text
+main 分支（Markdown）
+  └── ![](https://raw.githubusercontent.com/sayhelloproton-eng/ai-agent-platform/knowledge-assets/images/...)
+
+knowledge-assets 分支（只存图片）
+  └── images/architecture/
+  └── images/workflow/
+  └── images/screenshots/
+```
+
+Publisher 不需要判断图片是否存在、是否需要上传或是否覆盖 — GitHub Raw URL 是确定性的，直接透传。
 
 ## 3. Projection Filter
 
@@ -64,7 +82,8 @@ Git Markdown
 移除 Git frontmatter
       |
       v
-移除图片、Mermaid、draw.io、二进制资源引用
+移除本地相对路径图片、Mermaid、draw.io、二进制资源引用
+（保留 GitHub Raw URL 和公开 HTTPS URL 图片）
       |
       v
 处理普通文档链接

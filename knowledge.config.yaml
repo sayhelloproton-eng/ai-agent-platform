@@ -34,6 +34,8 @@ paths:
   docs_root: docs
   context_root: context
   knowledge_root: docs/knowledge
+  images_ref: knowledge-assets
+  images_url_base: https://raw.githubusercontent.com/sayhelloproton-eng/ai-agent-platform/knowledge-assets
   technical_root: docs/technical
   learning_root: docs/learning
   adr_root: docs/adr
