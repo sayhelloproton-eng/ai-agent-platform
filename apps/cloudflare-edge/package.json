@@ -1,0 +1,14 @@
+{
+  "name": "@ai-agent-platform/cloudflare-edge",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "tsc -p tsconfig.json --noEmit && node --test tests/*.test.mjs",
+    "deploy": "wrangler deploy",
+    "verify": "npm test"
+  },
+  "devDependencies": {
+    "wrangler": "4.86.0"
+  }
+}

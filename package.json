@@ -22,11 +22,12 @@
     "check:policy": "npm run verify --workspace @ai-agent-platform/policy",
     "check:gateway": "npm run verify --workspace @ai-agent-platform/action-gateway",
     "check:runtime": "npm run verify --workspace @ai-agent-platform/local-runtime",
+    "check:edge": "npm run verify --workspace @ai-agent-platform/cloudflare-edge",
     "check:local-chain": "npm run build --workspace @ai-agent-platform/local-runtime && npm run build --workspace @ai-agent-platform/action-gateway && node --test scripts/local-chain-test.mjs",
     "local:build": "npm run build --workspace @ai-agent-platform/contracts && npm run build --workspace @ai-agent-platform/auth && npm run build --workspace @ai-agent-platform/policy && npm run build --workspace @ai-agent-platform/local-runtime && npm run build --workspace @ai-agent-platform/action-gateway",
     "local:start": "npm run local:build && node scripts/local-stack.mjs",
     "check:local-stack": "npm run local:build && node --test scripts/local-stack-test.mjs",
-    "verify": "npm run check:repo && npm run check:knowledge && npm run check:contracts && npm run check:auth && npm run check:policy && npm run check:gateway && npm run check:runtime && npm run check:local-chain && npm run check:local-stack"
+    "verify": "npm run check:repo && npm run check:knowledge && npm run check:contracts && npm run check:auth && npm run check:policy && npm run check:gateway && npm run check:runtime && npm run check:edge && npm run check:local-chain && npm run check:local-stack"
   },
   "devDependencies": {
     "@types/node": "^20.19.43",
