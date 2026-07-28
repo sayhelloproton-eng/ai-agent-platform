@@ -4,7 +4,7 @@
 
 **Phase 2: AI Coding Workflow — In Progress**
 
-Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gateway MVP 设计基线、Monorepo 根级工程基线和 Contracts v1；尚未实现 Gateway / Runtime。
+Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gateway MVP 设计基线、Monorepo 根级工程基线、Contracts v1 和 Action Gateway 本地 HTTP 外壳；尚未实现认证、权限或 Runtime。
 
 ## Completed
 
@@ -19,17 +19,18 @@ Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gatewa
 - 首个真实 workspace：`@ai-agent-platform/contracts`；
 - Contracts v1：Task / Result / Error、Capability 白名单、JSON 数据边界和运行时 validator 已通过测试；
 - Skill 隔离：`skills/ai-knowledge` 未加入 workspace，前后自检通过且文件无变化。
+- Action Gateway 最小应用：`/health`、`/ready`、Request ID、404、405 和安全 JSON 响应已实现；
+- Gateway 默认仅监听 Loopback，13 个 Gateway 测试全部通过，Contracts 回归通过。
 
 ## Next
 
-- 创建 `apps/action-gateway`；
-- 实现本地 `/health`、`/ready` 与统一 JSON 响应格式，不连接 Runtime。
+- 实现 Gateway API Key 认证与日志脱敏。
 
 ## Not Started
 
 - Feishu 飞书操作（写入、节点创建、部署）；
-- Gateway、Action、Runtime、认证和权限实现；
-- Gateway、Runtime 和 Capability 的平台业务代码；
+- Gateway 认证、权限、Runtime、Cloudflare Tunnel 和 Custom GPT Action；
+- Runtime 和 Capability 的平台业务代码；
 - AI Video Workflow (Phase 3)。
 
 ## Current Restrictions

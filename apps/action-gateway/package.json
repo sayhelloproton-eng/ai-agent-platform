@@ -1,0 +1,17 @@
+{
+  "name": "@ai-agent-platform/action-gateway",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/app.js",
+  "types": "./dist/app.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test tests/*.test.mjs",
+    "verify": "npm test",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    "@ai-agent-platform/contracts": "0.1.0"
+  }
+}

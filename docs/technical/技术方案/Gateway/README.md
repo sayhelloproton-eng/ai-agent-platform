@@ -22,7 +22,15 @@
 
 当前阶段：**设计与渐进实施阶段**。
 
-`SOL-005` 已定义完整路线图（Phase 0 至 Phase 14）。Monorepo 工程基础和 Contracts v1 已落地并通过测试；Gateway、Runtime 与公网 Action 链路尚未实现。每阶段遵循“一步一任务、一步一自检、一步一反馈、一步一审核”原则。
+`SOL-005` 已定义完整路线图（Phase 0 至 Phase 14）。Monorepo 工程基础、Contracts v1 和 Action Gateway 本地 HTTP 外壳已落地并通过测试；认证、Runtime 与公网 Action 链路尚未实现。每阶段遵循“一步一任务、一步一自检、一步一反馈、一步一审核”原则。
+
+## 当前代码
+
+实现资产位于 [`apps/action-gateway/`](../../../../apps/action-gateway/)。
+
+- 已实现本地 HTTP 外壳；
+- 已实现 `GET /health` 和 `GET /ready`；
+- 尚未实现认证、Local Runtime 和公网链路。
 
 ## 代码落位边界
 
@@ -38,7 +46,7 @@
 | 基础设施 | `infra/cloudflare/`、`infra/launchd/` | Tunnel、进程管理 |
 | 运维脚本 | `scripts/` | 一键启动/停止/验证 |
 
-当前仅 `packages/contracts/` 已创建；其他运行时代码目录尚未创建。
+当前 `packages/contracts/` 与 `apps/action-gateway/` 已创建；其他运行时代码目录尚未创建。
 
 ## 使用规则
 

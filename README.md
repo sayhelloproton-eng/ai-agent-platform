@@ -12,7 +12,7 @@
 
 当前目标是进入 **Phase 2: AI Coding Workflow**，在已交付的 Knowledge Foundation 上逐步建立 Task、Gateway / Bridge、执行、验证、Result 与 Git 协作闭环。
 
-当前已建立最小 Monorepo 工程基础和首个公共 Contracts workspace，并保持现有知识与 Skill 资产稳定；后续按已验收任务逐步创建真实应用。
+当前已建立最小 Monorepo 工程基础、公共 Contracts workspace 和首个可启动应用 Action Gateway，并保持现有知识与 Skill 资产稳定；后续按已验收任务逐步补齐安全与执行链路。
 
 ## Architecture Overview
 
@@ -34,7 +34,7 @@ Knowledge Layer
 Infrastructure
 ```
 
-这是演进方向，不代表所有层已经实现。当前完成 Monorepo 根级工程基础和 Contracts v1，尚未实现 Gateway、MCP、Runtime、Capability 或业务工作流。详见 [`context/architecture-context.md`](context/architecture-context.md)。
+这是演进方向，不代表所有层已经实现。当前完成 Monorepo 根级工程基础、Contracts v1 和 Action Gateway 本地 HTTP 外壳，尚未实现认证、MCP、Runtime、Capability 或业务工作流。详见 [`context/architecture-context.md`](context/architecture-context.md)。
 
 ## Source Of Truth
 
@@ -63,8 +63,9 @@ Git 保存正式工程事实；Feishu 只提供便于人阅读的知识投影。
 - 17 个知识页面发布至飞书知识库"智能体工程探索"
 - Gateway MVP 渐进式实施方案与 npm workspaces 根级工程基础
 - `@ai-agent-platform/contracts`：Task / Result / Error Contract v1 与运行时校验
+- `@ai-agent-platform/action-gateway`：本地 `/health`、`/ready`、Request ID 与安全 JSON 响应
 
-下一步：创建 `apps/action-gateway`，实现本地 health / ready 与统一响应格式。详见 [`context/current-status.md`](context/current-status.md)。
+下一步：实现 Gateway API Key 认证与日志脱敏。详见 [`context/current-status.md`](context/current-status.md)。
 
 ## Engineering Workspace
 
@@ -78,7 +79,12 @@ capabilities/*
 
 `skills/ai-knowledge` 暂时保持独立，继续使用原生 Node.js `.mjs` 入口，不加入 workspace。
 
-当前首个真实 workspace 是 `@ai-agent-platform/contracts`，负责 Gateway、Runtime 和 Capability 共享的协议类型与无依赖运行时校验。
+当前有两个真实 workspace：
+
+- `@ai-agent-platform/contracts`：负责 Gateway、Runtime 和 Capability 共享的协议类型与无依赖运行时校验；
+- `@ai-agent-platform/action-gateway`：提供仅监听本地 Loopback 的 `/health` 和 `/ready` HTTP 接口。
+
+Gateway 当前只是本地 HTTP 外壳，尚未接入认证、Local Runtime、Cloudflare Tunnel 或 Custom GPT Action。
 
 本地环境要求 Node.js 20 与 npm 10；推荐使用 `.nvmrc` 中固定的 Node.js 版本。可执行验证命令：
 
@@ -86,12 +92,13 @@ capabilities/*
 npm run check:repo
 npm run check:knowledge
 npm run check:contracts
+npm run check:gateway
 npm run verify
 npm run build --workspace @ai-agent-platform/contracts
 npm run test --workspace @ai-agent-platform/contracts
 ```
 
-Gateway、Local Runtime、Capability 和公网 Action 链路尚未在本批次实现。
+Local Runtime、Capability 和公网 Action 链路尚未实现。
 
 ## Development Rules
 

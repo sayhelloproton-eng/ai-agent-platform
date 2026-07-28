@@ -18,9 +18,11 @@
     "check:repo": "node scripts/repo-check.mjs",
     "check:knowledge": "node skills/ai-knowledge/tests/self-test.mjs",
     "check:contracts": "npm run verify --workspace @ai-agent-platform/contracts",
-    "verify": "npm run check:repo && npm run check:knowledge && npm run check:contracts"
+    "check:gateway": "npm run verify --workspace @ai-agent-platform/action-gateway",
+    "verify": "npm run check:repo && npm run check:knowledge && npm run check:contracts && npm run check:gateway"
   },
   "devDependencies": {
+    "@types/node": "^20.19.43",
     "typescript": "^5.9.3"
   }
 }
