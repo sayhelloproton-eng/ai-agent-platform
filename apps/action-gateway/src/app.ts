@@ -1,4 +1,7 @@
 import {
+  verifyBearerAuthorization,
+} from "@ai-agent-platform/auth";
+import {
   CAPABILITY_NAMES,
   CONTRACT_VERSION,
 } from "@ai-agent-platform/contracts";
@@ -15,9 +18,14 @@ import {
 } from "./response.js";
 
 const SERVICE_NAME = "action-gateway";
-const GET_ROUTES = new Set(["/health", "/ready"]);
+const PUBLIC_ROUTES = new Set(["/health", "/ready"]);
+const CAPABILITIES_ROUTE = "/v1/capabilities";
 
-export function createGatewayHandler(): RequestListener {
+export interface GatewayOptions {
+  readonly apiKey: string;
+}
+
+export function createGatewayHandler(options: GatewayOptions): RequestListener {
   return (request, response) => {
     const requestId = resolveRequestId(request);
 
@@ -27,7 +35,7 @@ export function createGatewayHandler(): RequestListener {
         "http://action-gateway.local",
       ).pathname;
 
-      if (!GET_ROUTES.has(pathname)) {
+      if (!PUBLIC_ROUTES.has(pathname) && pathname !== CAPABILITIES_ROUTE) {
         writeError(
           response,
           404,
@@ -36,6 +44,25 @@ export function createGatewayHandler(): RequestListener {
           "Route not found.",
         );
         return;
+      }
+
+      if (pathname === CAPABILITIES_ROUTE) {
+        const verification = verifyBearerAuthorization(
+          request.headers.authorization,
+          options.apiKey,
+        );
+
+        if (!verification.ok) {
+          writeError(
+            response,
+            401,
+            requestId,
+            "UNAUTHENTICATED",
+            "Authentication required.",
+            { "www-authenticate": "Bearer" },
+          );
+          return;
+        }
       }
 
       if (request.method !== "GET") {
@@ -47,6 +74,14 @@ export function createGatewayHandler(): RequestListener {
           "Method not allowed.",
           { allow: "GET" },
         );
+        return;
+      }
+
+      if (pathname === CAPABILITIES_ROUTE) {
+        writeSuccess(response, 200, requestId, {
+          contractVersion: CONTRACT_VERSION,
+          capabilities: CAPABILITY_NAMES,
+        });
         return;
       }
 
@@ -84,6 +119,6 @@ export function createGatewayHandler(): RequestListener {
   };
 }
 
-export function createGatewayServer(): Server {
-  return createServer(createGatewayHandler());
+export function createGatewayServer(options: GatewayOptions): Server {
+  return createServer(createGatewayHandler(options));
 }

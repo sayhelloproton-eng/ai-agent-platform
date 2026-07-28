@@ -4,7 +4,7 @@
 
 **Phase 2: AI Coding Workflow — In Progress**
 
-Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gateway MVP 设计基线、Monorepo 根级工程基线、Contracts v1 和 Action Gateway 本地 HTTP 外壳；尚未实现认证、权限或 Runtime。
+Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gateway MVP 设计基线、Monorepo 根级工程基线、Contracts v1、Auth 基础包和 Action Gateway 静态 API Key 认证；尚未实现权限策略或 Runtime。
 
 ## Completed
 
@@ -20,16 +20,19 @@ Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gatewa
 - Contracts v1：Task / Result / Error、Capability 白名单、JSON 数据边界和运行时 validator 已通过测试；
 - Skill 隔离：`skills/ai-knowledge` 未加入 workspace，前后自检通过且文件无变化。
 - Action Gateway 最小应用：`/health`、`/ready`、Request ID、404、405 和安全 JSON 响应已实现；
-- Gateway 默认仅监听 Loopback，13 个 Gateway 测试全部通过，Contracts 回归通过。
+- Gateway 默认仅监听 Loopback；
+- Auth workspace：API Key 格式校验、SHA-256 固定长度摘要与恒定时间比较、Header 脱敏函数已实现；
+- 受保护路由：`GET /v1/capabilities` 要求 Bearer API Key，未认证响应统一为 401；
+- Auth 12/12、Gateway 24/24、Contracts 17/17 通过，Knowledge Skill 未受影响。
 
 ## Next
 
-- 实现 Gateway API Key 认证与日志脱敏。
+- 建立 Gateway 权限策略边界，并准备 Local Runtime 的最小通信契约。
 
 ## Not Started
 
 - Feishu 飞书操作（写入、节点创建、部署）；
-- Gateway 认证、权限、Runtime、Cloudflare Tunnel 和 Custom GPT Action；
+- Gateway 权限策略、Runtime、Cloudflare Tunnel 和 Custom GPT Action Schema；
 - Runtime 和 Capability 的平台业务代码；
 - AI Video Workflow (Phase 3)。
 

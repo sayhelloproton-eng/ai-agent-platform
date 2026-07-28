@@ -12,7 +12,7 @@
 
 当前目标是进入 **Phase 2: AI Coding Workflow**，在已交付的 Knowledge Foundation 上逐步建立 Task、Gateway / Bridge、执行、验证、Result 与 Git 协作闭环。
 
-当前已建立最小 Monorepo 工程基础、公共 Contracts workspace 和首个可启动应用 Action Gateway，并保持现有知识与 Skill 资产稳定；后续按已验收任务逐步补齐安全与执行链路。
+当前已建立最小 Monorepo 工程基础、Contracts 与 Auth 共享包和首个可启动应用 Action Gateway，并保持现有知识与 Skill 资产稳定；后续按已验收任务逐步补齐权限与执行链路。
 
 ## Architecture Overview
 
@@ -34,7 +34,7 @@ Knowledge Layer
 Infrastructure
 ```
 
-这是演进方向，不代表所有层已经实现。当前完成 Monorepo 根级工程基础、Contracts v1 和 Action Gateway 本地 HTTP 外壳，尚未实现认证、MCP、Runtime、Capability 或业务工作流。详见 [`context/architecture-context.md`](context/architecture-context.md)。
+这是演进方向，不代表所有层已经实现。当前完成 Monorepo 根级工程基础、Contracts v1、静态 API Key 认证基线和 Action Gateway 本地 HTTP 外壳，尚未实现权限策略、MCP、Runtime、Capability 或业务工作流。详见 [`context/architecture-context.md`](context/architecture-context.md)。
 
 ## Source Of Truth
 
@@ -63,9 +63,10 @@ Git 保存正式工程事实；Feishu 只提供便于人阅读的知识投影。
 - 17 个知识页面发布至飞书知识库"智能体工程探索"
 - Gateway MVP 渐进式实施方案与 npm workspaces 根级工程基础
 - `@ai-agent-platform/contracts`：Task / Result / Error Contract v1 与运行时校验
-- `@ai-agent-platform/action-gateway`：本地 `/health`、`/ready`、Request ID 与安全 JSON 响应
+- `@ai-agent-platform/auth`：Bearer 解析、API Key 校验、安全比较与 Header 脱敏
+- `@ai-agent-platform/action-gateway`：本地公开健康检查和受保护的 `/v1/capabilities`
 
-下一步：实现 Gateway API Key 认证与日志脱敏。详见 [`context/current-status.md`](context/current-status.md)。
+下一步：建立 Gateway 权限策略边界，并准备 Local Runtime 的最小通信契约。详见 [`context/current-status.md`](context/current-status.md)。
 
 ## Engineering Workspace
 
@@ -79,12 +80,13 @@ capabilities/*
 
 `skills/ai-knowledge` 暂时保持独立，继续使用原生 Node.js `.mjs` 入口，不加入 workspace。
 
-当前有两个真实 workspace：
+当前有三个真实 workspace：
 
 - `@ai-agent-platform/contracts`：负责 Gateway、Runtime 和 Capability 共享的协议类型与无依赖运行时校验；
-- `@ai-agent-platform/action-gateway`：提供仅监听本地 Loopback 的 `/health` 和 `/ready` HTTP 接口。
+- `@ai-agent-platform/auth`：提供无运行时依赖的基础认证原语；
+- `@ai-agent-platform/action-gateway`：提供仅监听本地 Loopback 的公开健康检查和受保护 Capability 查询接口。
 
-Gateway 当前只是本地 HTTP 外壳，尚未接入认证、Local Runtime、Cloudflare Tunnel 或 Custom GPT Action。
+当前认证仅为本地静态 API Key 基线，尚无密钥轮换、权限策略、Rate Limit 或公网链路。
 
 本地环境要求 Node.js 20 与 npm 10；推荐使用 `.nvmrc` 中固定的 Node.js 版本。可执行验证命令：
 
@@ -92,6 +94,7 @@ Gateway 当前只是本地 HTTP 外壳，尚未接入认证、Local Runtime、Cl
 npm run check:repo
 npm run check:knowledge
 npm run check:contracts
+npm run check:auth
 npm run check:gateway
 npm run verify
 npm run build --workspace @ai-agent-platform/contracts

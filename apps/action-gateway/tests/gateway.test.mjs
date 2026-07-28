@@ -3,8 +3,11 @@ import { test } from "node:test";
 
 import { createGatewayServer } from "../dist/app.js";
 
+const API_KEY = "test-api-key-0123456789abcdef-xyz";
+const WRONG_API_KEY = "wrong-api-key-0123456789abcdef-xyz";
+
 async function withGateway(run) {
-  const server = createGatewayServer();
+  const server = createGatewayServer({ apiKey: API_KEY });
 
   await new Promise((resolve, reject) => {
     server.once("error", reject);
@@ -178,6 +181,133 @@ test("a 128-character request id is accepted", async () => {
   await withGateway(async (baseUrl) => {
     const requestId = "a".repeat(128);
     const response = await fetch(`${baseUrl}/ready`, {
+      headers: { "x-request-id": requestId },
+    });
+    const body = await response.json();
+
+    assert.equal(body.requestId, requestId);
+    assert.equal(response.headers.get("x-request-id"), requestId);
+  });
+});
+
+test("GET /v1/capabilities requires authentication", async () => {
+  await withGateway(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/v1/capabilities`);
+    const body = await response.json();
+
+    assert.equal(response.status, 401);
+    assert.deepEqual(body.error, {
+      code: "UNAUTHENTICATED",
+      message: "Authentication required.",
+    });
+  });
+});
+
+test("GET /v1/capabilities rejects an incorrect token", async () => {
+  await withGateway(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/v1/capabilities`, {
+      headers: { authorization: `Bearer ${WRONG_API_KEY}` },
+    });
+
+    assert.equal(response.status, 401);
+  });
+});
+
+test("GET /v1/capabilities rejects a malformed header", async () => {
+  await withGateway(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/v1/capabilities`, {
+      headers: { authorization: `Basic ${API_KEY}` },
+    });
+
+    assert.equal(response.status, 401);
+  });
+});
+
+test("401 responses advertise Bearer authentication", async () => {
+  await withGateway(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/v1/capabilities`);
+
+    assert.equal(response.headers.get("www-authenticate"), "Bearer");
+  });
+});
+
+test("401 responses do not expose the presented token", async () => {
+  await withGateway(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/v1/capabilities`, {
+      headers: { authorization: `Bearer ${WRONG_API_KEY}` },
+    });
+    const bodyText = await response.text();
+
+    assert.equal(bodyText.includes(WRONG_API_KEY), false);
+    assert.equal(bodyText.includes(API_KEY), false);
+  });
+});
+
+test("a correct token accesses GET /v1/capabilities", async () => {
+  await withGateway(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/v1/capabilities`, {
+      headers: { authorization: `Bearer ${API_KEY}` },
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(body.ok, true);
+  });
+});
+
+test("the protected route exposes the Contracts version", async () => {
+  await withGateway(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/v1/capabilities`, {
+      headers: { authorization: `Bearer ${API_KEY}` },
+    });
+    const body = await response.json();
+
+    assert.equal(body.data.contractVersion, "1.0");
+  });
+});
+
+test("the protected route exposes the Capability allowlist", async () => {
+  await withGateway(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/v1/capabilities`, {
+      headers: { authorization: `Bearer ${API_KEY}` },
+    });
+    const body = await response.json();
+
+    assert.deepEqual(body.data.capabilities, [
+      "gateway.ping",
+      "runtime.status",
+      "system.info.safe",
+    ]);
+  });
+});
+
+test("an authenticated POST to the protected route returns 405", async () => {
+  await withGateway(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/v1/capabilities`, {
+      method: "POST",
+      headers: { authorization: `Bearer ${API_KEY}` },
+    });
+
+    assert.equal(response.status, 405);
+    assert.equal(response.headers.get("allow"), "GET");
+  });
+});
+
+test("an unauthenticated POST does not disclose method handling", async () => {
+  await withGateway(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/v1/capabilities`, {
+      method: "POST",
+    });
+
+    assert.equal(response.status, 401);
+    assert.equal(response.headers.get("allow"), null);
+  });
+});
+
+test("a 401 response preserves a valid request id", async () => {
+  await withGateway(async (baseUrl) => {
+    const requestId = "auth_request-401";
+    const response = await fetch(`${baseUrl}/v1/capabilities`, {
       headers: { "x-request-id": requestId },
     });
     const body = await response.json();

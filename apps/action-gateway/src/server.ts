@@ -1,3 +1,5 @@
+import { isValidApiKeyFormat } from "@ai-agent-platform/auth";
+
 import { createGatewayServer } from "./app.js";
 
 const DEFAULT_HOST = "127.0.0.1";
@@ -32,10 +34,21 @@ function resolvePort(input: string | undefined): number {
   return port;
 }
 
+function resolveApiKey(input: string | undefined): string {
+  if (!isValidApiKeyFormat(input)) {
+    throw new Error(
+      "API key must contain 32 to 256 non-whitespace characters.",
+    );
+  }
+
+  return input;
+}
+
 try {
   const host = resolveHost(process.env.ACTION_GATEWAY_HOST);
   const port = resolvePort(process.env.ACTION_GATEWAY_PORT);
-  const server = createGatewayServer();
+  const apiKey = resolveApiKey(process.env.ACTION_GATEWAY_API_KEY);
+  const server = createGatewayServer({ apiKey });
 
   server.once("error", () => {
     console.error("Action Gateway failed to start.");

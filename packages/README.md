@@ -11,6 +11,9 @@
 ## Contains
 
 - `contracts/`：Task、Result、Error、Capability 与运行时校验的公共协议包。
+- `auth/`：Bearer 解析、API Key 校验、安全比较和 Header 脱敏的基础认证包。
+
+`contracts` 定义跨组件协议；`auth` 提供基础认证原语。两者都不承担完整应用职责。
 
 ## Boundary
 
@@ -29,6 +32,7 @@
 
 ```bash
 npm run check:contracts
+npm run check:auth
 ```
 
 ## Maintenance
