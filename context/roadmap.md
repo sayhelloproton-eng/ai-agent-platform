@@ -19,11 +19,12 @@
 已完成：
 
 - Gateway MVP 渐进式实施方案；
-- npm workspaces 根级工程基础，包括 Node.js 版本约束、lock 文件和统一验证入口。
+- npm workspaces 根级工程基础，包括 Node.js 版本约束、lock 文件和统一验证入口；
+- `packages/contracts`：Task / Result / Error Contract v1、Capability 白名单、运行时校验和测试。
 
 下一项：
 
-- 创建 `packages/contracts`，定义 Task / Result / Error Contract v1。
+- 创建 `apps/action-gateway`，实现本地 `/health`、`/ready` 与统一响应格式。
 
 ## Phase 3: AI Video Workflow
 

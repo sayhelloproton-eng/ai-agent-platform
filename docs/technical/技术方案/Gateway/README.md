@@ -15,13 +15,14 @@
 
 | 文件 | 说明 |
 |---|---|
-| `SOL-005-Custom-GPT-Actions与Gateway-MVP渐进式实施方案.md` | 总纲：14 个阶段渐进式 MVP 实施计划，覆盖仓库基线、Monorepo、Contracts、Gateway、认证、权限、Runtime、Capability、Cloudflare Tunnel、Custom GPT Action、安全复核与知识沉淀 |
+| `SOL-005-Custom-GPT-Actions与Gateway-MVP渐进式实施方案.md` | 总纲：15 个阶段（Phase 0 至 Phase 14）渐进式 MVP 实施计划，覆盖仓库基线、Monorepo、Contracts、Gateway、认证、权限、Runtime、Capability、Cloudflare Tunnel、Custom GPT Action、安全复核与知识沉淀 |
+| `SOL-006-Task-Result-Error-Contract-v1.md` | 已实现的 Contract v1 设计：Task、Result、Error、Capability 白名单、运行时校验和不变量 |
 
 ## 实施状态
 
 当前阶段：**设计与渐进实施阶段**。
 
-`SOL-005` 已定义完整路线图（Phase 0 至 Phase 14），但各阶段尚未开始执行。每阶段遵循“一步一任务、一步一自检、一步一反馈、一步一审核”原则。
+`SOL-005` 已定义完整路线图（Phase 0 至 Phase 14）。Monorepo 工程基础和 Contracts v1 已落地并通过测试；Gateway、Runtime 与公网 Action 链路尚未实现。每阶段遵循“一步一任务、一步一自检、一步一反馈、一步一审核”原则。
 
 ## 代码落位边界
 
@@ -37,7 +38,7 @@
 | 基础设施 | `infra/cloudflare/`、`infra/launchd/` | Tunnel、进程管理 |
 | 运维脚本 | `scripts/` | 一键启动/停止/验证 |
 
-以上目录在当前阶段均未创建。
+当前仅 `packages/contracts/` 已创建；其他运行时代码目录尚未创建。
 
 ## 使用规则
 

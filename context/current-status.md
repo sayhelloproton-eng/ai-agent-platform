@@ -4,7 +4,7 @@
 
 **Phase 2: AI Coding Workflow — In Progress**
 
-Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gateway MVP 设计基线和 Monorepo 根级工程基线；尚未创建真实 workspace 包或实现 Gateway / Runtime。
+Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gateway MVP 设计基线、Monorepo 根级工程基线和 Contracts v1；尚未实现 Gateway / Runtime。
 
 ## Completed
 
@@ -15,18 +15,21 @@ Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gatewa
 - 知识体系理论文档（5 篇）：EXP-003、ARC-005、ARC-006、SOL-004、WFL-004；
 - 图片资源方案：`knowledge-assets` 分支 + `asset://` 引用 + Publisher 上传 Feishu 图片资源；
 - Gateway MVP 渐进式实施方案：`SOL-005` 已进入 Git；
-- Monorepo 根级工程基线：npm workspaces 契约、Node.js 版本约束、lock 文件和统一仓库验证入口。
+- Monorepo 根级工程基线：npm workspaces 契约、Node.js 版本约束、lock 文件和统一仓库验证入口；
+- 首个真实 workspace：`@ai-agent-platform/contracts`；
+- Contracts v1：Task / Result / Error、Capability 白名单、JSON 数据边界和运行时 validator 已通过测试；
+- Skill 隔离：`skills/ai-knowledge` 未加入 workspace，前后自检通过且文件无变化。
 
 ## Next
 
-- 创建 `packages/contracts`，定义 Task / Result / Error Contract v1；
-- 仅在该包出现真实代码与测试时创建对应 workspace 目录。
+- 创建 `apps/action-gateway`；
+- 实现本地 `/health`、`/ready` 与统一 JSON 响应格式，不连接 Runtime。
 
 ## Not Started
 
 - Feishu 飞书操作（写入、节点创建、部署）；
 - Gateway、Action、Runtime、认证和权限实现；
-- 真实 workspace 包与平台业务代码；
+- Gateway、Runtime 和 Capability 的平台业务代码；
 - AI Video Workflow (Phase 3)。
 
 ## Current Restrictions
