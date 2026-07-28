@@ -11,7 +11,7 @@
 ## Contains
 
 - `repo-check.mjs`：检查 Node.js 基线、必要文件与目录、npm workspace 契约及敏感文件 Git 跟踪状态。
-- `local-chain-test.mjs`：在随机 Loopback 端口真实启动 Gateway 与 Runtime，验证双层认证、双层 Policy 和 TaskResult；不访问公网。
+- `local-chain-test.mjs`：在随机 Loopback 端口真实启动 Gateway 与 Runtime，通过 6 个测试验证双层认证、双层 Policy 和 TaskResult；其中真实覆盖 Gateway Policy 放行 `system.info.safe`、Runtime Policy 二次拒绝并返回 rejected `TaskResult`；不访问公网。
 
 ## Boundary
 

@@ -4,7 +4,7 @@
 
 **Phase 2: AI Coding Workflow — In Progress**
 
-Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gateway MVP 设计基线、Monorepo 根级工程基线、Contracts v1、Auth、Capability Policy，以及 Action Gateway → Local Runtime 本地任务执行链路；公网链路尚未建立。
+Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gateway MVP 设计基线、Monorepo 根级工程基线、Contracts v1、Auth、Capability Policy、Action Gateway → Local Runtime 本地任务执行链路，以及公网接入前的五项传输边界安全加固；公网链路尚未建立。
 
 ## Completed
 
@@ -24,7 +24,7 @@ Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gatewa
 - Auth workspace：API Key 格式校验、SHA-256 固定长度摘要与恒定时间比较、Header 脱敏函数已实现；
 - 受保护路由：`GET /v1/capabilities` 要求 Bearer API Key，未认证响应统一为 401；
 - Policy workspace：Deny by default、未知 Capability 拒绝、Allowlist 去重与固定顺序已实现；
-- Gateway 默认只允许 `gateway.ping`，`/ready` 与 `/v1/capabilities` 只返回 Policy 允许的能力；
+- Gateway 默认允许 `gateway.ping` 与 `runtime.status`，`/ready` 与 `/v1/capabilities` 只返回 Policy 允许的能力；
 - Local Runtime workspace：`/health`、`/ready`、`/v1/tasks` 和 65536 字节 Body 限制已实现，仅监听 Loopback；
 - Runtime Task Contract 校验、Policy 二次校验、Capability 调度与 Contract v1 `TaskResult` 已实现；
 - Runtime 默认实现 `gateway.ping` 与 `runtime.status`，`system.info.safe` 未实现且默认拒绝；
@@ -32,16 +32,17 @@ Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gatewa
 - Gateway → Runtime HTTP Client 已实现，仅允许 Loopback HTTP，具有 3000 ms 默认 Timeout、65536 字节响应上限和 `TaskResult` 校验；
 - 外部 `ACTION_GATEWAY_API_KEY` 与内部 Runtime Key 分离，Runtime `/v1/tasks` 已增加内部 Bearer 认证；
 - Gateway 与 Runtime 分别执行 Capability Policy，`system.info.safe` 默认在 Gateway 被拒绝；
-- Local Chain 5/5、Runtime 38/38、Gateway 60/60、Policy 12/12、Contracts 17/17、Auth 12/12 通过，Repo Check 与 Knowledge Skill 回归通过。
+- Batch 7.1 公网接入前安全修复：Runtime `TaskResult.taskId` 绑定原 Task、Header 前与 Body 阶段 Timeout 安全映射、Runtime 二次 Policy 真实链路验证、提前响应排空未读 Body、Gateway 固定入站 Timeout；
+- Local Chain 6/6、Runtime 38/38、Gateway 64/64、Policy 12/12、Contracts 17/17、Auth 12/12 通过，Repo Check、Knowledge Skill 与根级 Verify 通过。
 
 ## Next
 
-- 建立本地一键启动脚本，并配置 Cloudflare Named Tunnel 与固定 HTTPS 域名。
+- 实现公网入口前的最小 Rate Limit、Gateway / Runtime 并发限制及本地一键启动。
 
 ## Not Started
 
 - Feishu 飞书操作（写入、节点创建、部署）；
-- 动态权限策略、Cloudflare Tunnel 和 Custom GPT Action Schema；
+- 动态权限策略、Rate Limit、任务并发限制、Cloudflare Tunnel 和 Custom GPT Action Schema；
 - 本地一键启动与公网端到端验证；
 - AI Video Workflow (Phase 3)。
 

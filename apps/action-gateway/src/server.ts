@@ -1,4 +1,6 @@
 import { isValidApiKeyFormat } from "@ai-agent-platform/auth";
+import type { Server } from "node:http";
+import { pathToFileURL } from "node:url";
 
 import { createGatewayServer } from "./app.js";
 import { createHttpRuntimeClient } from "./runtime-client.js";
@@ -8,6 +10,10 @@ const DEFAULT_PORT = 8787;
 const DEFAULT_RUNTIME_URL = "http://127.0.0.1:8790";
 const DEFAULT_RUNTIME_TIMEOUT_MS = 3_000;
 const LOOPBACK_HOSTS = new Set(["127.0.0.1", "localhost", "::1"]);
+export const GATEWAY_HEADERS_TIMEOUT_MS = 10_000;
+export const GATEWAY_REQUEST_TIMEOUT_MS = 20_000;
+export const GATEWAY_KEEP_ALIVE_TIMEOUT_MS = 5_000;
+export const GATEWAY_SOCKET_TIMEOUT_MS = 20_000;
 
 function resolveHost(input: string | undefined): string {
   const host = input ?? DEFAULT_HOST;
@@ -59,34 +65,54 @@ function resolveRuntimeTimeout(input: string | undefined): number {
   return Number(input);
 }
 
-try {
-  const host = resolveHost(process.env.ACTION_GATEWAY_HOST);
-  const port = resolvePort(process.env.ACTION_GATEWAY_PORT);
-  const apiKey = resolveApiKey(process.env.ACTION_GATEWAY_API_KEY);
-  const runtimeApiKey = resolveApiKey(
-    process.env.ACTION_GATEWAY_RUNTIME_API_KEY,
-  );
-  const runtimeClient = createHttpRuntimeClient({
-    baseUrl:
-      process.env.ACTION_GATEWAY_RUNTIME_URL ?? DEFAULT_RUNTIME_URL,
-    apiKey: runtimeApiKey,
-    timeoutMs: resolveRuntimeTimeout(
-      process.env.ACTION_GATEWAY_RUNTIME_TIMEOUT_MS,
-    ),
-  });
-  const server = createGatewayServer({ apiKey, runtimeClient });
+export function configureGatewayServerTimeouts(server: Server): Server {
+  server.headersTimeout = GATEWAY_HEADERS_TIMEOUT_MS;
+  server.requestTimeout = GATEWAY_REQUEST_TIMEOUT_MS;
+  server.keepAliveTimeout = GATEWAY_KEEP_ALIVE_TIMEOUT_MS;
+  server.setTimeout(GATEWAY_SOCKET_TIMEOUT_MS);
+  return server;
+}
 
-  server.once("error", () => {
-    console.error("Action Gateway failed to start.");
+function startActionGateway(): void {
+  try {
+    const host = resolveHost(process.env.ACTION_GATEWAY_HOST);
+    const port = resolvePort(process.env.ACTION_GATEWAY_PORT);
+    const apiKey = resolveApiKey(process.env.ACTION_GATEWAY_API_KEY);
+    const runtimeApiKey = resolveApiKey(
+      process.env.ACTION_GATEWAY_RUNTIME_API_KEY,
+    );
+    const runtimeClient = createHttpRuntimeClient({
+      baseUrl:
+        process.env.ACTION_GATEWAY_RUNTIME_URL ?? DEFAULT_RUNTIME_URL,
+      apiKey: runtimeApiKey,
+      timeoutMs: resolveRuntimeTimeout(
+        process.env.ACTION_GATEWAY_RUNTIME_TIMEOUT_MS,
+      ),
+    });
+    const server = configureGatewayServerTimeouts(
+      createGatewayServer({ apiKey, runtimeClient }),
+    );
+
+    server.once("error", () => {
+      console.error("Action Gateway failed to start.");
+      process.exitCode = 1;
+    });
+
+    server.listen(port, host, () => {
+      console.log(`Action Gateway listening on http://${host}:${port}`);
+    });
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Invalid server configuration.";
+    console.error(`Action Gateway failed to start: ${message}`);
     process.exitCode = 1;
-  });
+  }
+}
 
-  server.listen(port, host, () => {
-    console.log(`Action Gateway listening on http://${host}:${port}`);
-  });
-} catch (error: unknown) {
-  const message =
-    error instanceof Error ? error.message : "Invalid server configuration.";
-  console.error(`Action Gateway failed to start: ${message}`);
-  process.exitCode = 1;
+const entryPath = process.argv[1];
+if (
+  entryPath !== undefined &&
+  import.meta.url === pathToFileURL(entryPath).href
+) {
+  startActionGateway();
 }

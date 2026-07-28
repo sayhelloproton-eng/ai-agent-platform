@@ -183,3 +183,30 @@ test("wrong internal API key maps Runtime 401 to safe Gateway 502", async () => 
     assert.equal(bodyText.includes(INTERNAL_API_KEY), false);
   }, { runtimeClientApiKey: WRONG_INTERNAL_API_KEY });
 });
+
+test("Runtime Policy rejects a Capability allowed by Gateway Policy", async () => {
+  const gatewayPolicy = createCapabilityPolicy([
+    "gateway.ping",
+    "runtime.status",
+    "system.info.safe",
+  ]);
+  const runtimePolicy = createCapabilityPolicy([
+    "gateway.ping",
+    "runtime.status",
+  ]);
+
+  await withLocalChain(async (baseUrl) => {
+    const response = await submitTask(
+      baseUrl,
+      createTask({ capability: "system.info.safe" }),
+    );
+    const result = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(result.status, "rejected");
+    assert.equal(result.error.code, "FORBIDDEN");
+    assert.equal(result.error.retryable, false);
+    assert.equal(result.output, null);
+    assert.equal(result.metadata.executor, "local-runtime");
+  }, { gatewayPolicy, runtimePolicy });
+});

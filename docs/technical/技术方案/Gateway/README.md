@@ -41,12 +41,16 @@
 - Runtime 当前执行 `gateway.ping` 与 `runtime.status`，仅监听 Loopback；
 - Gateway 已新增受外部 API Key 保护的 `POST /v1/tasks`；
 - Gateway Runtime Client 只连接 Loopback HTTP，并验证 Runtime `TaskResult`；
+- Runtime `TaskResult` 必须与原 Task 的 `taskId` 一致，Header 前和 Body 读取阶段超时均安全映射；
 - Gateway 与 Runtime 使用分离的两套 API Key，并分别执行 Capability Policy；
+- Runtime 二次 Policy 已有 Gateway 放行、Runtime 拒绝的真实集成测试；
 - Runtime `/v1/tasks` 已增加内部 API Key，health 与 ready 保持公开；
+- Gateway 提前响应会排空未读请求 Body，并设置固定 Header、Request、Keep-Alive 与 Socket 入站 Timeout；
 - 本地 Gateway → Runtime 链路已通过真实双服务测试；
+- Rate Limit 与 Gateway / Runtime 并发限制尚未实现；
 - 公网链路尚未建立。
 
-下一步是建立本地启动编排、配置 Cloudflare Named Tunnel，并生成 Custom GPT OpenAPI Schema。
+下一步是实现公网入口前的 Rate Limit、Gateway / Runtime 并发控制和本地启动编排。
 
 ## 代码落位边界
 

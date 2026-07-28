@@ -98,6 +98,8 @@ Gateway 与 Runtime 使用分离的外部、内部 API Key，并分别执行 Gat
 
 本地端到端任务链路已经打通，但尚未配置 Cloudflare Tunnel 和 Custom GPT Action，因此公网端到端 MVP 仍未完成。
 
+本地链路已经完成公网接入前的结果对应校验、超时映射、请求排空和入站超时加固；Rate Limit 与并发限制尚未实现，因此 Gateway 仍不应直接暴露公网。
+
 本地环境要求 Node.js 20 与 npm 10；推荐使用 `.nvmrc` 中固定的 Node.js 版本。可执行验证命令：
 
 ```bash

@@ -7,6 +7,13 @@ import { validateTaskResult } from "@ai-agent-platform/contracts";
 import { createCapabilityPolicy } from "@ai-agent-platform/policy";
 import { createGatewayServer } from "../dist/app.js";
 import { createHttpRuntimeClient } from "../dist/runtime-client.js";
+import {
+  configureGatewayServerTimeouts,
+  GATEWAY_HEADERS_TIMEOUT_MS,
+  GATEWAY_KEEP_ALIVE_TIMEOUT_MS,
+  GATEWAY_REQUEST_TIMEOUT_MS,
+  GATEWAY_SOCKET_TIMEOUT_MS,
+} from "../dist/server.js";
 
 const API_KEY = "test-api-key-0123456789abcdef-xyz";
 const WRONG_API_KEY = "wrong-api-key-0123456789abcdef-xyz";
@@ -146,6 +153,11 @@ async function sendChunkedOversizedTask(port) {
 
 async function withHttpEndpoint(handler, run) {
   const server = http.createServer(handler);
+  const sockets = new Set();
+  server.on("connection", (socket) => {
+    sockets.add(socket);
+    socket.once("close", () => sockets.delete(socket));
+  });
   await new Promise((resolve, reject) => {
     server.once("error", reject);
     server.listen(0, "127.0.0.1", resolve);
@@ -157,6 +169,9 @@ async function withHttpEndpoint(handler, run) {
   try {
     await run(`http://127.0.0.1:${address.port}`);
   } finally {
+    for (const socket of sockets) {
+      socket.destroy();
+    }
     await new Promise((resolve, reject) => {
       server.close((error) => {
         if (error) {
@@ -167,6 +182,37 @@ async function withHttpEndpoint(handler, run) {
       });
     });
   }
+}
+
+function requestWithAgent(port, agent, options, body) {
+  return new Promise((resolve, reject) => {
+    let connection;
+    const request = http.request(
+      {
+        host: "127.0.0.1",
+        port,
+        agent,
+        ...options,
+      },
+      (response) => {
+        const chunks = [];
+        response.on("data", (chunk) => chunks.push(chunk));
+        response.on("end", () => {
+          resolve({
+            status: response.statusCode,
+            body: Buffer.concat(chunks).toString("utf8"),
+            connection,
+          });
+        });
+      },
+    );
+
+    request.once("socket", (socket) => {
+      connection = socket;
+    });
+    request.once("error", reject);
+    request.end(body);
+  });
 }
 
 async function withGateway(run, options = {}) {
@@ -960,4 +1006,116 @@ test("Runtime Client refuses redirects outside its validated base URL", async ()
       reason: "unavailable",
     });
   });
+});
+
+test("Runtime Client rejects a valid TaskResult for another task", async () => {
+  const task = createTask();
+  const wrongTaskId = `other-${randomUUID()}`;
+  const wrongResult = createSucceededResult({
+    ...task,
+    taskId: wrongTaskId,
+  });
+
+  await withHttpEndpoint((_request, response) => {
+    response.writeHead(200, { "content-type": "application/json" });
+    response.end(JSON.stringify(wrongResult));
+  }, async (baseUrl) => {
+    const runtimeClient = createHttpRuntimeClient({
+      baseUrl,
+      apiKey: API_KEY,
+    });
+
+    await withGateway(async (gatewayUrl) => {
+      const response = await submitTask(gatewayUrl, task);
+      const bodyText = await response.text();
+      const body = JSON.parse(bodyText);
+
+      assert.equal(response.status, 502);
+      assert.equal(body.error.code, "RUNTIME_UNAVAILABLE");
+      assert.equal(
+        body.error.message,
+        "Local Runtime returned an invalid response.",
+      );
+      assert.equal(bodyText.includes(wrongTaskId), false);
+      assert.equal(bodyText.includes("fake-runtime"), false);
+    }, { runtimeClient });
+  });
+});
+
+test("Runtime Body-stage timeout maps through Gateway to safe HTTP 504", async () => {
+  await withHttpEndpoint((_request, response) => {
+    response.writeHead(200, { "content-type": "application/json" });
+    response.write('{"contractVersion":"1.0",');
+  }, async (baseUrl) => {
+    const runtimeClient = createHttpRuntimeClient({
+      baseUrl,
+      apiKey: API_KEY,
+      timeoutMs: 100,
+    });
+
+    await withGateway(async (gatewayUrl) => {
+      const response = await submitTask(gatewayUrl, createTask());
+      const bodyText = await response.text();
+      const body = JSON.parse(bodyText);
+
+      assert.equal(response.status, 504);
+      assert.equal(body.error.code, "TIMEOUT");
+      assert.equal(bodyText.includes(baseUrl), false);
+      assert.equal(bodyText.includes("AbortError"), false);
+    }, { runtimeClient });
+  });
+});
+
+test("unauthenticated task Body is drained and Keep-Alive remains reusable", async () => {
+  await withGateway(async (_baseUrl, port) => {
+    const agent = new http.Agent({ keepAlive: true, maxSockets: 1 });
+    const secretBody = "untrusted-body-must-not-appear";
+
+    try {
+      const unauthorized = await requestWithAgent(
+        port,
+        agent,
+        {
+          method: "POST",
+          path: "/v1/tasks",
+          headers: {
+            "content-length": Buffer.byteLength(secretBody),
+            "content-type": "application/json",
+          },
+        },
+        secretBody,
+      );
+      const health = await requestWithAgent(
+        port,
+        agent,
+        {
+          method: "GET",
+          path: "/health",
+        },
+      );
+
+      assert.equal(unauthorized.status, 401);
+      assert.equal(unauthorized.body.includes(secretBody), false);
+      assert.equal(health.status, 200);
+      assert.equal(unauthorized.connection, health.connection);
+    } finally {
+      agent.destroy();
+    }
+  });
+});
+
+test("Gateway Server uses the fixed inbound timeout baseline", () => {
+  const server = configureGatewayServerTimeouts(
+    createGatewayServer({ apiKey: API_KEY }),
+  );
+
+  try {
+    assert.equal(server.headersTimeout, GATEWAY_HEADERS_TIMEOUT_MS);
+    assert.equal(server.requestTimeout, GATEWAY_REQUEST_TIMEOUT_MS);
+    assert.equal(server.keepAliveTimeout, GATEWAY_KEEP_ALIVE_TIMEOUT_MS);
+    assert.equal(server.timeout, GATEWAY_SOCKET_TIMEOUT_MS);
+    assert.equal(server.headersTimeout > server.keepAliveTimeout, true);
+  } finally {
+    server.close();
+  }
 });

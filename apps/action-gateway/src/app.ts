@@ -66,6 +66,12 @@ function contentLengthExceedsLimit(request: IncomingMessage): boolean {
   );
 }
 
+export function discardUnreadRequestBody(request: IncomingMessage): void {
+  if (!request.readableEnded && !request.destroyed) {
+    request.resume();
+  }
+}
+
 function readRequestBody(request: IncomingMessage): Promise<BodyReadResult> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
@@ -164,6 +170,7 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
         pathname !== CAPABILITIES_ROUTE &&
         pathname !== TASKS_ROUTE
       ) {
+        discardUnreadRequestBody(request);
         writeError(
           response,
           404,
@@ -181,6 +188,7 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
         );
 
         if (!verification.ok) {
+          discardUnreadRequestBody(request);
           writeError(
             response,
             401,
@@ -195,6 +203,7 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
 
       const allowedMethod = pathname === TASKS_ROUTE ? "POST" : "GET";
       if (request.method !== allowedMethod) {
+        discardUnreadRequestBody(request);
         writeError(
           response,
           405,
@@ -208,6 +217,7 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
 
       if (pathname === TASKS_ROUTE) {
         if (!hasJsonContentType(request)) {
+          discardUnreadRequestBody(request);
           writeError(
             response,
             415,
@@ -219,6 +229,7 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
         }
 
         if (contentLengthExceedsLimit(request)) {
+          discardUnreadRequestBody(request);
           writeError(
             response,
             413,
@@ -226,7 +237,6 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
             "PAYLOAD_TOO_LARGE",
             "Request body is too large.",
           );
-          request.resume();
           return;
         }
 
@@ -330,6 +340,7 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
       }
 
       if (pathname === CAPABILITIES_ROUTE) {
+        discardUnreadRequestBody(request);
         writeSuccess(response, 200, requestId, {
           contractVersion: CONTRACT_VERSION,
           capabilities: allowedCapabilities,
@@ -340,6 +351,7 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
       const timestamp = new Date().toISOString();
 
       if (pathname === "/health") {
+        discardUnreadRequestBody(request);
         writeSuccess(response, 200, requestId, {
           service: SERVICE_NAME,
           status: "ok",
@@ -348,6 +360,7 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
         return;
       }
 
+      discardUnreadRequestBody(request);
       writeSuccess(response, 200, requestId, {
         service: SERVICE_NAME,
         status: "ready",

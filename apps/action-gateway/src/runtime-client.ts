@@ -154,12 +154,19 @@ export function createHttpRuntimeClient(
         let body: unknown;
         try {
           body = await readLimitedJson(response);
-        } catch {
+        } catch (error: unknown) {
+          if (
+            controller.signal.aborted ||
+            (error instanceof DOMException && error.name === "AbortError")
+          ) {
+            return { ok: false, reason: "timeout" };
+          }
+
           return { ok: false, reason: "invalid-response" };
         }
 
         const validation = validateTaskResult(body);
-        return validation.ok
+        return validation.ok && validation.value.taskId === task.taskId
           ? { ok: true, result: validation.value }
           : { ok: false, reason: "invalid-response" };
       } catch (error: unknown) {
