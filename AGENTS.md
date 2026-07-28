@@ -145,6 +145,18 @@
 
 详细规则见 [`docs/technical/治理规则/git-feishu-governance.md`](docs/technical/治理规则/git-feishu-governance.md)。
 
+## 8.1 knowledge-assets 图片资源分支
+
+`knowledge-assets` 是项目公共图片资源分支，用于保存所有需要被互联网访问的知识展示图片（架构图、流程图、截图）。
+
+规则：
+- 本分支只允许 `images/` 目录，禁止存储代码、Markdown、配置或任何非图片资源；
+- `main` 分支 Markdown 引用图片时必须使用 GitHub Raw URL：
+  `https://raw.githubusercontent.com/sayhelloproton-eng/ai-agent-platform/knowledge-assets/images/{path}/{file}`
+- 禁止使用本地相对路径（`./images/arch.png`）引用图片；
+- 飞书知识库通过 GitHub Raw URL 直接渲染图片，Publisher 不处理图片上传或转换；
+- 本分支受保护（禁止删除、禁止 force push），永久存在，不参与业务开发。
+
 ## 9. 公共仓库安全底线
 
 禁止提交：

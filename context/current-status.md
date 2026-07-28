@@ -12,7 +12,8 @@ Knowledge Layer 基础建设已交付：Context Foundation、知识资产组织�
 - Task 002：知识资产组织 — `docs/knowledge/`、`docs/technical/`、`docs/learning/`、`docs/adr/` 四层结构；
 - Task 003-A/B/C：知识配置 v3.0、Project Profile 3.0、治理规则对齐；
 - 仓库清理：删除过期的 `feat/feishu-knowledge-projection-v1` 分支，修复全仓过期链接和导航，Archive 文件标记 superseded；
-- 知识体系理论文档（5 篇）：EXP-003 知识系统初始化复盘、ARC-005 单一真源与知识投影架构、ARC-006 项目知识分层与 Agent 上下文架构、SOL-004 跨平台文档可移植性与发布适配、WFL-004 多模型 Agent 执行治理与 Token 预算。
+- 知识体系理论文档（5 篇）：EXP-003、ARC-005、ARC-006、SOL-004、WFL-004；
+- 图片资源方案：新建 `knowledge-assets` 分支，配置分支保护，更新发布合同允许 GitHub Raw URL 图片。
 
 ## Next
 

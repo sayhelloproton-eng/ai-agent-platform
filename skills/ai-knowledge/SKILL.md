@@ -115,3 +115,13 @@ Git Repository 是所有正式项目事实的 Canonical Source。Feishu 只能�
 - `node scripts/validate_bundle.mjs`：校验 Skill 文件、项目配置和 JSON Schema。
 
 脚本只处理确定性工作；语义判断、内容组织、事实校验和最终决策由 Agent 完成。
+
+## 图片资源规则
+
+Agent 在编写或修改 `docs/knowledge/` 下的 Markdown 文档时：
+
+- 图片引用**必须**使用 GitHub Raw URL：
+  `https://raw.githubusercontent.com/sayhelloproton-eng/ai-agent-platform/knowledge-assets/images/{path}/{file}`
+- **禁止**使用本地相对路径（`./images/arch.png`、`../diagrams/flow.jpg`）
+- 图片统一存储在 `knowledge-assets` 分支的 `images/` 目录
+- Publisher 不做图片上传、下载、转换处理 — 飞书直接渲染 URL
