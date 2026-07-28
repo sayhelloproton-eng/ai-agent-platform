@@ -21,7 +21,8 @@
     "check:auth": "npm run verify --workspace @ai-agent-platform/auth",
     "check:policy": "npm run verify --workspace @ai-agent-platform/policy",
     "check:gateway": "npm run verify --workspace @ai-agent-platform/action-gateway",
-    "verify": "npm run check:repo && npm run check:knowledge && npm run check:contracts && npm run check:auth && npm run check:policy && npm run check:gateway"
+    "check:runtime": "npm run verify --workspace @ai-agent-platform/local-runtime",
+    "verify": "npm run check:repo && npm run check:knowledge && npm run check:contracts && npm run check:auth && npm run check:policy && npm run check:gateway && npm run check:runtime"
   },
   "devDependencies": {
     "@types/node": "^20.19.43",

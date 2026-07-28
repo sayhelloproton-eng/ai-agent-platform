@@ -1,6 +1,11 @@
 # Applications
 
-`apps/` 保存可以独立启动的平台应用。当前应用是 `action-gateway`。
+`apps/` 保存可以独立启动的平台应用。当前应用：
+
+- `action-gateway`：公网 Action 入口与认证、Policy 边界；
+- `local-runtime`：本机 Task 校验、Capability 调度和执行结果。
+
+当前二者尚未连接。
 
 与其他顶层工程目录的边界：
 

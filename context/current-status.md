@@ -4,7 +4,7 @@
 
 **Phase 2: AI Coding Workflow — In Progress**
 
-Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gateway MVP 设计基线、Monorepo 根级工程基线、Contracts v1、Auth、Capability Policy 和 Action Gateway 静态 API Key 认证；尚未实现 Local Runtime 或任务执行。
+Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gateway MVP 设计基线、Monorepo 根级工程基线、Contracts v1、Auth、Capability Policy、Action Gateway 静态 API Key 认证和 Local Runtime 最小任务执行闭环；Gateway 尚未连接 Runtime。
 
 ## Completed
 
@@ -25,24 +25,27 @@ Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gatewa
 - 受保护路由：`GET /v1/capabilities` 要求 Bearer API Key，未认证响应统一为 401；
 - Policy workspace：Deny by default、未知 Capability 拒绝、Allowlist 去重与固定顺序已实现；
 - Gateway 默认只允许 `gateway.ping`，`/ready` 与 `/v1/capabilities` 只返回 Policy 允许的能力；
-- Policy 12/12、Gateway 30/30、Contracts 17/17、Auth 12/12 通过，Knowledge Skill 未受影响。
+- Local Runtime workspace：`/health`、`/ready`、`/v1/tasks` 和 65536 字节 Body 限制已实现，仅监听 Loopback；
+- Runtime Task Contract 校验、Policy 二次校验、Capability 调度与 Contract v1 `TaskResult` 已实现；
+- Runtime 默认实现 `gateway.ping` 与 `runtime.status`，`system.info.safe` 未实现且默认拒绝；
+- Runtime 26/26、Policy 12/12、Gateway 30/30、Contracts 17/17、Auth 12/12 通过，Repo Check 与 Knowledge Skill 回归通过。
 
 ## Next
 
-- 创建 Local Runtime 最小应用，并实现 `gateway.ping` 与 `runtime.status`。
+- 连接 Action Gateway 与 Local Runtime，新增受保护的 `POST /v1/tasks`。
 
 ## Not Started
 
 - Feishu 飞书操作（写入、节点创建、部署）；
-- 动态权限策略、Runtime、Cloudflare Tunnel 和 Custom GPT Action Schema；
-- Runtime 和 Capability 的平台业务代码；
+- 动态权限策略、Cloudflare Tunnel 和 Custom GPT Action Schema；
+- Gateway → Runtime 通信与 Runtime 内部认证；
 - AI Video Workflow (Phase 3)。
 
 ## Current Restrictions
 
 - 不处理 Feishu 写入或部署；
 - 不把 Monorepo 工程基线描述为 Gateway MVP 已完成；
-- 未经后续任务授权不提前创建 Gateway、Runtime、Capability 或基础设施；
+- 未经后续任务授权不提前连接 Gateway 与 Runtime，或创建后续 Capability 和基础设施；
 - 不把后续计划描述为当前已实现。
 
-当前无 Known Issues。
+当前限制：Action Gateway 尚未连接 Runtime；Runtime 暂无内部认证；公网 Tunnel 与 Custom GPT Action 尚未建立。

@@ -12,7 +12,7 @@
 
 当前目标是进入 **Phase 2: AI Coding Workflow**，在已交付的 Knowledge Foundation 上逐步建立 Task、Gateway / Bridge、执行、验证、Result 与 Git 协作闭环。
 
-当前已建立最小 Monorepo 工程基础、Contracts、Auth 与 Policy 共享包和首个可启动应用 Action Gateway，并保持现有知识与 Skill 资产稳定；后续按已验收任务逐步补齐 Runtime 与执行链路。
+当前已建立最小 Monorepo 工程基础、Contracts、Auth 与 Policy 共享包、Action Gateway 和可独立执行安全 Task 的 Local Runtime，并保持现有知识与 Skill 资产稳定；后续连接 Gateway 与 Runtime。
 
 ## Architecture Overview
 
@@ -34,7 +34,7 @@ Knowledge Layer
 Infrastructure
 ```
 
-这是演进方向，不代表所有层已经实现。当前完成 Monorepo 根级工程基础、Contracts v1、静态 API Key 认证、Capability Policy 基线和 Action Gateway 本地 HTTP 外壳，尚未实现动态策略、MCP、Runtime、Capability 执行或业务工作流。详见 [`context/architecture-context.md`](context/architecture-context.md)。
+这是演进方向，不代表所有层已经实现。当前完成 Monorepo 根级工程基础、Contracts v1、静态 API Key 认证、Capability Policy 基线、Action Gateway 本地 HTTP 外壳和 Local Runtime 最小安全执行闭环，尚未实现动态策略、MCP、Gateway → Runtime 通信或业务工作流。详见 [`context/architecture-context.md`](context/architecture-context.md)。
 
 ## Source Of Truth
 
@@ -66,8 +66,9 @@ Git 保存正式工程事实；Feishu 只提供便于人阅读的知识投影。
 - `@ai-agent-platform/auth`：Bearer 解析、API Key 校验、安全比较与 Header 脱敏
 - `@ai-agent-platform/policy`：Capability 级默认拒绝与明确允许决策
 - `@ai-agent-platform/action-gateway`：本地公开健康检查和受保护的 `/v1/capabilities`
+- `@ai-agent-platform/local-runtime`：Loopback Task 校验、Policy 二次校验、Capability 调度和 `TaskResult`
 
-下一步：创建 Local Runtime 最小应用，并实现 `gateway.ping` 与 `runtime.status`。详见 [`context/current-status.md`](context/current-status.md)。
+Local Runtime 当前提供 `/health`、`/ready` 与 `/v1/tasks`，并安全执行 `gateway.ping` 和 `runtime.status`。下一步连接 Action Gateway 与 Local Runtime，并新增受保护的 Task 转发路由。详见 [`context/current-status.md`](context/current-status.md)。
 
 ## Engineering Workspace
 
@@ -81,16 +82,19 @@ capabilities/*
 
 `skills/ai-knowledge` 暂时保持独立，继续使用原生 Node.js `.mjs` 入口，不加入 workspace。
 
-当前有四个真实 workspace：
+当前有五个真实 workspace：
 
 - `@ai-agent-platform/contracts`：负责 Gateway、Runtime 和 Capability 共享的协议类型与无依赖运行时校验；
 - `@ai-agent-platform/auth`：提供无运行时依赖的基础认证原语；
 - `@ai-agent-platform/policy`：提供只依赖 Contracts 的 Capability Allow / Deny 决策；
-- `@ai-agent-platform/action-gateway`：提供仅监听本地 Loopback 的公开健康检查和受保护 Capability 查询接口。
+- `@ai-agent-platform/action-gateway`：提供仅监听本地 Loopback 的公开健康检查和受保护 Capability 查询接口；
+- `@ai-agent-platform/local-runtime`：提供仅监听 Loopback 的 Task Contract 校验、Runtime Policy 二次校验和安全 Capability 执行。
 
 当前认证仅为本地静态 API Key 基线，尚无密钥轮换、动态角色权限、Rate Limit 或公网链路。
 
-Policy 已实现 Capability 级默认拒绝和明确允许，但尚未实现 Capability 执行、Local Runtime 或公网 Action 链路。
+Policy 已实现 Capability 级默认拒绝和明确允许；Local Runtime 已能独立执行 `gateway.ping` 与 `runtime.status` 并返回 Contract v1 `TaskResult`。
+
+Local Runtime 已能独立执行安全 Task，但 Action Gateway 尚未连接 Local Runtime，Runtime 当前没有内部认证，Custom GPT 端到端链路仍未打通。
 
 本地环境要求 Node.js 20 与 npm 10；推荐使用 `.nvmrc` 中固定的 Node.js 版本。可执行验证命令：
 
@@ -101,12 +105,13 @@ npm run check:contracts
 npm run check:auth
 npm run check:policy
 npm run check:gateway
+npm run check:runtime
 npm run verify
 npm run build --workspace @ai-agent-platform/contracts
 npm run test --workspace @ai-agent-platform/contracts
 ```
 
-Local Runtime、Capability 和公网 Action 链路尚未实现。
+公网 Action 链路及 Gateway → Runtime 通信尚未实现。
 
 ## Development Rules
 

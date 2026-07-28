@@ -23,11 +23,12 @@
 - `packages/contracts`：Task / Result / Error Contract v1、Capability 白名单、运行时校验和测试；
 - `apps/action-gateway`：本地 `/health`、`/ready`、Request ID 与统一安全响应格式；
 - `packages/auth` 与 Gateway API Key 认证：安全密钥比较、Header 脱敏和受保护 Capability 查询；
-- `packages/policy`：Capability 级默认拒绝、明确允许和 Gateway 可见能力过滤。
+- `packages/policy`：Capability 级默认拒绝、明确允许和 Gateway 可见能力过滤；
+- `apps/local-runtime`：本地 health、Task Contract 校验、Runtime Policy 二次校验、安全 Capability 调度和 `TaskResult`。
 
 下一项：
 
-- 创建 `apps/local-runtime`，实现本地 health、Task Contract 校验和安全 Capability 调度。
+- 实现 Action Gateway → Local Runtime 通信，并通过受保护路由转发 `TaskRequest`。
 
 ## Phase 3: AI Video Workflow
 

@@ -22,11 +22,11 @@
 
 当前阶段：**设计与渐进实施阶段**。
 
-`SOL-005` 已定义完整路线图（Phase 0 至 Phase 14）。Monorepo 工程基础、Contracts v1、Auth、Capability Policy 和 Action Gateway 静态 API Key 认证已落地并通过测试；动态策略、Runtime 与公网 Action 链路尚未实现。每阶段遵循“一步一任务、一步一自检、一步一反馈、一步一审核”原则。
+`SOL-005` 已定义完整路线图（Phase 0 至 Phase 14）。Monorepo 工程基础、Contracts v1、Auth、Capability Policy、Action Gateway 静态 API Key 认证和 Local Runtime 最小任务执行闭环已落地并通过测试；动态策略、Gateway → Runtime 通信与公网 Action 链路尚未实现。每阶段遵循“一步一任务、一步一自检、一步一反馈、一步一审核”原则。
 
 ## 当前代码
 
-实现资产位于 [`apps/action-gateway/`](../../../../apps/action-gateway/)。
+实现资产位于 [`apps/action-gateway/`](../../../../apps/action-gateway/) 和 [`apps/local-runtime/`](../../../../apps/local-runtime/)。
 
 - 已实现本地 HTTP 外壳；
 - 已实现 `GET /health` 和 `GET /ready`；
@@ -36,7 +36,11 @@
 - Gateway 默认只展示 `gateway.ping`；
 - 当前没有动态策略管理；
 - Authorization Header 脱敏工具已存在，但正式日志系统尚未建立；
-- 尚未实现 Local Runtime、任务执行和公网链路。
+- Local Runtime 已实现 `GET /health`、`GET /ready` 与 `POST /v1/tasks`；
+- Runtime 已实现 Task Contract 校验、Policy 二次校验和 Contract v1 `TaskResult`；
+- Runtime 当前执行 `gateway.ping` 与 `runtime.status`，仅监听 Loopback；
+- Gateway 尚未连接 Runtime，Runtime 暂无内部 API Key；
+- 公网链路尚未建立。
 
 ## 代码落位边界
 
@@ -52,7 +56,7 @@
 | 基础设施 | `infra/cloudflare/`、`infra/launchd/` | Tunnel、进程管理 |
 | 运维脚本 | `scripts/` | 一键启动/停止/验证 |
 
-当前 `packages/contracts/`、`packages/auth/`、`packages/policy/` 与 `apps/action-gateway/` 已创建；其他运行时代码目录尚未创建。
+当前 `packages/contracts/`、`packages/auth/`、`packages/policy/`、`apps/action-gateway/` 与 `apps/local-runtime/` 已创建；其他运行时代码目录尚未创建。
 
 ## 使用规则
 
