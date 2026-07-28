@@ -75,6 +75,8 @@ read back 验证
 
 Publisher 负责图片转换。LLM 不判断图片处理逻辑。
 
+当前实现：`skills/ai-knowledge/scripts/lark_write.mjs`（v1.3.0）已集成 asset:// 解析 → knowledge-assets 图片提取 → Feishu media-insert 全流程。
+
 ### 禁止发布
 
 - 外部图床链接（GitHub Raw URL、Imgur、OSS 等）；
