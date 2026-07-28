@@ -1,0 +1,22 @@
+{
+  "name": "ai-agent-platform",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A personal AI agent engineering platform for knowledge, execution, tools, and workflows.",
+  "engines": {
+    "node": ">=20 <21",
+    "npm": ">=10 <11"
+  },
+  "packageManager": "npm@10.8.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "capabilities/*"
+  ],
+  "scripts": {
+    "check:repo": "node scripts/repo-check.mjs",
+    "check:knowledge": "node skills/ai-knowledge/tests/self-test.mjs",
+    "verify": "npm run check:repo && npm run check:knowledge"
+  }
+}

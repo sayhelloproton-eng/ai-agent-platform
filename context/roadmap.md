@@ -2,35 +2,30 @@
 
 本 Roadmap 描述阶段顺序，不代表后续能力已经实现。每一阶段必须在上一阶段通过验收并获得人工确认后再开始。
 
-## Phase 1: Context + Knowledge
+## Phase 1: Knowledge Foundation
 
-建立 Project Context Root、项目级 Context、Git 唯一真源和 Knowledge Strategy，使新 Agent 能从仓库恢复项目方向和当前任务。
+建立 Project Context Root、项目级 Context、Git 唯一真源、Knowledge Strategy 与 AI Knowledge Skill，使新 Agent 能恢复项目方向并受控管理长期知识。
 
 当前状态：**Completed**
 
-> Task 001（Context Foundation）、Task 002（知识资产组织）、Task 003-A/B/C（知识配置 v3.0、Project Profile、治理规则对齐）已完成。当前进入 Knowledge System Redesign v3.0 迁移阶段（详见 `repository-analysis.md`）。
+> Task 001（Context Foundation）、Task 002（知识资产组织）、Task 003-A/B/C（知识配置 v3.0、Project Profile、治理规则对齐）及 `skills/ai-knowledge/` v1.2.0 已完成交付。
 
-## Phase 2: AI Knowledge Skill
+## Phase 2: AI Coding Workflow
 
-建立面向 Agent 的知识能力，用于最小上下文检索、知识组织、状态维护和受控知识生命周期。
+建立 ChatGPT → Task → Codex → Git 的可追踪工程闭环，包括 Task Contract、Gateway / Bridge、执行、测试、Result、Branch / Commit / PR 和知识回写。
 
-当前状态：**Completed / Delivered**
+当前状态：**In Progress**
 
-> `skills/ai-knowledge/` v1.2.0 已完成交付并通过 `validate_bundle.mjs` 和 `self-test.mjs` 验证。当前活动：Knowledge Foundation 仓库一致性修复。
+已完成：
 
-## Phase 3: ChatGPT Action + Gateway
+- Gateway MVP 渐进式实施方案；
+- npm workspaces 根级工程基础，包括 Node.js 版本约束、lock 文件和统一验证入口。
 
-建立 ChatGPT 到平台的受控任务入口、契约与 Gateway 边界。
+下一项：
 
-当前状态：**Not Started**
+- 创建 `packages/contracts`，定义 Task / Result / Error Contract v1。
 
-## Phase 4: Coding Agent Workflow
-
-建立 ChatGPT → Task → Codex → Git 的可追踪工程闭环，包括执行、验证、结果与 Review。
-
-当前状态：**Not Started**
-
-## Phase 5: AI Video Workflow
+## Phase 3: AI Video Workflow
 
 以真实复杂业务验证 Agent、Tool、Knowledge、Workflow 与 Provider 的组合能力。
 

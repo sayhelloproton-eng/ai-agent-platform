@@ -10,12 +10,9 @@
 
 ## Project Goal
 
-当前目标是建立 **Knowledge Layer / Context Foundation**：
+当前目标是进入 **Phase 2: AI Coding Workflow**，在已交付的 Knowledge Foundation 上逐步建立 Task、Gateway / Bridge、执行、验证、Result 与 Git 协作闭环。
 
-- 让新会话只读取 Git 仓库即可理解项目；
-- 固化项目愿景、架构方向、当前状态、路线图和知识策略；
-- 为后续 AI Knowledge Skill 与工程工作流提供稳定上下文；
-- 明确 Agent 的工作范围、验证责任与安全边界。
+第一步只建立最小 Monorepo 工程基础并保持现有知识与 Skill 资产稳定；后续按已验收任务逐步创建公共 Contract 和真实 workspace 包。
 
 ## Architecture Overview
 
@@ -37,7 +34,7 @@ Knowledge Layer
 Infrastructure
 ```
 
-这是演进方向，不代表所有层已经实现。当前只建设 Context Foundation，不实现 Gateway、MCP、Runtime 或业务工作流。详见 [`context/architecture-context.md`](context/architecture-context.md)。
+这是演进方向，不代表所有层已经实现。当前仅完成 Monorepo 根级工程基础，尚未实现 Gateway、MCP、Runtime、Capability 或业务工作流。详见 [`context/architecture-context.md`](context/architecture-context.md)。
 
 ## Source Of Truth
 
@@ -57,15 +54,38 @@ Git 保存正式工程事实；Feishu 只提供便于人阅读的知识投影。
 
 ## Current Phase
 
-当前阶段：**Phase 1: Knowledge Foundation — 已交付**
+当前阶段：**Phase 2: AI Coding Workflow — 进行中**
 
 已完成：
 - Git 唯一真源与四层文档架构（`docs/knowledge/`、`docs/technical/`、`docs/learning/`、`docs/adr/`）
 - AI Knowledge Skill v1.2.0（Git → Feishu 受控投影）
 - `context/` 项目级 Agent 启动上下文
 - 17 个知识页面发布至飞书知识库"智能体工程探索"
+- Gateway MVP 渐进式实施方案与 npm workspaces 根级工程基础
 
-当前：仓库一致性修复。下一步见 [`context/current-status.md`](context/current-status.md)。
+下一步：创建 `packages/contracts`，定义 Task / Result / Error Contract v1。详见 [`context/current-status.md`](context/current-status.md)。
+
+## Engineering Workspace
+
+仓库使用 npm workspaces 管理后续平台代码，当前预留范围：
+
+```text
+apps/*
+packages/*
+capabilities/*
+```
+
+`skills/ai-knowledge` 暂时保持独立，继续使用原生 Node.js `.mjs` 入口，不加入 workspace。
+
+本地环境要求 Node.js 20 与 npm 10；推荐使用 `.nvmrc` 中固定的 Node.js 版本。可执行验证命令：
+
+```bash
+npm run check:repo
+npm run check:knowledge
+npm run verify
+```
+
+Gateway、Local Runtime、Capability 和公网 Action 链路尚未在本批次实现。
 
 ## Development Rules
 
