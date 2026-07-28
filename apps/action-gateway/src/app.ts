@@ -21,6 +21,14 @@ import {
   type ServerResponse,
 } from "node:http";
 
+import {
+  createConcurrencyGate,
+  type ConcurrencyGate,
+} from "./concurrency.js";
+import {
+  createFixedWindowRateLimiter,
+  type RateLimiter,
+} from "./rate-limit.js";
 import type { RuntimeClient } from "./runtime-client.js";
 import {
   resolveRequestId,
@@ -33,6 +41,12 @@ const PUBLIC_ROUTES = new Set(["/health", "/ready"]);
 const CAPABILITIES_ROUTE = "/v1/capabilities";
 const TASKS_ROUTE = "/v1/tasks";
 const MAX_BODY_BYTES = 65_536;
+const TASK_RATE_LIMIT_KEY = "authenticated:/v1/tasks";
+const CAPABILITIES_RATE_LIMIT_KEY = "authenticated:/v1/capabilities";
+export const DEFAULT_TASK_RATE_LIMIT = 30;
+export const DEFAULT_CAPABILITIES_RATE_LIMIT = 60;
+export const DEFAULT_RATE_LIMIT_WINDOW_MS = 60_000;
+export const DEFAULT_GATEWAY_MAX_CONCURRENT_TASKS = 2;
 const DEFAULT_POLICY = createCapabilityPolicy([
   "gateway.ping",
   "runtime.status",
@@ -42,6 +56,9 @@ export interface GatewayOptions {
   readonly apiKey: string;
   readonly policy?: CapabilityPolicy;
   readonly runtimeClient?: RuntimeClient;
+  readonly taskRateLimiter?: RateLimiter;
+  readonly capabilitiesRateLimiter?: RateLimiter;
+  readonly concurrencyGate?: ConcurrencyGate;
 }
 
 interface BodyReadResult {
@@ -155,6 +172,21 @@ function writeTaskResult(
 export function createGatewayHandler(options: GatewayOptions): RequestListener {
   const policy = options.policy ?? DEFAULT_POLICY;
   const allowedCapabilities = listAllowedCapabilities(policy);
+  const taskRateLimiter =
+    options.taskRateLimiter ??
+    createFixedWindowRateLimiter({
+      limit: DEFAULT_TASK_RATE_LIMIT,
+      windowMs: DEFAULT_RATE_LIMIT_WINDOW_MS,
+    });
+  const capabilitiesRateLimiter =
+    options.capabilitiesRateLimiter ??
+    createFixedWindowRateLimiter({
+      limit: DEFAULT_CAPABILITIES_RATE_LIMIT,
+      windowMs: DEFAULT_RATE_LIMIT_WINDOW_MS,
+    });
+  const concurrencyGate =
+    options.concurrencyGate ??
+    createConcurrencyGate(DEFAULT_GATEWAY_MAX_CONCURRENT_TASKS);
 
   return (request, response) => {
     const requestId = resolveRequestId(request);
@@ -213,6 +245,28 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
           { allow: allowedMethod },
         );
         return;
+      }
+
+      if (pathname === TASKS_ROUTE || pathname === CAPABILITIES_ROUTE) {
+        const rateLimitDecision =
+          pathname === TASKS_ROUTE
+            ? taskRateLimiter.consume(TASK_RATE_LIMIT_KEY)
+            : capabilitiesRateLimiter.consume(CAPABILITIES_RATE_LIMIT_KEY);
+
+        if (!rateLimitDecision.allowed) {
+          discardUnreadRequestBody(request);
+          writeError(
+            response,
+            429,
+            requestId,
+            "RATE_LIMITED",
+            "Too many requests.",
+            {
+              "retry-after": String(rateLimitDecision.retryAfterSeconds),
+            },
+          );
+          return;
+        }
       }
 
       if (pathname === TASKS_ROUTE) {
@@ -306,13 +360,52 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
           return;
         }
 
-        const runtimeResult = await options.runtimeClient.executeTask(
-          task,
-          requestId,
-        );
+        const release = concurrencyGate.tryAcquire();
+        if (release === undefined) {
+          writeError(
+            response,
+            503,
+            requestId,
+            "BUSY",
+            "Gateway task capacity is full.",
+            { "retry-after": "1" },
+          );
+          return;
+        }
+
+        let runtimeResult;
+        try {
+          runtimeResult = await options.runtimeClient.executeTask(
+            task,
+            requestId,
+          );
+        } catch {
+          writeError(
+            response,
+            502,
+            requestId,
+            "RUNTIME_UNAVAILABLE",
+            "Local Runtime is unavailable.",
+          );
+          return;
+        } finally {
+          release();
+        }
 
         if (runtimeResult.ok) {
           writeTaskResult(response, requestId, runtimeResult.result);
+          return;
+        }
+
+        if (runtimeResult.reason === "busy") {
+          writeError(
+            response,
+            503,
+            requestId,
+            "RUNTIME_BUSY",
+            "Local Runtime task capacity is full.",
+            { "retry-after": "1" },
+          );
           return;
         }
 

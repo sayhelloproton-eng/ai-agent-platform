@@ -1,7 +1,11 @@
 import { isValidApiKeyFormat } from "@ai-agent-platform/auth";
 import { pathToFileURL } from "node:url";
 
-import { createRuntimeServer } from "./app.js";
+import {
+  createRuntimeServer,
+  DEFAULT_RUNTIME_MAX_CONCURRENT_TASKS,
+} from "./app.js";
+import { createConcurrencyGate } from "./concurrency.js";
 
 const DEFAULT_HOST = "127.0.0.1";
 const DEFAULT_PORT = 8790;
@@ -43,10 +47,32 @@ function resolveApiKey(input: string | undefined): string {
   return input;
 }
 
+function resolveMaximumConcurrency(input: string | undefined): number {
+  if (input === undefined) {
+    return DEFAULT_RUNTIME_MAX_CONCURRENT_TASKS;
+  }
+
+  if (!/^\d+$/.test(input)) {
+    throw new Error(
+      "Runtime concurrency limit must be an integer from 1 to 16.",
+    );
+  }
+
+  const limit = Number(input);
+  if (!Number.isInteger(limit) || limit < 1 || limit > 16) {
+    throw new Error(
+      "Runtime concurrency limit must be an integer from 1 to 16.",
+    );
+  }
+
+  return limit;
+}
+
 export interface LocalRuntimeConfiguration {
   readonly host: string;
   readonly port: number;
   readonly apiKey: string;
+  readonly maxConcurrentTasks: number;
 }
 
 export function resolveLocalRuntimeConfiguration(
@@ -56,13 +82,21 @@ export function resolveLocalRuntimeConfiguration(
     host: resolveHost(environment.LOCAL_RUNTIME_HOST),
     port: resolvePort(environment.LOCAL_RUNTIME_PORT),
     apiKey: resolveApiKey(environment.LOCAL_RUNTIME_API_KEY),
+    maxConcurrentTasks: resolveMaximumConcurrency(
+      environment.LOCAL_RUNTIME_MAX_CONCURRENT_TASKS,
+    ),
   };
 }
 
 function startLocalRuntime(): void {
   try {
     const configuration = resolveLocalRuntimeConfiguration(process.env);
-    const server = createRuntimeServer({ apiKey: configuration.apiKey });
+    const server = createRuntimeServer({
+      apiKey: configuration.apiKey,
+      concurrencyGate: createConcurrencyGate(
+        configuration.maxConcurrentTasks,
+      ),
+    });
 
     server.once("error", () => {
       console.error("Local Runtime failed to start.");

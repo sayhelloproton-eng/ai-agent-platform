@@ -34,6 +34,10 @@ runtime.status
 
 Runtime Client 只连接 Loopback HTTP URL，默认超时 3000 ms，并把连接失败、Header 前或 Body 读取阶段超时、非法 Runtime 响应映射为安全 Transport Error。合法 Runtime `TaskResult` 还必须与原 Task 的 `taskId` 一致才会原样返回；Transport Error 与 Task 的 succeeded、failed、rejected 状态是不同层次。Runtime 超时统一安全映射为 HTTP 504。
 
+认证和方法校验通过后，Gateway 对 `POST /v1/tasks` 应用每 60 秒 30 次、对 `GET /v1/capabilities` 应用每 60 秒 60 次的固定窗口 Rate Limit。两条路由使用独立配额；超限返回 HTTP 429 和 `Retry-After`。该限制为单实例内存状态，不保存或记录 API Key。
+
+Gateway 默认最多同时转发 2 个已通过 Contract 与 Policy 的 Task，达到上限时无队列快速返回 HTTP 503 `BUSY`。Runtime 自身满载时，Runtime Client 将其分类为 Busy，Gateway 返回 HTTP 503 `RUNTIME_BUSY`，且不透传 Runtime 原始响应。429 表示请求速率超限，503 表示当前执行容量已满。
+
 ## 当前安全边界
 
 - 默认只监听 `127.0.0.1`；
@@ -61,14 +65,16 @@ ACTION_GATEWAY_API_KEY
 ACTION_GATEWAY_RUNTIME_API_KEY
 ACTION_GATEWAY_RUNTIME_URL
 ACTION_GATEWAY_RUNTIME_TIMEOUT_MS
+ACTION_GATEWAY_MAX_CONCURRENT_TASKS
 ```
 
-Runtime URL 与 Timeout 可省略，默认分别为 `http://127.0.0.1:8790` 和 `3000`。
+Runtime URL、Timeout 与最大并发可省略，默认分别为 `http://127.0.0.1:8790`、`3000` 和 `2`。最大并发范围为 1～32。
 
 ## 当前限制
 
 - 仅支持静态外部与内部 API Key，无轮换；
 - 无动态策略管理；
-- 无 Rate Limit 或 Gateway / Runtime 任务并发上限，完成这些防护前不应直接暴露公网；
+- Rate Limit 为单实例内存级，不能替代 Cloudflare 边缘 Rate Limit；
+- 并发保护不建立任务队列；
 - 无 Cloudflare Tunnel；
 - 无 Custom GPT OpenAPI Schema。

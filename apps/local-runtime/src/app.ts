@@ -14,7 +14,12 @@ import {
 } from "node:http";
 
 import {
+  createConcurrencyGate,
+  type ConcurrencyGate,
+} from "./concurrency.js";
+import {
   createRuntimeExecutor,
+  type RuntimeExecutor,
 } from "./executor.js";
 import {
   resolveRequestId,
@@ -26,6 +31,7 @@ import {
 const SERVICE_NAME = "local-runtime";
 const TASKS_ROUTE = "/v1/tasks";
 const MAX_BODY_BYTES = 65_536;
+export const DEFAULT_RUNTIME_MAX_CONCURRENT_TASKS = 1;
 const ALLOWED_METHODS: Readonly<Record<string, string>> = Object.freeze({
   "/health": "GET",
   "/ready": "GET",
@@ -102,14 +108,21 @@ function readRequestBody(request: IncomingMessage): Promise<BodyReadResult> {
 export interface LocalRuntimeOptions {
   readonly apiKey: string;
   readonly policy?: CapabilityPolicy;
+  readonly executor?: RuntimeExecutor;
+  readonly concurrencyGate?: ConcurrencyGate;
 }
 
 export function createRuntimeHandler(
   options: LocalRuntimeOptions,
 ): RequestListener {
-  const executor = createRuntimeExecutor(
-    options.policy === undefined ? {} : { policy: options.policy },
-  );
+  const executor =
+    options.executor ??
+    createRuntimeExecutor(
+      options.policy === undefined ? {} : { policy: options.policy },
+    );
+  const concurrencyGate =
+    options.concurrencyGate ??
+    createConcurrencyGate(DEFAULT_RUNTIME_MAX_CONCURRENT_TASKS);
 
   return (request, response) => {
     const requestId = resolveRequestId(request);
@@ -246,8 +259,31 @@ export function createRuntimeHandler(
         return;
       }
 
-      const result = await executor.execute(validation.value);
-      writeJson(response, 200, requestId, result);
+      if (!executor.listCapabilities().includes(validation.value.capability)) {
+        const result = await executor.execute(validation.value);
+        writeJson(response, 200, requestId, result);
+        return;
+      }
+
+      const release = concurrencyGate.tryAcquire();
+      if (release === undefined) {
+        writeError(
+          response,
+          503,
+          requestId,
+          "BUSY",
+          "Local Runtime task capacity is full.",
+          { "retry-after": "1" },
+        );
+        return;
+      }
+
+      try {
+        const result = await executor.execute(validation.value);
+        writeJson(response, 200, requestId, result);
+      } finally {
+        release();
+      }
     })().catch(() => {
       if (!response.headersSent) {
         writeError(

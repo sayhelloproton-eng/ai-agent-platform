@@ -2,7 +2,11 @@ import { isValidApiKeyFormat } from "@ai-agent-platform/auth";
 import type { Server } from "node:http";
 import { pathToFileURL } from "node:url";
 
-import { createGatewayServer } from "./app.js";
+import {
+  createGatewayServer,
+  DEFAULT_GATEWAY_MAX_CONCURRENT_TASKS,
+} from "./app.js";
+import { createConcurrencyGate } from "./concurrency.js";
 import { createHttpRuntimeClient } from "./runtime-client.js";
 
 const DEFAULT_HOST = "127.0.0.1";
@@ -65,6 +69,58 @@ function resolveRuntimeTimeout(input: string | undefined): number {
   return Number(input);
 }
 
+function resolveMaximumConcurrency(input: string | undefined): number {
+  if (input === undefined) {
+    return DEFAULT_GATEWAY_MAX_CONCURRENT_TASKS;
+  }
+
+  if (!/^\d+$/.test(input)) {
+    throw new Error(
+      "Gateway concurrency limit must be an integer from 1 to 32.",
+    );
+  }
+
+  const limit = Number(input);
+  if (!Number.isInteger(limit) || limit < 1 || limit > 32) {
+    throw new Error(
+      "Gateway concurrency limit must be an integer from 1 to 32.",
+    );
+  }
+
+  return limit;
+}
+
+export interface ActionGatewayConfiguration {
+  readonly host: string;
+  readonly port: number;
+  readonly apiKey: string;
+  readonly runtimeUrl: string;
+  readonly runtimeApiKey: string;
+  readonly runtimeTimeoutMs: number;
+  readonly maxConcurrentTasks: number;
+}
+
+export function resolveActionGatewayConfiguration(
+  environment: Readonly<Record<string, string | undefined>>,
+): ActionGatewayConfiguration {
+  return {
+    host: resolveHost(environment.ACTION_GATEWAY_HOST),
+    port: resolvePort(environment.ACTION_GATEWAY_PORT),
+    apiKey: resolveApiKey(environment.ACTION_GATEWAY_API_KEY),
+    runtimeUrl:
+      environment.ACTION_GATEWAY_RUNTIME_URL ?? DEFAULT_RUNTIME_URL,
+    runtimeApiKey: resolveApiKey(
+      environment.ACTION_GATEWAY_RUNTIME_API_KEY,
+    ),
+    runtimeTimeoutMs: resolveRuntimeTimeout(
+      environment.ACTION_GATEWAY_RUNTIME_TIMEOUT_MS,
+    ),
+    maxConcurrentTasks: resolveMaximumConcurrency(
+      environment.ACTION_GATEWAY_MAX_CONCURRENT_TASKS,
+    ),
+  };
+}
+
 export function configureGatewayServerTimeouts(server: Server): Server {
   server.headersTimeout = GATEWAY_HEADERS_TIMEOUT_MS;
   server.requestTimeout = GATEWAY_REQUEST_TIMEOUT_MS;
@@ -75,22 +131,20 @@ export function configureGatewayServerTimeouts(server: Server): Server {
 
 function startActionGateway(): void {
   try {
-    const host = resolveHost(process.env.ACTION_GATEWAY_HOST);
-    const port = resolvePort(process.env.ACTION_GATEWAY_PORT);
-    const apiKey = resolveApiKey(process.env.ACTION_GATEWAY_API_KEY);
-    const runtimeApiKey = resolveApiKey(
-      process.env.ACTION_GATEWAY_RUNTIME_API_KEY,
-    );
+    const configuration = resolveActionGatewayConfiguration(process.env);
     const runtimeClient = createHttpRuntimeClient({
-      baseUrl:
-        process.env.ACTION_GATEWAY_RUNTIME_URL ?? DEFAULT_RUNTIME_URL,
-      apiKey: runtimeApiKey,
-      timeoutMs: resolveRuntimeTimeout(
-        process.env.ACTION_GATEWAY_RUNTIME_TIMEOUT_MS,
-      ),
+      baseUrl: configuration.runtimeUrl,
+      apiKey: configuration.runtimeApiKey,
+      timeoutMs: configuration.runtimeTimeoutMs,
     });
     const server = configureGatewayServerTimeouts(
-      createGatewayServer({ apiKey, runtimeClient }),
+      createGatewayServer({
+        apiKey: configuration.apiKey,
+        runtimeClient,
+        concurrencyGate: createConcurrencyGate(
+          configuration.maxConcurrentTasks,
+        ),
+      }),
     );
 
     server.once("error", () => {
@@ -98,8 +152,10 @@ function startActionGateway(): void {
       process.exitCode = 1;
     });
 
-    server.listen(port, host, () => {
-      console.log(`Action Gateway listening on http://${host}:${port}`);
+    server.listen(configuration.port, configuration.host, () => {
+      console.log(
+        `Action Gateway listening on http://${configuration.host}:${configuration.port}`,
+      );
     });
   } catch (error: unknown) {
     const message =

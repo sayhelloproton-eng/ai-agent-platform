@@ -22,7 +22,7 @@
 
 当前阶段：**设计与渐进实施阶段**。
 
-`SOL-005` 已定义完整路线图（Phase 0 至 Phase 14）。Monorepo 工程基础、Contracts v1、Auth、Capability Policy、Action Gateway → Local Runtime 本地任务链路已落地并通过测试；动态策略、启动编排、Tunnel 与公网 Action 链路尚未实现。每阶段遵循“一步一任务、一步一自检、一步一反馈、一步一审核”原则。
+`SOL-005` 已定义完整路线图（Phase 0 至 Phase 14）。Monorepo 工程基础、Contracts v1、Auth、Capability Policy、Action Gateway → Local Runtime 本地任务链路、应用层入口保护与本地启动编排已落地并通过测试；动态策略、Tunnel 与公网 Action 链路尚未实现。每阶段遵循“一步一任务、一步一自检、一步一反馈、一步一审核”原则。
 
 ## 当前代码
 
@@ -47,10 +47,13 @@
 - Runtime `/v1/tasks` 已增加内部 API Key，health 与 ready 保持公开；
 - Gateway 提前响应会排空未读请求 Body，并设置固定 Header、Request、Keep-Alive 与 Socket 入站 Timeout；
 - 本地 Gateway → Runtime 链路已通过真实双服务测试；
-- Rate Limit 与 Gateway / Runtime 并发限制尚未实现；
+- Gateway 对 Task 与 Capabilities 使用独立的单实例固定窗口 Rate Limit；
+- Gateway 和 Runtime 分别使用无队列并发 Gate，满载快速返回 503；
+- Runtime Busy 由 Gateway 安全分类和映射，不透传 Runtime 原始响应；
+- Local Stack 已实现 Runtime → Gateway 顺序启动、Ready 检查和双进程清理；
 - 公网链路尚未建立。
 
-下一步是实现公网入口前的 Rate Limit、Gateway / Runtime 并发控制和本地启动编排。
+下一步是配置 Cloudflare Named Tunnel、固定 HTTPS 域名和 Custom GPT OpenAPI Schema。
 
 ## 代码落位边界
 

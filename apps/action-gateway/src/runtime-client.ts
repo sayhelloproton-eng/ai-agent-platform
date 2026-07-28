@@ -18,7 +18,11 @@ export type RuntimeClientResult =
     }
   | {
       readonly ok: false;
-      readonly reason: "timeout" | "unavailable" | "invalid-response";
+      readonly reason:
+        | "timeout"
+        | "unavailable"
+        | "invalid-response"
+        | "busy";
     };
 
 export interface RuntimeClient {
@@ -145,6 +149,11 @@ export function createHttpRuntimeClient(
           redirect: "error",
           signal: controller.signal,
         });
+
+        if (response.status === 503) {
+          void response.body?.cancel();
+          return { ok: false, reason: "busy" };
+        }
 
         if (response.status !== 200) {
           void response.body?.cancel();

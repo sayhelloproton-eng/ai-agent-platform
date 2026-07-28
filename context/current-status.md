@@ -4,7 +4,7 @@
 
 **Phase 2: AI Coding Workflow — In Progress**
 
-Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gateway MVP 设计基线、Monorepo 根级工程基线、Contracts v1、Auth、Capability Policy、Action Gateway → Local Runtime 本地任务执行链路，以及公网接入前的五项传输边界安全加固；公网链路尚未建立。
+Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gateway MVP 设计基线、Monorepo 根级工程基线、Contracts v1、Auth、Capability Policy、Action Gateway → Local Runtime 本地任务执行链路，以及公网接入前的传输边界、Rate Limit、双端并发和本地启动编排；公网链路尚未建立。
 
 ## Completed
 
@@ -33,17 +33,21 @@ Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gatewa
 - 外部 `ACTION_GATEWAY_API_KEY` 与内部 Runtime Key 分离，Runtime `/v1/tasks` 已增加内部 Bearer 认证；
 - Gateway 与 Runtime 分别执行 Capability Policy，`system.info.safe` 默认在 Gateway 被拒绝；
 - Batch 7.1 公网接入前安全修复：Runtime `TaskResult.taskId` 绑定原 Task、Header 前与 Body 阶段 Timeout 安全映射、Runtime 二次 Policy 真实链路验证、提前响应排空未读 Body、Gateway 固定入站 Timeout；
-- Local Chain 6/6、Runtime 38/38、Gateway 64/64、Policy 12/12、Contracts 17/17、Auth 12/12 通过，Repo Check、Knowledge Skill 与根级 Verify 通过。
+- Gateway 单实例固定窗口 Rate Limit：Task 30/60 秒、Capabilities 60/60 秒，超限安全返回 429；
+- Gateway 默认最大 2 个在途 Task、Runtime 默认最大 1 个执行 Task，均采用无队列快速失败并保证槽位释放；
+- Runtime 503 被 Gateway 安全映射为 `RUNTIME_BUSY`，不透传 Runtime Body；
+- `npm run local:start` 已实现 Runtime → Gateway 顺序启动、Ready 检查、Key 一致性校验和双进程 Shutdown；
+- Local Chain 6/6、Local Stack 5/5、Runtime 44/44、Gateway 76/76、Policy 12/12、Contracts 17/17、Auth 12/12 通过，Repo Check、Knowledge Skill 与根级 Verify 通过。
 
 ## Next
 
-- 实现公网入口前的最小 Rate Limit、Gateway / Runtime 并发限制及本地一键启动。
+- 配置 Cloudflare Named Tunnel、固定 HTTPS 域名和 Custom GPT OpenAPI Schema。
 
 ## Not Started
 
 - Feishu 飞书操作（写入、节点创建、部署）；
-- 动态权限策略、Rate Limit、任务并发限制、Cloudflare Tunnel 和 Custom GPT Action Schema；
-- 本地一键启动与公网端到端验证；
+- 动态权限策略、Cloudflare Tunnel 和 Custom GPT Action Schema；
+- 公网端到端验证；
 - AI Video Workflow (Phase 3)。
 
 ## Current Restrictions

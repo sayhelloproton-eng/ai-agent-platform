@@ -8,12 +8,45 @@ import {
 } from "@ai-agent-platform/contracts";
 import { createCapabilityPolicy } from "@ai-agent-platform/policy";
 import { createRuntimeServer } from "../dist/app.js";
+import { createConcurrencyGate } from "../dist/concurrency.js";
 import {
   resolveLocalRuntimeConfiguration,
 } from "../dist/server.js";
 
 const API_KEY = "runtime-test-key-0123456789abcdef-xyz";
 const WRONG_API_KEY = "wrong-runtime-key-0123456789abcdef-xyz";
+
+function createDeferred() {
+  let resolve;
+  const promise = new Promise((resolver) => {
+    resolve = resolver;
+  });
+  return { promise, resolve };
+}
+
+function createSucceededResult(task) {
+  const timestamp = new Date().toISOString();
+  return {
+    contractVersion: "1.0",
+    taskId: task.taskId,
+    status: "succeeded",
+    output: { capability: task.capability, source: "controlled-executor" },
+    error: null,
+    evidence: [],
+    metadata: {
+      startedAt: timestamp,
+      completedAt: timestamp,
+      durationMs: 0,
+      executor: "local-runtime",
+    },
+  };
+}
+
+async function waitForCallCount(calls, count) {
+  while (calls.length < count) {
+    await new Promise((resolve) => setImmediate(resolve));
+  }
+}
 
 function createTask(overrides = {}) {
   return {
@@ -628,4 +661,179 @@ test("missing LOCAL_RUNTIME_API_KEY fails configuration safely", () => {
       return true;
     },
   );
+});
+
+test("Runtime concurrency Gate validates limits and releases idempotently", () => {
+  for (const limit of [0, 17, 1.5, Number.NaN]) {
+    assert.throws(() => createConcurrencyGate(limit));
+  }
+
+  const gate = createConcurrencyGate(1);
+  const release = gate.tryAcquire();
+  assert.equal(typeof release, "function");
+  assert.equal(gate.activeCount, 1);
+  assert.equal(gate.tryAcquire(), undefined);
+  release();
+  release();
+  assert.equal(gate.activeCount, 0);
+});
+
+test("Runtime concurrency fails fast and releases after execution", async () => {
+  const deferred = createDeferred();
+  const calls = [];
+  const executor = {
+    listCapabilities: () => ["gateway.ping", "runtime.status"],
+    async execute(task) {
+      calls.push(task);
+      await deferred.promise;
+      return createSucceededResult(task);
+    },
+  };
+  const concurrencyGate = createConcurrencyGate(1);
+
+  await withRuntime(async (baseUrl) => {
+    const first = submitTask(baseUrl, createTask());
+    await waitForCallCount(calls, 1);
+
+    const second = await submitTask(baseUrl, createTask());
+    const bodyText = await second.text();
+    const body = JSON.parse(bodyText);
+    assert.equal(second.status, 503);
+    assert.equal(second.headers.get("retry-after"), "1");
+    assert.equal(body.error.code, "BUSY");
+    assert.equal(calls.length, 1);
+    assert.equal(bodyText.includes(API_KEY), false);
+
+    deferred.resolve();
+    assert.equal((await first).status, 200);
+    assert.equal(concurrencyGate.activeCount, 0);
+    assert.equal((await submitTask(baseUrl, createTask())).status, 200);
+    assert.equal(calls.length, 2);
+  }, { executor, concurrencyGate });
+});
+
+test("Runtime releases concurrency after Executor throws", async () => {
+  const concurrencyGate = createConcurrencyGate(1);
+  let calls = 0;
+  const executor = {
+    listCapabilities: () => ["gateway.ping"],
+    async execute(task) {
+      calls += 1;
+      if (calls === 1) {
+        throw new Error("controlled failure");
+      }
+      return createSucceededResult(task);
+    },
+  };
+
+  await withRuntime(async (baseUrl) => {
+    const failed = await submitTask(baseUrl, createTask());
+    assert.equal(failed.status, 500);
+    assert.equal(concurrencyGate.activeCount, 0);
+    const recovered = await submitTask(baseUrl, createTask());
+    assert.equal(recovered.status, 200);
+    assert.equal(calls, 2);
+  }, { executor, concurrencyGate });
+});
+
+test("Policy rejection does not acquire Runtime concurrency", async () => {
+  const timestamp = new Date().toISOString();
+  const concurrencyGate = {
+    activeCount: 0,
+    limit: 1,
+    calls: 0,
+    tryAcquire() {
+      this.calls += 1;
+      return () => {};
+    },
+  };
+  const executor = {
+    listCapabilities: () => ["gateway.ping"],
+    async execute(task) {
+      return {
+        contractVersion: "1.0",
+        taskId: task.taskId,
+        status: "rejected",
+        output: null,
+        error: {
+          code: "FORBIDDEN",
+          message: "Capability is not allowed.",
+          retryable: false,
+        },
+        evidence: [],
+        metadata: {
+          startedAt: timestamp,
+          completedAt: timestamp,
+          durationMs: 0,
+          executor: "local-runtime",
+        },
+      };
+    },
+  };
+
+  await withRuntime(async (baseUrl) => {
+    const response = await submitTask(
+      baseUrl,
+      createTask({ capability: "system.info.safe" }),
+    );
+    assert.equal(response.status, 200);
+    assert.equal(concurrencyGate.calls, 0);
+  }, { executor, concurrencyGate });
+});
+
+test("Invalid Contract, health, and ready do not acquire Runtime concurrency", async () => {
+  const concurrencyGate = {
+    activeCount: 0,
+    limit: 1,
+    calls: 0,
+    tryAcquire() {
+      this.calls += 1;
+      return () => {};
+    },
+  };
+
+  await withRuntime(async (baseUrl) => {
+    await fetch(`${baseUrl}/health`);
+    await fetch(`${baseUrl}/ready`);
+    await submitTask(baseUrl, { taskId: "invalid" });
+    assert.equal(concurrencyGate.calls, 0);
+  }, { concurrencyGate });
+});
+
+test("Runtime concurrency Server configuration is bounded and safe", () => {
+  assert.equal(
+    resolveLocalRuntimeConfiguration({
+      LOCAL_RUNTIME_API_KEY: API_KEY,
+    }).maxConcurrentTasks,
+    1,
+  );
+  assert.equal(
+    resolveLocalRuntimeConfiguration({
+      LOCAL_RUNTIME_API_KEY: API_KEY,
+      LOCAL_RUNTIME_MAX_CONCURRENT_TASKS: "4",
+    }).maxConcurrentTasks,
+    4,
+  );
+
+  const secret = "not-a-valid-runtime-limit-secret";
+  assert.throws(
+    () =>
+      resolveLocalRuntimeConfiguration({
+        LOCAL_RUNTIME_API_KEY: API_KEY,
+        LOCAL_RUNTIME_MAX_CONCURRENT_TASKS: secret,
+      }),
+    (error) => {
+      assert.ok(error instanceof Error);
+      assert.equal(error.message.includes(secret), false);
+      return true;
+    },
+  );
+  for (const value of ["0", "17", "1.5"]) {
+    assert.throws(() =>
+      resolveLocalRuntimeConfiguration({
+        LOCAL_RUNTIME_API_KEY: API_KEY,
+        LOCAL_RUNTIME_MAX_CONCURRENT_TASKS: value,
+      }),
+    );
+  }
 });

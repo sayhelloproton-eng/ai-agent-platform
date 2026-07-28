@@ -6,6 +6,10 @@ import { test } from "node:test";
 import { validateTaskResult } from "@ai-agent-platform/contracts";
 import { createCapabilityPolicy } from "@ai-agent-platform/policy";
 import { createGatewayServer } from "../dist/app.js";
+import { createConcurrencyGate } from "../dist/concurrency.js";
+import {
+  createFixedWindowRateLimiter,
+} from "../dist/rate-limit.js";
 import { createHttpRuntimeClient } from "../dist/runtime-client.js";
 import {
   configureGatewayServerTimeouts,
@@ -13,6 +17,7 @@ import {
   GATEWAY_KEEP_ALIVE_TIMEOUT_MS,
   GATEWAY_REQUEST_TIMEOUT_MS,
   GATEWAY_SOCKET_TIMEOUT_MS,
+  resolveActionGatewayConfiguration,
 } from "../dist/server.js";
 
 const API_KEY = "test-api-key-0123456789abcdef-xyz";
@@ -73,6 +78,20 @@ function createFakeRuntimeClient(options = {}) {
       };
     },
   };
+}
+
+function createDeferred() {
+  let resolve;
+  const promise = new Promise((resolver) => {
+    resolve = resolver;
+  });
+  return { promise, resolve };
+}
+
+async function waitForCallCount(calls, count) {
+  while (calls.length < count) {
+    await new Promise((resolve) => setImmediate(resolve));
+  }
 }
 
 async function submitTask(baseUrl, task, options = {}) {
@@ -1117,5 +1136,321 @@ test("Gateway Server uses the fixed inbound timeout baseline", () => {
     assert.equal(server.headersTimeout > server.keepAliveTimeout, true);
   } finally {
     server.close();
+  }
+});
+
+test("Fixed Window Rate Limiter validates configuration and resets safely", () => {
+  for (const options of [
+    { limit: 0, windowMs: 1_000 },
+    { limit: 10_001, windowMs: 1_000 },
+    { limit: 1.5, windowMs: 1_000 },
+    { limit: 1, windowMs: 999 },
+    { limit: 1, windowMs: 3_600_001 },
+  ]) {
+    assert.throws(() => createFixedWindowRateLimiter(options));
+  }
+
+  let now = 10_000;
+  const limiter = createFixedWindowRateLimiter({
+    limit: 2,
+    windowMs: 1_000,
+    now: () => now,
+  });
+  const first = limiter.consume("route");
+  const second = limiter.consume("route");
+  const denied = limiter.consume("route");
+  assert.equal(first.allowed, true);
+  assert.equal(second.allowed, true);
+  assert.equal(denied.allowed, false);
+  assert.equal(denied.remaining, 0);
+  assert.equal(denied.retryAfterSeconds, 1);
+  assert.equal(Object.isFrozen(denied), true);
+
+  now = 11_000;
+  assert.equal(limiter.consume("route").allowed, true);
+  now = 9_000;
+  assert.equal(limiter.consume("route").allowed, true);
+});
+
+test("Task Rate Limit returns safe 429 with Retry-After", async () => {
+  const secret = "limiter-secret-that-must-not-appear";
+  const taskRateLimiter = createFixedWindowRateLimiter({
+    limit: 2,
+    windowMs: 60_000,
+  });
+  const runtimeClient = createFakeRuntimeClient();
+
+  await withGateway(async (baseUrl) => {
+    assert.equal((await submitTask(baseUrl, createTask())).status, 200);
+    assert.equal((await submitTask(baseUrl, createTask())).status, 200);
+    const response = await submitTask(baseUrl, createTask());
+    const bodyText = await response.text();
+    const body = JSON.parse(bodyText);
+
+    assert.equal(response.status, 429);
+    assert.equal(response.headers.get("retry-after"), "60");
+    assert.equal(response.headers.get("cache-control"), "no-store");
+    assert.ok(response.headers.get("x-request-id"));
+    assert.deepEqual(body.error, {
+      code: "RATE_LIMITED",
+      message: "Too many requests.",
+    });
+    assert.equal(bodyText.includes(API_KEY), false);
+    assert.equal(bodyText.includes(secret), false);
+    assert.equal(bodyText.includes("authenticated:/v1/tasks"), false);
+  }, { runtimeClient, taskRateLimiter });
+});
+
+test("Health, authentication failures, and wrong methods do not consume Task quota", async () => {
+  const taskRateLimiter = createFixedWindowRateLimiter({
+    limit: 1,
+    windowMs: 60_000,
+  });
+  const runtimeClient = createFakeRuntimeClient();
+
+  await withGateway(async (baseUrl) => {
+    await fetch(`${baseUrl}/health`);
+    await fetch(`${baseUrl}/v1/tasks`, {
+      method: "GET",
+      headers: { authorization: `Bearer ${API_KEY}` },
+    });
+    await submitTask(baseUrl, createTask(), {
+      headers: { authorization: `Bearer ${WRONG_API_KEY}` },
+    });
+
+    assert.equal((await submitTask(baseUrl, createTask())).status, 200);
+    assert.equal((await submitTask(baseUrl, createTask())).status, 429);
+  }, { runtimeClient, taskRateLimiter });
+});
+
+test("Rate-limited task Body is drained and Keep-Alive remains reusable", async () => {
+  const taskRateLimiter = createFixedWindowRateLimiter({
+    limit: 1,
+    windowMs: 60_000,
+  });
+  const runtimeClient = createFakeRuntimeClient();
+
+  await withGateway(async (baseUrl, port) => {
+    await submitTask(baseUrl, createTask());
+    const agent = new http.Agent({ keepAlive: true, maxSockets: 1 });
+    const body = JSON.stringify(createTask());
+
+    try {
+      const limited = await requestWithAgent(
+        port,
+        agent,
+        {
+          method: "POST",
+          path: "/v1/tasks",
+          headers: {
+            authorization: `Bearer ${API_KEY}`,
+            "content-length": Buffer.byteLength(body),
+            "content-type": "application/json",
+          },
+        },
+        body,
+      );
+      const health = await requestWithAgent(port, agent, {
+        method: "GET",
+        path: "/health",
+      });
+
+      assert.equal(limited.status, 429);
+      assert.equal(health.status, 200);
+      assert.equal(limited.connection, health.connection);
+    } finally {
+      agent.destroy();
+    }
+  }, { runtimeClient, taskRateLimiter });
+});
+
+test("Task and Capabilities routes use independent Rate Limit quotas", async () => {
+  const taskRateLimiter = createFixedWindowRateLimiter({
+    limit: 1,
+    windowMs: 60_000,
+  });
+  const capabilitiesRateLimiter = createFixedWindowRateLimiter({
+    limit: 1,
+    windowMs: 60_000,
+  });
+  const runtimeClient = createFakeRuntimeClient();
+
+  await withGateway(async (baseUrl) => {
+    const capabilityHeaders = {
+      authorization: `Bearer ${API_KEY}`,
+    };
+    assert.equal(
+      (await fetch(`${baseUrl}/v1/capabilities`, {
+        headers: capabilityHeaders,
+      })).status,
+      200,
+    );
+    assert.equal((await submitTask(baseUrl, createTask())).status, 200);
+    assert.equal(
+      (await fetch(`${baseUrl}/v1/capabilities`, {
+        headers: capabilityHeaders,
+      })).status,
+      429,
+    );
+    assert.equal((await submitTask(baseUrl, createTask())).status, 429);
+  }, {
+    runtimeClient,
+    taskRateLimiter,
+    capabilitiesRateLimiter,
+  });
+});
+
+test("Gateway concurrency fails fast and releases after completion", async () => {
+  const deferred = createDeferred();
+  const calls = [];
+  const runtimeClient = {
+    calls,
+    async executeTask(task, requestId) {
+      calls.push({ task, requestId });
+      await deferred.promise;
+      return { ok: true, result: createSucceededResult(task) };
+    },
+  };
+  const concurrencyGate = createConcurrencyGate(1);
+
+  await withGateway(async (baseUrl) => {
+    const first = submitTask(baseUrl, createTask());
+    await waitForCallCount(calls, 1);
+
+    const second = await submitTask(baseUrl, createTask());
+    const secondBody = await second.json();
+    assert.equal(second.status, 503);
+    assert.equal(second.headers.get("retry-after"), "1");
+    assert.equal(secondBody.error.code, "BUSY");
+    assert.equal(calls.length, 1);
+
+    deferred.resolve();
+    assert.equal((await first).status, 200);
+    assert.equal(concurrencyGate.activeCount, 0);
+    assert.equal((await submitTask(baseUrl, createTask())).status, 200);
+    assert.equal(calls.length, 2);
+  }, { runtimeClient, concurrencyGate });
+});
+
+test("Gateway releases concurrency slots after safe Runtime failures", async () => {
+  for (const reason of ["timeout", "unavailable"]) {
+    const concurrencyGate = createConcurrencyGate(1);
+    const runtimeClient = createFakeRuntimeClient({ reason });
+    await withGateway(async (baseUrl) => {
+      await submitTask(baseUrl, createTask());
+      assert.equal(concurrencyGate.activeCount, 0);
+      await submitTask(baseUrl, createTask());
+      assert.equal(runtimeClient.calls.length, 2);
+    }, { runtimeClient, concurrencyGate });
+  }
+});
+
+test("Gateway releases concurrency slots when Runtime Client throws", async () => {
+  const concurrencyGate = createConcurrencyGate(1);
+  const runtimeClient = {
+    calls: 0,
+    async executeTask() {
+      this.calls += 1;
+      throw new Error("unexpected internal failure");
+    },
+  };
+
+  await withGateway(async (baseUrl) => {
+    const first = await submitTask(baseUrl, createTask());
+    const bodyText = await first.text();
+    assert.equal(first.status, 502);
+    assert.equal(bodyText.includes("unexpected internal failure"), false);
+    assert.equal(concurrencyGate.activeCount, 0);
+    await submitTask(baseUrl, createTask());
+    assert.equal(runtimeClient.calls, 2);
+  }, { runtimeClient, concurrencyGate });
+});
+
+test("Policy and Contract rejections do not acquire Gateway concurrency", async () => {
+  const concurrencyGate = {
+    activeCount: 0,
+    limit: 1,
+    calls: 0,
+    tryAcquire() {
+      this.calls += 1;
+      return () => {};
+    },
+  };
+  const policy = createCapabilityPolicy(["gateway.ping"]);
+
+  await withGateway(async (baseUrl) => {
+    await submitTask(baseUrl, { taskId: "invalid" });
+    await submitTask(
+      baseUrl,
+      createTask({ capability: "system.info.safe" }),
+    );
+    assert.equal(concurrencyGate.calls, 0);
+  }, { concurrencyGate, policy });
+});
+
+test("Runtime Busy maps to safe Gateway 503", async () => {
+  const runtimeClient = createFakeRuntimeClient({ reason: "busy" });
+  await withGateway(async (baseUrl) => {
+    const response = await submitTask(baseUrl, createTask());
+    const body = await response.json();
+    assert.equal(response.status, 503);
+    assert.equal(response.headers.get("retry-after"), "1");
+    assert.deepEqual(body.error, {
+      code: "RUNTIME_BUSY",
+      message: "Local Runtime task capacity is full.",
+    });
+  }, { runtimeClient });
+});
+
+test("HTTP Runtime Client classifies 503 as Busy without reading its Body", async () => {
+  const unsafeBody = `unsafe-${API_KEY}`;
+  await withHttpEndpoint((_request, response) => {
+    response.writeHead(503, { "content-type": "application/json" });
+    response.end(unsafeBody);
+  }, async (baseUrl) => {
+    const client = createHttpRuntimeClient({ baseUrl, apiKey: API_KEY });
+    const result = await client.executeTask(createTask(), "busy-request");
+    assert.deepEqual(result, { ok: false, reason: "busy" });
+    assert.equal(JSON.stringify(result).includes(unsafeBody), false);
+  });
+});
+
+test("Gateway concurrency Server configuration is bounded and safe", () => {
+  const baseEnvironment = {
+    ACTION_GATEWAY_API_KEY: API_KEY,
+    ACTION_GATEWAY_RUNTIME_API_KEY: API_KEY,
+  };
+  assert.equal(
+    resolveActionGatewayConfiguration(baseEnvironment).maxConcurrentTasks,
+    2,
+  );
+  assert.equal(
+    resolveActionGatewayConfiguration({
+      ...baseEnvironment,
+      ACTION_GATEWAY_MAX_CONCURRENT_TASKS: "7",
+    }).maxConcurrentTasks,
+    7,
+  );
+
+  const secret = "not-a-valid-limit-secret";
+  assert.throws(
+    () =>
+      resolveActionGatewayConfiguration({
+        ...baseEnvironment,
+        ACTION_GATEWAY_MAX_CONCURRENT_TASKS: secret,
+      }),
+    (error) => {
+      assert.ok(error instanceof Error);
+      assert.equal(error.message.includes(secret), false);
+      return true;
+    },
+  );
+  for (const value of ["0", "33", "1.5"]) {
+    assert.throws(() =>
+      resolveActionGatewayConfiguration({
+        ...baseEnvironment,
+        ACTION_GATEWAY_MAX_CONCURRENT_TASKS: value,
+      }),
+    );
   }
 });

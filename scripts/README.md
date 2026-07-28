@@ -12,6 +12,8 @@
 
 - `repo-check.mjs`：检查 Node.js 基线、必要文件与目录、npm workspace 契约及敏感文件 Git 跟踪状态。
 - `local-chain-test.mjs`：在随机 Loopback 端口真实启动 Gateway 与 Runtime，通过 6 个测试验证双层认证、双层 Policy 和 TaskResult；其中真实覆盖 Gateway Policy 放行 `system.info.safe`、Runtime Policy 二次拒绝并返回 rejected `TaskResult`；不访问公网。
+- `local-stack.mjs`：校验三套显式 Key，依次启动并等待 Loopback Runtime、Gateway Ready，收到 SIGINT/SIGTERM 后清理两个子进程；不生成 Secret、不配置 Tunnel。
+- `local-stack-test.mjs`：通过 5 个测试验证 Local Stack 配置失败、默认并发、启动顺序、真实 Task、Secret 日志、Shutdown、端口回收和无孤儿进程；不访问公网。
 
 ## Boundary
 
@@ -19,7 +21,7 @@
 
 ## Structure
 
-当前包含根级仓库基线检查与真实本地链路验证。后续一键启动和部署脚本将在相应批次逐步落位。
+当前包含根级仓库基线检查、真实本地链路验证和前台 Local Stack 启停编排。公网 Tunnel 与部署编排尚未落位。
 
 ## Usage
 
@@ -28,6 +30,8 @@
 ```bash
 npm run check:repo
 npm run check:local-chain
+npm run check:local-stack
+npm run local:start
 npm run verify
 ```
 

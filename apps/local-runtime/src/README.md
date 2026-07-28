@@ -3,6 +3,7 @@
 本目录保存 Local Runtime 的最小 HTTP 与任务执行实现：
 
 - `app.ts`：HTTP 边界、内部认证、路由、Content-Type、Body 限制和 Task 校验；
+- `concurrency.ts`：Runtime 执行并发 Gate；
 - `executor.ts`：Policy 二次校验、Task 执行流程与 `TaskResult`；
 - `handlers.ts`：两个安全 Capability Handler；
 - `response.ts`：Request ID 和安全 JSON 响应；

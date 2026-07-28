@@ -5,6 +5,8 @@
 | 文件 | 职责 |
 |---|---|
 | `app.ts` | HTTP 路由、外部认证、Task Contract、Gateway Policy 和 Server 创建 |
+| `rate-limit.ts` | 单实例固定窗口 Rate Limiter |
+| `concurrency.ts` | Gateway 在途任务并发 Gate |
 | `response.ts` | JSON Envelope、响应 Header 和 Request ID |
 | `runtime-client.ts` | 连接 Loopback Local Runtime、内部认证、Timeout、响应限制和 `TaskResult` 校验 |
 | `server.ts` | 本地启动入口、Host / Port 与 Runtime Client 配置 |

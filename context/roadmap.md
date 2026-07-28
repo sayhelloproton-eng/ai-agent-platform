@@ -27,10 +27,11 @@
 - `apps/local-runtime`：本地 health、Task Contract 校验、Runtime Policy 二次校验、安全 Capability 调度和 `TaskResult`；
 - Action Gateway → Local Runtime：受保护 Task 转发、双层 API Key、双层 Policy、Runtime Client 和真实本地链路验证。
 - 公网接入前安全加固：TaskResult 与原 Task 的 `taskId` 绑定、Header 前与 Body 阶段 Timeout 映射、Runtime 二次 Policy 真实链路、未读请求 Body 排空和 Gateway 固定入站 Timeout。
+- 公网入口前应用保护与本地编排：单实例 Rate Limit、Gateway / Runtime 无队列并发 Gate、Runtime Busy 安全映射和 Local Stack 启停验证。
 
 下一项：
 
-- 实现公网入口前的 Rate Limit、并发控制和本地启动编排。
+- 配置 Cloudflare Tunnel，并完成 Custom GPT Action 公网端到端验证。
 
 ## Phase 3: AI Video Workflow
 

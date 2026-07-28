@@ -27,6 +27,8 @@ Action Gateway 已通过独立 Runtime Client 连接 Local Runtime。本地链�
 
 执行顺序为：Task Contract 校验 → Runtime Policy 二次校验 → Handler 查找 → 空对象输入检查 → Handler 执行 → `TaskResult`。`system.info.safe` 当前没有实现且默认拒绝。
 
+Runtime 默认最多执行 1 个已通过 Contract 与 Runtime Policy 的 Task，可通过 `LOCAL_RUNTIME_MAX_CONCURRENT_TASKS` 配置为 1～16。达到上限时不排队、不调用 Executor，立即返回 HTTP 503 `BUSY` 和 `Retry-After: 1`；执行成功、失败或异常后都会释放槽位。
+
 ## 使用
 
 ```bash
@@ -37,7 +39,7 @@ npm run start --workspace @ai-agent-platform/local-runtime
 
 默认监听 `127.0.0.1:8790`。`LOCAL_RUNTIME_HOST` 只接受 `127.0.0.1`、`localhost` 或 `::1`；`LOCAL_RUNTIME_PORT` 必须为 1～65535 的整数。
 
-启动必须设置符合格式要求的 `LOCAL_RUNTIME_API_KEY`。它应与外部 `ACTION_GATEWAY_API_KEY` 分离，并与 Gateway 侧的 `ACTION_GATEWAY_RUNTIME_API_KEY` 匹配。
+启动必须设置符合格式要求的 `LOCAL_RUNTIME_API_KEY`。它应与外部 `ACTION_GATEWAY_API_KEY` 分离，并与 Gateway 侧的 `ACTION_GATEWAY_RUNTIME_API_KEY` 匹配。`LOCAL_RUNTIME_MAX_CONCURRENT_TASKS` 可省略，默认值为 `1`。
 
 ## 安全边界
 

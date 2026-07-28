@@ -68,7 +68,7 @@ Git 保存正式工程事实；Feishu 只提供便于人阅读的知识投影。
 - `@ai-agent-platform/action-gateway`：本地公开健康检查和受保护的 `/v1/capabilities`
 - `@ai-agent-platform/local-runtime`：Loopback Task 校验、Policy 二次校验、Capability 调度和 `TaskResult`
 
-Action Gateway 当前提供受保护的 `POST /v1/tasks`，通过独立内部 API Key 连接 Local Runtime，并安全执行 `gateway.ping` 和 `runtime.status`。下一步建立本地启动编排并配置 Cloudflare Tunnel。详见 [`context/current-status.md`](context/current-status.md)。
+Action Gateway 当前提供受保护的 `POST /v1/tasks`，通过独立内部 API Key 连接 Local Runtime，并安全执行 `gateway.ping` 和 `runtime.status`。应用层 Rate Limit、Gateway / Runtime 并发保护和本地启动编排已经建立，下一步配置 Cloudflare Tunnel。详见 [`context/current-status.md`](context/current-status.md)。
 
 ## Engineering Workspace
 
@@ -90,7 +90,7 @@ capabilities/*
 - `@ai-agent-platform/action-gateway`：提供仅监听本地 Loopback 的公开健康检查、受保护 Capability 查询和 Task 转发接口；
 - `@ai-agent-platform/local-runtime`：提供仅监听 Loopback、受内部 API Key 保护的 Task Contract 校验、Runtime Policy 二次校验和安全 Capability 执行。
 
-当前认证仅为本地静态 API Key 基线，尚无密钥轮换、动态角色权限、Rate Limit 或公网链路。
+当前认证仅为本地静态 API Key 基线，尚无密钥轮换、动态角色权限或公网链路。
 
 Policy 已实现 Capability 级默认拒绝和明确允许；Local Runtime 已能独立执行 `gateway.ping` 与 `runtime.status` 并返回 Contract v1 `TaskResult`。
 
@@ -98,7 +98,9 @@ Gateway 与 Runtime 使用分离的外部、内部 API Key，并分别执行 Gat
 
 本地端到端任务链路已经打通，但尚未配置 Cloudflare Tunnel 和 Custom GPT Action，因此公网端到端 MVP 仍未完成。
 
-本地链路已经完成公网接入前的结果对应校验、超时映射、请求排空和入站超时加固；Rate Limit 与并发限制尚未实现，因此 Gateway 仍不应直接暴露公网。
+本地链路已经完成公网接入前的结果对应校验、超时映射、请求排空、入站超时、单实例 Rate Limit 和双端并发加固，并可通过前台脚本一键启停。
+
+应用层 Rate Limit 和并发保护已建立，但它们不能替代 Cloudflare 边缘防护。
 
 本地环境要求 Node.js 20 与 npm 10；推荐使用 `.nvmrc` 中固定的 Node.js 版本。可执行验证命令：
 
@@ -111,6 +113,8 @@ npm run check:policy
 npm run check:gateway
 npm run check:runtime
 npm run check:local-chain
+npm run check:local-stack
+npm run local:start
 npm run verify
 npm run build --workspace @ai-agent-platform/contracts
 npm run test --workspace @ai-agent-platform/contracts
