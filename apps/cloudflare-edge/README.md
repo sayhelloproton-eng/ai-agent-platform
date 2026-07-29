@@ -37,6 +37,12 @@ Origin 必须是无凭据、Query、Fragment 或子路径的 `https:` URL，且 
 非默认端口都会被拒绝。请求只允许一次 Origin Fetch，设置 `redirect: error`，
 不跟随重定向，也不自动重试。
 
+Wrangler 配置只启用 `global_fetch_strictly_public` compatibility flag，使已部署
+Worker 通过 Cloudflare 的公开网络 Fetch `*.trycloudflare.com` Quick Tunnel。
+该标志不会扩大固定路由或 Header 白名单，不允许客户端指定 Origin，也不表示
+信任任意 Cloudflare 域名；Origin 仍必须通过上述严格 URL 校验并由受控 Secret
+配置。
+
 发往 Origin 的 Header 白名单为：
 
 - `Authorization`：由 Edge 覆盖为 Origin Key；

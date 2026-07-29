@@ -5,6 +5,9 @@ import ts from "typescript";
 
 const sourceUrl = new URL("../src/index.ts", import.meta.url);
 const source = await readFile(sourceUrl, "utf8");
+const wranglerUrl = new URL("../wrangler.jsonc", import.meta.url);
+const wranglerSource = await readFile(wranglerUrl, "utf8");
+const wranglerConfiguration = JSON.parse(wranglerSource);
 const compiled = ts.transpileModule(source, {
   compilerOptions: {
     module: ts.ModuleKind.ES2022,
@@ -30,6 +33,26 @@ const CLIENT_KEY = "c".repeat(MIN_API_KEY_LENGTH);
 const ORIGIN_KEY = "o".repeat(MIN_API_KEY_LENGTH);
 const ORIGIN_BASE_URL = "https://unit-test-tunnel.trycloudflare.com";
 const UUID = "11111111-1111-4111-8111-111111111111";
+
+test("Wrangler enables only the approved public Fetch compatibility flag", () => {
+  assert.equal(wranglerConfiguration.name, "edge");
+  assert.equal(wranglerConfiguration.workers_dev, true);
+  assert.deepEqual(wranglerConfiguration.compatibility_flags, [
+    "global_fetch_strictly_public",
+  ]);
+});
+
+test("Wrangler configuration contains no deployment identity or Origin binding", () => {
+  assert.equal("account_id" in wranglerConfiguration, false);
+  assert.equal("zone_id" in wranglerConfiguration, false);
+  assert.equal("vars" in wranglerConfiguration, false);
+  assert.equal("secrets" in wranglerConfiguration, false);
+  assert.doesNotMatch(wranglerSource, /trycloudflare\.com/iu);
+  assert.doesNotMatch(
+    wranglerSource,
+    /EDGE_(?:CLIENT_API_KEY|ORIGIN_API_KEY|ORIGIN_BASE_URL)/u,
+  );
+});
 
 function bindings(overrides = {}) {
   return {

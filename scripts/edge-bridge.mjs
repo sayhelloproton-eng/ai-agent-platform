@@ -986,21 +986,20 @@ export function createStateRecord({
   };
 }
 
-async function createOwnedState(record, dependencies) {
-  let created = false;
+async function createOwnedState(record, ownership, dependencies) {
   try {
     await dependencies.writeFile(
       BRIDGE_STATE_FILE,
       `${JSON.stringify(record, null, 2)}\n`,
       { encoding: "utf8", mode: 0o600, flag: "wx" },
     );
-    created = true;
+    ownership.owned = true;
     await dependencies.chmod(BRIDGE_STATE_FILE, 0o600);
-    return { owned: true };
   } catch {
-    if (created) {
+    if (ownership.owned) {
       try {
         await dependencies.removeFile(BRIDGE_STATE_FILE);
+        ownership.owned = false;
       } catch {
         throw new BridgeError(
           "STATE_ROLLBACK_FAILED",
@@ -1011,6 +1010,21 @@ async function createOwnedState(record, dependencies) {
     throw new BridgeError(
       "STATE_WRITE_FAILED",
       "Bridge state could not be created safely.",
+    );
+  }
+}
+
+async function removeOwnedState(ownership, dependencies) {
+  if (!ownership.owned) {
+    return;
+  }
+  try {
+    await dependencies.removeFile(BRIDGE_STATE_FILE);
+    ownership.owned = false;
+  } catch {
+    throw new BridgeError(
+      "CLEANUP_FAILED",
+      "The owned Bridge state file could not be removed.",
     );
   }
 }
@@ -1107,7 +1121,7 @@ export async function runBridge(inputDependencies = {}) {
   let cloudflared;
   let gatewayOrigin;
   let cleanupPromise;
-  let stateOwned = false;
+  const stateOwnership = { owned: false };
   const cleanup = () => {
     if (cleanupPromise === undefined) {
       cleanupPromise = (async () => {
@@ -1129,13 +1143,6 @@ export async function runBridge(inputDependencies = {}) {
             dependencies,
           ),
         ];
-        if (stateOwned) {
-          cleanupTasks.push(
-            dependencies.removeFile(BRIDGE_STATE_FILE).then(() => {
-              stateOwned = false;
-            }),
-          );
-        }
         const results = await Promise.allSettled(cleanupTasks);
         if (results.some((result) => result.status === "rejected")) {
           throw new BridgeError(
@@ -1228,16 +1235,16 @@ export async function runBridge(inputDependencies = {}) {
     );
     gatewayOrigin = await waitForTunnelUrl(cloudflared, dependencies);
     await verifyTunnel(gatewayOrigin, keys.externalKey, dependencies);
-    const stateOwnership = await createOwnedState(
+    await createOwnedState(
       createStateRecord({
         pid: dependencies.pid,
         cloudflaredPid: cloudflared.pid,
         gatewayOrigin,
         startedAt: dependencies.now(),
       }),
+      stateOwnership,
       dependencies,
     );
-    stateOwned = stateOwnership.owned;
     throwIfCancelled(lifecycle.signal);
     dependencies.log(`Quick Tunnel ready: ${gatewayOrigin}`);
     dependencies.log("Ctrl+C to disconnect");
@@ -1265,6 +1272,7 @@ export async function runBridge(inputDependencies = {}) {
     throw new BridgeError("BRIDGE_FAILED", "Edge Bridge failed safely.");
   } finally {
     interrupts.dispose();
+    await removeOwnedState(stateOwnership, dependencies);
   }
 }
 

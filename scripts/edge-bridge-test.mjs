@@ -695,6 +695,12 @@ function runDependencies(options = {}) {
     },
     removeFile: async (path) => {
       removals.push(path);
+      if (
+        options.stateRemoveFailure &&
+        path === BRIDGE_STATE_FILE
+      ) {
+        throw new Error("state removal failed");
+      }
       files.delete(path);
     },
   });
@@ -881,6 +887,7 @@ test("unexpected Tunnel exit triggers cleanup without restart", async () => {
     1,
   );
   assert.deepEqual(dependencies.children[1].kills, ["SIGTERM"]);
+  assert.equal(dependencies.files.has(BRIDGE_STATE_FILE), false);
 });
 
 for (const signal of ["SIGINT", "SIGTERM"]) {
@@ -1111,6 +1118,56 @@ test("a stuck child cannot block other cleanup or owned state removal", async ()
   );
   assert.deepEqual(dependencies.children[1].kills, ["SIGTERM"]);
   assert.equal(dependencies.files.has(BRIDGE_STATE_FILE), false);
+  assert.deepEqual(dependencies.removals, [BRIDGE_STATE_FILE]);
+});
+
+test("Local Stack cleanup failure still removes owned state", async () => {
+  const dependencies = runDependencies({
+    localBehavior: { ignoreTerm: true, ignoreKill: true },
+  });
+  await assert.rejects(
+    runBridge(dependencies),
+    (error) => assertBridgeCode(error, "CLEANUP_FAILED"),
+  );
+  assert.deepEqual(
+    dependencies.children[1].kills,
+    ["SIGTERM", "SIGKILL"],
+  );
+  assert.deepEqual(dependencies.children[2].kills, ["SIGTERM"]);
+  assert.equal(dependencies.files.has(BRIDGE_STATE_FILE), false);
+  assert.deepEqual(dependencies.removals, [BRIDGE_STATE_FILE]);
+});
+
+test("multiple child cleanup failures still remove owned state", async () => {
+  const dependencies = runDependencies({
+    localBehavior: { ignoreTerm: true, ignoreKill: true },
+    cloudBehavior: { ignoreTerm: true, ignoreKill: true },
+  });
+  await assert.rejects(
+    runBridge(dependencies),
+    (error) => assertBridgeCode(error, "CLEANUP_FAILED"),
+  );
+  assert.deepEqual(
+    dependencies.children[1].kills,
+    ["SIGTERM", "SIGKILL"],
+  );
+  assert.deepEqual(
+    dependencies.children[2].kills,
+    ["SIGTERM", "SIGKILL"],
+  );
+  assert.equal(dependencies.files.has(BRIDGE_STATE_FILE), false);
+  assert.deepEqual(dependencies.removals, [BRIDGE_STATE_FILE]);
+});
+
+test("owned state removal failure does not block child cleanup", async () => {
+  const dependencies = runDependencies({ stateRemoveFailure: true });
+  await assert.rejects(
+    runBridge(dependencies),
+    (error) => assertBridgeCode(error, "CLEANUP_FAILED"),
+  );
+  assert.deepEqual(dependencies.children[1].kills, ["SIGTERM"]);
+  assert.deepEqual(dependencies.children[2].kills, ["SIGTERM"]);
+  assert.equal(dependencies.files.has(BRIDGE_STATE_FILE), true);
   assert.deepEqual(dependencies.removals, [BRIDGE_STATE_FILE]);
 });
 
