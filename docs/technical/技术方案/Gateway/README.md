@@ -15,18 +15,27 @@
 
 | 文件 | 说明 |
 |---|---|
-| `SOL-005-Custom-GPT-Actions与Gateway-MVP渐进式实施方案.md` | 总纲：15 个阶段（Phase 0 至 Phase 14）渐进式 MVP 实施计划，覆盖仓库基线、Monorepo、Contracts、Gateway、认证、权限、Runtime、Capability、Cloudflare Tunnel、Custom GPT Action、安全复核与知识沉淀 |
+| `SOL-005-Custom-GPT-Actions与Gateway-MVP渐进式实施方案.md` | 历史总纲（superseded）：原 Cloudflare Tunnel 路线已由 Microsoft Dev Tunnels 当前实现取代，仍保留早期阶段与决策记录 |
 | `SOL-006-Task-Result-Error-Contract-v1.md` | 已实现的 Contract v1 设计：Task、Result、Error、Capability 白名单、运行时校验和不变量 |
 
 ## 实施状态
 
-当前阶段：**设计与渐进实施阶段**。
+当前阶段：**Microsoft Dev Tunnels + Custom GPT Actions MVP 已完成**。
 
-`SOL-005` 已定义完整路线图（Phase 0 至 Phase 14）。Monorepo 工程基础、Contracts v1、Auth、Capability Policy、Action Gateway → Local Runtime 本地任务链路、应用层入口保护与本地启动编排已落地并通过测试；动态策略、Tunnel 与公网 Action 链路尚未实现。每阶段遵循“一步一任务、一步一自检、一步一反馈、一步一审核”原则。
+`SOL-005` 保留早期 Phase 0 至 Phase 14 路线作为历史基线。当前已完成 Monorepo 工程基础、Contracts v1、Auth、Capability Policy、Action Gateway → Local Runtime、本地进程编排、Microsoft Dev Tunnels 持久入口、公网直连 `runtime.status`、URL 重启稳定性，以及 Custom GPT Builder、Preview 和正式 GPT Action 调用验证；下一步是最终审阅和提交 MVP 差异。
+
+当前公网链路固定为：
+
+```text
+Custom GPT Action
+→ Microsoft Dev Tunnel
+→ action-gateway
+→ local-runtime
+```
 
 ## 当前代码
 
-实现资产位于 [`apps/action-gateway/`](../../../../apps/action-gateway/) 和 [`apps/local-runtime/`](../../../../apps/local-runtime/)。
+实现资产位于 [`apps/action-gateway/`](../../../../apps/action-gateway/)、[`apps/local-runtime/`](../../../../apps/local-runtime/) 和 [`apps/dev-tunnel/`](../../../../apps/dev-tunnel/)。
 
 - 已实现本地 HTTP 外壳；
 - 已实现 `GET /health` 和 `GET /ready`；
@@ -51,25 +60,32 @@
 - Gateway 和 Runtime 分别使用无队列并发 Gate，满载快速返回 503；
 - Runtime Busy 由 Gateway 安全分类和映射，不透传 Runtime 原始响应；
 - Local Stack 已实现 Runtime → Gateway 顺序启动、Ready 检查和双进程清理；
-- 公网链路尚未建立。
+- Microsoft Dev Tunnels 只公开 Gateway loopback 8787，Runtime 8790 不公开；
+- Tunnel 匿名访问与 Gateway Bearer 认证继续分层；
+- 公网 `/health`、未认证 401、已认证 capabilities 和真实 `runtime.status` 已通过；
+- 同一持久 Tunnel 停止并重新 Host 后公网 URL 精确一致；
+- Custom GPT Action OpenAPI 模板和本机解析 Schema 已通过 Builder 验证；
+- 创建后的正式 Custom GPT 已通过自然语言调用零参数 `POST /v1/runtime/status`，并返回成功的 Local Runtime 状态。
 
-下一步是配置 Cloudflare Named Tunnel、固定 HTTPS 域名和 Custom GPT OpenAPI Schema。
+下一步仅包括：
+
+- 最终审阅 MVP 差异；
+- 提交已验收的 MVP 变更。
 
 ## 代码落位边界
 
 本目录仅存放技术方案文档，**不存放运行时代码**。
 
-运行时代码完成后将位于以下目录：
+当前运行代码位于以下目录：
 
 | 边界 | 目录 | 说明 |
 |---|---|---|
-| 可部署应用 | `apps/action-gateway/`、`apps/local-runtime/` | Gateway 与 Runtime 服务 |
-| 共享库 | `packages/contracts/`、`packages/auth/`、`packages/policy/`、`packages/observability/` | 协议、认证、策略、可观测性 |
-| 安全能力 | `capabilities/` | 白名单 Capability 实现 |
-| 基础设施 | `infra/cloudflare/`、`infra/launchd/` | Tunnel、进程管理 |
-| 运维脚本 | `scripts/` | 一键启动/停止/验证 |
+| 可运行应用 | `apps/action-gateway/`、`apps/local-runtime/` | Gateway 与 Runtime 服务 |
+| 公网开发入口 | `apps/dev-tunnel/` | Microsoft Dev Tunnels 安装、持久资源复用、启动、停止、验证和 OpenAPI |
+| 共享库 | `packages/contracts/`、`packages/auth/`、`packages/policy/` | 协议、认证与策略 |
+| 仓库脚本 | `scripts/` | 仓库检查与本地链路验证 |
 
-当前 `packages/contracts/`、`packages/auth/`、`packages/policy/`、`apps/action-gateway/` 与 `apps/local-runtime/` 已创建；其他运行时代码目录尚未创建。
+当前公网运行入口统一使用 `apps/dev-tunnel/`。
 
 ## 使用规则
 

@@ -1,6 +1,9 @@
 # Cloudflare Edge Worker 安全、运行与审计说明
 
-> **文档状态**：待用户 Review  
+> **状态：Superseded（历史审计）**
+> Cloudflare Edge 活跃应用已于 2026-07-30 被 Microsoft Dev Tunnels 开发期入口取代。本文仅保留历史实现与安全审计证据，不再是当前部署、运行或 Secret 操作指南。
+
+> **文档状态**：历史归档，禁止按本文执行当前部署
 > **建议仓库路径**：`docs/technical/技术方案/安全/SEC-002-cloudflare-edge安全与运行说明.md`  
 > **发布策略**：暂不进入 `docs/knowledge/`，暂不同步飞书知识库  
 > **代码基线**：`5b1c24888e00b03d04565d520684e8b0f892a2fa`  

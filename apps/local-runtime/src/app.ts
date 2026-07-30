@@ -110,6 +110,7 @@ export interface LocalRuntimeOptions {
   readonly policy?: CapabilityPolicy;
   readonly executor?: RuntimeExecutor;
   readonly concurrencyGate?: ConcurrencyGate;
+  readonly auditLog?: (entry: string) => void;
 }
 
 export function createRuntimeHandler(
@@ -258,6 +259,13 @@ export function createRuntimeHandler(
         );
         return;
       }
+
+      options.auditLog?.(
+        JSON.stringify({
+          event: "runtime.task.accepted",
+          taskId: validation.value.taskId,
+        }),
+      );
 
       if (!executor.listCapabilities().includes(validation.value.capability)) {
         const result = await executor.execute(validation.value);

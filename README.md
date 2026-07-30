@@ -34,7 +34,7 @@ Knowledge Layer
 Infrastructure
 ```
 
-这是演进方向，不代表所有层已经实现。当前完成 Monorepo 根级工程基础、Contracts v1、双层静态 API Key、双层 Capability Policy、Action Gateway → Local Runtime 本地任务链路和两个安全 Capability，尚未实现动态策略、MCP、公网 Tunnel 或业务工作流。详见 [`context/architecture-context.md`](context/architecture-context.md)。
+这是演进方向，不代表所有层已经实现。当前完成 Monorepo 根级工程基础、Contracts v1、双层静态 API Key、双层 Capability Policy、Action Gateway → Local Runtime 本地任务链路、两个安全 Capability，以及 Microsoft Dev Tunnels 持久公网入口；尚未实现动态策略、MCP 或业务工作流。详见 [`context/architecture-context.md`](context/architecture-context.md)。
 
 ## Source Of Truth
 
@@ -67,8 +67,9 @@ Git 保存正式工程事实；Feishu 只提供便于人阅读的知识投影。
 - `@ai-agent-platform/policy`：Capability 级默认拒绝与明确允许决策
 - `@ai-agent-platform/action-gateway`：本地公开健康检查和受保护的 `/v1/capabilities`
 - `@ai-agent-platform/local-runtime`：Loopback Task 校验、Policy 二次校验、Capability 调度和 `TaskResult`
+- Microsoft Dev Tunnels 公网链路：Gateway 仅监听 `127.0.0.1:8787`，Runtime 仅监听 `127.0.0.1:8790`；持久 Dev Tunnel 已建立且 Host 重启前后 URL 一致；公网未认证请求返回 401，已认证 capabilities 返回 200，`runtime.status` 返回 `succeeded`
 
-Action Gateway 当前提供受保护的 `POST /v1/tasks`，通过独立内部 API Key 连接 Local Runtime，并安全执行 `gateway.ping` 和 `runtime.status`。应用层 Rate Limit、Gateway / Runtime 并发保护和本地启动编排已经建立，下一步配置 Cloudflare Tunnel。详见 [`context/current-status.md`](context/current-status.md)。
+Action Gateway 保留严格接收完整 Task Contract 的受保护 `POST /v1/tasks`，并新增由服务端构造 `runtime.status` Task 的 Custom GPT 专用 `POST /v1/runtime/status`；两条路径复用同一 Policy 和 Runtime Client 边界。Microsoft Dev Tunnels 持久入口、Builder 解析、Preview 和创建后的正式 Custom GPT 对话调用均已完成真实验证，下一步是审阅并提交 MVP 差异。详见 [`context/current-status.md`](context/current-status.md)。
 
 ## Engineering Workspace
 
@@ -82,25 +83,26 @@ capabilities/*
 
 `skills/ai-knowledge` 暂时保持独立，继续使用原生 Node.js `.mjs` 入口，不加入 workspace。
 
-当前有五个真实 workspace：
+当前有六个真实 workspace：
 
 - `@ai-agent-platform/contracts`：负责 Gateway、Runtime 和 Capability 共享的协议类型与无依赖运行时校验；
 - `@ai-agent-platform/auth`：提供无运行时依赖的基础认证原语；
 - `@ai-agent-platform/policy`：提供只依赖 Contracts 的 Capability Allow / Deny 决策；
 - `@ai-agent-platform/action-gateway`：提供仅监听本地 Loopback 的公开健康检查、受保护 Capability 查询和 Task 转发接口；
 - `@ai-agent-platform/local-runtime`：提供仅监听 Loopback、受内部 API Key 保护的 Task Contract 校验、Runtime Policy 二次校验和安全 Capability 执行。
+- `@ai-agent-platform/dev-tunnel`：使用官方 Microsoft Dev Tunnels CLI 发布 Gateway 8787，并编排、验证和停止公网开发链路。
 
-当前认证仅为本地静态 API Key 基线，尚无密钥轮换、动态角色权限或公网链路。
+当前认证使用本机私有静态 API Key，尚无自动轮换或动态角色权限；公网入口的匿名 Tunnel 访问不替代 Gateway Bearer 认证。
 
 Policy 已实现 Capability 级默认拒绝和明确允许；Local Runtime 已能独立执行 `gateway.ping` 与 `runtime.status` 并返回 Contract v1 `TaskResult`。
 
 Gateway 与 Runtime 使用分离的外部、内部 API Key，并分别执行 Gateway Policy 与 Runtime Policy。Runtime Client 只允许 Loopback HTTP，具有 Timeout、响应大小限制和 `TaskResult` 校验。
 
-本地端到端任务链路已经打通，但尚未配置 Cloudflare Tunnel 和 Custom GPT Action，因此公网端到端 MVP 仍未完成。
+本地与 Microsoft Dev Tunnel 公网 `runtime.status` 链路已经打通，Custom GPT Action 的 Builder 配置、Preview 和正式 GPT 对话调用均已完成。
 
 本地链路已经完成公网接入前的结果对应校验、超时映射、请求排空、入站超时、单实例 Rate Limit 和双端并发加固，并可通过前台脚本一键启停。
 
-应用层 Rate Limit 和并发保护已建立，但它们不能替代 Cloudflare 边缘防护。
+应用层 Rate Limit 和并发保护已建立；Microsoft Dev Tunnels 仅用于开发期 MVP，不视为生产边缘防护。
 
 本地环境要求 Node.js 20 与 npm 10；推荐使用 `.nvmrc` 中固定的 Node.js 版本。可执行验证命令：
 
@@ -112,6 +114,7 @@ npm run check:auth
 npm run check:policy
 npm run check:gateway
 npm run check:runtime
+npm run check:dev-tunnel
 npm run check:local-chain
 npm run check:local-stack
 npm run local:start
@@ -120,7 +123,7 @@ npm run build --workspace @ai-agent-platform/contracts
 npm run test --workspace @ai-agent-platform/contracts
 ```
 
-Cloudflare Tunnel、Custom GPT OpenAPI Schema 和公网 Action 链路尚未实现。
+Custom GPT OpenAPI 模板与本机解析 Schema 已通过 Builder 验证，正式 GPT 对话已完成真实 Action 调用验收。
 
 ## Development Rules
 

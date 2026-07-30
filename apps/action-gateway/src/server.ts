@@ -141,6 +141,7 @@ function startActionGateway(): void {
       createGatewayServer({
         apiKey: configuration.apiKey,
         runtimeClient,
+        auditLog: (entry) => console.log(entry),
         concurrencyGate: createConcurrencyGate(
           configuration.maxConcurrentTasks,
         ),

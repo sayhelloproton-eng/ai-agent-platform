@@ -76,5 +76,5 @@ Runtime URL、Timeout 与最大并发可省略，默认分别为 `http://127.0.0
 - 无动态策略管理；
 - Rate Limit 为单实例内存级，不能替代 Cloudflare 边缘 Rate Limit；
 - 并发保护不建立任务队列；
-- 无 Cloudflare Tunnel；
+- 公网开发入口由 `apps/dev-tunnel` 管理，不在 Gateway 内实现 Tunnel；
 - 无 Custom GPT OpenAPI Schema。

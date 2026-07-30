@@ -93,6 +93,7 @@ function startLocalRuntime(): void {
     const configuration = resolveLocalRuntimeConfiguration(process.env);
     const server = createRuntimeServer({
       apiKey: configuration.apiKey,
+      auditLog: (entry) => console.log(entry),
       concurrencyGate: createConcurrencyGate(
         configuration.maxConcurrentTasks,
       ),

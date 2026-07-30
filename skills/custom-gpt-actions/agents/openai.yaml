@@ -1,0 +1,4 @@
+interface:
+  display_name: "Custom GPT Actions"
+  short_description: "Validate Builder-compatible OpenAPI Action schemas"
+  default_prompt: "Use $custom-gpt-actions to design and validate a Builder-compatible Custom GPT Action."

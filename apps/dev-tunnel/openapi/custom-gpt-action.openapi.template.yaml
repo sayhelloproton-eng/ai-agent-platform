@@ -1,0 +1,60 @@
+openapi: 3.1.0
+info:
+  title: AI Agent Platform Runtime Status
+  version: 1.0.0
+  description: Query the authenticated local Runtime status through the Action Gateway.
+servers:
+  - url: ${DEV_TUNNEL_PUBLIC_BASE_URL}
+paths:
+  /v1/runtime/status:
+    post:
+      operationId: getRuntimeStatus
+      summary: Query the authenticated local Runtime status
+      responses:
+        "200":
+          description: Runtime status task completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  contractVersion:
+                    type: string
+                  taskId:
+                    type: string
+                  status:
+                    type: string
+                    enum:
+                      - succeeded
+                      - failed
+                      - rejected
+                      - timed_out
+                  output:
+                    type: object
+                    properties:
+                      runtime:
+                        type: string
+                      status:
+                        type: string
+                      capabilities:
+                        type: array
+                        items:
+                          type: string
+                required:
+                  - contractVersion
+                  - taskId
+                  - status
+                  - output
+        "401":
+          description: Bearer authentication failed
+        "503":
+          description: Local Runtime is unavailable
+components:
+  schemas: {}
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: API_KEY
+security:
+  - bearerAuth: []

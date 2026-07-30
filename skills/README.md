@@ -11,7 +11,9 @@ Skill 将稳定的领域能力、运行时规则、Schema、示例和测试组�
 ## Contains
 
 - [`AGENTS.md`](AGENTS.md)：所有 Skill 共同遵守的工程规则；
-- `ai-knowledge/`：AI Knowledge Skill 源包。
+- `ai-knowledge/`：AI Knowledge Skill 源包；
+- `custom-gpt-actions/`：Custom GPT Action Schema、Builder 兼容性与适配端点规则；
+- `microsoft-dev-tunnels/`：Microsoft Dev Tunnels 本机公网入口运行与安全规则。
 
 ## Boundary
 

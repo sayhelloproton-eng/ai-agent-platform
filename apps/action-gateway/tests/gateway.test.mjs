@@ -106,6 +106,26 @@ async function submitTask(baseUrl, task, options = {}) {
   });
 }
 
+async function submitRuntimeStatus(baseUrl, options = {}) {
+  const headers = {
+    ...options.headers,
+  };
+  if (options.authenticated !== false) {
+    headers.authorization = `Bearer ${API_KEY}`;
+  }
+  if (options.body !== undefined) {
+    headers["content-type"] = "application/json";
+  }
+  return fetch(`${baseUrl}/v1/runtime/status`, {
+    method: "POST",
+    headers,
+    body:
+      options.body === undefined
+        ? undefined
+        : JSON.stringify(options.body),
+  });
+}
+
 async function sendDeclaredOversizedTask(port) {
   return new Promise((resolve, reject) => {
     const request = http.request(
@@ -680,6 +700,93 @@ test("POST /v1/tasks only accepts custom-gpt requesters", async () => {
       assert.equal(response.status, 400);
     }
   });
+});
+
+test("POST /v1/runtime/status requires Gateway authentication", async () => {
+  await withGateway(async (baseUrl) => {
+    const response = await submitRuntimeStatus(baseUrl, {
+      authenticated: false,
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 401);
+    assert.equal(body.error.code, "UNAUTHENTICATED");
+  });
+});
+
+test("POST /v1/runtime/status constructs and forwards a safe Task", async () => {
+  const runtimeClient = createFakeRuntimeClient();
+  const auditEntries = [];
+
+  await withGateway(async (baseUrl) => {
+    const response = await submitRuntimeStatus(baseUrl);
+    const result = await response.json();
+    const call = runtimeClient.calls[0];
+
+    assert.equal(response.status, 200);
+    assert.equal(runtimeClient.calls.length, 1);
+    assert.equal(call.task.contractVersion, "1.0");
+    assert.equal(call.task.capability, "runtime.status");
+    assert.deepEqual(call.task.input, {});
+    assert.equal(call.task.requestedBy.type, "custom-gpt");
+    assert.equal(call.task.requestedBy.subject, "custom-gpt-action");
+    assert.equal(
+      new Date(call.task.metadata.requestedAt).toISOString(),
+      call.task.metadata.requestedAt,
+    );
+    assert.match(
+      call.task.taskId,
+      /^custom-gpt-runtime-status-[0-9a-f-]+$/u,
+    );
+    assert.equal(result.taskId, call.task.taskId);
+    assert.equal(auditEntries.length, 1);
+    assert.equal(
+      JSON.parse(auditEntries[0]).taskId,
+      call.task.taskId,
+    );
+  }, {
+    runtimeClient,
+    auditLog: (entry) => auditEntries.push(entry),
+  });
+});
+
+test("POST /v1/runtime/status ignores all client Task fields", async () => {
+  const runtimeClient = createFakeRuntimeClient();
+  const untrustedTaskId = "client-controlled-task";
+
+  await withGateway(async (baseUrl) => {
+    const response = await submitRuntimeStatus(baseUrl, {
+      body: {
+        contractVersion: "9.9",
+        taskId: untrustedTaskId,
+        capability: "system.info.safe",
+        input: { unsafe: true },
+        requestedBy: {
+          type: "user",
+          subject: "chat-user",
+        },
+        metadata: {
+          requestedAt: "2000-01-01T00:00:00.000Z",
+        },
+      },
+    });
+    const result = await response.json();
+    const task = runtimeClient.calls[0].task;
+
+    assert.equal(response.status, 200);
+    assert.notEqual(task.taskId, untrustedTaskId);
+    assert.equal(task.capability, "runtime.status");
+    assert.deepEqual(task.input, {});
+    assert.deepEqual(task.requestedBy, {
+      type: "custom-gpt",
+      subject: "custom-gpt-action",
+    });
+    assert.notEqual(
+      task.metadata.requestedAt,
+      "2000-01-01T00:00:00.000Z",
+    );
+    assert.equal(result.taskId, task.taskId);
+  }, { runtimeClient });
 });
 
 test("POST /v1/tasks rejects an oversized Content-Length", async () => {

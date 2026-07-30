@@ -4,7 +4,7 @@
 
 **Phase 2: AI Coding Workflow — In Progress**
 
-Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gateway MVP 设计基线、Monorepo 根级工程基线、Contracts v1、Auth、Capability Policy、Action Gateway → Local Runtime 本地任务执行链路，以及公网接入前的传输边界、Rate Limit、双端并发和本地启动编排；公网链路尚未建立。
+Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gateway MVP 设计基线、Monorepo 根级工程基线、Contracts v1、Auth、Capability Policy、Action Gateway → Local Runtime 本地任务执行链路，以及 Microsoft Dev Tunnels + Custom GPT Actions MVP；正式 Custom GPT 已通过自然语言完成真实 `runtime.status` Action 调用。
 
 ## Completed
 
@@ -29,6 +29,7 @@ Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gatewa
 - Runtime Task Contract 校验、Policy 二次校验、Capability 调度与 Contract v1 `TaskResult` 已实现；
 - Runtime 默认实现 `gateway.ping` 与 `runtime.status`，`system.info.safe` 未实现且默认拒绝；
 - Gateway 新增受保护的 `POST /v1/tasks`，只接受 `custom-gpt` requester，并覆盖不可信 Task Request ID；
+- Gateway 新增 Custom GPT 专用零参数 `POST /v1/runtime/status`，由服务端生成完整 `runtime.status` Task，并与 `/v1/tasks` 复用同一 Policy 和 Runtime Client 边界；
 - Gateway → Runtime HTTP Client 已实现，仅允许 Loopback HTTP，具有 3000 ms 默认 Timeout、65536 字节响应上限和 `TaskResult` 校验；
 - 外部 `ACTION_GATEWAY_API_KEY` 与内部 Runtime Key 分离，Runtime `/v1/tasks` 已增加内部 Bearer 认证；
 - Gateway 与 Runtime 分别执行 Capability Policy，`system.info.safe` 默认在 Gateway 被拒绝；
@@ -37,17 +38,23 @@ Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gatewa
 - Gateway 默认最大 2 个在途 Task、Runtime 默认最大 1 个执行 Task，均采用无队列快速失败并保证槽位释放；
 - Runtime 503 被 Gateway 安全映射为 `RUNTIME_BUSY`，不透传 Runtime Body；
 - `npm run local:start` 已实现 Runtime → Gateway 顺序启动、Ready 检查、Key 一致性校验和双进程 Shutdown；
-- Local Chain 6/6、Local Stack 5/5、Runtime 44/44、Gateway 76/76、Policy 12/12、Contracts 17/17、Auth 12/12 通过，Repo Check、Knowledge Skill 与根级 Verify 通过。
+- Cloudflare Edge 活跃应用与 Edge Bridge 已从当前实现删除，历史方案保留为 superseded 记录；
+- `apps/dev-tunnel` 已使用官方 macOS x64 CLI 建立持久 Microsoft Dev Tunnel，仅公开 Gateway 8787，Tunnel 匿名访问与 Gateway Bearer 认证边界均已验证；
+- 现有 Client Key 未轮换，已迁移到权限 0600 的本机私有 `dev-tunnel.env` 新变量；
+- 本地和公网 `/health`、未认证 401、已认证 capabilities 200、真实 `runtime.status` succeeded 均通过，taskId 已在 Gateway 与 Runtime 日志对应；
+- 同一 Tunnel ID 停止并重新 Host 后公网 URL 精确一致，30 天显式 refresh 已验证；
+- Custom GPT OpenAPI 模板和忽略的本机解析 Schema 已收窄为零参数 `/v1/runtime/status` Action，Builder 实测要求显式 `components.schemas: {}`；
+- 正式 Custom GPT 已创建，Bearer 认证成功；自然语言触发 `getRuntimeStatus` 后返回 Runtime `local-runtime` 版本 `0.1.0`、状态 `ready`，Capabilities 包含 `gateway.ping` 与 `runtime.status`；
+- Local Chain 6/6、Local Stack 5/5、Dev Tunnel 44/44、Runtime 44/44、Gateway 79/79、Policy 12/12、Contracts 17/17、Auth 12/12 通过，Repo Check、Knowledge Skill 与根级 Verify 通过。
 
 ## Next
 
-- 配置 Cloudflare Named Tunnel、固定 HTTPS 域名和 Custom GPT OpenAPI Schema。
+- 审阅并提交 Microsoft Dev Tunnels + Custom GPT Actions MVP 的最终仓库差异，再由 Project Owner 确认 Phase 2 后续批次。
 
 ## Not Started
 
 - Feishu 飞书操作（写入、节点创建、部署）；
-- 动态权限策略、Cloudflare Tunnel 和 Custom GPT Action Schema；
-- 公网端到端验证；
+- 动态权限策略；
 - AI Video Workflow (Phase 3)。
 
 ## Current Restrictions
@@ -57,4 +64,4 @@ Phase 1 Knowledge Foundation 已交付。Phase 2 已启动，当前完成 Gatewa
 - 未经后续任务授权不提前配置 Tunnel、OpenAPI、后续 Capability 或基础设施；
 - 不把后续计划描述为当前已实现。
 
-当前限制：Cloudflare Tunnel 尚未配置；Custom GPT OpenAPI 尚未生成；公网端到端链路尚未验证。
+当前限制：Microsoft Dev Tunnels 为 Public Preview、无生产 SLA且连续 30 天无活动可能删除；Cloudflare 远端资源清理保留为独立后续债务，未经单独授权不得执行。

@@ -14,6 +14,9 @@ import {
   type CapabilityPolicy,
 } from "@ai-agent-platform/policy";
 import {
+  randomUUID,
+} from "node:crypto";
+import {
   createServer,
   type IncomingMessage,
   type RequestListener,
@@ -40,6 +43,7 @@ const SERVICE_NAME = "action-gateway";
 const PUBLIC_ROUTES = new Set(["/health", "/ready"]);
 const CAPABILITIES_ROUTE = "/v1/capabilities";
 const TASKS_ROUTE = "/v1/tasks";
+const RUNTIME_STATUS_ROUTE = "/v1/runtime/status";
 const MAX_BODY_BYTES = 65_536;
 const TASK_RATE_LIMIT_KEY = "authenticated:/v1/tasks";
 const CAPABILITIES_RATE_LIMIT_KEY = "authenticated:/v1/capabilities";
@@ -59,6 +63,7 @@ export interface GatewayOptions {
   readonly taskRateLimiter?: RateLimiter;
   readonly capabilitiesRateLimiter?: RateLimiter;
   readonly concurrencyGate?: ConcurrencyGate;
+  readonly auditLog?: (entry: string) => void;
 }
 
 interface BodyReadResult {
@@ -188,6 +193,113 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
     options.concurrencyGate ??
     createConcurrencyGate(DEFAULT_GATEWAY_MAX_CONCURRENT_TASKS);
 
+  async function forwardTask(
+    taskInput: TaskRequest,
+    response: ServerResponse,
+    requestId: string,
+  ): Promise<void> {
+    const task: TaskRequest = {
+      ...taskInput,
+      metadata: {
+        ...taskInput.metadata,
+        requestId,
+      },
+    };
+    options.auditLog?.(
+      JSON.stringify({
+        event: "gateway.task.accepted",
+        taskId: task.taskId,
+      }),
+    );
+    const decision = evaluateCapability(policy, task.capability);
+
+    if (!decision.allowed) {
+      writeTaskResult(response, requestId, createRejectedResult(task));
+      return;
+    }
+
+    if (options.runtimeClient === undefined) {
+      writeError(
+        response,
+        502,
+        requestId,
+        "RUNTIME_UNAVAILABLE",
+        "Local Runtime is unavailable.",
+      );
+      return;
+    }
+
+    const release = concurrencyGate.tryAcquire();
+    if (release === undefined) {
+      writeError(
+        response,
+        503,
+        requestId,
+        "BUSY",
+        "Gateway task capacity is full.",
+        { "retry-after": "1" },
+      );
+      return;
+    }
+
+    let runtimeResult;
+    try {
+      runtimeResult = await options.runtimeClient.executeTask(
+        task,
+        requestId,
+      );
+    } catch {
+      writeError(
+        response,
+        502,
+        requestId,
+        "RUNTIME_UNAVAILABLE",
+        "Local Runtime is unavailable.",
+      );
+      return;
+    } finally {
+      release();
+    }
+
+    if (runtimeResult.ok) {
+      writeTaskResult(response, requestId, runtimeResult.result);
+      return;
+    }
+
+    if (runtimeResult.reason === "busy") {
+      writeError(
+        response,
+        503,
+        requestId,
+        "RUNTIME_BUSY",
+        "Local Runtime task capacity is full.",
+        { "retry-after": "1" },
+      );
+      return;
+    }
+
+    if (runtimeResult.reason === "timeout") {
+      writeError(
+        response,
+        504,
+        requestId,
+        "TIMEOUT",
+        "Local Runtime request timed out.",
+      );
+      return;
+    }
+
+    writeError(
+      response,
+      502,
+      requestId,
+      "RUNTIME_UNAVAILABLE",
+      runtimeResult.reason === "invalid-response"
+        ? "Local Runtime returned an invalid response."
+        : "Local Runtime is unavailable.",
+    );
+  }
+
   return (request, response) => {
     const requestId = resolveRequestId(request);
 
@@ -200,7 +312,8 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
       if (
         !PUBLIC_ROUTES.has(pathname) &&
         pathname !== CAPABILITIES_ROUTE &&
-        pathname !== TASKS_ROUTE
+        pathname !== TASKS_ROUTE &&
+        pathname !== RUNTIME_STATUS_ROUTE
       ) {
         discardUnreadRequestBody(request);
         writeError(
@@ -213,7 +326,11 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
         return;
       }
 
-      if (pathname === CAPABILITIES_ROUTE || pathname === TASKS_ROUTE) {
+      if (
+        pathname === CAPABILITIES_ROUTE ||
+        pathname === TASKS_ROUTE ||
+        pathname === RUNTIME_STATUS_ROUTE
+      ) {
         const verification = verifyBearerAuthorization(
           request.headers.authorization,
           options.apiKey,
@@ -233,7 +350,10 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
         }
       }
 
-      const allowedMethod = pathname === TASKS_ROUTE ? "POST" : "GET";
+      const allowedMethod =
+        pathname === TASKS_ROUTE || pathname === RUNTIME_STATUS_ROUTE
+          ? "POST"
+          : "GET";
       if (request.method !== allowedMethod) {
         discardUnreadRequestBody(request);
         writeError(
@@ -247,9 +367,13 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
         return;
       }
 
-      if (pathname === TASKS_ROUTE || pathname === CAPABILITIES_ROUTE) {
+      if (
+        pathname === TASKS_ROUTE ||
+        pathname === RUNTIME_STATUS_ROUTE ||
+        pathname === CAPABILITIES_ROUTE
+      ) {
         const rateLimitDecision =
-          pathname === TASKS_ROUTE
+          pathname === TASKS_ROUTE || pathname === RUNTIME_STATUS_ROUTE
             ? taskRateLimiter.consume(TASK_RATE_LIMIT_KEY)
             : capabilitiesRateLimiter.consume(CAPABILITIES_RATE_LIMIT_KEY);
 
@@ -335,100 +459,26 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
           return;
         }
 
+        await forwardTask(validation.value, response, requestId);
+        return;
+      }
+
+      if (pathname === RUNTIME_STATUS_ROUTE) {
+        discardUnreadRequestBody(request);
         const task: TaskRequest = {
-          ...validation.value,
+          contractVersion: CONTRACT_VERSION,
+          taskId: `custom-gpt-runtime-status-${randomUUID()}`,
+          capability: "runtime.status",
+          input: {},
+          requestedBy: {
+            type: "custom-gpt",
+            subject: "custom-gpt-action",
+          },
           metadata: {
-            ...validation.value.metadata,
-            requestId,
+            requestedAt: new Date().toISOString(),
           },
         };
-        const decision = evaluateCapability(policy, task.capability);
-
-        if (!decision.allowed) {
-          writeTaskResult(response, requestId, createRejectedResult(task));
-          return;
-        }
-
-        if (options.runtimeClient === undefined) {
-          writeError(
-            response,
-            502,
-            requestId,
-            "RUNTIME_UNAVAILABLE",
-            "Local Runtime is unavailable.",
-          );
-          return;
-        }
-
-        const release = concurrencyGate.tryAcquire();
-        if (release === undefined) {
-          writeError(
-            response,
-            503,
-            requestId,
-            "BUSY",
-            "Gateway task capacity is full.",
-            { "retry-after": "1" },
-          );
-          return;
-        }
-
-        let runtimeResult;
-        try {
-          runtimeResult = await options.runtimeClient.executeTask(
-            task,
-            requestId,
-          );
-        } catch {
-          writeError(
-            response,
-            502,
-            requestId,
-            "RUNTIME_UNAVAILABLE",
-            "Local Runtime is unavailable.",
-          );
-          return;
-        } finally {
-          release();
-        }
-
-        if (runtimeResult.ok) {
-          writeTaskResult(response, requestId, runtimeResult.result);
-          return;
-        }
-
-        if (runtimeResult.reason === "busy") {
-          writeError(
-            response,
-            503,
-            requestId,
-            "RUNTIME_BUSY",
-            "Local Runtime task capacity is full.",
-            { "retry-after": "1" },
-          );
-          return;
-        }
-
-        if (runtimeResult.reason === "timeout") {
-          writeError(
-            response,
-            504,
-            requestId,
-            "TIMEOUT",
-            "Local Runtime request timed out.",
-          );
-          return;
-        }
-
-        writeError(
-          response,
-          502,
-          requestId,
-          "RUNTIME_UNAVAILABLE",
-          runtimeResult.reason === "invalid-response"
-            ? "Local Runtime returned an invalid response."
-            : "Local Runtime is unavailable.",
-        );
+        await forwardTask(task, response, requestId);
         return;
       }
 

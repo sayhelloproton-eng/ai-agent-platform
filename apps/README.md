@@ -4,8 +4,9 @@
 
 - `action-gateway`：公网 Action 入口与认证、Policy 边界；
 - `local-runtime`：本机 Task 校验、Capability 调度和执行结果。
+- `dev-tunnel`：Microsoft Dev Tunnels 官方 CLI、本地进程编排、公网验证与 Custom GPT Action Schema。
 
-当前二者尚未连接。
+Action Gateway 已通过独立内部 API Key 连接 Local Runtime；Dev Tunnel 只发布 Gateway 的 loopback 8787 端口。
 
 与其他顶层工程目录的边界：
 
