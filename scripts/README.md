@@ -51,8 +51,33 @@ Gateway、Runtime、Edge 或 Cloudflare API Key。
 
 Quick Tunnel 只接受单一合法随机子域的标准 HTTPS
 `*.trycloudflare.com` 地址；拒绝凭据、端口、路径、Query 和 Fragment。所有
-就绪请求均有超时与 65,536 字节响应上限，不无限重试。VPN 只是 Cloudflare
-可达性的网络依赖，不承担身份认证，Bridge 不会控制 VPN。
+就绪请求均有超时与 65,536 字节响应上限，不无限重试。Bridge 启动采用独立且
+有界的阶段预算：Local Runtime 与 Gateway 分别检查；Quick Tunnel URL 最多等待
+20 秒；URL 生成后独立等待 cloudflared `REGISTERED` 最多 10 秒；注册确认后，
+Tunnel `/health` 获得独立最多 30 秒，未认证和已认证 capabilities 各自最多
+等待 10 秒，但所有阶段都受 Bridge 启动 60 秒绝对截止时间约束。注册等待先检查
+已有脱敏摘要，再订阅后续事件，避免
+`REGISTERED` 先于等待函数发生时被漏掉；注册确认前绝不发起公网 health 请求。
+Tunnel 单次公网探测预算为 5 秒、当前阶段剩余时间和 Bridge 剩余时间三者的
+最小值；阶段内约每 500 毫秒轮询一次，轮询等待也会按剩余时间截断，不增加
+无条件固定 sleep。URL 与注册耗时不会占用 health 自身的 30 秒预算，但会消耗
+Bridge 的 60 秒绝对预算。
+VPN 只是 Cloudflare 可达性的网络依赖，不承担身份认证，Bridge 不会控制 VPN。
+
+阶段失败分别使用 `RUNTIME_NOT_READY`、`GATEWAY_NOT_READY`、
+`TUNNEL_URL_TIMEOUT`、`TUNNEL_HEALTH_NOT_READY`、
+`TUNNEL_REGISTER_TIMEOUT`、
+`TUNNEL_UNAUTHENTICATED_CHECK_FAILED`、
+`TUNNEL_AUTHENTICATED_CHECK_FAILED` 和 `CLOUDFLARED_EXITED`，不再统一折叠
+为 `SERVICE_NOT_READY`。Bridge 只保留有界的 cloudflared 脱敏阶段摘要，例如
+URL 已生成、已注册和 QUIC/HTTP2 协议分类；不保存随机 Tunnel 子域、完整 stderr、
+Secret 或 Authorization，并在退出时移除监听器和内存缓冲。
+Tunnel Probe 只输出十种固定脱敏分类：`HTTP_200`、`HTTP_4XX`、
+`HTTP_5XX`、`FETCH_TIMEOUT`、`DNS_ERROR`、`CONNECT_ERROR`、`TLS_ERROR`、
+`ABORTED`、`RESPONSE_TOO_LARGE`、`UNKNOWN_NETWORK_ERROR`。它记录阶段、
+尝试次数、阶段耗时、首次 200 耗时和最后分类；不输出响应体、异常 message、
+stack、Tunnel URL、随机子域或认证信息。成功终端日志同样不输出 Tunnel URL
+或随机子域。
 
 运行状态文件固定为：
 

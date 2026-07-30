@@ -12,9 +12,27 @@ export const DEFAULT_GATEWAY_PORT = 8787;
 export const DEFAULT_RUNTIME_PORT = 8790;
 export const NETWORK_TIMEOUT_MS = 3_000;
 export const READY_TIMEOUT_MS = 10_000;
-export const TUNNEL_URL_TIMEOUT_MS = 15_000;
+export const TUNNEL_URL_TIMEOUT_MS = 20_000;
+export const TUNNEL_REGISTER_TIMEOUT_MS = 10_000;
+export const TUNNEL_HEALTH_TIMEOUT_MS = 30_000;
+export const TUNNEL_REQUEST_TIMEOUT_MS = 5_000;
+export const TUNNEL_POLL_DELAY_MS = 500;
+export const BRIDGE_STARTUP_TIMEOUT_MS = 60_000;
 export const MAX_NETWORK_RESPONSE_BYTES = 65_536;
 export const MAX_TUNNEL_OUTPUT_BYTES = 65_536;
+export const MAX_CLOUDFLARED_SUMMARY_BUFFER_BYTES = 4_096;
+export const PROBE_RESULT_CLASSIFICATIONS = Object.freeze([
+  "HTTP_200",
+  "HTTP_4XX",
+  "HTTP_5XX",
+  "FETCH_TIMEOUT",
+  "DNS_ERROR",
+  "CONNECT_ERROR",
+  "TLS_ERROR",
+  "ABORTED",
+  "RESPONSE_TOO_LARGE",
+  "UNKNOWN_NETWORK_ERROR",
+]);
 export const LOCAL_STACK_TERM_GRACE_MS = 5_000;
 export const CHILD_TERM_GRACE_MS = 2_000;
 export const KILL_CONFIRM_TIMEOUT_MS = 1_000;
@@ -49,10 +67,13 @@ const EDGE_AND_CLOUDFLARE_SECRET_NAMES = Object.freeze([
 ]);
 
 export class BridgeError extends Error {
-  constructor(code, message) {
+  constructor(code, message, diagnostics) {
     super(message);
     this.name = "BridgeError";
     this.code = code;
+    if (diagnostics !== undefined) {
+      this.diagnostics = Object.freeze({ ...diagnostics });
+    }
   }
 }
 
@@ -479,12 +500,15 @@ export async function boundedFetch(
   const controller = new AbortController();
   const lifecycleSignal = options.signal ?? dependencies.lifecycleSignal;
   const timeoutMs = options.timeoutMs ?? NETWORK_TIMEOUT_MS;
+  const timeoutCode = options.timeoutCode ?? "NETWORK_TIMEOUT";
   const sentinel = Symbol("network-timeout");
   const cancelled = Symbol("lifecycle-cancelled");
+  let timeoutTriggered = false;
   let timer;
   let onLifecycleAbort;
   const timeout = new Promise((_, reject) => {
     timer = setTimeout(() => {
+      timeoutTriggered = true;
       controller.abort(sentinel);
       reject(sentinel);
     }, timeoutMs);
@@ -518,14 +542,18 @@ export async function boundedFetch(
         lifecycleCancellation,
       ]);
     } catch (error) {
-      if (error === cancelled) {
+      if (lifecycleSignal?.aborted || error === cancelled) {
         throwIfCancelled(lifecycleSignal);
       }
+      if (timeoutTriggered || error === sentinel) {
+        throw new BridgeError(
+          timeoutCode,
+          "A Bridge verification request timed out.",
+        );
+      }
       throw new BridgeError(
-        error === sentinel ? "NETWORK_TIMEOUT" : "NETWORK_UNAVAILABLE",
-        error === sentinel
-          ? "A Bridge verification request timed out."
-          : "A Bridge verification request failed.",
+        classifyNetworkErrorCode(error),
+        "A Bridge verification request failed.",
       );
     }
     const body = await Promise.race([
@@ -537,12 +565,12 @@ export async function boundedFetch(
       timeout,
       lifecycleCancellation,
     ]).catch((error) => {
-      if (error === cancelled) {
+      if (lifecycleSignal?.aborted || error === cancelled) {
         throwIfCancelled(lifecycleSignal);
       }
-      if (error === sentinel) {
+      if (timeoutTriggered || error === sentinel) {
         throw new BridgeError(
-          "NETWORK_TIMEOUT",
+          timeoutCode,
           "A Bridge verification request timed out.",
         );
       }
@@ -553,6 +581,59 @@ export async function boundedFetch(
     clearTimeout(timer);
     lifecycleSignal?.removeEventListener("abort", onLifecycleAbort);
   }
+}
+
+function stableErrorCodes(error, maximumDepth = 4) {
+  const codes = [];
+  let current = error;
+  for (
+    let depth = 0;
+    depth < maximumDepth &&
+    current !== null &&
+    (typeof current === "object" || typeof current === "function");
+    depth += 1
+  ) {
+    if (typeof current.code === "string") {
+      codes.push(current.code.toUpperCase());
+    }
+    current = current.cause;
+  }
+  return codes;
+}
+
+function classifyNetworkErrorCode(error) {
+  const codes = stableErrorCodes(error);
+  if (codes.some((code) =>
+    ["ENOTFOUND", "EAI_AGAIN", "ENODATA"].includes(code))) {
+    return "NETWORK_DNS_ERROR";
+  }
+  if (codes.some((code) =>
+    [
+      "ECONNREFUSED",
+      "ECONNRESET",
+      "ENETUNREACH",
+      "EHOSTUNREACH",
+      "EPIPE",
+      "ETIMEDOUT",
+      "UND_ERR_CONNECT_TIMEOUT",
+      "UND_ERR_SOCKET",
+    ].includes(code))) {
+    return "NETWORK_CONNECT_ERROR";
+  }
+  if (codes.some((code) =>
+    code.startsWith("ERR_TLS_") ||
+    code.startsWith("ERR_SSL_") ||
+    [
+      "CERT_HAS_EXPIRED",
+      "DEPTH_ZERO_SELF_SIGNED_CERT",
+      "SELF_SIGNED_CERT_IN_CHAIN",
+      "UNABLE_TO_VERIFY_LEAF_SIGNATURE",
+      "UNABLE_TO_GET_ISSUER_CERT",
+      "UNABLE_TO_GET_ISSUER_CERT_LOCALLY",
+    ].includes(code))) {
+    return "NETWORK_TLS_ERROR";
+  }
+  return "NETWORK_UNAVAILABLE";
 }
 
 async function checkFixedWorker(dependencies) {
@@ -810,38 +891,196 @@ function startLocalStackBuild(dependencies) {
   );
 }
 
-async function waitForExpectedStatus(
+export function calculateProbeTiming({
+  stageStartedAt,
+  stageTimeoutMs,
+  bridgeStartupDeadline = Number.POSITIVE_INFINITY,
+  now,
+  configuredRequestTimeoutMs,
+  configuredPollDelayMs,
+}) {
+  const stageDeadline = Math.min(
+    stageStartedAt + stageTimeoutMs,
+    bridgeStartupDeadline,
+  );
+  const remainingMs = Math.max(0, stageDeadline - now);
+  return Object.freeze({
+    stageDeadline,
+    remainingMs,
+    effectiveRequestTimeoutMs: Math.min(
+      configuredRequestTimeoutMs,
+      remainingMs,
+    ),
+    effectivePollDelayMs: Math.min(
+      configuredPollDelayMs,
+      remainingMs,
+    ),
+  });
+}
+
+export async function waitForExpectedStatus(
   url,
   expectedStatus,
   headers,
   dependencies,
+  stage = {},
 ) {
   const signal = dependencies.lifecycleSignal;
-  const deadline =
-    Date.now() + (dependencies.readyTimeoutMs ?? READY_TIMEOUT_MS);
-  while (Date.now() < deadline) {
+  const nowMilliseconds = dependencies.nowMilliseconds ?? Date.now;
+  const startedAt = nowMilliseconds();
+  const stageTimeoutMs =
+    stage.timeoutMs ?? dependencies.readyTimeoutMs ?? READY_TIMEOUT_MS;
+  const configuredRequestTimeoutMs =
+    stage.requestTimeoutMs ??
+    dependencies.readinessRequestTimeoutMs ??
+    500;
+  const configuredPollDelayMs =
+    stage.pollDelayMs ?? dependencies.pollDelayMs ?? 50;
+  const bridgeStartupDeadline =
+    dependencies.bridgeStartupDeadline ?? Number.POSITIVE_INFINITY;
+  let attempts = 0;
+  let first200Ms;
+  let lastResult = "ABORTED";
+  const telemetry = () => Object.freeze({
+    stage: stage.name ?? "SERVICE_READINESS",
+    attempts,
+    durationMs: Math.max(0, nowMilliseconds() - startedAt),
+    first200Ms,
+    lastResult,
+  });
+  while (true) {
     throwIfCancelled(signal);
+    const timing = calculateProbeTiming({
+      stageStartedAt: startedAt,
+      stageTimeoutMs,
+      bridgeStartupDeadline,
+      now: nowMilliseconds(),
+      configuredRequestTimeoutMs,
+      configuredPollDelayMs,
+    });
+    if (timing.remainingMs <= 0) {
+      lastResult = "ABORTED";
+      break;
+    }
+    attempts += 1;
     try {
       const result = await boundedFetch(
         url,
-        { headers, timeoutMs: 500, signal },
+        {
+          headers,
+          timeoutMs: timing.effectiveRequestTimeoutMs,
+          timeoutCode:
+            timing.effectiveRequestTimeoutMs <
+            configuredRequestTimeoutMs
+              ? "NETWORK_ABORTED"
+              : "NETWORK_TIMEOUT",
+          signal,
+        },
         dependencies,
       );
+      const completedAt = nowMilliseconds();
+      if (completedAt >= timing.stageDeadline) {
+        lastResult = "ABORTED";
+        break;
+      }
+      lastResult = classifyProbeResult({ status: result.response.status });
+      if (result.response.status === 200 && first200Ms === undefined) {
+        first200Ms = Math.max(0, nowMilliseconds() - startedAt);
+      }
       if (result.response.status === expectedStatus) {
-        return result;
+        const probe = telemetry();
+        if (stage.logTelemetry === true) {
+          dependencies.log(formatProbeTelemetry(probe));
+        }
+        return { ...result, probe };
       }
     } catch (error) {
+      if (signal?.aborted) {
+        lastResult = "ABORTED";
+        throwIfCancelled(signal);
+      }
       if (error instanceof BridgeInterrupted) {
         throw error;
       }
+      lastResult = classifyProbeResult({ error });
       // Readiness polling is finite and bounded.
     }
-    await cancellableDelay(dependencies.pollDelayMs ?? 50, signal);
+    const afterRequest = calculateProbeTiming({
+      stageStartedAt: startedAt,
+      stageTimeoutMs,
+      bridgeStartupDeadline,
+      now: nowMilliseconds(),
+      configuredRequestTimeoutMs,
+      configuredPollDelayMs,
+    });
+    if (afterRequest.remainingMs > 0) {
+      await cancellableDelay(
+        afterRequest.effectivePollDelayMs,
+        signal,
+      );
+    } else {
+      if (lastResult !== "FETCH_TIMEOUT") {
+        lastResult = "ABORTED";
+      }
+      break;
+    }
   }
   throw new BridgeError(
-    "SERVICE_NOT_READY",
-    "A Bridge service did not become ready in time.",
+    stage.errorCode ?? "SERVICE_NOT_READY",
+    stage.errorMessage ?? "A Bridge service did not become ready in time.",
+    telemetry(),
   );
+}
+
+export function classifyProbeResult({ status, error } = {}) {
+  if (Number.isInteger(status)) {
+    if (status === 200) {
+      return "HTTP_200";
+    }
+    if (status >= 400 && status < 500) {
+      return "HTTP_4XX";
+    }
+    if (status >= 500 && status < 600) {
+      return "HTTP_5XX";
+    }
+    return "UNKNOWN_NETWORK_ERROR";
+  }
+  if (error instanceof BridgeError) {
+    const classifications = {
+      NETWORK_TIMEOUT: "FETCH_TIMEOUT",
+      NETWORK_ABORTED: "ABORTED",
+      NETWORK_DNS_ERROR: "DNS_ERROR",
+      NETWORK_CONNECT_ERROR: "CONNECT_ERROR",
+      NETWORK_TLS_ERROR: "TLS_ERROR",
+      NETWORK_RESPONSE_TOO_LARGE: "RESPONSE_TOO_LARGE",
+      NETWORK_READ_FAILED: "UNKNOWN_NETWORK_ERROR",
+      NETWORK_UNAVAILABLE: "UNKNOWN_NETWORK_ERROR",
+    };
+    return classifications[error.code] ?? "UNKNOWN_NETWORK_ERROR";
+  }
+  if (error instanceof BridgeInterrupted) {
+    return "ABORTED";
+  }
+  const networkCode = classifyNetworkErrorCode(error);
+  return {
+    NETWORK_DNS_ERROR: "DNS_ERROR",
+    NETWORK_CONNECT_ERROR: "CONNECT_ERROR",
+    NETWORK_TLS_ERROR: "TLS_ERROR",
+  }[networkCode] ?? "UNKNOWN_NETWORK_ERROR";
+}
+
+export function formatProbeTelemetry(telemetry) {
+  const first200 =
+    telemetry.first200Ms === undefined
+      ? "NONE"
+      : `${telemetry.first200Ms}ms`;
+  return [
+    `probe stage=${telemetry.stage}`,
+    `attempts=${telemetry.attempts}`,
+    `duration=${telemetry.durationMs}ms`,
+    `first200=${first200}`,
+    `last=${telemetry.lastResult}`,
+  ].join(" ");
 }
 
 async function verifyLocalStack(configuration, keys, dependencies) {
@@ -850,24 +1089,40 @@ async function verifyLocalStack(configuration, keys, dependencies) {
     200,
     undefined,
     dependencies,
+    {
+      errorCode: "RUNTIME_NOT_READY",
+      errorMessage: "Local Runtime did not become ready in time.",
+    },
   );
   await waitForExpectedStatus(
     `http://127.0.0.1:${configuration.gatewayPort}/health`,
     200,
     undefined,
     dependencies,
+    {
+      errorCode: "GATEWAY_NOT_READY",
+      errorMessage: "Action Gateway did not become ready in time.",
+    },
   );
   await waitForExpectedStatus(
     `http://127.0.0.1:${configuration.gatewayPort}/v1/capabilities`,
     401,
     undefined,
     dependencies,
+    {
+      errorCode: "GATEWAY_NOT_READY",
+      errorMessage: "Action Gateway did not become ready in time.",
+    },
   );
   await waitForExpectedStatus(
     `http://127.0.0.1:${configuration.gatewayPort}/v1/capabilities`,
     200,
     { authorization: `Bearer ${keys.externalKey}` },
     dependencies,
+    {
+      errorCode: "GATEWAY_NOT_READY",
+      errorMessage: "Action Gateway did not become ready in time.",
+    },
   );
 }
 
@@ -913,7 +1168,7 @@ export function waitForTunnelUrl(child, inputDependencies = {}) {
     const onExit = () => {
       finish(
         new BridgeError(
-          "TUNNEL_EXITED",
+          "CLOUDFLARED_EXITED",
           "cloudflared exited before publishing a valid URL.",
         ),
       );
@@ -954,19 +1209,227 @@ export function waitForTunnelUrl(child, inputDependencies = {}) {
   });
 }
 
+function classifyCloudflaredLine(line, summary) {
+  if (extractTunnelUrl(line) !== undefined) {
+    summary.add("URL_GENERATED");
+  }
+  if (/Registered tunnel connection/iu.test(line)) {
+    summary.add("REGISTERED");
+  }
+  if (/(?:Initial protocol|protocol[=:])\s*quic/iu.test(line)) {
+    summary.add("PROTOCOL_QUIC");
+  }
+  if (/(?:Initial protocol|protocol[=:])\s*http2/iu.test(line)) {
+    summary.add("PROTOCOL_HTTP2");
+  }
+  if (/dns.{0,80}(?:error|failed)/iu.test(line)) {
+    summary.add("DNS_ERROR");
+  }
+  if (/quic.{0,80}(?:timeout|timed out)/iu.test(line)) {
+    summary.add("QUIC_TIMEOUT");
+  }
+  if (/tcp.{0,80}(?:timeout|timed out)/iu.test(line)) {
+    summary.add("TCP_TIMEOUT");
+  }
+}
+
+export function observeCloudflared(child) {
+  const summary = new Set();
+  const subscribers = new Set();
+  let partial = "";
+  let disposed = false;
+  const record = (stage) => {
+    if (summary.has(stage)) {
+      return;
+    }
+    summary.add(stage);
+    for (const subscriber of subscribers) {
+      subscriber(stage);
+    }
+  };
+  const onData = (chunk) => {
+    partial += chunk.toString();
+    if (
+      Buffer.byteLength(partial, "utf8") >
+      MAX_CLOUDFLARED_SUMMARY_BUFFER_BYTES
+    ) {
+      partial = partial.slice(-MAX_CLOUDFLARED_SUMMARY_BUFFER_BYTES);
+    }
+    const lines = partial.split(/\r?\n/u);
+    partial = lines.pop() ?? "";
+    for (const line of lines) {
+      const classified = new Set();
+      classifyCloudflaredLine(line, classified);
+      for (const stage of classified) {
+        record(stage);
+      }
+    }
+  };
+  const onExit = () => record("PROCESS_EXITED");
+  child.stdout?.on("data", onData);
+  child.stderr?.on("data", onData);
+  child.once("exit", onExit);
+  return {
+    snapshot() {
+      return Object.freeze([...summary]);
+    },
+    subscribe(subscriber) {
+      if (disposed) {
+        return () => {};
+      }
+      subscribers.add(subscriber);
+      return () => subscribers.delete(subscriber);
+    },
+    dispose() {
+      if (disposed) {
+        return;
+      }
+      disposed = true;
+      child.stdout?.off("data", onData);
+      child.stderr?.off("data", onData);
+      child.off("exit", onExit);
+      subscribers.clear();
+      partial = "";
+    },
+  };
+}
+
+export function waitForTunnelRegistration(
+  child,
+  observer,
+  inputDependencies = {},
+) {
+  const dependencies = defaults(inputDependencies);
+  const signal = dependencies.lifecycleSignal;
+  const existing = new Set(observer.snapshot());
+  if (existing.has("REGISTERED")) {
+    return Promise.resolve();
+  }
+  if (
+    existing.has("PROCESS_EXITED") ||
+    child.exitCode !== null ||
+    child.signalCode !== null
+  ) {
+    return Promise.reject(
+      new BridgeError(
+        "CLOUDFLARED_EXITED",
+        "cloudflared exited before Tunnel registration.",
+      ),
+    );
+  }
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    let unsubscribe = () => {};
+    const finish = (error) => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      clearTimeout(timer);
+      unsubscribe();
+      signal?.removeEventListener("abort", onAbort);
+      if (error === undefined) {
+        resolve();
+      } else {
+        reject(error);
+      }
+    };
+    const onStage = (stage) => {
+      if (stage === "REGISTERED") {
+        finish();
+      } else if (stage === "PROCESS_EXITED") {
+        finish(
+          new BridgeError(
+            "CLOUDFLARED_EXITED",
+            "cloudflared exited before Tunnel registration.",
+          ),
+        );
+      }
+    };
+    const onAbort = () => {
+      finish(
+        signal.reason instanceof Error
+          ? signal.reason
+          : new BridgeInterrupted("cancelled"),
+      );
+    };
+    const timer = setTimeout(() => {
+      finish(
+        new BridgeError(
+          "TUNNEL_REGISTER_TIMEOUT",
+          "Quick Tunnel registration was not confirmed in time.",
+        ),
+      );
+    }, dependencies.tunnelRegisterTimeoutMs ?? TUNNEL_REGISTER_TIMEOUT_MS);
+    unsubscribe = observer.subscribe(onStage);
+    const afterSubscription = new Set(observer.snapshot());
+    if (afterSubscription.has("REGISTERED")) {
+      finish();
+      return;
+    }
+    if (
+      afterSubscription.has("PROCESS_EXITED") ||
+      child.exitCode !== null ||
+      child.signalCode !== null
+    ) {
+      onStage("PROCESS_EXITED");
+      return;
+    }
+    if (signal?.aborted) {
+      onAbort();
+      return;
+    }
+    signal?.addEventListener("abort", onAbort, { once: true });
+  });
+}
+
 async function verifyTunnel(origin, externalKey, dependencies) {
-  await waitForExpectedStatus(`${origin}/health`, 200, undefined, dependencies);
+  const stage = (name, errorCode, errorMessage, timeoutMs) => ({
+    name,
+    timeoutMs,
+    requestTimeoutMs:
+      dependencies.tunnelRequestTimeoutMs ?? TUNNEL_REQUEST_TIMEOUT_MS,
+    pollDelayMs:
+      dependencies.tunnelPollDelayMs ?? TUNNEL_POLL_DELAY_MS,
+    errorCode,
+    errorMessage,
+    logTelemetry: true,
+  });
+  await waitForExpectedStatus(
+    `${origin}/health`,
+    200,
+    undefined,
+    dependencies,
+    stage(
+      "TUNNEL_HEALTH",
+      "TUNNEL_HEALTH_NOT_READY",
+      "Quick Tunnel health did not become ready in time.",
+      dependencies.tunnelHealthTimeoutMs ?? TUNNEL_HEALTH_TIMEOUT_MS,
+    ),
+  );
   await waitForExpectedStatus(
     `${origin}/v1/capabilities`,
     401,
     undefined,
     dependencies,
+    stage(
+      "TUNNEL_UNAUTHENTICATED",
+      "TUNNEL_UNAUTHENTICATED_CHECK_FAILED",
+      "Quick Tunnel unauthenticated verification failed.",
+      dependencies.tunnelReadyTimeoutMs ?? READY_TIMEOUT_MS,
+    ),
   );
   await waitForExpectedStatus(
     `${origin}/v1/capabilities`,
     200,
     { authorization: `Bearer ${externalKey}` },
     dependencies,
+    stage(
+      "TUNNEL_AUTHENTICATED",
+      "TUNNEL_AUTHENTICATED_CHECK_FAILED",
+      "Quick Tunnel authenticated verification failed.",
+      dependencies.tunnelReadyTimeoutMs ?? READY_TIMEOUT_MS,
+    ),
   );
 }
 
@@ -1107,9 +1570,19 @@ function watchInterrupts(signalSource, controller) {
 
 export async function runBridge(inputDependencies = {}) {
   const baseDependencies = defaults(inputDependencies);
+  const nowMilliseconds =
+    baseDependencies.nowMilliseconds ?? Date.now;
+  const bridgeStartupStartedAt = nowMilliseconds();
+  const bridgeStartupTimeoutMs =
+    baseDependencies.bridgeStartupTimeoutMs ??
+    BRIDGE_STARTUP_TIMEOUT_MS;
+  const bridgeStartupDeadline =
+    bridgeStartupStartedAt + bridgeStartupTimeoutMs;
   const lifecycle = new AbortController();
   const dependencies = {
     ...baseDependencies,
+    nowMilliseconds,
+    bridgeStartupDeadline,
     lifecycleSignal: lifecycle.signal,
   };
   const interrupts = watchInterrupts(
@@ -1119,9 +1592,32 @@ export async function runBridge(inputDependencies = {}) {
   let buildProcess;
   let localStack;
   let cloudflared;
+  let cloudflaredObserver;
   let gatewayOrigin;
   let cleanupPromise;
+  let summaryLogged = false;
   const stateOwnership = { owned: false };
+  const startupTimer = setTimeout(() => {
+    if (!lifecycle.signal.aborted) {
+      lifecycle.abort(
+        new BridgeError(
+          "BRIDGE_STARTUP_TIMEOUT",
+          "Edge Bridge startup exceeded its safe deadline.",
+        ),
+      );
+    }
+  }, Math.max(0, bridgeStartupDeadline - nowMilliseconds()));
+  startupTimer.unref?.();
+  const logCloudflaredSummary = () => {
+    if (summaryLogged || cloudflaredObserver === undefined) {
+      return;
+    }
+    summaryLogged = true;
+    const summary = cloudflaredObserver.snapshot();
+    dependencies.log(
+      `cloudflared summary: ${summary.length === 0 ? "NONE" : summary.join(",")}`,
+    );
+  };
   const cleanup = () => {
     if (cleanupPromise === undefined) {
       cleanupPromise = (async () => {
@@ -1233,7 +1729,13 @@ export async function runBridge(inputDependencies = {}) {
         stdio: ["ignore", "pipe", "pipe"],
       },
     );
+    cloudflaredObserver = observeCloudflared(cloudflared);
     gatewayOrigin = await waitForTunnelUrl(cloudflared, dependencies);
+    await waitForTunnelRegistration(
+      cloudflared,
+      cloudflaredObserver,
+      dependencies,
+    );
     await verifyTunnel(gatewayOrigin, keys.externalKey, dependencies);
     await createOwnedState(
       createStateRecord({
@@ -1245,8 +1747,10 @@ export async function runBridge(inputDependencies = {}) {
       stateOwnership,
       dependencies,
     );
+    clearTimeout(startupTimer);
+    logCloudflaredSummary();
     throwIfCancelled(lifecycle.signal);
-    dependencies.log(`Quick Tunnel ready: ${gatewayOrigin}`);
+    dependencies.log("Quick Tunnel ready.");
     dependencies.log("Ctrl+C to disconnect");
     await waitForUnexpectedExit(
       localStack,
@@ -1260,6 +1764,10 @@ export async function runBridge(inputDependencies = {}) {
     } catch (caught) {
       cleanupError = caught;
     }
+    logCloudflaredSummary();
+    if (error instanceof BridgeError && error.diagnostics !== undefined) {
+      dependencies.log(formatProbeTelemetry(error.diagnostics));
+    }
     if (cleanupError instanceof BridgeError) {
       throw cleanupError;
     }
@@ -1271,8 +1779,13 @@ export async function runBridge(inputDependencies = {}) {
     }
     throw new BridgeError("BRIDGE_FAILED", "Edge Bridge failed safely.");
   } finally {
+    clearTimeout(startupTimer);
     interrupts.dispose();
-    await removeOwnedState(stateOwnership, dependencies);
+    try {
+      await removeOwnedState(stateOwnership, dependencies);
+    } finally {
+      cloudflaredObserver?.dispose();
+    }
   }
 }
 
@@ -1292,11 +1805,9 @@ async function main() {
       "Usage: node scripts/edge-bridge.mjs <check|run>",
     );
   } catch (error) {
-    const message =
-      error instanceof BridgeError
-        ? error.message
-        : "Edge Bridge failed safely.";
-    console.error(message);
+    const code =
+      error instanceof BridgeError ? error.code : "BRIDGE_FAILED";
+    console.error(`Edge Bridge failed: ${code}`);
     process.exitCode = 1;
   }
 }

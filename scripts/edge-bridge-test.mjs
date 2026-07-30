@@ -3,21 +3,32 @@ import { EventEmitter } from "node:events";
 import test from "node:test";
 
 import {
+  BRIDGE_STARTUP_TIMEOUT_MS,
   BRIDGE_STATE_FILE,
   LOCAL_STACK_TERM_GRACE_MS,
+  TUNNEL_HEALTH_TIMEOUT_MS,
+  TUNNEL_POLL_DELAY_MS,
+  TUNNEL_REQUEST_TIMEOUT_MS,
   BridgeError,
   MAX_NETWORK_RESPONSE_BYTES,
   MAX_TUNNEL_OUTPUT_BYTES,
+  PROBE_RESULT_CLASSIFICATIONS,
   boundedFetch,
+  calculateProbeTiming,
   checkBridge,
+  classifyProbeResult,
   createStateRecord,
   ensureNoActiveState,
   extractTunnelUrl,
+  formatProbeTelemetry,
   isValidApiKey,
+  observeCloudflared,
   runBridge,
   resolveSafeRuntimeUrl,
   validateBridgeKeys,
   validateTunnelUrl,
+  waitForExpectedStatus,
+  waitForTunnelRegistration,
   waitForTunnelUrl,
 } from "./edge-bridge.mjs";
 
@@ -417,8 +428,103 @@ test("Tunnel URL wait rejects an early cloudflared exit", async () => {
   child.complete(1);
   await assert.rejects(
     result,
-    (error) => assertBridgeCode(error, "TUNNEL_EXITED"),
+    (error) => assertBridgeCode(error, "CLOUDFLARED_EXITED"),
   );
+});
+
+test("cloudflared observer retains only bounded stage summaries", () => {
+  const child = new MockChild();
+  const observer = observeCloudflared(child);
+  child.stderr.emit(
+    "data",
+    [
+      `Quick Tunnel ${TUNNEL_ORIGIN}`,
+      "Initial protocol quic",
+      "Registered tunnel connection protocol=quic",
+      "",
+    ].join("\n"),
+  );
+  const summary = observer.snapshot();
+  assert.deepEqual(summary, [
+    "URL_GENERATED",
+    "PROTOCOL_QUIC",
+    "REGISTERED",
+  ]);
+  assert.equal(JSON.stringify(summary).includes(TUNNEL_ORIGIN), false);
+  observer.dispose();
+  assert.equal(child.stdout.listenerCount("data"), 0);
+  assert.equal(child.stderr.listenerCount("data"), 0);
+  assert.equal(child.listenerCount("exit"), 0);
+});
+
+test("cloudflared observer reports process exit without stderr content", () => {
+  const child = new MockChild();
+  const observer = observeCloudflared(child);
+  child.stderr.emit("data", "QUIC handshake timeout secret-like-detail\n");
+  child.complete(1);
+  assert.deepEqual(observer.snapshot(), [
+    "QUIC_TIMEOUT",
+    "PROCESS_EXITED",
+  ]);
+  observer.dispose();
+});
+
+test("Tunnel registration recognizes an existing REGISTERED summary", async () => {
+  const child = new MockChild();
+  const observer = observeCloudflared(child);
+  child.stderr.emit(
+    "data",
+    "Registered tunnel connection protocol=quic\n",
+  );
+  await waitForTunnelRegistration(child, observer, {
+    tunnelRegisterTimeoutMs: 5,
+  });
+  observer.dispose();
+});
+
+test("Tunnel registration timeout is precise and bounded", async () => {
+  const child = new MockChild();
+  const observer = observeCloudflared(child);
+  await assert.rejects(
+    waitForTunnelRegistration(child, observer, {
+      tunnelRegisterTimeoutMs: 5,
+    }),
+    (error) => assertBridgeCode(error, "TUNNEL_REGISTER_TIMEOUT"),
+  );
+  observer.dispose();
+});
+
+test("Tunnel registration reports cloudflared exit precisely", async () => {
+  const child = new MockChild();
+  const observer = observeCloudflared(child);
+  const result = waitForTunnelRegistration(child, observer, {
+    tunnelRegisterTimeoutMs: 50,
+  });
+  child.complete(1);
+  await assert.rejects(
+    result,
+    (error) => assertBridgeCode(error, "CLOUDFLARED_EXITED"),
+  );
+  observer.dispose();
+});
+
+test("Tunnel registration Abort removes its observer subscription", async () => {
+  const child = new MockChild();
+  const observer = observeCloudflared(child);
+  const controller = new AbortController();
+  const result = waitForTunnelRegistration(child, observer, {
+    lifecycleSignal: controller.signal,
+    tunnelRegisterTimeoutMs: 50,
+  });
+  controller.abort(new BridgeError("TEST_ABORT", "test aborted"));
+  await assert.rejects(
+    result,
+    (error) => assertBridgeCode(error, "TEST_ABORT"),
+  );
+  observer.dispose();
+  assert.equal(child.stdout.listenerCount("data"), 0);
+  assert.equal(child.stderr.listenerCount("data"), 0);
+  assert.equal(child.listenerCount("exit"), 0);
 });
 
 test("bounded fetch enforces its timeout", async () => {
@@ -561,12 +667,19 @@ function runDependencies(options = {}) {
     signalSource,
     pid: 3001,
     now: () => new Date("2026-07-29T00:00:00.000Z"),
-    readyTimeoutMs: 20,
+    readyTimeoutMs: options.readyTimeoutMs ?? 100,
+    tunnelHealthTimeoutMs: options.tunnelHealthTimeoutMs ?? 20,
+    tunnelReadyTimeoutMs: options.tunnelReadyTimeoutMs ?? 20,
+    tunnelRequestTimeoutMs: options.tunnelRequestTimeoutMs ?? 10,
+    tunnelPollDelayMs: options.tunnelPollDelayMs ?? 1,
+    tunnelRegisterTimeoutMs: options.tunnelRegisterTimeoutMs ?? 20,
+    bridgeStartupTimeoutMs:
+      options.bridgeStartupTimeoutMs ?? BRIDGE_STARTUP_TIMEOUT_MS,
     pollDelayMs: 1,
     childTermGraceMs: options.childTermGraceMs ?? 5,
     localStackTermGraceMs: options.localStackTermGraceMs ?? 10,
     killConfirmTimeoutMs: options.killConfirmTimeoutMs ?? 5,
-    tunnelUrlTimeoutMs: 20,
+    tunnelUrlTimeoutMs: options.tunnelUrlTimeoutMs ?? 20,
     portAvailable: async () => true,
     spawn: (command, args, spawnOptions) => {
       const behavior =
@@ -588,22 +701,71 @@ function runDependencies(options = {}) {
         }
       } else if (command === "cloudflared") {
         cloudflared = child;
+        const publishTunnel = () => {
+          if (options.registerBeforeUrl) {
+            child.stderr.emit(
+              "data",
+              "Registered tunnel connection protocol=quic\n",
+            );
+          }
+          child.stderr.emit("data", `origin ${TUNNEL_ORIGIN}\n`);
+          if (options.exitBeforeRegistration) {
+            queueMicrotask(() => child.complete(1));
+          } else if (options.interruptDuringRegistration) {
+            queueMicrotask(() =>
+              signalSource.emit(options.signal ?? "SIGTERM"),
+            );
+          } else if (
+            !options.neverRegister &&
+            !options.registerBeforeUrl
+          ) {
+            const publishRegistration = () =>
+              child.stderr.emit(
+                "data",
+                "Registered tunnel connection protocol=quic\n",
+              );
+            if (options.registrationDelayMs !== undefined) {
+              setTimeout(
+                publishRegistration,
+                options.registrationDelayMs,
+              );
+            } else {
+              publishRegistration();
+            }
+          }
+        };
         if (options.tunnelStartFailure) {
           queueMicrotask(() => child.complete(1));
         } else if (options.interruptDuringTunnelUrl) {
           queueMicrotask(() =>
             signalSource.emit(options.signal ?? "SIGINT"),
           );
+        } else if (options.neverPublishTunnelUrl) {
+          // The absolute Bridge startup deadline must remain authoritative.
+        } else if (options.tunnelUrlDelayMs !== undefined) {
+          setTimeout(publishTunnel, options.tunnelUrlDelayMs);
         } else {
-          queueMicrotask(() =>
-            child.stderr.emit("data", `origin ${TUNNEL_ORIGIN}\n`),
-          );
+          queueMicrotask(publishTunnel);
         }
       }
       return child;
     },
     fetch: async (url, init) => {
       fetchCalls.push({ url: String(url), init });
+      const tunnelRequest = String(url).startsWith(TUNNEL_ORIGIN);
+      if (tunnelRequest && options.tunnelProbeDelayMs !== undefined) {
+        await new Promise((resolve, reject) => {
+          const timer = setTimeout(resolve, options.tunnelProbeDelayMs);
+          init.signal.addEventListener(
+            "abort",
+            () => {
+              clearTimeout(timer);
+              reject(new Error("cancelled delayed Tunnel probe"));
+            },
+            { once: true },
+          );
+        });
+      }
       if (
         options.interruptDuringFixedWorker &&
         String(url).includes("workers.dev")
@@ -643,8 +805,29 @@ function runDependencies(options = {}) {
           );
         });
       }
+      if (
+        options.runtimeVerificationFailure &&
+        String(url) === "http://127.0.0.1:8790/ready"
+      ) {
+        return response(500);
+      }
       if (String(url).includes("workers.dev")) {
         return response(200, { service: "ai-agent-platform-edge" });
+      }
+      if (String(url) === `${TUNNEL_ORIGIN}/health`) {
+        return response(options.tunnelHealthFailure ? 503 : 200);
+      }
+      if (
+        String(url) === `${TUNNEL_ORIGIN}/v1/capabilities` &&
+        init.headers?.authorization === undefined
+      ) {
+        return response(options.tunnelUnauthFailure ? 200 : 401);
+      }
+      if (
+        String(url) === `${TUNNEL_ORIGIN}/v1/capabilities` &&
+        init.headers?.authorization !== undefined
+      ) {
+        return response(options.tunnelAuthFailure ? 401 : 200);
       }
       if (
         options.gatewayVerificationFailure &&
@@ -847,6 +1030,562 @@ test("Tunnel verification checks health then unauthenticated and authenticated c
     tunnelCalls[2].init.headers.authorization,
     `Bearer ${EXTERNAL_KEY}`,
   );
+  const probeLogs = dependencies.logs.filter((message) =>
+    message.startsWith("probe "));
+  assert.equal(probeLogs.length, 3);
+  assert.match(
+    probeLogs[0],
+    /^probe stage=TUNNEL_HEALTH attempts=1 duration=\d+ms first200=\d+ms last=HTTP_200$/u,
+  );
+  assert.match(
+    probeLogs[1],
+    /^probe stage=TUNNEL_UNAUTHENTICATED attempts=1 duration=\d+ms first200=NONE last=HTTP_4XX$/u,
+  );
+  assert.match(
+    probeLogs[2],
+    /^probe stage=TUNNEL_AUTHENTICATED attempts=1 duration=\d+ms first200=\d+ms last=HTTP_200$/u,
+  );
+});
+
+test("Tunnel health never starts before REGISTERED", async () => {
+  const dependencies = runDependencies({
+    neverRegister: true,
+    tunnelRegisterTimeoutMs: 5,
+  });
+  await assert.rejects(
+    runBridge(dependencies),
+    (error) => assertBridgeCode(error, "TUNNEL_REGISTER_TIMEOUT"),
+  );
+  assert.equal(
+    dependencies.fetchCalls.some(({ url }) =>
+      url.startsWith(TUNNEL_ORIGIN)),
+    false,
+  );
+});
+
+test("REGISTERED starts Tunnel health and capability verification", async () => {
+  const dependencies = runDependencies({
+    registrationDelayMs: 5,
+    tunnelRegisterTimeoutMs: 20,
+  });
+  await runBridge(dependencies);
+  assert.deepEqual(
+    dependencies.fetchCalls
+      .filter(({ url }) => url.startsWith(TUNNEL_ORIGIN))
+      .map(({ url }) => url),
+    [
+      `${TUNNEL_ORIGIN}/health`,
+      `${TUNNEL_ORIGIN}/v1/capabilities`,
+      `${TUNNEL_ORIGIN}/v1/capabilities`,
+    ],
+  );
+});
+
+test("REGISTERED observed before registration wait is recognized immediately", async () => {
+  const dependencies = runDependencies({ registerBeforeUrl: true });
+  await runBridge(dependencies);
+  assert.equal(
+    dependencies.fetchCalls.filter(({ url }) =>
+      url.startsWith(TUNNEL_ORIGIN)).length,
+    3,
+  );
+});
+
+test("scaled 1.5-second URL-to-registration gap continues safely", async () => {
+  const dependencies = runDependencies({
+    registrationDelayMs: 15,
+    tunnelRegisterTimeoutMs: 20,
+  });
+  await runBridge(dependencies);
+  assert.equal(
+    dependencies.fetchCalls.filter(({ url }) =>
+      url.startsWith(TUNNEL_ORIGIN)).length,
+    3,
+  );
+});
+
+test("cloudflared exit before REGISTERED stops all Tunnel probes", async () => {
+  const dependencies = runDependencies({ exitBeforeRegistration: true });
+  await assert.rejects(
+    runBridge(dependencies),
+    (error) => assertBridgeCode(error, "CLOUDFLARED_EXITED"),
+  );
+  assert.equal(
+    dependencies.fetchCalls.some(({ url }) =>
+      url.startsWith(TUNNEL_ORIGIN)),
+    false,
+  );
+});
+
+test("registration Abort stops before all Tunnel probes", async () => {
+  const dependencies = runDependencies({
+    interruptDuringRegistration: true,
+  });
+  const result = await runBridge(dependencies);
+  assert.equal(result.signal, "SIGTERM");
+  assert.equal(
+    dependencies.fetchCalls.some(({ url }) =>
+      url.startsWith(TUNNEL_ORIGIN)),
+    false,
+  );
+  const tunnel = dependencies.children[2];
+  assert.equal(tunnel.stdout.listenerCount("data"), 0);
+  assert.equal(tunnel.stderr.listenerCount("data"), 0);
+  assert.equal(tunnel.listenerCount("exit"), 0);
+});
+
+test("absolute startup deadline also bounds registration", async () => {
+  const dependencies = runDependencies({
+    neverRegister: true,
+    tunnelRegisterTimeoutMs: 100,
+    bridgeStartupTimeoutMs: 5,
+  });
+  await assert.rejects(
+    runBridge(dependencies),
+    (error) => assertBridgeCode(error, "BRIDGE_STARTUP_TIMEOUT"),
+  );
+  assert.equal(
+    dependencies.fetchCalls.some(({ url }) =>
+      url.startsWith(TUNNEL_ORIGIN)),
+    false,
+  );
+});
+
+test("registration failure is redacted and removes all listeners", async () => {
+  const dependencies = runDependencies({
+    neverRegister: true,
+    tunnelRegisterTimeoutMs: 5,
+  });
+  let caught;
+  try {
+    await runBridge(dependencies);
+  } catch (error) {
+    caught = error;
+  }
+  assertBridgeCode(caught, "TUNNEL_REGISTER_TIMEOUT");
+  const output = [caught.message, ...dependencies.logs].join("\n");
+  assert.equal(output.includes(TUNNEL_ORIGIN), false);
+  assert.equal(output.includes(EXTERNAL_KEY), false);
+  assert.equal(output.includes(INTERNAL_KEY), false);
+  const tunnel = dependencies.children[2];
+  assert.equal(tunnel.stdout.listenerCount("data"), 0);
+  assert.equal(tunnel.stderr.listenerCount("data"), 0);
+  assert.equal(tunnel.listenerCount("exit"), 0);
+});
+
+test("scaled 7.5-second URL delay leaves full budgets for all Tunnel checks", async () => {
+  const dependencies = runDependencies({
+    tunnelUrlDelayMs: 15,
+    tunnelUrlTimeoutMs: 20,
+    tunnelProbeDelayMs: 8,
+    tunnelRequestTimeoutMs: 15,
+    tunnelReadyTimeoutMs: 50,
+  });
+  await runBridge(dependencies);
+  const tunnelCalls = dependencies.fetchCalls.filter(({ url }) =>
+    url.startsWith(TUNNEL_ORIGIN));
+  assert.deepEqual(
+    tunnelCalls.map(({ url }) => url),
+    [
+      `${TUNNEL_ORIGIN}/health`,
+      `${TUNNEL_ORIGIN}/v1/capabilities`,
+      `${TUNNEL_ORIGIN}/v1/capabilities`,
+    ],
+  );
+});
+
+test("URL near its stage limit does not consume Tunnel verification budgets", async () => {
+  const dependencies = runDependencies({
+    tunnelUrlDelayMs: 18,
+    tunnelUrlTimeoutMs: 20,
+    tunnelProbeDelayMs: 4,
+    tunnelRequestTimeoutMs: 8,
+    tunnelReadyTimeoutMs: 8,
+  });
+  await runBridge(dependencies);
+  assert.equal(
+    dependencies.fetchCalls.filter(({ url }) =>
+      url.startsWith(TUNNEL_ORIGIN)).length,
+    3,
+  );
+});
+
+test("Tunnel health timeout has a precise stage error", async () => {
+  const dependencies = runDependencies({
+    tunnelHealthFailure: true,
+    tunnelHealthTimeoutMs: 5,
+  });
+  let caught;
+  try {
+    await runBridge(dependencies);
+  } catch (error) {
+    caught = error;
+  }
+  assertBridgeCode(caught, "TUNNEL_HEALTH_NOT_READY");
+  assert.equal(caught.diagnostics.stage, "TUNNEL_HEALTH");
+  assert.ok(caught.diagnostics.attempts >= 1);
+  assert.ok(caught.diagnostics.durationMs >= 5);
+  assert.equal(caught.diagnostics.first200Ms, undefined);
+  assert.equal(caught.diagnostics.lastResult, "ABORTED");
+});
+
+test("Tunnel unauthenticated verification has a precise stage error", async () => {
+  const dependencies = runDependencies({
+    tunnelUnauthFailure: true,
+    tunnelReadyTimeoutMs: 5,
+  });
+  await assert.rejects(
+    runBridge(dependencies),
+    (error) =>
+      assertBridgeCode(error, "TUNNEL_UNAUTHENTICATED_CHECK_FAILED"),
+  );
+});
+
+test("Tunnel authenticated verification has a precise stage error", async () => {
+  const dependencies = runDependencies({
+    tunnelAuthFailure: true,
+    tunnelReadyTimeoutMs: 5,
+  });
+  await assert.rejects(
+    runBridge(dependencies),
+    (error) =>
+      assertBridgeCode(error, "TUNNEL_AUTHENTICATED_CHECK_FAILED"),
+  );
+});
+
+test("absolute Bridge startup deadline bounds all startup stages", async () => {
+  const dependencies = runDependencies({
+    neverPublishTunnelUrl: true,
+    tunnelUrlTimeoutMs: 100,
+    bridgeStartupTimeoutMs: 5,
+  });
+  await assert.rejects(
+    runBridge(dependencies),
+    (error) => assertBridgeCode(error, "BRIDGE_STARTUP_TIMEOUT"),
+  );
+  const tunnel = dependencies.children[2];
+  assert.deepEqual(tunnel.kills, ["SIGTERM"]);
+  assert.equal(tunnel.stdout.listenerCount("data"), 0);
+  assert.equal(tunnel.stderr.listenerCount("data"), 0);
+  assert.equal(tunnel.listenerCount("exit"), 0);
+});
+
+test("stage errors and summaries never expose Tunnel URL or keys", async () => {
+  const dependencies = runDependencies({
+    tunnelHealthFailure: true,
+    tunnelHealthTimeoutMs: 5,
+  });
+  let caught;
+  try {
+    await runBridge(dependencies);
+  } catch (error) {
+    caught = error;
+  }
+  assertBridgeCode(caught, "TUNNEL_HEALTH_NOT_READY");
+  const output = [caught.message, ...dependencies.logs].join("\n");
+  assert.equal(output.includes(TUNNEL_ORIGIN), false);
+  assert.equal(output.includes(EXTERNAL_KEY), false);
+  assert.equal(output.includes(INTERNAL_KEY), false);
+  assert.doesNotMatch(output, /authorization|bearer/iu);
+});
+
+test("Tunnel timing defaults match the post-registration contract", () => {
+  assert.equal(TUNNEL_HEALTH_TIMEOUT_MS, 30_000);
+  assert.equal(TUNNEL_REQUEST_TIMEOUT_MS, 5_000);
+  assert.equal(TUNNEL_POLL_DELAY_MS, 500);
+  assert.equal(BRIDGE_STARTUP_TIMEOUT_MS, 60_000);
+});
+
+test("Probe timing uses the post-registration Health budget and absolute deadline", () => {
+  const fullHealthBudget = calculateProbeTiming({
+    stageStartedAt: 20_000,
+    stageTimeoutMs: TUNNEL_HEALTH_TIMEOUT_MS,
+    bridgeStartupDeadline: 80_000,
+    now: 20_000,
+    configuredRequestTimeoutMs: TUNNEL_REQUEST_TIMEOUT_MS,
+    configuredPollDelayMs: TUNNEL_POLL_DELAY_MS,
+  });
+  assert.equal(fullHealthBudget.stageDeadline, 50_000);
+  assert.equal(fullHealthBudget.remainingMs, 30_000);
+  assert.equal(fullHealthBudget.effectiveRequestTimeoutMs, 5_000);
+
+  const boundedByBridge = calculateProbeTiming({
+    stageStartedAt: 55_000,
+    stageTimeoutMs: TUNNEL_HEALTH_TIMEOUT_MS,
+    bridgeStartupDeadline: 60_000,
+    now: 55_000,
+    configuredRequestTimeoutMs: TUNNEL_REQUEST_TIMEOUT_MS,
+    configuredPollDelayMs: TUNNEL_POLL_DELAY_MS,
+  });
+  assert.equal(boundedByBridge.stageDeadline, 60_000);
+  assert.equal(boundedByBridge.remainingMs, 5_000);
+});
+
+test("Probe timing truncates request and poll budgets to remaining time", () => {
+  const stageRemaining = calculateProbeTiming({
+    stageStartedAt: 0,
+    stageTimeoutMs: 30_000,
+    bridgeStartupDeadline: 60_000,
+    now: 28_800,
+    configuredRequestTimeoutMs: 5_000,
+    configuredPollDelayMs: 500,
+  });
+  assert.equal(stageRemaining.effectiveRequestTimeoutMs, 1_200);
+  assert.equal(stageRemaining.effectivePollDelayMs, 500);
+
+  const globalRemaining = calculateProbeTiming({
+    stageStartedAt: 50_000,
+    stageTimeoutMs: 30_000,
+    bridgeStartupDeadline: 51_100,
+    now: 50_000,
+    configuredRequestTimeoutMs: 5_000,
+    configuredPollDelayMs: 500,
+  });
+  assert.equal(globalRemaining.effectiveRequestTimeoutMs, 1_100);
+
+  const shortPoll = calculateProbeTiming({
+    stageStartedAt: 0,
+    stageTimeoutMs: 30_000,
+    bridgeStartupDeadline: 60_000,
+    now: 29_880,
+    configuredRequestTimeoutMs: 5_000,
+    configuredPollDelayMs: 500,
+  });
+  assert.equal(shortPoll.effectivePollDelayMs, 120);
+});
+
+test("expired Probe deadline performs no fetch or sleep", async () => {
+  let fetches = 0;
+  let delays = 0;
+  await assert.rejects(
+    waitForExpectedStatus(
+      "https://unit.test",
+      200,
+      undefined,
+      {
+        bridgeStartupDeadline: 1_000,
+        nowMilliseconds: () => 1_000,
+        fetch: async () => {
+          fetches += 1;
+          return response();
+        },
+        delay: async () => {
+          delays += 1;
+        },
+      },
+      {
+        timeoutMs: 30_000,
+        requestTimeoutMs: 5_000,
+        pollDelayMs: 500,
+        errorCode: "TEST_DEADLINE",
+      },
+    ),
+    (error) => {
+      assertBridgeCode(error, "TEST_DEADLINE");
+      assert.equal(error.diagnostics.attempts, 0);
+      assert.equal(error.diagnostics.lastResult, "ABORTED");
+      return true;
+    },
+  );
+  assert.equal(fetches, 0);
+  assert.equal(delays, 0);
+});
+
+test("Probe deadline prevents an extra fetch after the final response", async () => {
+  let now = 0;
+  let fetches = 0;
+  await assert.rejects(
+    waitForExpectedStatus(
+      "https://unit.test",
+      200,
+      undefined,
+      {
+        bridgeStartupDeadline: 10,
+        nowMilliseconds: () => now,
+        fetch: async () => {
+          fetches += 1;
+          now = 10;
+          return response(503);
+        },
+      },
+      {
+        timeoutMs: 30_000,
+        requestTimeoutMs: 5_000,
+        pollDelayMs: 500,
+        errorCode: "TEST_DEADLINE",
+      },
+    ),
+    (error) => {
+      assertBridgeCode(error, "TEST_DEADLINE");
+      assert.equal(error.diagnostics.attempts, 1);
+      assert.equal(error.diagnostics.lastResult, "ABORTED");
+      return true;
+    },
+  );
+  assert.equal(fetches, 1);
+});
+
+test("full request timeout and deadline-truncated timeout classify differently", async () => {
+  let fullTimeout;
+  try {
+    await boundedFetch(
+      "https://unit.test",
+      { timeoutMs: 5, timeoutCode: "NETWORK_TIMEOUT" },
+      { fetch: async () => new Promise(() => {}) },
+    );
+  } catch (error) {
+    fullTimeout = error;
+  }
+  assert.equal(classifyProbeResult({ error: fullTimeout }), "FETCH_TIMEOUT");
+
+  let deadlineTimeout;
+  try {
+    await boundedFetch(
+      "https://unit.test",
+      { timeoutMs: 5, timeoutCode: "NETWORK_ABORTED" },
+      { fetch: async () => new Promise(() => {}) },
+    );
+  } catch (error) {
+    deadlineTimeout = error;
+  }
+  assert.equal(classifyProbeResult({ error: deadlineTimeout }), "ABORTED");
+});
+
+test("fake fetch failures cover stable network cause classifications", async () => {
+  async function classifyFetchFailure(error, options = {}) {
+    try {
+      await boundedFetch(
+        "https://unit.test",
+        options,
+        { fetch: async () => { throw error; } },
+      );
+    } catch (caught) {
+      return classifyProbeResult({ error: caught });
+    }
+    assert.fail("fake fetch unexpectedly succeeded");
+  }
+
+  const dnsCause = new Error("redacted");
+  dnsCause.code = "ENOTFOUND";
+  assert.equal(
+    await classifyFetchFailure(new Error("redacted", { cause: dnsCause })),
+    "DNS_ERROR",
+  );
+
+  const connectCause = new Error("redacted");
+  connectCause.code = "UND_ERR_CONNECT_TIMEOUT";
+  assert.equal(
+    await classifyFetchFailure(
+      new Error("redacted", {
+        cause: new Error("redacted", { cause: connectCause }),
+      }),
+    ),
+    "CONNECT_ERROR",
+  );
+
+  const tlsCause = new Error("redacted");
+  tlsCause.code = "ERR_TLS_CERT_ALTNAME_INVALID";
+  assert.equal(
+    await classifyFetchFailure(new Error("redacted", { cause: tlsCause })),
+    "TLS_ERROR",
+  );
+  assert.equal(
+    await classifyFetchFailure(new Error("redacted")),
+    "UNKNOWN_NETWORK_ERROR",
+  );
+
+  let oversized;
+  try {
+    await boundedFetch(
+      "https://unit.test",
+      {},
+      {
+        fetch: async () =>
+          new Response("x".repeat(MAX_NETWORK_RESPONSE_BYTES + 1)),
+      },
+    );
+  } catch (error) {
+    oversized = error;
+  }
+  assert.equal(
+    classifyProbeResult({ error: oversized }),
+    "RESPONSE_TOO_LARGE",
+  );
+});
+
+test("Probe results are exactly the ten approved stable classifications", () => {
+  const cases = [
+    classifyProbeResult({ status: 200 }),
+    classifyProbeResult({ status: 401 }),
+    classifyProbeResult({ status: 503 }),
+    classifyProbeResult({
+      error: new BridgeError("NETWORK_TIMEOUT", "redacted"),
+    }),
+    classifyProbeResult({
+      error: new BridgeError("NETWORK_DNS_ERROR", "redacted"),
+    }),
+    classifyProbeResult({
+      error: new BridgeError("NETWORK_CONNECT_ERROR", "redacted"),
+    }),
+    classifyProbeResult({
+      error: new BridgeError("NETWORK_TLS_ERROR", "redacted"),
+    }),
+    classifyProbeResult({
+      error: new BridgeError("NETWORK_ABORTED", "redacted"),
+    }),
+    classifyProbeResult({
+      error: new BridgeError("NETWORK_RESPONSE_TOO_LARGE", "redacted"),
+    }),
+    classifyProbeResult({ status: 302 }),
+  ];
+  assert.deepEqual(cases, PROBE_RESULT_CLASSIFICATIONS);
+
+  const observed = new Set([
+    ...cases,
+    classifyProbeResult({ status: 101 }),
+    classifyProbeResult({ status: 204 }),
+    classifyProbeResult({ status: 600 }),
+    classifyProbeResult({
+      error: new BridgeError("NETWORK_READ_FAILED", "redacted"),
+    }),
+    classifyProbeResult({ error: new Error("redacted") }),
+  ]);
+  assert.deepEqual(
+    [...observed].sort(),
+    [...PROBE_RESULT_CLASSIFICATIONS].sort(),
+  );
+});
+
+test("Probe telemetry formatting cannot include errors, URLs, or keys", () => {
+  const formatted = formatProbeTelemetry({
+    stage: "TUNNEL_HEALTH",
+    attempts: 7,
+    durationMs: 3_250,
+    first200Ms: 2_501,
+    lastResult: "HTTP_200",
+  });
+  assert.equal(
+    formatted,
+    "probe stage=TUNNEL_HEALTH attempts=7 duration=3250ms first200=2501ms last=HTTP_200",
+  );
+  assert.equal(formatted.includes(TUNNEL_ORIGIN), false);
+  assert.equal(formatted.includes(EXTERNAL_KEY), false);
+  assert.equal(formatted.includes(INTERNAL_KEY), false);
+});
+
+test("30-second health behavior is simulated without a real 30-second wait", async () => {
+  const dependencies = runDependencies({
+    tunnelHealthFailure: true,
+    tunnelHealthTimeoutMs: 8,
+    tunnelRequestTimeoutMs: 2,
+    tunnelPollDelayMs: 1,
+  });
+  const startedAt = Date.now();
+  await assert.rejects(
+    runBridge(dependencies),
+    (error) => assertBridgeCode(error, "TUNNEL_HEALTH_NOT_READY"),
+  );
+  assert.ok(Date.now() - startedAt < 1_000);
 });
 
 test("Bridge logs do not contain keys or Authorization headers", async () => {
@@ -855,14 +1594,34 @@ test("Bridge logs do not contain keys or Authorization headers", async () => {
   const serialized = dependencies.logs.join("\n");
   assert.equal(serialized.includes(EXTERNAL_KEY), false);
   assert.equal(serialized.includes(INTERNAL_KEY), false);
+  assert.equal(serialized.includes(TUNNEL_ORIGIN), false);
+  assert.doesNotMatch(serialized, /[a-z0-9-]+\.trycloudflare\.com/iu);
   assert.doesNotMatch(serialized, /authorization|bearer/i);
+  assert.equal(
+    dependencies.logs.includes("Quick Tunnel ready."),
+    true,
+  );
 });
 
 test("Gateway verification failure prevents Tunnel startup", async () => {
   const dependencies = runDependencies({ gatewayVerificationFailure: true });
   await assert.rejects(
     runBridge(dependencies),
-    (error) => assertBridgeCode(error, "SERVICE_NOT_READY"),
+    (error) => assertBridgeCode(error, "GATEWAY_NOT_READY"),
+  );
+  assert.deepEqual(
+    dependencies.spawns.map(({ command }) => command),
+    ["npm", process.execPath],
+  );
+});
+
+test("Runtime readiness failure has a precise stage error", async () => {
+  const dependencies = runDependencies({
+    runtimeVerificationFailure: true,
+  });
+  await assert.rejects(
+    runBridge(dependencies),
+    (error) => assertBridgeCode(error, "RUNTIME_NOT_READY"),
   );
   assert.deepEqual(
     dependencies.spawns.map(({ command }) => command),
