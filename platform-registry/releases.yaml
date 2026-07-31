@@ -7,6 +7,14 @@ releases:
   status: verified
   notes: Custom GPT Actions + Gateway + Local Runtime MVP and Engineering Insight
     Registry baseline.
+- release_id: KNOWLEDGE-REBUILD-V2
+  type: knowledge-rebuild
+  source_commit: bd31893ddb9bb2efeb3cb38f67f1add66735cd79
+  status: in_review
+  branch: knowledge-rebuild-v2
+  publication_status: unpublished
+  feishu_status: not_started
+  notes: Overall knowledge migration remains in review while later content batches are pending.
 - release_id: KNOWLEDGE-REBUILD-V2-BATCH-01
   type: knowledge-rebuild
   source_commit: c9c44380e06a7263fbf9525ed961a3825e4a9a08
@@ -19,17 +27,21 @@ releases:
   feishu_status: not_started
 - release_id: KNOWLEDGE-REBUILD-V2-BATCH-02
   type: knowledge-rebuild
-  status: in_review
+  status: completed
   branch: knowledge-rebuild-v2
   base_commit: 42306077c4d11773c510222abc7a79d83384bb36
+  implementation_commit: 3206cd4da7ecb66eb4e706d2908a1d59e1a483fe
+  review_fix_commit: cbc9dc020d8a3503381980032ea76935e249f7b2
+  repository_review_status: accepted
   publication_status: unpublished
   feishu_status: not_started
 - release_id: KNOWLEDGE-REBUILD-V2-BATCH-02-R1
   type: knowledge-rebuild-review-fix
-  status: in_review
+  status: completed
   branch: knowledge-rebuild-v2
   base_commit: 3206cd4da7ecb66eb4e706d2908a1d59e1a483fe
+  implementation_commit: cbc9dc020d8a3503381980032ea76935e249f7b2
   content_correction_status: completed
-  repository_review_status: pending_post_commit
+  repository_review_status: accepted
   publication_status: unpublished
   feishu_status: not_started

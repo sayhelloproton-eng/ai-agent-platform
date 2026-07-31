@@ -23,11 +23,13 @@ bd31893ddb9bb2efeb3cb38f67f1add66735cd79
 Branch: knowledge-rebuild-v2
 Commit: 以该分支实际 HEAD 为准
 Batch 01: 已完成
-Batch 01-R1: 已完成 Review
-Current Review: Batch 02 repository review and content correction
+Batch 01-R1: 已完成
+Batch 02: 已完成并通过 Review
+Batch 02-R1: 已完成并通过 Review
+Current Work: Batch 03 内容审计与设计准备
 ```
 
-Batch 01 已完成控制面、Platform Registry、目标知识树和技术目录重构，Batch 01-R1 已完成状态与 Registry 语义修正。Batch 02 的十一篇项目入口与产品体系正文已经进入仓库，当前等待基于本次真实 Commit 的仓库级整体 Review 和集中修正；图片、HTML 与飞书发布均尚未开始。
+Batch 02 的十一篇项目入口与产品体系正文已经完成落库、事实校准和仓库级 Review，并成为 accepted Git 正式知识。当前开始准备 `02_基础产品与能力` 和 `03_架构思想与理论` 的内容审计；图片、HTML 与飞书发布仍未开始。
 
 已验证链路：
 

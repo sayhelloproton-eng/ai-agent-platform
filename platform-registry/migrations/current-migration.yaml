@@ -7,8 +7,9 @@ completed_batches:
 - 01-r1-registry-consistency
 - 02-entry-and-product-documents
 - 02-r1-content-lifecycle-cleanup
-current_batch: 02-post-commit-repository-review
-next_batch: Batch 02 review decision and follow-up correction
+- 02-post-commit-repository-review
+current_batch: 03-foundation-capabilities-and-architecture-theory-planning
+next_batch: Materialize CAP-001～CAP-008 and THY-001～THY-006 after content review
 matrix: platform-registry/migrations/asset-migration-matrix.csv
 rules:
   preserve_stable_ids: true

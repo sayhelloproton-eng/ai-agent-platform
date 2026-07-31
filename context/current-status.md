@@ -69,23 +69,30 @@ Phase: 2.5 — Knowledge Asset Rebuild and Platform Governance
 - `canonical_path`、`current_path` 与 `target_path` 语义修正；
 - 空 Generated 索引清理与 Registry 校验增强。
 
-### Batch 02 and Batch 02-R1 — Content Correction Completed
+### Batch 02 and Batch 02-R1 — Completed and Accepted
 
-- `00_项目入口` 六篇正文已经进入仓库；
-- `01_产品体系` 五篇正文已经进入仓库；
-- Batch 02-R1 已完成十一篇正文的事实校准、动态生命周期语言清理和导航修正；
-- 十一篇正文当前仍为 `partial`、`unpublished`，等待本次修正提交后的仓库级整体 Review；
+- `00_项目入口` 六篇正文已落库并通过 Review；
+- `01_产品体系` 五篇正文已落库并通过 Review；
+- 十一篇正文已升级为 `accepted`；
+- `publication_status` 仍为 `unpublished`；
 - 图片尚未生成；
 - HTML 尚未生成；
 - 飞书尚未发布。
 
-下一步是基于本次修正提交对 Batch 02 做整体 Review，再决定是否需要继续修正；当前不进入后续知识批次。
+### Current — Batch 03 Planning
+
+- 审计 CAP-001～CAP-008 的旧学习与产品资料；
+- 审计 THY-001～THY-006 的架构理论资料；
+- 确定复用、重写、归档和证据关系；
+- 在生成正文前完成内容边界与外部事实核验。
+
+CAP / THY 正文尚未生成。
 
 后续总体顺序：
 
 ```text
-→ 完成 Batch 02 修正提交后的仓库级整体 Review
-→ 后续批次正式文档落库与全库 Review
+→ 完成 Batch 03 内容审计、设计和事实核验
+→ CAP / THY 正式文档落库与 Review
 → 生成正式视觉资产
 → 建立 Feishu 映射
 → 对正式文档逐篇 overwrite
