@@ -9,8 +9,9 @@ completed_batches:
 - 02-r1-content-lifecycle-cleanup
 - 02-post-commit-repository-review
 - 03-content-audit-and-design
-current_batch: 03a-chatgpt-and-custom-gpt-documents
-next_batch: Review CAP-001～CAP-005 from the real implementation commit before acceptance
+- 03a-chatgpt-and-custom-gpt-documents
+current_batch: 03bc-codex-and-agent-theory-documents
+next_batch: Review CAP-006～CAP-008 and THY-001～THY-006 from the real implementation commit before acceptance
 matrix: platform-registry/migrations/asset-migration-matrix.csv
 rules:
   preserve_stable_ids: true

@@ -2,19 +2,26 @@
 
 ## 目录职责
 
-沉淀从 AI 工具到 Agent 工程平台的理论、DDD、Agent + Skills 和可信系统原则。
+沉淀从 AI 工具到 Agent 工程平台、开发范式、Agent + Skills、DDD、可信系统和项目方法论。
 
-## 计划资产
+## 正式资产
 
-`THY-001～THY-006`
+| ID | 文件 | 当前状态 |
+|---|---|---|
+| THY-001 | `THY-001-从AI工具到Agent工程平台.md` | partial |
+| THY-002 | `THY-002-AI开发范式演进.md` | partial |
+| THY-003 | `THY-003-Agent与Skills开发范式.md` | partial |
+| THY-004 | `THY-004-DDD与Agent系统边界建模.md` | partial |
+| THY-005 | `THY-005-可信Agent系统基本原则.md` | partial |
+| THY-006 | `THY-006-项目方法论与可复用工程启发.md` | partial |
 
-## 当前状态
-
-目标目录已经建立；正式文章将在对应内容批次生成。目录存在不代表计划文章已经实现。
+六篇正文已经物化，等待真实 Commit Review。复杂图在正文冻结后集中生成。
 
 ## 维护规则
 
-- 正文进入 Git Review 后才成为正式事实；
+- 理论必须说明适用条件和边界；
+- 当前实现与目标设计分开；
+- 历史架构文档只作为证据，不自动成为当前事实；
+- provisional / candidate 洞见不能写成普遍定律；
 - 系统元数据进入 `platform-registry/`；
-- 复杂图在正文冻结后生成；
-- 本目录内容可作为飞书覆盖式投影源。
+- 本目录内容在全库 Review 前保持 `unpublished`。

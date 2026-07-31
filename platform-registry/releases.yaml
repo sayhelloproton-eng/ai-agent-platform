@@ -46,10 +46,21 @@ releases:
   feishu_status: not_started
 - release_id: KNOWLEDGE-REBUILD-V2-BATCH-03A
   type: knowledge-rebuild
-  status: in_review
+  status: completed
   branch: knowledge-rebuild-v2
   base_commit: 4712cd05e1faf7e8a6ed06eb0fccae7d395d1be3
   content_scope: CAP-001～CAP-005
+  repository_review_status: accepted
+  publication_status: unpublished
+  feishu_status: not_started
+  implementation_commit: bec2851ae20509d52cfad9b1231839d9a86e55bf
+- release_id: KNOWLEDGE-REBUILD-V2-BATCH-03BC
+  type: knowledge-rebuild
+  source_commit: bec2851ae20509d52cfad9b1231839d9a86e55bf
+  status: in_review
+  branch: knowledge-rebuild-v2
+  base_commit: bec2851ae20509d52cfad9b1231839d9a86e55bf
+  content_scope: CAP-006～CAP-008 and THY-001～THY-006
   repository_review_status: pending
   publication_status: unpublished
   feishu_status: not_started

@@ -55,10 +55,11 @@ Batch 03：基础产品能力与架构理论
 - [x] 审计 CAP-001～CAP-008 的来源和旧资产；
 - [x] 审计 THY-001～THY-006 的来源和旧资产；
 - [x] 完成十四项资产的标题、边界与来源设计；
-- [x] 生成 CAP-001～CAP-005 确定正文与执行包；
-- [ ] 按真实 Commit Review CAP-001～CAP-005；
-- [ ] 生成并 Review CAP-006～CAP-008；
-- [ ] 生成并 Review THY-001～THY-006。
+- [x] 生成并落库 CAP-001～CAP-005；
+- [x] 按真实 Commit Review 并接受 CAP-001～CAP-005；
+- [x] 生成 CAP-006～CAP-008 与 THY-001～THY-006 确定正文和执行包；
+- [ ] 按真实 Commit Review CAP-006～CAP-008 与 THY-001～THY-006；
+- [ ] 将通过 Review 的九篇正文升级为 `accepted`。
 
 后续批次再处理平台架构与知识系统、智能体资产与工作流、实验、作品集、来源、正式视觉资产和全库 Review。
 

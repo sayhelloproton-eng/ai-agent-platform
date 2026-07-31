@@ -527,7 +527,7 @@ assets:
 - asset_id: CAP-001
   title: 什么是 ChatGPT：产品、模型与 Agent 入口
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/02_基础产品与能力/CAP-001-什么是ChatGPT-产品模型与Agent入口.md
@@ -538,7 +538,7 @@ assets:
 - asset_id: CAP-002
   title: ChatGPT 产品形态与能力边界
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/02_基础产品与能力/CAP-002-ChatGPT产品形态与能力边界.md
@@ -549,7 +549,7 @@ assets:
 - asset_id: CAP-003
   title: ChatGPT 配置、权限与使用基线
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/02_基础产品与能力/CAP-003-ChatGPT配置权限与使用基线.md
@@ -560,7 +560,7 @@ assets:
 - asset_id: CAP-004
   title: Custom GPT 产品能力与边界
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/02_基础产品与能力/CAP-004-CustomGPT产品能力与边界.md
@@ -571,7 +571,7 @@ assets:
 - asset_id: CAP-005
   title: Custom GPT Instructions、Knowledge、Actions 与发布配置
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/02_基础产品与能力/CAP-005-CustomGPT-Instructions-Knowledge-Actions与发布配置.md
@@ -580,104 +580,104 @@ assets:
   publication_status: unpublished
   migration_state: complete
 - asset_id: CAP-006
-  title: Codex产品与执行体系
+  title: Codex 产品与执行体系
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/02_基础产品与能力/CAP-006-Codex产品与执行体系.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/02_基础产品与能力/CAP-006-Codex产品与执行体系.md
+  target_path: null
+  canonical_path: docs/knowledge/02_基础产品与能力/CAP-006-Codex产品与执行体系.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: CAP-007
-  title: Codex配置体系
+  title: Codex 配置、权限与执行基线
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/02_基础产品与能力/CAP-007-Codex配置体系.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/02_基础产品与能力/CAP-007-Codex配置权限与执行基线.md
+  target_path: null
+  canonical_path: docs/knowledge/02_基础产品与能力/CAP-007-Codex配置权限与执行基线.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: CAP-008
-  title: Agent-Skills-Rules-Hooks与MCP
+  title: Agent 扩展与治理：AGENTS、Rules、Skills、Hooks、MCP 与 Plugins
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/02_基础产品与能力/CAP-008-Agent-Skills-Rules-Hooks与MCP.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/02_基础产品与能力/CAP-008-Agent扩展与治理-AGENTSRulesSkillsHooksMCP与Plugins.md
+  target_path: null
+  canonical_path: docs/knowledge/02_基础产品与能力/CAP-008-Agent扩展与治理-AGENTSRulesSkillsHooksMCP与Plugins.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: THY-001
-  title: 从AI工具到Agent工程平台
+  title: 从 AI 工具到 Agent 工程平台
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/03_架构思想与理论/THY-001-从AI工具到Agent工程平台.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/03_架构思想与理论/THY-001-从AI工具到Agent工程平台.md
+  target_path: null
+  canonical_path: docs/knowledge/03_架构思想与理论/THY-001-从AI工具到Agent工程平台.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: THY-002
-  title: AI开发范式演进
+  title: AI 开发范式演进
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/03_架构思想与理论/THY-002-AI开发范式演进.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/03_架构思想与理论/THY-002-AI开发范式演进.md
+  target_path: null
+  canonical_path: docs/knowledge/03_架构思想与理论/THY-002-AI开发范式演进.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: THY-003
-  title: Agent加Skills开发范式
+  title: Agent + Skills 开发范式
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/03_架构思想与理论/THY-003-Agent加Skills开发范式.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/03_架构思想与理论/THY-003-Agent与Skills开发范式.md
+  target_path: null
+  canonical_path: docs/knowledge/03_架构思想与理论/THY-003-Agent与Skills开发范式.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: THY-004
-  title: DDD与多智能体工程
+  title: DDD 与 Agent 系统边界建模
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/03_架构思想与理论/THY-004-DDD与多智能体工程.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/03_架构思想与理论/THY-004-DDD与Agent系统边界建模.md
+  target_path: null
+  canonical_path: docs/knowledge/03_架构思想与理论/THY-004-DDD与Agent系统边界建模.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: THY-005
-  title: 可信Agent系统基本原则
+  title: 可信 Agent 系统基本原则
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/03_架构思想与理论/THY-005-可信Agent系统基本原则.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/03_架构思想与理论/THY-005-可信Agent系统基本原则.md
+  target_path: null
+  canonical_path: docs/knowledge/03_架构思想与理论/THY-005-可信Agent系统基本原则.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: THY-006
-  title: 方法论亮点与实践智慧
+  title: 项目方法论与可复用工程启发
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/03_架构思想与理论/THY-006-方法论亮点与实践智慧.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/03_架构思想与理论/THY-006-项目方法论与可复用工程启发.md
+  target_path: null
+  canonical_path: docs/knowledge/03_架构思想与理论/THY-006-项目方法论与可复用工程启发.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: ARC-007
   title: 多窗口多角色多任务并行架构
   asset_type: architecture

@@ -26,10 +26,10 @@ Batch 01: 已完成
 Batch 01-R1: 已完成
 Batch 02: 已完成并通过 Review
 Batch 02-R1: 已完成并通过 Review
-Current Work: Batch 03A ChatGPT 与 Custom GPT 正文已物化，等待真实 Commit Review
+Current Work: Batch 03BC Codex 与 Agent 工程理论正文已物化，等待真实 Commit Review
 ```
 
-Batch 02 的十一篇项目入口与产品体系正文已经成为 accepted Git 正式知识。Batch 03 内容审计与边界设计已完成；CAP-001～CAP-005 的 ChatGPT 与 Custom GPT 正文已经物化为 partial，等待真实 Commit Review。CAP-006～CAP-008 与 THY-001～THY-006 尚未生成；图片、HTML 与飞书发布仍未开始。
+Batch 02 的十一篇项目入口与产品体系正文已经成为 accepted Git 正式知识。CAP-001～CAP-005 已通过真实 Commit Review 并成为 accepted；CAP-006～CAP-008 与 THY-001～THY-006 已完成首次物化，当前为 partial 并等待真实 Commit Review。图片、HTML 与飞书发布仍未开始。
 
 已验证链路：
 
