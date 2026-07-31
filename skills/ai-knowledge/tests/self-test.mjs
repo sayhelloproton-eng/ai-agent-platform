@@ -4,6 +4,18 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const skillText = fs.readFileSync(path.join(root, 'SKILL.md'), 'utf8');
+for (const required of [
+  'deterministic-delivery',
+  'knowledge_content_frozen: true',
+  'contract_reference_only',
+  'continuation / resume',
+]) {
+  if (!skillText.includes(required)) {
+    throw new Error(`SKILL.md missing trigger-boundary marker: ${required}`);
+  }
+}
+
 const tmpRel = 'tests/.tmp-self-test';
 const tmp = path.join(root, tmpRel);
 fs.rmSync(tmp, { recursive: true, force: true });

@@ -790,3 +790,15 @@ relations:
 - from: REF-005
   type: depends_on
   to: PRT-006
+- from: CAP-008
+  type: explains
+  to: SKILL-DETERMINISTIC-DELIVERY
+- from: AGT-005
+  type: governed_by
+  to: SKILL-DETERMINISTIC-DELIVERY
+- from: WFL-006
+  type: uses_skill
+  to: SKILL-DETERMINISTIC-DELIVERY
+- from: WFL-008
+  type: uses_skill
+  to: SKILL-DETERMINISTIC-DELIVERY

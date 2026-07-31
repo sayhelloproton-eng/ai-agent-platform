@@ -13,6 +13,19 @@
 Feishu 的定位是 **Human Readable Knowledge Projection**，不是与 Git 并列的知识源。
 它面向人和 AI 阅读，不追求对 Git 文件、元数据和资源目录做仓库镜像。
 
+## Trigger Boundary
+
+本 Skill 只处理知识语义：检索、综合、正文、生命周期、Registry 语义和 Feishu Projection。
+
+以下任务应路由到 [`deterministic-delivery`](../deterministic-delivery/)：
+
+- 冻结交付包的 ZIP、Manifest、Hash 和中央目录校验；
+- Overlay / Delete 白名单复制与范围检查；
+- 测试、精确暂存、唯一 Commit 和 Push；
+- 同一任务失败后的 continuation / resume。
+
+当 Contract 声明 `knowledge_content_frozen: true` 时，`ai-knowledge` 使用 `contract_reference_only`，不得重复加载全部知识 References，也不得重新解释、改写或扩大交付正文。
+
 ## Knowledge Layers
 
 | Layer | Path | Responsibility | Feishu Projection |

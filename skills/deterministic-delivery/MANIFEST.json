@@ -1,0 +1,26 @@
+{
+  "name": "deterministic-delivery",
+  "version": "0.1.0",
+  "standard": "Agent Skills / SKILL.md bundle",
+  "file_count": 18,
+  "files": [
+    "MANIFEST.json",
+    "CHANGELOG.md",
+    "README.md",
+    "SKILL.md",
+    "assets/README.md",
+    "assets/examples/README.md",
+    "assets/examples/continuation.json",
+    "assets/examples/deterministic-delivery.json",
+    "assets/schemas/delivery-contract.schema.json",
+    "references/01-contract-and-modes.md",
+    "references/02-archive-git-and-shell-gates.md",
+    "references/03-continuation-and-resume.md",
+    "references/README.md",
+    "scripts/README.md",
+    "scripts/validate-contract.mjs",
+    "tests/README.md",
+    "tests/fixtures/invalid-overlap.json",
+    "tests/self-test.mjs"
+  ]
+}

@@ -22,7 +22,7 @@
 
 ## Phase 2.5：Knowledge Asset Rebuild and Platform Governance
 
-状态：**In Progress**
+状态：**Knowledge Migration Completed / Execution Governance In Review**
 
 Batch 01 已完成首次仓库落库：
 
@@ -98,8 +98,18 @@ Batch 07：全库一致性与 Registry 迁移收口
 - [x] 删除旧知识目录导航文件，使 `docs/knowledge/` 只保留 `00～10`；
 - [x] 清理正式知识正文中的旧系统 Front Matter；
 - [x] 更新全仓内部链接与 Skill 路径引用；
-- [ ] 按真实 Commit Review Batch 07；
-- [ ] 将整体知识迁移状态升级为 completed。
+- [x] 按真实 Commit Review Batch 07；
+- [x] 将整体知识迁移状态升级为 completed。
+
+Batch 08：执行治理与确定性交付 Skill
+
+- [x] 收紧 `ai-knowledge` 触发条件；
+- [x] 新增 `deterministic-delivery` Skill；
+- [x] 建立 `deterministic_delivery` 与 `continuation` 两种执行模式；
+- [x] 固化 ZIP、Hash、Overlay/Delete、tracked+untracked、rename-aware staged scope 门禁；
+- [x] 固化 Ruby 中文路径、zsh `path`、空目录和失败续跑规则；
+- [x] 增加 Contract Schema、Example、Validator 和自测；
+- [ ] 按真实 Commit Review Batch 08。
 
 后续进入正式视觉资产、main 合并和飞书覆盖式发布。
 

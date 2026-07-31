@@ -79,20 +79,20 @@ Phase: 2.5 — Knowledge Asset Rebuild and Platform Governance
 - HTML 尚未生成；
 - 飞书尚未发布。
 
-### Current — Batch 05 In Review
+### Current — Batch 08 Execution Governance In Review
 
-- CAP-001～CAP-008 与 THY-001～THY-006 已通过真实 Commit Review 并保持 `accepted`；
-- ARC-007～ARC-014、ARC-016 与 KNO-001～KNO-010 已通过 Batch 04 真实 Commit Review 并升级为 `accepted`；
-- ARC-017～ARC-018、AGT-001～AGT-010 与 WFL-005～WFL-012 已首次物化为 `partial`；
-- 本批二十篇新正文均保持 `unpublished`；
-- `ARC-015`、`SKL-001～SKL-002` 和旧路径 `WFL-001～WFL-004` 未纳入本批；
-- 当前等待 Batch 05 二十篇正文的真实 Commit Review；
-- 图片、HTML 和飞书尚未开始。
+- Batch 02～Batch 07 已全部通过真实 Commit Review；
+- 知识资产重构迁移状态已完成：126 个资产全部 `materialized`，126 个资产全部 `migration_state: complete`；
+- `docs/knowledge/` 顶层只保留 `00～10` 正式知识树；
+- Batch 08 将 `ai-knowledge` 收紧为知识语义能力，不再为冻结交付包的机械落库重复加载完整知识规则；
+- Batch 08 新增 `deterministic-delivery` Skill，负责冻结 Contract 的校验、Overlay/Delete 白名单、验证、暂存、Commit、Push 与安全续跑；
+- 本批不生成图片或 HTML，不操作飞书，不修改业务 Runtime；
+- 当前等待 Batch 08 真实 Commit Review。
 
-后续总体顺序：
+后续总体顺序:
 
 ```text
-→ Review 并接受 Batch 07 全库一致性与迁移收口
+→ Review 并接受 Batch 08 执行治理收口
 → 生成正式视觉资产
 → 合并 main
 → 建立 Feishu 映射并逐篇 overwrite

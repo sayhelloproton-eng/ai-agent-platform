@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.0 — 2026-08-01
+
+- 收紧触发条件，仅处理知识语义；
+- 冻结 Contract 的机械落库路由到 `deterministic-delivery`；
+- continuation / resume 不再重复加载完整知识 References；
+- 新增 `contract_reference_only` 策略说明。
+
+
 ## 1.2.0 - 2026-07-27
 
 - 将飞书定位收敛为面向人和 AI 阅读的文本知识投影，而不是 Git 仓库镜像。

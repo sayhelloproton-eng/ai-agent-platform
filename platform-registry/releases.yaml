@@ -9,11 +9,14 @@ releases:
 - release_id: KNOWLEDGE-REBUILD-V2
   type: knowledge-rebuild
   source_commit: bd31893ddb9bb2efeb3cb38f67f1add66735cd79
-  status: in_review
+  status: completed
   branch: knowledge-rebuild-v2
   publication_status: unpublished
   feishu_status: not_started
-  notes: All knowledge content is materialized; full-library consistency and registry migration closure are in review.
+  notes: Knowledge content materialization and registry migration closure completed; visual assets and publication remain
+    pending.
+  repository_review_status: accepted
+  implementation_commit: 3ef6b7a74d0626edad1179336df618e372a7588f
 - release_id: KNOWLEDGE-REBUILD-V2-BATCH-01
   type: knowledge-rebuild
   source_commit: c9c44380e06a7263fbf9525ed961a3825e4a9a08
@@ -97,11 +100,22 @@ releases:
   implementation_commit: 1e2beb8c584ba12c5dff0fb5efb3100942394fbd
 - release_id: KNOWLEDGE-REBUILD-V2-BATCH-07
   type: knowledge-rebuild-review-fix
-  status: in_review
+  status: completed
   branch: knowledge-rebuild-v2
   base_commit: 1e2beb8c584ba12c5dff0fb5efb3100942394fbd
   content_scope: full-library consistency, 15 approved path moves, 17 in-place migration audits, and legacy knowledge directory
     closure
+  repository_review_status: accepted
+  publication_status: unpublished
+  feishu_status: not_started
+  implementation_commit: 3ef6b7a74d0626edad1179336df618e372a7588f
+- release_id: KNOWLEDGE-REBUILD-V2-BATCH-08
+  type: execution-governance
+  status: in_review
+  branch: knowledge-rebuild-v2
+  base_commit: 3ef6b7a74d0626edad1179336df618e372a7588f
+  content_scope: ai-knowledge trigger narrowing, deterministic delivery skill, continuation/resume protocol, and migration
+    status closure
   repository_review_status: pending
   publication_status: unpublished
   feishu_status: not_started

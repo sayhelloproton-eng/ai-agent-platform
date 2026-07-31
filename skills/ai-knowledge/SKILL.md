@@ -11,13 +11,16 @@ metadata:
 
 该 Skill 给 **ai-agent-platform 中的 Agent** 使用，提供项目知识生命周期能力。它不是飞书 CRUD 包装器，也不是给 Codex 自由发挥内容的提示词。Codex/CLI 是执行器；调用该 Skill 的 Agent 负责理解目标、组织语义内容、引用依据和决定是否沉淀。
 
-## 开始前必须读取
+## 开始前读取策略
 
-1. [`references/00-shared-rules.md`](references/00-shared-rules.md)：认证、安全、确认门禁和停止条件。
-2. [`references/01-architecture-and-boundaries.md`](references/01-architecture-and-boundaries.md)：Skill、Provider、Agent、Codex 的职责边界。
-3. [`references/02-project-profile.md`](references/02-project-profile.md)：当前 `ai-agent-platform` Git 资产、飞书投影和动态状态策略。
-4. 涉及飞书读取或写入时，再读取 [`references/06-feishu-provider.md`](references/06-feishu-provider.md)。
-5. 发布 `docs/knowledge/` 时，必须读取 [`references/11-feishu-publishing.md`](references/11-feishu-publishing.md)。
+只读取与当前知识意图直接相关的最小参考，不再默认加载全部 References。
+
+1. 首先判断任务是否真正涉及知识语义；
+2. 涉及认证、确认或高风险知识写入时读取 [`references/00-shared-rules.md`](references/00-shared-rules.md)；
+3. 涉及职责边界时读取 [`references/01-architecture-and-boundaries.md`](references/01-architecture-and-boundaries.md)；
+4. 涉及知识模型或 Git 知识写入时读取 `03-knowledge-model.md`、`05-write-governance.md`；
+5. 涉及飞书读取或发布时才读取 `06-feishu-provider.md`、`11-feishu-publishing.md`；
+6. 冻结 Contract 的机械落库和同一任务续跑不加载完整 References，交由 `deterministic-delivery` Skill。
 
 ## Knowledge Boundary
 
@@ -33,22 +36,30 @@ Git Repository 是所有正式项目事实的 Canonical Source。Feishu 只能�
 
 ## 触发场景
 
-- Agent 开始项目任务前需要架构、ADR、工作流或当前阶段上下文。
-- 用户询问“为什么这样设计”“当前进度是什么”“下一步是什么”。
-- 任务或实验完成，需要形成实验记录、ADR、问题解决记录或项目状态更新。
-- 用户提供公开飞书 Wiki，希望结构化读取、导入或建立本地索引。
-- 用户希望依据知识库生成循序渐进的学习路径。
-- 知识库内容增长后，需要重建索引、检查过期内容或发现知识缺口。
+仅在任务需要理解、选择、生成或治理**知识语义**时触发：
+
+- 查询项目架构、ADR、工作流、当前阶段或知识来源；
+- 形成知识正文、实验记录、ADR、状态草稿或学习路径；
+- 决定资产落位、知识生命周期、Registry 语义关系或发布资格；
+- 读取、导入或发布飞书知识投影；
+- 重建知识索引、检查过期知识或发现知识缺口。
 
 ## 不触发
 
-- 仅需要执行单个飞书 API/CLI 命令且不涉及项目知识语义时，优先使用官方 `lark-wiki`、`lark-doc`、`lark-drive` 等 Skill。
-- 仅处理代码仓库文件、与知识上下文无关的普通编码任务。
-- 用户要求更改互联网公开、成员、权限、删除或批量移动节点；本 Skill 不自动执行这些治理操作。
+以下任务不完整触发本 Skill：
+
+- 已冻结 ZIP / Overlay / Delete Contract 的解压、Hash、`cmp`、测试、暂存、Commit 和 Push；
+- 同一批次失败后的 continuation / resume，且知识内容、范围与生命周期没有改变；
+- 普通代码修改、仓库机械操作或单个 Provider 命令，不需要知识语义判断；
+- 只读检查 Git SHA、工作区、中央目录、Manifest、白名单或测试结果。
+
+上述确定性执行任务使用 `skills/deterministic-delivery/`。若包内标记 `knowledge_content_frozen: true`，本 Skill 的策略必须是 `contract_reference_only`：只核对知识边界，不重复加载完整 References，也不重新解释或改写正文。
+
+删除、权限、公开分享、批量移动等高风险操作仍需明确授权；本 Skill 不因被触发而自动获得这些权限。
 
 ## 总流程
 
-1. **识别知识意图**：查询、Git 变更、状态更新、ADR、导入、索引、学习路径或 Projection Publish。
+1. **识别知识意图**：先判断是否需要知识语义；冻结 Contract 的机械执行直接路由到 `deterministic-delivery`。
 2. **确定 Git Layer**：Context、Knowledge、Technical、Learning 或 ADR；不要先按 Provider 分类。
 3. **读取最小证据**：先目录/索引，再 outline/section，最后才是完整正文。
 4. **生成 Context Package 或 Draft**：列出来源、范围、缺口和置信度；不得编造项目事实。

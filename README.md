@@ -26,10 +26,10 @@ Batch 01: 已完成
 Batch 01-R1: 已完成
 Batch 02: 已完成并通过 Review
 Batch 02-R1: 已完成并通过 Review
-Current Work: Batch 07 全库一致性与 Registry 迁移收口已执行，等待真实 Commit Review
+Current Work: Batch 08 执行治理与确定性交付 Skill 已执行，等待真实 Commit Review
 ```
 
-Batch 02～Batch 06 的正式正文均已完成真实 Commit Review；Batch 06 的十五篇新正文已升级为 accepted。Registry 中 126 个资产已经全部物化，32 个剩余迁移状态已收口，其中 15 个资产执行目标路径迁移、17 个资产完成原位审计。`docs/knowledge/` 顶层只保留 `00～10` 正式知识树。图片、HTML 与飞书发布仍未开始。
+Batch 02～Batch 07 已全部完成真实 Commit Review。知识资产重构迁移已经完成：Registry 中原有 126 个资产全部物化、全部完成路径迁移审计，`docs/knowledge/` 顶层只保留 `00～10` 正式知识树。Batch 08 新增确定性交付 Skill，并收紧 AI Knowledge Skill 的触发边界；该治理批次等待真实 Commit Review。图片、HTML 与飞书发布仍未开始。
 
 已验证链路：
 
@@ -49,7 +49,7 @@ Custom GPT
 - 双层 API Key、双层 Capability Policy、Loopback 边界；
 - Rate Limit、并发、Timeout、响应大小和安全错误映射；
 - Custom GPT Builder、Preview 和正式自然语言 Action 调用；
-- AI Knowledge、Custom GPT Actions、Microsoft Dev Tunnels、Engineering Insight Distillation 四个 Skill；
+- AI Knowledge、Deterministic Delivery、Custom GPT Actions、Microsoft Dev Tunnels、Engineering Insight Distillation 五个 Skill；
 - Engineering Insight Registry 与首批五条工程洞见。
 
 尚未实现：

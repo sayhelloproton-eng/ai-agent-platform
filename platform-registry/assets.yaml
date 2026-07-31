@@ -1393,3 +1393,14 @@ assets:
   canonical_path: platform-registry/registries/engineering-insights/
   publication_status: unpublished
   migration_state: complete
+- asset_id: SKILL-DETERMINISTIC-DELIVERY
+  title: Deterministic Delivery Skill
+  asset_type: skill
+  status: verified
+  evidence_level: verified
+  materialized: true
+  current_path: skills/deterministic-delivery/
+  target_path: null
+  canonical_path: skills/deterministic-delivery/
+  publication_status: unpublished
+  migration_state: complete

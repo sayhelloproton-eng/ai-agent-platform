@@ -1,7 +1,7 @@
 version: 1
 migration_id: MIG-KNOWLEDGE-V2
 source_commit: bd31893ddb9bb2efeb3cb38f67f1add66735cd79
-status: in_review
+status: completed
 completed_batches:
 - 01-control-plane
 - 01-r1-registry-consistency
@@ -14,8 +14,9 @@ completed_batches:
 - 04-platform-architecture-and-knowledge-system-documents
 - 05-agent-assets-and-workflow-governance-documents
 - 06-experiments-portfolio-references-and-path-closure
-current_batch: 07-full-library-consistency-and-registry-closure
-next_batch: Review Batch 07 real implementation commit, complete the overall migration, then generate formal visual assets
+- 07-full-library-consistency-and-registry-closure
+current_batch: knowledge-rebuild-v2-completed
+next_batch: Review Batch 08 execution governance, then generate formal visual assets
 matrix: platform-registry/migrations/asset-migration-matrix.csv
 rules:
   preserve_stable_ids: true

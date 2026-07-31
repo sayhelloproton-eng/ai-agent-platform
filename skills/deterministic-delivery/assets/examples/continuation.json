@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "execution_mode": "continuation",
+  "base_commit": "0123456789abcdef0123456789abcdef01234567",
+  "branch": "knowledge-rebuild-v2",
+  "knowledge_content_frozen": true,
+  "archive": "delivery.zip",
+  "overlay_paths": [
+    "README.md"
+  ],
+  "delete_paths": [
+    "docs/old.md"
+  ],
+  "empty_directories": [
+    "docs/old"
+  ],
+  "validation_commands": [
+    "git diff --cached --check"
+  ],
+  "commit_message": "docs: finish frozen delivery",
+  "push_remote": "origin",
+  "push_branch": "knowledge-rebuild-v2",
+  "stop_on_failure": true,
+  "resume_from": "staged_scope_check",
+  "prior_gates": [
+    "archive_hash",
+    "overlay_cmp",
+    "npm_verify"
+  ],
+  "new_authorization": [
+    "use --no-renames for staged scope"
+  ],
+  "skill_policy": {
+    "ai_knowledge": "contract_reference_only",
+    "deterministic_delivery": "full"
+  }
+}
