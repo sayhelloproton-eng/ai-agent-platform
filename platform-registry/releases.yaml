@@ -67,10 +67,20 @@ releases:
   implementation_commit: 9de7ff4426d1b01843ef37adb8ad0feecafd24b5
 - release_id: KNOWLEDGE-REBUILD-V2-BATCH-04
   type: knowledge-rebuild
-  status: in_review
+  status: completed
   branch: knowledge-rebuild-v2
   base_commit: 9de7ff4426d1b01843ef37adb8ad0feecafd24b5
   content_scope: ARC-007～ARC-014、ARC-016 and KNO-001～KNO-010
+  repository_review_status: accepted
+  publication_status: unpublished
+  feishu_status: not_started
+  implementation_commit: 81bc32f747be1d20ee6ce2070491f0e20b3202a0
+- release_id: KNOWLEDGE-REBUILD-V2-BATCH-05
+  type: knowledge-rebuild
+  status: in_review
+  branch: knowledge-rebuild-v2
+  base_commit: 81bc32f747be1d20ee6ce2070491f0e20b3202a0
+  content_scope: ARC-017～ARC-018、AGT-001～AGT-010 and WFL-005～WFL-012
   repository_review_status: pending
   publication_status: unpublished
   feishu_status: not_started

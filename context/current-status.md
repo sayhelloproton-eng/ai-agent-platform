@@ -79,21 +79,22 @@ Phase: 2.5 — Knowledge Asset Rebuild and Platform Governance
 - HTML 尚未生成；
 - 飞书尚未发布。
 
-### Current — Batch 03BC In Review
+### Current — Batch 05 In Review
 
-- Batch 03 的十四项资产来源、标题和边界审计已经完成；
-- CAP-001～CAP-005 已通过真实 Commit Review 并升级为 `accepted`；
-- CAP-006～CAP-008 与 THY-001～THY-006 已首次物化为 `partial`；
-- 十四篇文章均保持 `unpublished`；
-- 当前等待 CAP-006～CAP-008 与 THY-001～THY-006 的真实 Commit Review；
+- CAP-001～CAP-008 与 THY-001～THY-006 已通过真实 Commit Review 并保持 `accepted`；
+- ARC-007～ARC-014、ARC-016 与 KNO-001～KNO-010 已通过 Batch 04 真实 Commit Review 并升级为 `accepted`；
+- ARC-017～ARC-018、AGT-001～AGT-010 与 WFL-005～WFL-012 已首次物化为 `partial`；
+- 本批二十篇新正文均保持 `unpublished`；
+- `ARC-015`、`SKL-001～SKL-002` 和旧路径 `WFL-001～WFL-004` 未纳入本批；
+- 当前等待 Batch 05 二十篇正文的真实 Commit Review；
 - 图片、HTML 和飞书尚未开始。
 
 后续总体顺序：
 
 ```text
-→ Review 并接受 ARC-007～ARC-014、ARC-016 与 KNO-001～KNO-010
-→ 处理智能体资产、工作流和项目治理
+→ Review 并接受 ARC-017～ARC-018、AGT-001～AGT-010 与 WFL-005～WFL-012
 → 处理实验、作品集、术语与来源
+→ 处理 SKL / WFL 历史路径迁移与剩余计划资产
 → 全库一致性 Review
 → 生成正式视觉资产
 → 合并 main

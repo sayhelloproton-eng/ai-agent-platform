@@ -681,7 +681,7 @@ assets:
 - asset_id: ARC-007
   title: 多窗口多角色多任务并行架构
   asset_type: architecture
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/04_平台架构/ARC-007-多窗口多角色多任务并行架构.md
@@ -692,7 +692,7 @@ assets:
 - asset_id: ARC-008
   title: ai-agent-platform-DDD领域蓝图
   asset_type: architecture
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图.md
@@ -703,7 +703,7 @@ assets:
 - asset_id: ARC-009
   title: 轻量Task-Control架构
   asset_type: architecture
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/04_平台架构/ARC-009-轻量Task-Control架构.md
@@ -714,7 +714,7 @@ assets:
 - asset_id: ARC-010
   title: Execution-Lane执行通道模型
   asset_type: architecture
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/04_平台架构/ARC-010-Execution-Lane执行通道模型.md
@@ -725,7 +725,7 @@ assets:
 - asset_id: ARC-011
   title: Git-Branch-Worktree与任务隔离
   asset_type: architecture
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/04_平台架构/ARC-011-Git-Branch-Worktree与任务隔离.md
@@ -736,7 +736,7 @@ assets:
 - asset_id: ARC-012
   title: Agent-Profile与Skills资产化
   asset_type: architecture
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/04_平台架构/ARC-012-Agent-Profile与Skills资产化.md
@@ -747,7 +747,7 @@ assets:
 - asset_id: ARC-013
   title: 审批证据与副作用账本
   asset_type: architecture
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/04_平台架构/ARC-013-审批证据与副作用账本.md
@@ -758,7 +758,7 @@ assets:
 - asset_id: ARC-014
   title: 健康与恢复治理架构
   asset_type: architecture
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/04_平台架构/ARC-014-健康与恢复治理架构.md
@@ -780,7 +780,7 @@ assets:
 - asset_id: ARC-016
   title: 架构能力与仓库实现映射
   asset_type: architecture
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/04_平台架构/ARC-016-架构能力与仓库实现映射.md
@@ -791,29 +791,29 @@ assets:
 - asset_id: ARC-017
   title: 产品孵化与需求治理体系
   asset_type: architecture
-  status: candidate
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/04_平台架构/ARC-017-产品孵化与需求治理体系.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/04_平台架构/ARC-017-产品孵化与需求治理体系.md
+  target_path: null
+  canonical_path: docs/knowledge/04_平台架构/ARC-017-产品孵化与需求治理体系.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: ARC-018
   title: 项目治理与汇报架构
   asset_type: architecture
-  status: candidate
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/04_平台架构/ARC-018-项目治理与汇报架构.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/04_平台架构/ARC-018-项目治理与汇报架构.md
+  target_path: null
+  canonical_path: docs/knowledge/04_平台架构/ARC-018-项目治理与汇报架构.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: KNO-001
   title: AGENTS上下文契约与跨平台治理
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/05_上下文与知识系统/KNO-001-AGENTS上下文契约与跨平台治理.md
@@ -824,7 +824,7 @@ assets:
 - asset_id: KNO-002
   title: 多级领域上下文架构
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/05_上下文与知识系统/KNO-002-多级领域上下文架构.md
@@ -835,7 +835,7 @@ assets:
 - asset_id: KNO-003
   title: 上下文Token与证据治理
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/05_上下文与知识系统/KNO-003-上下文Token与证据治理.md
@@ -846,7 +846,7 @@ assets:
 - asset_id: KNO-004
   title: Custom-GPT内置知识外部知识与记忆
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/05_上下文与知识系统/KNO-004-Custom-GPT内置知识外部知识与记忆.md
@@ -857,7 +857,7 @@ assets:
 - asset_id: KNO-005
   title: 项目知识生命周期
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/05_上下文与知识系统/KNO-005-项目知识生命周期.md
@@ -868,7 +868,7 @@ assets:
 - asset_id: KNO-006
   title: Knowledge-Pack设计
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/05_上下文与知识系统/KNO-006-Knowledge-Pack设计.md
@@ -879,7 +879,7 @@ assets:
 - asset_id: KNO-007
   title: 平台资产关联模型
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/05_上下文与知识系统/KNO-007-平台资产关联模型.md
@@ -890,7 +890,7 @@ assets:
 - asset_id: KNO-008
   title: 知识与资产变更影响分析
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/05_上下文与知识系统/KNO-008-知识与资产变更影响分析.md
@@ -901,7 +901,7 @@ assets:
 - asset_id: KNO-009
   title: 项目会话知识综合与仓库沉淀
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/05_上下文与知识系统/KNO-009-项目会话知识综合与仓库沉淀.md
@@ -912,7 +912,7 @@ assets:
 - asset_id: KNO-010
   title: 工程洞见提炼与注册表治理
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/05_上下文与知识系统/KNO-010-工程洞见提炼与注册表治理.md
@@ -923,201 +923,201 @@ assets:
 - asset_id: AGT-001
   title: Agent角色体系
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/06_智能体资产体系/AGT-001-Agent角色体系.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/06_智能体资产体系/AGT-001-Agent角色体系.md
+  target_path: null
+  canonical_path: docs/knowledge/06_智能体资产体系/AGT-001-Agent角色体系.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: AGT-002
   title: Agent-Profile设计规范
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/06_智能体资产体系/AGT-002-Agent-Profile设计规范.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/06_智能体资产体系/AGT-002-Agent-Profile设计规范.md
+  target_path: null
+  canonical_path: docs/knowledge/06_智能体资产体系/AGT-002-Agent-Profile设计规范.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: AGT-003
   title: Agent知识记忆与行为模型
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/06_智能体资产体系/AGT-003-Agent知识记忆与行为模型.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/06_智能体资产体系/AGT-003-Agent知识记忆与行为模型.md
+  target_path: null
+  canonical_path: docs/knowledge/06_智能体资产体系/AGT-003-Agent知识记忆与行为模型.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: AGT-004
   title: Agent工具权限与审批边界
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/06_智能体资产体系/AGT-004-Agent工具权限与审批边界.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/06_智能体资产体系/AGT-004-Agent工具权限与审批边界.md
+  target_path: null
+  canonical_path: docs/knowledge/06_智能体资产体系/AGT-004-Agent工具权限与审批边界.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: AGT-005
   title: Agent-Skill设计与治理
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/06_智能体资产体系/AGT-005-Agent-Skill设计与治理.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/06_智能体资产体系/AGT-005-Agent-Skill设计与治理.md
+  target_path: null
+  canonical_path: docs/knowledge/06_智能体资产体系/AGT-005-Agent-Skill设计与治理.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: AGT-006
   title: 多Agent协作角色模型
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/06_智能体资产体系/AGT-006-多Agent协作角色模型.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/06_智能体资产体系/AGT-006-多Agent协作角色模型.md
+  target_path: null
+  canonical_path: docs/knowledge/06_智能体资产体系/AGT-006-多Agent协作角色模型.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: AGT-007
   title: Agent评估测试与发布
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/06_智能体资产体系/AGT-007-Agent评估测试与发布.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/06_智能体资产体系/AGT-007-Agent评估测试与发布.md
+  target_path: null
+  canonical_path: docs/knowledge/06_智能体资产体系/AGT-007-Agent评估测试与发布.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: AGT-008
   title: 专业智能体目录
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/06_智能体资产体系/AGT-008-专业智能体目录.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/06_智能体资产体系/AGT-008-专业智能体目录.md
+  target_path: null
+  canonical_path: docs/knowledge/06_智能体资产体系/AGT-008-专业智能体目录.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: AGT-009
   title: 需求与产品孵化智能体
   asset_type: knowledge-document
-  status: candidate
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/06_智能体资产体系/AGT-009-需求与产品孵化智能体.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/06_智能体资产体系/AGT-009-需求与产品孵化智能体.md
+  target_path: null
+  canonical_path: docs/knowledge/06_智能体资产体系/AGT-009-需求与产品孵化智能体.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: AGT-010
   title: 项目治理与汇报智能体
   asset_type: knowledge-document
-  status: candidate
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/06_智能体资产体系/AGT-010-项目治理与汇报智能体.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/06_智能体资产体系/AGT-010-项目治理与汇报智能体.md
+  target_path: null
+  canonical_path: docs/knowledge/06_智能体资产体系/AGT-010-项目治理与汇报智能体.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: WFL-005
   title: 多角色任务合同
   asset_type: workflow
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/07_工作流与项目治理/WFL-005-多角色任务合同.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/07_工作流与项目治理/WFL-005-多角色任务合同.md
+  target_path: null
+  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-005-多角色任务合同.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: WFL-006
   title: 规划实现测试复审与集成
   asset_type: workflow
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/07_工作流与项目治理/WFL-006-规划实现测试复审与集成.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/07_工作流与项目治理/WFL-006-规划实现测试复审与集成.md
+  target_path: null
+  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-006-规划实现测试复审与集成.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: WFL-007
   title: 上下文Checkpoint与任务移交
   asset_type: workflow
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/07_工作流与项目治理/WFL-007-上下文Checkpoint与任务移交.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/07_工作流与项目治理/WFL-007-上下文Checkpoint与任务移交.md
+  target_path: null
+  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-007-上下文Checkpoint与任务移交.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: WFL-008
   title: 任务暂停恢复与安全终止
   asset_type: workflow
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/07_工作流与项目治理/WFL-008-任务暂停恢复与安全终止.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/07_工作流与项目治理/WFL-008-任务暂停恢复与安全终止.md
+  target_path: null
+  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-008-任务暂停恢复与安全终止.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: WFL-009
   title: 审批工作流
   asset_type: workflow
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/07_工作流与项目治理/WFL-009-审批工作流.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/07_工作流与项目治理/WFL-009-审批工作流.md
+  target_path: null
+  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-009-审批工作流.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: WFL-010
   title: 资产变更与关联同步工作流
   asset_type: workflow
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/07_工作流与项目治理/WFL-010-资产变更与关联同步工作流.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/07_工作流与项目治理/WFL-010-资产变更与关联同步工作流.md
+  target_path: null
+  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-010-资产变更与关联同步工作流.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: WFL-011
   title: 新产品孵化与资产生成工作流
   asset_type: workflow
-  status: candidate
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/07_工作流与项目治理/WFL-011-新产品孵化与资产生成工作流.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/07_工作流与项目治理/WFL-011-新产品孵化与资产生成工作流.md
+  target_path: null
+  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-011-新产品孵化与资产生成工作流.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: WFL-012
   title: 项目状态汇总与阶段汇报
   asset_type: workflow
-  status: candidate
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/07_工作流与项目治理/WFL-012-项目状态汇总与阶段汇报.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/07_工作流与项目治理/WFL-012-项目状态汇总与阶段汇报.md
+  target_path: null
+  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-012-项目状态汇总与阶段汇报.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: EXP-005
   title: Custom-GPT-Actions链路实验
   asset_type: experiment

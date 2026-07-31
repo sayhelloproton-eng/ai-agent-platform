@@ -66,10 +66,20 @@ Batch 04：平台架构与上下文知识系统
 - [x] 生成 ARC-007～ARC-014 与 ARC-016；
 - [x] 生成 KNO-001～KNO-010；
 - [x] 同步 Registry、关系、迁移矩阵和 Release；
-- [ ] 按真实 Commit Review 十九篇正文；
-- [ ] 将通过 Review 的十九篇正文升级为 `accepted`。
+- [x] 按真实 Commit Review 十九篇正文；
+- [x] 将通过 Review 的十九篇正文升级为 `accepted`。
 
-后续批次再处理智能体资产与工作流、实验、作品集、来源、正式视觉资产和全库 Review。
+Batch 05：智能体资产与工作流治理
+
+- [x] 修正 `context/current-status.md` 的 Batch 03BC 状态漂移；
+- [x] 生成 ARC-017～ARC-018；
+- [x] 生成 AGT-001～AGT-010；
+- [x] 生成 WFL-005～WFL-012；
+- [x] 同步 Registry、关系、迁移矩阵和 Release；
+- [ ] 按真实 Commit Review 二十篇正文；
+- [ ] 将通过 Review 的二十篇正文升级为 `accepted`。
+
+后续批次再处理实验、作品集、术语与来源，以及 SKL / WFL 历史路径迁移、正式视觉资产和全库 Review。
 
 ## Phase 2 Next：Task Control and Trusted Execution
 

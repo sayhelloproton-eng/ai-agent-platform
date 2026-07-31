@@ -11,8 +11,9 @@ completed_batches:
 - 03-content-audit-and-design
 - 03a-chatgpt-and-custom-gpt-documents
 - 03bc-codex-and-agent-theory-documents
-current_batch: 04-platform-architecture-and-knowledge-system-documents
-next_batch: Review ARC-007～ARC-014、ARC-016 and KNO-001～KNO-010 from the real implementation commit before acceptance
+- 04-platform-architecture-and-knowledge-system-documents
+current_batch: 05-agent-assets-and-workflow-governance-documents
+next_batch: Review ARC-017～ARC-018、AGT-001～AGT-010 and WFL-005～WFL-012 from the real implementation commit before acceptance
 matrix: platform-registry/migrations/asset-migration-matrix.csv
 rules:
   preserve_stable_ids: true
