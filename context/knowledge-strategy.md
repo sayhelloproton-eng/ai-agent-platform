@@ -4,64 +4,78 @@
 
 **Git Repository is the only source of truth.**
 
-Git 保存项目正式事实，包括项目上下文、当前状态、Roadmap、架构、规则、知识、代码、测试与已验证结论。
+正式项目事实包括代码、测试、Context、知识、技术方案、ADR、Agent 配置、Knowledge Pack、Registry 和发布记录。
 
-只有经过 Review 并进入 Git 的内容，才是正式项目事实。
+## Knowledge Layers
 
-## Git
+```text
+Raw Sources
+  → Learning / Research / Experiment
+  → Reviewed Knowledge / Technical Solution / ADR
+  → Agent Profile / Knowledge Pack / Skill
+  → Runtime Use and Evidence
+  → New Insight and Revision
+```
 
-角色：**Engineering Source of Truth**
+## Platform Registry
 
-Git 提供：
+`platform-registry/` 负责：
 
-- 可审阅的变更；
-- 可追踪的历史；
-- 可比较的 Diff；
-- 可回滚的版本；
-- 与代码、测试和文档一致的工程证据；
-- 新 Agent 可直接读取的正式上下文。
+- 稳定资产 ID；
+- Canonical Path；
+- 实现状态；
+- 资产关系；
+- 证据入口；
+- Feishu Projection；
+- Release；
+- 变更影响。
 
-## Feishu
+知识正文不再保存大段系统 Front Matter。
 
-角色：**Human Readable Knowledge Projection**
+## Engineering Insights
 
-Feishu 可以承载从 Git 生成的阅读视图、摘要、目录或展示页面，但它不是项目真源，不能独立改变正式项目事实。
+- `skills/engineering-insight-distillation/`：提炼方法；
+- `platform-registry/registries/engineering-insights/`：成熟度、生命周期、Occurrence 和关系的机器真源；
+- `docs/knowledge/.../INS-001`：面向人的综合解释。
 
-Task 001 只定义关系，不执行任何 Feishu 读取、写入、同步或配置。
+## Custom GPT Knowledge
 
-## Allowed Flow
+每个专有 Custom GPT 使用两层稳定知识：
+
+1. 通用基础知识包；
+2. 角色专属知识包。
+
+Git 是知识真源，Knowledge Pack 是派生发布资产；外部知识服务负责实时、共享和按权限检索。
+
+## Feishu Projection
 
 允许：
 
 ```text
-Git → Feishu
+Git docs/knowledge/ → Feishu
 ```
 
-投影必须以 Git 内容为输入。Git 与 Feishu 不一致时，以 Git 为准。
+发布规则：
 
-## Forbidden Flows
+- overwrite；
+- one-way；
+- one-to-one mapping；
+- zero pre-read；
+- no semantic diff；
+- no merge；
+- no reverse write。
 
-禁止：
+首次迁移按映射文档逐篇覆盖。映射稳定后，只覆盖 Git 中发生变化的文档。
 
-```text
-Feishu → Git
-```
+发布后验证 API、revision、图片、映射和失败项，不让大模型阅读飞书全文。
 
-禁止从 Feishu 自动反写、覆盖或合并 Git。
+## Retrieval
 
-同时禁止：
+Agent 默认索引优先、最小必要上下文：
 
-```text
-Git ↔ Feishu
-```
+1. Context；
+2. Registry；
+3. 与任务相关的最多少量完整文档；
+4. 相关代码、测试和证据。
 
-不建立双向同步，不维护两个可独立修改的权威版本。
-
-## Agent Rules
-
-- Agent 先读取 Git，不把 Feishu 当作启动依赖；
-- Feishu 内容不能未经 Review 成为项目事实；
-- 不因外部页面更新而自动修改 Git；
-- 发现投影与 Git 不一致时报告 Drift；
-- 任何未来投影写入都必须单独授权、预览并回读验收；
-- 当前 Task 不执行任何 Feishu 操作。
+不默认扫描全部仓库或全部飞书。

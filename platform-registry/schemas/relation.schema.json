@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Platform Relation",
+  "type": "object",
+  "required": [
+    "from",
+    "type",
+    "to"
+  ],
+  "properties": {
+    "from": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "to": {
+      "type": [
+        "string",
+        "array"
+      ]
+    }
+  }
+}

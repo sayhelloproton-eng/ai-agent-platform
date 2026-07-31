@@ -1,0 +1,42 @@
+version: 1
+baseline_commit: bd31893ddb9bb2efeb3cb38f67f1add66735cd79
+capabilities:
+- id: CAP-RUNTIME-STATUS
+  status: verified
+  implemented_by:
+  - APP-GATEWAY
+  - APP-RUNTIME
+  - APP-DEV-TUNNEL
+  evidence:
+  - apps/action-gateway/tests/gateway.test.mjs
+  - apps/local-runtime/tests/runtime.test.mjs
+  - apps/dev-tunnel/tests/dev-tunnel.test.mjs
+  - context/current-status.md
+- id: CAP-GATEWAY-PING
+  status: verified
+  implemented_by:
+  - APP-GATEWAY
+  - APP-RUNTIME
+  evidence:
+  - apps/action-gateway/tests/gateway.test.mjs
+  - apps/local-runtime/tests/runtime.test.mjs
+- id: CAP-TASK-CONTROL
+  status: designing
+  implemented_by: []
+  evidence: []
+- id: CAP-APPROVAL
+  status: candidate
+  implemented_by: []
+  evidence: []
+- id: CAP-EVIDENCE
+  status: candidate
+  implemented_by: []
+  evidence: []
+- id: CAP-HEALTH-RECOVERY
+  status: candidate
+  implemented_by: []
+  evidence: []
+- id: CAP-AI-VIDEO-WORKFLOW
+  status: idea
+  implemented_by: []
+  evidence: []

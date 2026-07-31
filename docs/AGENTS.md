@@ -1,114 +1,37 @@
 # Documentation and Knowledge Asset Rules
 
-> 作用范围：`docs/**`。本文件细化根项目宪法，不得推翻根 `AGENTS.md`。
+> 作用范围：`docs/**`。
 
-## 1. 文档类型
+## 文档边界
 
-正式知识资产按职责区分：
+- `knowledge/`：面向人的正式知识与飞书发布源；
+- `technical/`：实现方案、调研、治理、运维和迁移；
+- `learning/`：学习过程和来源；
+- `adr/`：正式决策；
+- `templates/`：统一模板。
 
-- **Project Context**：愿景、背景、目标、非目标和约束；
-- **Architecture**：架构驱动、视图、边界、数据流和权衡；
-- **Domain**：领域、实体、值对象、聚合、服务和不变量；
-- **ADR**：已评审的架构决策及其后果；
-- **Research**：外部资料、候选方案和证据来源；
-- **Experiment**：实际环境、方法、观察、结果和限制；
-- **Skill Design**：Skill 的领域定位、能力边界和契约；
-- **Workflow**：步骤、状态、输入输出、失败和恢复；
-- **Engineering**：工程规范、模块说明和实现约束；
-- **Current State**：当前阶段、完成项、进行中、阻塞和下一步；
-- **Current Task**：当前任务的范围、交付物、验收和状态。
+## 正文与元数据
 
-不同类型不得混用：
+正文服务人的理解，不使用大段 YAML Front Matter 保存系统关系。
 
-- Research 回答“查到了什么”；
-- Experiment 回答“实际验证了什么”；
-- ADR 回答“项目最终决定了什么”。
+稳定 ID、状态、Canonical Path、关系、实现证据、飞书映射和 Release 进入 `platform-registry/`。
 
-未经验证的 Research 不得写成实验结果；未经 Project Owner 接受的观察或建议不得标记为 Accepted ADR。
+## 事实纪律
 
-## 2. 正式事实和证据
+- Research、Experiment、ADR、Current State 不得混用；
+- 已完成、已验证、已接受必须有证据；
+- 当前实现与目标设计必须分开；
+- superseded 内容保留历史关系；
+- ID 不得复用。
 
-- Git 文档是正式知识资产的唯一真源；
-- Chat、执行输出和飞书页面不是自动成立的正式事实；
-- 已完成、已验证、已接受等表述必须有来源或证据；
-- 推测、观察、验证和决策必须明确区分；
-- 历史材料不得覆盖最新 Accepted ADR、代码、测试或 Current State。
+## README
 
-## 3. Asset ID 与索引
+每个长期目录必须有 README，并登记目录职责、文件、子目录、入口、状态和维护规则。
 
-需要稳定 `asset_id` 的正式资产包括：
+## 飞书
 
-- Project Context、Architecture、Domain；
-- ADR、Research、Experiment；
-- Skill Design、Workflow、Engineering；
-- 其他需要长期引用、关联或飞书投影的正式资产。
+只有 `docs/knowledge/` 可发布。
 
-规则：
+发布采用零预读、逐篇 overwrite，不做语义 Diff、合并或反向同步。
 
-- 新建前检查 `docs/technical/元数据/assets.yaml`，不得自行创造冲突编号；
-- 文件移动、重命名和飞书投影调整时原则上保持 `asset_id` 不变；
-- 新增、移动、废弃或改变关系时，检查 Asset Index 和 Relation Index；
-- `superseded`、`archived` 和替代关系必须保留演进证据，不得静默删除；
-- 索引与正文冲突时必须报告 Drift。
-
-## 4. Git 与飞书
-
-- Feishu Projection 只由 `docs/knowledge/` 构建，不是第二真源或协作源；
-- 外部 Feishu 内容形成项目结论前，必须先进入 Git Draft 并经过 Review；
-- 修改 `docs/knowledge/` 时，检查是否影响下一次 Overwrite Publish；
-- 飞书内容不得自动反写或覆盖 Git；
-- 飞书写入需要 Write Plan、人工确认和回读验收；
-- 除非任务明确授权，本目录修改不得自动发布 Feishu Projection。
-
-详细规则见 [`governance/git-feishu-governance.md`](./technical/治理规则/git-feishu-governance.md)。
-
-## 5. 文档修改检查
-
-根据资产类型检查以下适用部分：
-
-- What；
-- Why；
-- Problem；
-- Context；
-- Decision；
-- Alternatives；
-- Implementation；
-- Result；
-- Lessons；
-- Next；
-- Related Assets；
-- 状态和证据等级；
-- 链接、路径和引用；
-- 是否重复、冲突或过时；
-- 是否影响索引和 Knowledge Projection。
-
-不得为满足模板而编造不适用内容。缺失事实应标记待确认。
-
-## 6. README 与目录
-
-新增长期文档目录时必须创建 `README.md`，至少说明：
-
-- 目录职责；
-- 允许的文件类型；
-- 命名和 Asset ID 规则；
-- 关键结构；
-- 使用和维护方式；
-- 与其他目录的边界；
-- 相关架构、ADR、Skill、Workflow 和 Projection 规则。
-
-机器生成、外部镜像或固定格式目录如果不适合 README，必须由父目录 README 记录例外和原因。
-
-详细规范见 [`governance/documentation-rules.md`](./technical/治理规则/documentation-rules.md)。
-
-## 7. 修改与验收
-
-修改 `docs/**` 前：
-
-1. 确定文档类型和权威来源；
-2. 检查相关 ADR、代码、测试和索引；
-3. 锁定允许修改范围；
-4. 对批量迁移、归档或飞书投影先给出计划；
-5. 修改后检查 Markdown、链接、状态、Asset ID、索引和 Git diff；
-6. 明确报告未验证、未发布和未完成项。
-
-不得借文档整理顺手重构仓库、修正未授权旧文档或执行飞书写入。
+除非任务明确授权，不执行飞书写入。

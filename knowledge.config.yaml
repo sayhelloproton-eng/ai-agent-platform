@@ -1,4 +1,4 @@
-version: 3
+version: 4
 project: ai-agent-platform
 
 source_of_truth:
@@ -7,21 +7,31 @@ source_of_truth:
 knowledge_source:
   path: docs/knowledge/
 
+registry:
+  root: platform-registry/
+  asset_index: platform-registry/assets.yaml
+  relation_index: platform-registry/relations.yaml
+  projection_index: platform-registry/projections.yaml
+  implementation_status: platform-registry/implementation-status.yaml
+  release_index: platform-registry/releases.yaml
+  engineering_insights: platform-registry/registries/engineering-insights/
+
 projection:
   target: feishu
   mode: overwrite
   direction: one_way
   structure: one_to_one
+  pre_read_content: false
+  semantic_diff: false
+  reverse_write_allowed: false
   require_write_preview: true
   require_human_confirmation: true
-  require_read_back_verification: true
+  require_api_verification: true
 
-governance:
-  asset_id_required: true
-  formal_asset_requires_review: true
-  accepted_adr_requires_human_approval: true
-  preserve_superseded_history: true
-  default_evidence_level: hypothesis
+publisher:
+  image_source: knowledge-assets
+  image_reference_scheme: asset
+  upload_images: true
 
 retrieval:
   strategy: index_first
@@ -34,35 +44,16 @@ paths:
   docs_root: docs
   context_root: context
   knowledge_root: docs/knowledge
-  images_ref: knowledge-assets
   technical_root: docs/technical
   learning_root: docs/learning
   adr_root: docs/adr
+  templates_root: docs/templates
+  archive_root: docs/technical/归档
   project_context: context/project-context.md
+  architecture_context: context/architecture-context.md
   current_state: context/current-status.md
-  current_task: null
-  project_outline: docs/knowledge/项目与产品/CTX-003-项目总览.md
   roadmap: context/roadmap.md
-  platform_vision: docs/knowledge/项目与产品/PRD-001-平台愿景.md
-  target_architecture: docs/knowledge/架构与领域/平台架构/ARC-001-平台目标架构.md
-  delivery_architecture: docs/knowledge/架构与领域/平台架构/ARC-003-六个月交付架构.md
-  domain_model: docs/knowledge/架构与领域/领域模型/DOM-001-核心领域模型.md
-  skill_design: docs/knowledge/Agent与能力/Skill设计/SKL-001-AI知识技能.md
-  workflows: docs/knowledge/工作流
-  knowledge_system: docs/knowledge/知识系统
-  runtime_architecture: docs/technical/架构实现
-  solutions: docs/technical/技术方案
-  research: docs/technical/技术调研
-  experiments: docs/knowledge/实验与复盘
-  adr: docs/adr
-  engineering: docs/technical/工程规范
-  operations: docs/technical/运维与迁移
-  portfolio: docs/knowledge/作品集
-  asset_index: docs/technical/元数据/assets.yaml
-  relation_index: docs/technical/元数据/relations.yaml
-  migration_inventory: docs/technical/元数据/migration-inventory.yaml
-  templates: docs/technical/工程规范/模板
-  archive: docs/technical/Archive
+  knowledge_strategy: context/knowledge-strategy.md
 
 runtime_evidence:
   store_full_agent_logs_in_docs: false

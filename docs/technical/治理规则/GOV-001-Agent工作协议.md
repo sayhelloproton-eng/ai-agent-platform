@@ -1,4 +1,4 @@
-# Agent Working Protocol
+# GOV-001 Agent 工作协议
 
 ## 1. 目的
 
@@ -206,3 +206,11 @@ Skill 不替 Project Owner 接受 ADR，不把飞书 CRUD 当作上层领域能�
 - 方案、替代方案和权衡明确；
 - 分阶段步骤、停止条件和验收明确；
 - 不把未来计划描述为已实现。
+
+## 当前执行模式
+
+当前 Chat 负责目标、架构、正式正文、任务拆解与 Commit 复审；Codex / Work 负责真实仓库修改、测试、Commit 和证据。
+
+一个完整逻辑批次对应一个主 Commit。每个 Commit 推送后，当前 Chat 必须按固定 SHA 重新读取真实 Diff，再决定修正或下一批。
+
+Codex 不读取飞书正文，不做 Git / 飞书语义 Diff，也不自行改变稳定 ID 和知识树。

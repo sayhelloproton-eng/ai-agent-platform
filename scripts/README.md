@@ -5,6 +5,7 @@
 当前脚本：
 
 - `repo-check.mjs`：检查 Node.js、必要资产、workspace 契约和敏感文件跟踪状态；
+- `platform-registry-check.mjs`：检查资产 ID、关系词表、Projection 安全策略和必要 Registry 文件；
 - `local-chain-test.mjs`：在随机 loopback 端口验证 Gateway → Runtime 双层认证、Policy 和真实 TaskResult；
 - `local-stack.mjs`：以前台方式依次启动 Runtime 与 Gateway，校验外部/内部 Key，并处理 SIGINT/SIGTERM；
 - `local-stack-test.mjs`：验证配置失败、启动顺序、真实任务、日志脱敏、关闭、端口回收和无孤儿进程。
@@ -27,6 +28,8 @@ npm run dev-tunnel:openapi
 
 ```bash
 npm run check:repo
+npm run check:insights
+npm run check:registry
 npm run check:local-chain
 npm run check:local-stack
 npm run verify

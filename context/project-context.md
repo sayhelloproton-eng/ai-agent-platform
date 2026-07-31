@@ -2,37 +2,46 @@
 
 ## 项目是什么
 
-`ai-agent-platform` 是面向个人学习、工程实践和求职 Portfolio 的长期 AI Agent 工程平台。
+`ai-agent-platform` 是面向 AI Agent 工程学习、真实平台建设、知识治理、多 Agent 协作和求职 Portfolio 的长期工程项目。
 
-它以 ChatGPT / Chat 作为交互和决策入口，逐步组织 Agent、工具、知识与工作流，使工程任务能够被理解、执行、验证、恢复和持续演进。
+它不是单个聊天机器人，也不是提示词集合，而是把 Chat、Custom GPT、Codex、Gateway、Runtime、Skills、知识、代码、测试和基础设施组织成可持续演进的工程系统。
 
 ## 为什么创建
 
-AI 工程实践常被分散在聊天、临时提示词、工具调用和局部实验中。新的 Agent 会话难以知道项目为什么存在、已经决定了什么、当前应该做什么，也容易把计划误认为实现。
+用户原本从事前端开发，正在向 Agent 开发和全栈 Agent 工程方向转型。项目必须通过真实代码、架构、实验、Demo 和工程证据形成职业竞争力，而不能停留在工具使用和概念学习。
 
-本项目通过 Git 中可审阅、可追踪、可恢复的工程上下文，把零散探索转化为长期项目能力和可信 Portfolio 证据。
+长期实践中的主要问题包括：
 
-## 解决什么问题
+- 项目知识散落在长聊天和临时输出中；
+- 新 Agent 难以恢复真实上下文；
+- 产品能力、平台设计和当前实现容易混淆；
+- 强模型 Token 被机械执行消耗；
+- 文档、代码、决策和飞书缺少稳定关系；
+- 多角色和多任务缺少可靠状态与治理。
 
-- 项目上下文依赖历史聊天，无法被新会话稳定恢复；
-- 愿景、状态、架构与执行规则缺少统一入口；
-- 模型、工具、设备和 Provider 容易与业务耦合；
-- 计划、实现、验证和正式结论容易混淆；
-- 工程实践缺少可复现、可解释、可审计的证据。
+## 长期目标
 
-## 最终目标
+- 建立可运行、可解释、可验证的 Agent 工程平台；
+- 让 Task、Agent、Capability、Workflow、Knowledge 与 Result 具有稳定边界；
+- 让模型、工具、设备和 Provider 可替换；
+- 让 Chat 负责高价值推理，执行器负责真实变更；
+- 让知识、代码、测试、决策和证据可追踪；
+- 让上层产品可以依托平台孵化；
+- 形成可用于简历和面试的真实 Portfolio。
 
-逐步构建一个真实可运行的 AI Agent 工程平台：
+## 当前主线
 
-- 新 Agent 能从 Git 获取最小必要上下文；
-- Task、Agent、Capability、Workflow、Knowledge 与 Result 具有清晰边界；
-- 模型、工具、设备和 Provider 可以替换；
-- 工程任务有明确输入、权限、执行、验证与结果；
-- 复杂业务工作流可以在统一边界下组合和演进；
-- 项目成果能够以代码、测试、文档、实验和 Demo 提供证据。
+1. Knowledge Foundation：已完成首轮；
+2. AI Coding Workflow：已完成首个 Actions → Gateway → Runtime MVP；
+3. 知识资产重构与平台治理：当前进行中；
+4. Task Control、Approval、Evidence、Recovery：后续；
+5. AI Video Workflow：未来真实业务验证。
 
-最终目标是长期方向，不表示这些能力当前已经实现。
+## 非目标
 
-## 当前任务边界
-
-Task 001 只建立 Context Foundation。当前不实现 Feishu、MCP、Gateway、Action、Runtime 或任何业务代码。
+- 当前不建设通用 Agent SaaS；
+- 不采用 LangGraph 作为当前核心；
+- 不预建根级 `products/`；
+- 不提前创建没有真实资产的包和目录；
+- 不把飞书作为第二真源；
+- 不把未验证设计写成实现。

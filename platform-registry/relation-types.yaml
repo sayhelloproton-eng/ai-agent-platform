@@ -1,0 +1,38 @@
+version: 1
+types:
+- id: explains
+  description: 知识或技术文档解释某资产
+- id: implements
+  description: 代码、Skill、Workflow 或方案实现某能力
+- id: configured_by
+  description: 资产由配置或 Registry 定义
+- id: uses_skill
+  description: Agent 或 Workflow 使用 Skill
+- id: loads_knowledge
+  description: Agent 加载 Knowledge Pack
+- id: governed_by
+  description: 资产受 ADR、AGENTS 或治理规则约束
+- id: validated_by
+  description: 资产由测试、实验或证据验证
+- id: distilled_from
+  description: 正式知识从学习、调研、复盘或洞见提炼
+- id: projected_to
+  description: Git 知识投影到外部节点
+- id: supersedes
+  description: 新资产替代旧资产
+- id: superseded_by
+  description: 旧资产被新资产替代
+- id: depends_on
+  description: 运行或设计依赖
+- id: belongs_to_product
+  description: 资产归属某上层产品
+- id: supports_product
+  description: 平台能力支持某产品
+- id: produces
+  description: 资产产生另一个资产或证据
+- id: consumes
+  description: 资产消费另一个资产或输入
+- id: decided_by
+  description: 资产由 ADR 或正式决策确定
+- id: derived_from
+  description: 资产由上游资料、调研或实践派生

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Registry Release",
+  "type": "object",
+  "required": [
+    "release_id",
+    "source_commit",
+    "status"
+  ],
+  "properties": {
+    "release_id": {
+      "type": "string"
+    },
+    "source_commit": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    }
+  }
+}

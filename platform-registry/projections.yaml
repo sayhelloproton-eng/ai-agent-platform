@@ -1,0 +1,9 @@
+version: 1
+project: ai-agent-platform
+provider: feishu
+direction: git_to_feishu
+mode: overwrite
+pre_read_content: false
+semantic_diff: false
+reverse_write: false
+mappings: []

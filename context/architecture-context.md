@@ -1,11 +1,9 @@
 # Architecture Context
 
-## 当前架构思想
+## 长期六层架构
 
 ```text
-User
-  ↓
-ChatGPT Interface
+Agent Interface
   ↓
 Agent Brain
   ↓
@@ -18,50 +16,82 @@ Knowledge Layer
 Infrastructure
 ```
 
-## 分层含义
+## 当前真实实现
 
-### User
+```text
+Custom GPT
+  → Microsoft Dev Tunnels
+  → Action Gateway
+  → Local Runtime
+  → gateway.ping / runtime.status
+```
 
-提出目标、约束和验收要求，并对架构方向、高风险操作与正式决策做最终确认。
+当前已实现：
 
-### ChatGPT Interface
+- Interface：正式 Custom GPT 与 Action；
+- Public Entry：Microsoft Dev Tunnels 开发期公网入口；
+- Control Boundary：Gateway 认证、Policy、Task 构造和 Runtime 转发；
+- Execution Boundary：Runtime 二次认证、二次 Policy、Capability 执行和 TaskResult；
+- Shared Contracts：contracts、auth、policy；
+- Knowledge and Skills：Git 文档、四个 Skill、Engineering Insight Registry；
+- Evidence：测试、验收记录、Commit 和真实调用结果。
 
-承担交互、需求澄清、任务组织和结果沟通，不把聊天内容自动视为正式项目事实。
+## 目标架构
 
-### Agent Brain
+### 认知平面
 
-理解目标、选择能力、组织上下文与制定执行策略。它应依赖稳定 Contract 和 Port，不绑定单一模型或 Provider。
+- Chat / 总控 Agent；
+- 专业 Agent；
+- Agent Profile；
+- Knowledge Pack；
+- Skills；
+- 上下文选择与证据推理。
 
-### Agent Runtime
+### 控制平面
 
-负责执行生命周期、状态、重试、权限和可观测性。该层是长期方向，当前尚未建设。
+- Task Contract；
+- Task State；
+- Agent / Executor Registry；
+- Policy；
+- Approval；
+- Evidence；
+- Side-effect Ledger；
+- Health Event；
+- Recovery；
+- Resource Lease。
 
-### Tool Layer
+### 执行平面
 
-封装 Agent 可调用的工程能力，并通过明确输入、输出和错误边界连接外部系统。
+- Codex / Work；
+- Local Runtime；
+- Browser / CLI / API Adapter；
+- Git Branch / Worktree；
+- 模型和外部 Provider；
+- 可替换执行器。
 
-### Knowledge Layer
+### 知识与资产平面
 
-提供正式知识、上下文检索、关系、状态和证据。Git 是其正式事实来源；Feishu 只能是投影。
+- Git 正式知识；
+- Platform Registry；
+- Engineering Insight Registry；
+- Agent Profile；
+- Knowledge Pack；
+- Feishu Projection；
+- Release 与变更影响。
 
-### Infrastructure
+## 当前差距
 
-承载模型、存储、代码平台、设备、网络和外部 Provider。上层不应依赖某一个具体实现。
+最小 Runtime 已经存在，但完整执行生命周期、持久状态、重试、暂停、恢复、审批、证据和多执行器调度尚未实现。
+
+Cloudflare Edge 是历史 superseded 路线。当前公网入口是 Microsoft Dev Tunnels，且只用于开发期 MVP。
 
 ## 架构原则
 
-- 业务与模型解耦；
-- 业务与设备解耦；
-- Domain 与 Provider 解耦；
-- 上层依赖 Port、Contract 和稳定接口；
-- 模型、Tool、Provider 和设备可替换；
-- 优先简单、清晰、可验证的实现；
-- 计划能力与已实现能力必须明确区分。
-
-## 渐进式建设
-
-这张分层图描述长期架构方向，不是当前实现清单。
-
-当前只建设 **Knowledge Layer / Context Foundation**。后续模块必须按 Roadmap 逐步进入，并且只有在存在真实调用方、测试和验收证据时，才能被标记为已实现。
-
-Task 001 禁止提前实现 Gateway、MCP、Action、Agent Runtime、业务代码或其他未来模块。
+- 业务与模型、设备和 Provider 解耦；
+- 上层依赖 Contract、Port 和稳定接口；
+- 外部调用方只提交业务意图和必要参数；
+- 身份、权限、路由和内部协议由受信任服务端生成；
+- 默认拒绝、最小权限和双层校验；
+- 当前与目标必须分开；
+- 真实调用路径优先于 Mock；
+- 阶段适配优先于永久平台承诺。

@@ -12,10 +12,11 @@
 
 Policy 不负责认证、不执行 Capability、不读取环境变量，只依赖 Contracts。
 
-Action Gateway 当前使用的默认 Policy 只允许：
+Action Gateway 与 Local Runtime 当前默认 Policy 允许：
 
 ```text
 gateway.ping
+runtime.status
 ```
 
 当前尚无动态策略管理、角色权限或持久化配置。

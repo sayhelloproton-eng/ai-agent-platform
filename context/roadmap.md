@@ -1,55 +1,60 @@
 # Roadmap
 
-本 Roadmap 描述阶段顺序，不代表后续能力已经实现。每一阶段必须在上一阶段通过验收并获得人工确认后再开始。
+## Phase 1：Knowledge Foundation
 
-## Phase 1: Knowledge Foundation
+状态：**Completed**
 
-建立 Project Context Root、项目级 Context、Git 唯一真源、Knowledge Strategy 与 AI Knowledge Skill，使新 Agent 能恢复项目方向并受控管理长期知识。
+已完成 Git 唯一真源、AI Knowledge Skill、知识发布、图片 Publisher 和首轮知识治理。
 
-当前状态：**Completed**
+## Phase 2：AI Coding Workflow
 
-> Task 001（Context Foundation）、Task 002（知识资产组织）、Task 003-A/B/C（知识配置 v3.0、Project Profile、治理规则对齐）及 `skills/ai-knowledge/` v1.2.0 已完成交付。
-
-## Phase 2: AI Coding Workflow
-
-建立 ChatGPT → Task → Codex → Git 的可追踪工程闭环，包括 Task Contract、Gateway / Bridge、执行、测试、Result、Branch / Commit / PR 和知识回写。
-
-当前状态：**In Progress**
+状态：**MVP Verified / Platform Incomplete**
 
 已完成：
 
-- Gateway MVP 渐进式实施方案；
-- npm workspaces 根级工程基础，包括 Node.js 版本约束、lock 文件和统一验证入口；
-- `packages/contracts`：Task / Result / Error Contract v1、Capability 白名单、运行时校验和测试；
-- `apps/action-gateway`：本地 `/health`、`/ready`、Request ID 与统一安全响应格式；
-- `packages/auth` 与 Gateway API Key 认证：安全密钥比较、Header 脱敏和受保护 Capability 查询；
-- `packages/policy`：Capability 级默认拒绝、明确允许和 Gateway 可见能力过滤；
-- `apps/local-runtime`：本地 health、Task Contract 校验、Runtime Policy 二次校验、安全 Capability 调度和 `TaskResult`；
-- Action Gateway → Local Runtime：受保护 Task 转发、双层 API Key、双层 Policy、Runtime Client 和真实本地链路验证。
-- 公网接入前安全加固：TaskResult 与原 Task 的 `taskId` 绑定、Header 前与 Body 阶段 Timeout 映射、Runtime 二次 Policy 真实链路、未读请求 Body 排空和 Gateway 固定入站 Timeout。
-- 公网入口前应用保护与本地编排：单实例 Rate Limit、Gateway / Runtime 无队列并发 Gate、Runtime Busy 安全映射和 Local Stack 启停验证。
-- Microsoft Dev Tunnels 持久公网入口：官方 macOS x64 CLI、8787/http、匿名 Tunnel 层、Gateway Bearer 层、公网 runtime.status、URL 重启稳定性和显式 refresh 已验证。
-- Custom GPT Actions MVP：正式 GPT 已创建并通过自然语言触发零参数 `POST /v1/runtime/status`；Gateway 服务端构造内部 `TaskRequest`，Builder Bearer 认证及显式 `components.schemas: {}` 兼容性均已完成真实验收。
-- Cloudflare Edge 活跃路线已由 Project Owner 决定淘汰，历史方案标记为 superseded。
+- Contracts、Auth、Policy；
+- Action Gateway；
+- Local Runtime；
+- Microsoft Dev Tunnels；
+- Custom GPT `runtime.status` 正式调用；
+- 安全和并发加固；
+- Engineering Insight Distillation 与 Registry。
 
-下一项：
+## Phase 2.5：Knowledge Asset Rebuild and Platform Governance
 
-- 审阅并提交 Microsoft Dev Tunnels + Custom GPT Actions MVP 最终差异，再由 Project Owner 确认 Phase 2 后续批次。
+状态：**In Progress**
 
-后续债务：
+顺序：
 
-- Cloudflare 远端资源清理需独立授权，不属于本次 MVP 收尾。
+1. 控制面、Context、Platform Registry 和目标目录；
+2. 项目入口与产品体系；
+3. 基础产品能力与理论；
+4. 平台架构与知识系统；
+5. 智能体资产与工作流；
+6. 实验、作品集与来源；
+7. 正式视觉资产；
+8. 全库 Review；
+9. 飞书逐篇 overwrite。
 
-## Phase 3: AI Video Workflow
+## Phase 2 Next：Task Control and Trusted Execution
 
-以真实复杂业务验证 Agent、Tool、Knowledge、Workflow 与 Provider 的组合能力。
+目标：
 
-当前状态：**Not Started**
+- 动态 Task State；
+- Execution Lane；
+- Branch / Worktree；
+- Approval；
+- Evidence；
+- Side-effect Ledger；
+- Health & Recovery；
+- 多执行器适配。
 
-## Roadmap Rules
+只有产生真实调用方、测试和证据后才创建代码包。
 
-- 当前一次只执行一个 Phase 内的一个明确任务；
-- 不因长期架构存在而提前实现未来模块；
-- 阶段完成必须有实际交付物与验证证据；
-- 阶段顺序、目标或架构方向的变化由 Project Owner 确认；
-- 计划中的能力不得描述为已实现。
+## Phase 3：AI Video Workflow
+
+状态：**Not Started**
+
+以真实视频业务验证平台能力，包括故事理解、角色和场景、分镜、提示词、模型 Adapter、评估重试、成本和 Demo。
+
+AI 视频工作流依托 `ai-agent-platform`，不创建根级 `products/`。

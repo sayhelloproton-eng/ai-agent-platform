@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Feishu Projection",
+  "type": "object",
+  "required": [
+    "asset_id",
+    "git_path",
+    "node_id",
+    "mode"
+  ],
+  "properties": {
+    "asset_id": {
+      "type": "string"
+    },
+    "git_path": {
+      "type": "string"
+    },
+    "node_id": {
+      "type": "string"
+    },
+    "mode": {
+      "const": "overwrite"
+    },
+    "source_commit": {
+      "type": "string"
+    }
+  }
+}

@@ -1,251 +1,182 @@
 # AI Agent Platform Project Constitution
 
-> 本文件是 `ai-agent-platform` 中人类协作者、ChatGPT、Codex 和其他 Agent 共同遵守的最高项目级规则。详细操作规范由下层 `AGENTS.md` 和 `docs/governance/` 细化，但不得推翻本宪法。
+> 本文件是 `ai-agent-platform` 中人类协作者、当前 ChatGPT、Codex / Work 和其他 Agent 共同遵守的最高项目规则。
 
 ## 1. 项目定位
 
-`ai-agent-platform` 是面向个人学习、工程实践和求职 Portfolio 的 AI Agent 工程平台。
+`ai-agent-platform` 是面向 AI Agent 工程学习、真实平台建设、知识治理、多 Agent 协作和求职 Portfolio 的长期工程项目。
 
-项目长期建设：
+项目必须同时形成：
 
-- 以 ChatGPT / Chat 为交互和决策入口；
-- 以 Task、Agent、Capability、Workflow、Knowledge、Result 为核心领域；
-- 通过 Gateway、Application Service、Port 和 Adapter 接入模型、工具、知识库、代码平台和存储；
-- 让模型、设备、Tool、Provider 和业务工作流可替换；
-- 形成真实可运行能力、可解释工程证据和可展示业务成果。
+- 可运行代码；
+- 可解释架构；
+- 可验证实验；
+- 可追踪决策；
+- 可恢复上下文；
+- 可展示 Demo 与作品集。
 
-本项目不是：
-
-- 单纯的飞书知识库或 Feishu CLI 包装器；
-- 单纯的 ChatGPT → Codex 转发器；
-- 只有架构图、没有真实实现的概念项目；
-- 当前六个月内一次性实现完整通用 Agent SaaS。
-
-## 2. 六个月优先级
-
-> 本节目的是高层优先级概述。详细分阶段路线图见 [`context/roadmap.md`](context/roadmap.md)，两文件必须保持一致，冲突时 Agent 报告 Drift。
-
-### Phase 1：Knowledge Foundation（已交付）
-
-完成 Git + Feishu + AI Knowledge Skill：项目知识、索引、受控投影、回读验收和 Drift 检测。
-
-当前状态：Context Foundation（Task 001）、知识资产组织（Task 002）、知识配置与治理（Task 003A/B/C）已交付。
-
-### Phase 2：AI Coding Workflow
-
-完成 ChatGPT → Task → Codex → Git：Task Contract、Gateway / Bridge、执行、测试、Result、Branch / Commit / PR 和知识回写。
-
-### Phase 3：AI Video Workflow
-
-以 AI 视频工作流验证真实复杂业务：文本处理、故事分析、人物场景、分镜提示词、模型适配、评估重试、成本记录和 Demo。
-
-长期总体架构必须保留。MVP 只决定优先级和验证范围，不代表删除未来能力：
-
-- `Now`：当前阶段实现；
-- `Next`：六个月内后续实现；
-- `Later`：保留边界，暂不实现。
-
-不得因暂不实现而删除长期能力，也不得提前创建没有调用方、测试和真实用途的大量空模块。
-
-## 3. 核心架构原则
-
-- 业务与模型解耦；
-- 业务与设备解耦；
-- Domain 与 Provider 解耦；
-- 上层依赖 Port、Contract 和稳定接口；
-- 模型、Tool、Provider 和设备可替换；
-- 优先使用简单、清晰、可验证的实现，但不得破坏长期边界；
-- Git 是正式项目事实的唯一真源；
-- 飞书只承担 Projection 和 Feishu Native 补充知识；
-- 飞书不得未经 Review 自动反写或覆盖 Git。
-
-## 4. 角色与决策边界
+## 2. 角色边界
 
 ### Project Owner
 
-负责最终目标、优先级、架构方向、ADR、高风险操作、公开范围和资产处置决策。
+负责最终目标、优先级、架构方向、高风险操作、正式决策和飞书写入授权。
 
-### ChatGPT / Architecture Advisor
+### 当前 ChatGPT
 
-负责需求澄清、研究比较、架构和领域设计、执行任务设计、验收标准与风险设计；不假定本地执行已经完成。
+负责：
 
-### Codex / Execution Agent
+- 目标理解；
+- 产品和架构规划；
+- 知识综合；
+- 正式正文；
+- 复杂图规格；
+- Codex 精确任务；
+- Commit 复审。
 
-负责读取授权范围、修改文件、运行验证并报告证据。不得自行改变项目愿景、阶段顺序和总体架构，不得用推断替代已接受决策。
+当前 Chat 不假装已经修改本机仓库。
 
-### AI Knowledge Skill
+### Codex / GPT Work
 
-负责最小上下文查询、Context Package、Knowledge Draft、Write Plan、Git / 飞书映射、受控投影和回读验收；不替 Project Owner 做最终决策。
+负责：
 
-详细职责见 [`docs/technical/治理规则/agent-working-protocol.md`](docs/technical/治理规则/agent-working-protocol.md)。
+- 读取授权范围；
+- 修改真实仓库；
+- 运行命令和测试；
+- 创建 Commit；
+- 返回 Diff、SHA 和证据。
 
-## 5. Agent 开始任务前
+Codex 不得自行改变项目思想、文章边界、稳定 ID 或长期架构。
 
-默认按顺序读取：
+### Custom GPT
 
-1. 根 `AGENTS.md`；
-2. 根 `README.md`；
-3. `context/current-status.md`、`context/roadmap.md` 和 `knowledge.config.yaml`；
-4. 与任务直接相关的目录 `AGENTS.md`、README、Architecture、ADR、Skill、Workflow、Research 或 Experiment；
-5. 目标文件和工作区状态。
+是专业角色入口，负责稳定 Instructions、角色知识、Actions 和专业交互。它不是任务数据库，不承担可靠跨会话状态。
 
-默认采用索引优先、最小必要上下文。
+### Gateway / Runtime
 
-当任务明确授权“完整 Review 仓库”“全量盘点”或“目录重构”时，可以执行受控全仓扫描。
-.private-context 是私有目录不允许提交到远程
+负责 Task Contract、身份、权限、状态、执行器连接、审批、证据和恢复。当前只实现最小安全调用链。
 
-## 6. 修改协议
+## 3. 事实优先级
 
-### Scope Lock
+发生冲突时：
+
+```text
+代码、测试、真实调用证据
+  ↓
+当前 main 的 Context、ADR 和治理规则
+  ↓
+Project Owner 与当前 Chat 已确认原则
+  ↓
+已 Review 的底稿与蓝图
+  ↓
+旧知识文章和历史建议
+```
+
+旧文档不能反向约束目标设计，但其历史、问题、实验和证据必须保留。
+
+## 4. Git、飞书与 Registry
+
+- Git 是唯一真源；
+- `docs/knowledge/` 是飞书唯一发布源；
+- `platform-registry/` 是资产身份、关系、状态、实现证据和投影的系统真源；
+- 飞书只允许 Git → Feishu；
+- 发布前禁止读取飞书正文；
+- 禁止语义 Diff、合并、反向同步和双向同步；
+- 映射建立后按文档 `node_id` 覆盖变化文档。
+
+飞书写入必须由 Project Owner 明确授权。
+
+## 5. 当前与目标
+
+必须明确区分：
+
+```text
+已验证实现
+部分实现
+已确认设计
+未来候选
+已被替代
+历史归档
+```
+
+不得把 MVP 描述为完整平台，不得把 Candidate / Provisional 工程洞见描述为 Accepted 标准。
+
+## 6. Scope Lock
 
 执行前必须明确：
 
-- 允许修改和新增的文件；
-- 禁止修改的范围；
-- 预期结果；
-- 验收方式。
+- 允许修改范围；
+- 禁止范围；
+- 输入基线 SHA；
+- 预期输出；
+- 验证命令；
+- Commit 信息。
 
-未经允许不顺手重构、不扩大范围。
+不得顺手扩大范围。
 
-### Plan Before Change
+## 7. 批次与提交
 
-总体架构、Contract / Schema、核心领域、基础设施依赖、权限、公开范围、批量迁移、删除、Force Push 和历史重写必须先报告计划；高风险操作必须获得明确确认。
+一个完整、可独立 Review、可回滚的逻辑批次对应一个主 Commit。
 
-### Execution
+流程：
 
-- 优先小批次、可 Review、可回滚的变更；
-- 不编造完成状态；
-- 无法完成时明确标记 `Blocked`、`Not Verified` 或 `Partially Completed`；
-- 未运行的验证不得声称通过；
-- 发现规则、事实或实现冲突时停止静默合并并报告。
+```text
+固定 SHA
+→ 执行批次
+→ 验证
+→ Commit 与 Push
+→ Chat 重新读取固定 SHA
+→ Review
+→ 修正或下一批
+```
 
-详细流程见 [`docs/technical/治理规则/agent-working-protocol.md`](docs/technical/治理规则/agent-working-protocol.md)。
+不采用每改一个小文件就提交，也不采用全仓一次性大爆炸提交。
 
-## 7. README 与目录级规则
+## 8. 文档与 Registry
 
-每个进入 Git、具有长期职责的目录必须包含 `README.md`。
+- 每个长期目录必须有有效 README；
+- 最近一级 README 必须说明目录、文件、入口和状态；
+- 正式资产必须有稳定 ID；
+- ID 不得复用；
+- 正文不保存大段系统 Front Matter；
+- 关系、投影、实现状态和发布记录进入 `platform-registry/`；
+- 被替代资产必须记录 `supersedes` / `superseded_by` / `merged_into`。
 
-- README 解释目录是什么、为什么存在、包含什么、边界、结构、使用和维护方式；
-- `AGENTS.md` 约束 Agent 如何修改该范围；
-- 不是每个目录都需要 `AGENTS.md`；
-- 只有存在特殊执行、验证或安全规则的目录才增加目录级 `AGENTS.md`；
-- 机器生成或固定格式目录若不适合 README，必须由父目录 README 记录例外。
+## 9. 复杂图
 
-详细规则见 [`docs/technical/治理规则/documentation-rules.md`](docs/technical/治理规则/documentation-rules.md)。
+复杂架构、跨层关系、多角色泳道、状态机、治理闭环和生命周期必须生成正式 SVG / PNG 资产。
 
-## 8. Git、飞书与正式事实
+图在正文冻结后生成。现有失败图不作为视觉基线。
 
-项目定位、状态、架构、ADR、Skill、Workflow、Schema、代码、测试和已验证结论必须以 Git 为最终权威。
-
-- Feishu Projection：由 Git 生成或对齐，冲突时 Git 胜出；
-- Feishu Native：可保存讨论、学习、外部资料和评审批注，但不是正式项目事实；
-- Native 内容影响架构、接口、状态或后续执行时，必须先晋升为 Git Draft，经 Review 和 Merge 后再发布；
-- 飞书写入必须先有 Write Plan 和人工确认，写入后回读验收；
-- 删除、移动、权限和公开分享不得自动执行。
-
-详细规则见 [`docs/technical/治理规则/git-feishu-governance.md`](docs/technical/治理规则/git-feishu-governance.md)。
-
-## 8.1 knowledge-assets 图片源资产分支
-
-`knowledge-assets` 是项目知识图片源资产仓库，不是 CDN、公网图床或飞书缓存。
-
-规则：
-- 本分支只允许图片（png/jpg/jpeg/svg），禁止代码、Markdown、配置或任何非图片资源；
-- 图片按文档级目录组织：`images/{docs/knowledge 子路径}/{文档名}/`
-- `main` 分支 Markdown 引用图片时使用 `asset://` 内部引用：
-  `![图名](asset://文档名/图片文件名.png)`
-- Publisher 负责：解析 `asset://` → 定位 knowledge-assets 文件 → 上传飞书 → 生成 image block
-- 禁止直接使用 GitHub Raw URL 或外部图床链接；
-- 本分支受保护（禁止删除、禁止 force push），永久存在，不参与业务开发。
-
-## 9. 公共仓库安全底线
+## 10. 安全底线
 
 禁止提交：
 
-- Token、Secret、Cookie、密码、私钥、认证缓存和 `.env`；
-- 个人隐私、与项目无关的求职资料或敏感工作材料；
-- 未授权第三方完整内容镜像；
-- 本地 Agent 运行状态或授权范围不明的数据。
+- Token、Secret、Cookie、密码、私钥和 `.env`；
+- 私人原文和未脱敏材料；
+- 未授权第三方全文；
+- 本地运行缓存和认证状态。
 
-不得自动删除正式资产、修改仓库权限、切换公开状态、Force Push 或重写 Git 历史。发现 Public Repository 存在敏感信息时，先报告路径和风险，由 Project Owner 决定修复方式。
+删除、权限、公开范围、Force Push 和历史重写必须单独授权。
 
-## 10. Definition of Done
+## 11. Definition of Done
 
 任务完成至少满足：
 
-- 交付物已创建或修改；
-- 实现符合任务范围和已确认架构；
-- 相关测试或验证已实际运行；
-- 相关 README 已更新；
-- 正式项目事实受影响时，对应文档已更新；
-- Git diff、文件清单和验证证据已提供；
-- 错误、限制和未完成项明确；
-- 未执行的内容没有被描述为已完成。
+- 交付物真实存在；
+- 只修改授权范围；
+- 验证实际运行；
+- README 与 Registry 同步；
+- 当前与目标未混淆；
+- Diff、Commit SHA 和限制已报告；
+- 未执行内容没有被描述为完成。
 
-## 11. 分层规则优先级
+## 12. 启动顺序
 
-1. 用户当前明确指令在任务范围内优先于仓库规则，但高风险操作仍需确认；
-2. 根 `AGENTS.md` 是最高项目宪法；
-3. 子目录 `AGENTS.md` 只能细化其目录规则，不得推翻根宪法；
-4. Governance 文档解释操作细节，不得改变上层决策边界；
-5. 发现冲突时立即停止并报告，不得自行选择方便的规则。
+1. 根 `README.md`；
+2. 根 `AGENTS.md`；
+3. `context/README.md`；
+4. `context/current-status.md`；
+5. 与任务直接相关的最小知识、技术方案、ADR、Skill、代码和测试；
+6. `platform-registry/` 中的相关资产与关系。
 
-## 12. 正式规则导航
-
-- 项目恢复入口：[`docs/technical/Archive/历史Context/recovery-map.md`](docs/technical/Archive/历史Context/recovery-map.md)
-- 当前项目状态：[`context/current-status.md`](context/current-status.md)
-- 项目上下文：[`context/project-context.md`](context/project-context.md)
-- 路线图：[`context/roadmap.md`](context/roadmap.md)
-- 知识策略：[`context/knowledge-strategy.md`](context/knowledge-strategy.md)
-- 文档目录规则：[`docs/AGENTS.md`](docs/AGENTS.md)
-- Skill 通用规则：[`skills/AGENTS.md`](skills/AGENTS.md)
-- Agent 工作协议：[`docs/technical/治理规则/agent-working-protocol.md`](docs/technical/治理规则/agent-working-protocol.md)
-- Git / Feishu 治理：[`docs/technical/治理规则/git-feishu-governance.md`](docs/technical/治理规则/git-feishu-governance.md)
-- 文档与 README 规范：[`docs/technical/治理规则/documentation-rules.md`](docs/technical/治理规则/documentation-rules.md)
-- 私有上下文与敏感资产：[`docs/technical/治理规则/private-context-and-sensitive-assets.md`](docs/technical/治理规则/private-context-and-sensitive-assets.md)
-- 知识配置：[`knowledge.config.yaml`](knowledge.config.yaml)
-
-修改本宪法必须说明原因和受影响规则，检查是否需要 ADR，并由 Project Owner 确认。
-
-## 13. 状态同步规则（强制）
-
-### 13.1 任务关闭前置检查
-
-任何任务关闭前，Agent 必须检查以下三个文件是否需要更新。只要有一项需要更新而未更新，任务视为 **未完成**，不得标记 Done：
-
-| 文件 | 当发生以下情况时必须更新 |
-|---|---|
-| `context/current-status.md` | 当前阶段、已完成项、进行中项或下一步发生变化 |
-| `context/roadmap.md` | 阶段推进、路线图新增或调整 |
-| `README.md` | 项目当前方向、架构或 Context Navigation 引用发生变化 |
-
-此检查不属于"建议"，不属于"顺手做一下"。不通过此检查 = 任务未关闭。
-
-### 13.2 Agent 启动 Context Drift 规则
-
-Agent 启动时，完成最小上下文读取后，必须交叉验证以下事实是否自洽，任一项不成立即为 **Context Drift**：
-
-- `context/current-status.md` 描述的阶段 vs. 仓库实际文件结构和 commit 历史
-- `knowledge.config.yaml` 中的 `version` 和路径引用 vs. 仓库实际文件存在性
-- `context/roadmap.md` 的阶段顺序 vs. `context/current-status.md` 的当前阶段
-
-**检测到 Context Drift 时**：
-1. 禁止基于不确定事实继续执行写操作（文件修改、删除、移动、提交）；
-2. 允许只读审计（读取、搜索、链接检查、路径验证、差异对比），向 Project Owner 收集证据并生成修复计划；
-3. 必须向 Project Owner 报告：哪个文件与哪个事实冲突、偏差是什么、建议修复范围；
-4. **Project Owner 可显式授权一个范围受限的修复任务**，Agent 在授权范围内执行修复；
-5. 任何例外必须在任务记录中保留授权依据和影响范围；
-6. 禁止 Agent 静默忽略 Drift 或自行选择"哪一方正确"。
-
-**不应被阻止的操作**：
-- 只读检查、证据收集和修复方案生成
-- Project Owner 明确授权的范围内修复
-- 非破坏性验证（如 `git diff --check`、路径存在性检查、链接验证）
-
-### 13.3 禁止行为
-
-- 基于过期 `current-status.md` 直接执行任务
-- 发现 drift 后自行"推测真实状态"并继续写操作
-- 静默忽略 Drift 不报告
-- 更新状态文件时把计划、假设或期望写成已完成事实
-- 任务关闭时以"这个文件和我的任务无关"为由跳过 13.1 检查
+只有任务明确授权全仓审计时才允许全量扫描。

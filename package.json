@@ -37,7 +37,9 @@
     "dev-tunnel:openapi": "npm run openapi --workspace @ai-agent-platform/dev-tunnel",
     "mvp:runtime-status": "npm run dev-tunnel:verify",
     "check:local-stack": "npm run local:build && node --test scripts/local-stack-test.mjs",
-    "verify": "npm run check:repo && npm run check:knowledge && npm run check:contracts && npm run check:auth && npm run check:policy && npm run check:gateway && npm run check:runtime && npm run check:dev-tunnel && npm run check:local-chain && npm run check:local-stack"
+    "verify": "npm run check:repo && npm run check:knowledge && npm run check:insights && npm run check:registry && npm run check:contracts && npm run check:auth && npm run check:policy && npm run check:gateway && npm run check:runtime && npm run check:dev-tunnel && npm run check:local-chain && npm run check:local-stack",
+    "check:insights": "node skills/engineering-insight-distillation/scripts/eval.mjs validate-registry platform-registry/registries/engineering-insights",
+    "check:registry": "node scripts/platform-registry-check.mjs"
   },
   "devDependencies": {
     "@types/node": "^20.19.43",

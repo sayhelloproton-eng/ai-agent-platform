@@ -87,7 +87,7 @@ Contract v1 只允许：
 - v1 不强制 `taskId` 使用 UUID；
 - v1 不拒绝所有未知字段；
 - 未提供 Schema 文件或跨语言代码生成；
-- 尚无 Gateway 或 Runtime 消费者。
+- 当前消费者为 `apps/action-gateway/` 与 `apps/local-runtime/`；跨语言 Schema 和代码生成仍未提供。
 
 ## Evolution
 
@@ -99,7 +99,6 @@ Contract v1 只允许：
 
 ## Related Docs
 
-- [SOL-006：Task / Result / Error Contract v1](../../docs/technical/技术方案/Gateway/SOL-006-Task-Result-Error-Contract-v1.md)
-- [Gateway MVP 渐进式实施方案](../../docs/technical/技术方案/Gateway/SOL-005-Custom-GPT-Actions与Gateway-MVP渐进式实施方案.md)
+- [SOL-006：Task / Result / Error Contract v1](../../docs/technical/技术方案/Task-Control/SOL-006-Task-Result-Error-Contract-v1.md)
 - [源码说明](src/README.md)
 - [测试说明](tests/README.md)

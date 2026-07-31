@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Platform Asset",
+  "type": "object",
+  "required": [
+    "asset_id",
+    "asset_type",
+    "status",
+    "canonical_path"
+  ],
+  "properties": {
+    "asset_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "asset_type": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "idea",
+        "candidate",
+        "designing",
+        "approved",
+        "partial",
+        "implemented",
+        "verified",
+        "deprecated",
+        "superseded",
+        "archived",
+        "accepted",
+        "adopted",
+        "proposed",
+        "validated"
+      ]
+    },
+    "canonical_path": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}
