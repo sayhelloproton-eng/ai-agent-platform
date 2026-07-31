@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Registry Migration",
+  "type": "object",
+  "required": [
+    "migration_id",
+    "source_commit",
+    "status",
+    "completed_batches",
+    "current_batch",
+    "next_batch",
+    "matrix",
+    "rules"
+  ],
+  "properties": {
+    "migration_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_commit": {
+      "type": "string",
+      "minLength": 7
+    },
+    "status": {
+      "enum": [
+        "planned",
+        "in_review",
+        "completed",
+        "blocked"
+      ]
+    },
+    "completed_batches": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "current_batch": {
+      "type": "string",
+      "minLength": 1
+    },
+    "next_batch": {
+      "type": "string",
+      "minLength": 1
+    },
+    "matrix": {
+      "type": "string",
+      "minLength": 1
+    },
+    "rules": {
+      "type": "object"
+    }
+  }
+}

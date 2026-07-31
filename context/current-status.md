@@ -1,13 +1,14 @@
 # Current Status
 
-## Baseline
+## Implementation Baseline
 
 ```text
 Branch: main
 Commit: bd31893ddb9bb2efeb3cb38f67f1add66735cd79
-Working Tree: clean
 Phase: 2.5 — Knowledge Asset Rebuild and Platform Governance
 ```
+
+该提交是进入知识资产重构前的实现事实基线。知识重构工作位于 `knowledge-rebuild-v2`，当前提交以该分支实际 HEAD 为准，不代表已经合并到 `main`。
 
 ## Verified Implementation
 
@@ -53,14 +54,39 @@ Phase: 2.5 — Knowledge Asset Rebuild and Platform Governance
 - 五条初始洞见，其中四条 provisional、一条 candidate；
 - 两轮离线 Pilot Eval。
 
-## Current Work
+## Knowledge Rebuild Status
 
-当前主任务：
+### Batch 01 — First Repository Materialization Completed
+
+- 根入口与 Context 控制面；
+- Platform Registry MVP；
+- Engineering Insight Registry 迁移；
+- `00～10` 目标知识树；
+- 技术目录职责拆分；
+- Registry 校验入口。
+
+Batch 01 已完成首次仓库落库，但仍处于 Review 阶段，不能描述为最终验收通过。
+
+### Current — Batch 01-R1
+
+- 修复 Context 当前状态；
+- 修复 Registry 计划资产与正式资产的状态混淆；
+- 将迁移矩阵纳入 Git；
+- 修复 `canonical_path`、`current_path` 与 `target_path` 语义；
+- 清理空 Generated 索引；
+- 增强 Registry 校验。
+
+### Not Started — Batch 02
+
+- `00_项目入口` 正式文章；
+- `01_产品体系` 正式文章；
+- 正式文章逐篇 Review；
+- 图片资产；
+- 飞书发布。
+
+后续总体顺序：
 
 ```text
-以固定 SHA 为实现事实
-→ 重构仓库控制面与 Platform Registry
-→ 重建正式知识树
 → 批量生成和落库正式文档
 → 全库 Review
 → 生成正式视觉资产

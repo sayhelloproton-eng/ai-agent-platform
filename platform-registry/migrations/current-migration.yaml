@@ -1,9 +1,12 @@
 version: 1
 migration_id: MIG-KNOWLEDGE-V2
 source_commit: bd31893ddb9bb2efeb3cb38f67f1add66735cd79
-status: approved
-current_batch: 01-control-plane
-matrix: 02_现有资产迁移矩阵.csv
+status: in_review
+completed_batches:
+- 01-control-plane
+current_batch: 01-r1-registry-consistency
+next_batch: 02-entry-and-product-documents
+matrix: platform-registry/migrations/asset-migration-matrix.csv
 rules:
   preserve_stable_ids: true
   reuse_asset_ids: false

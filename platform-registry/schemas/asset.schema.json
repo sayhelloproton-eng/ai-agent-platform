@@ -6,7 +6,13 @@
     "asset_id",
     "asset_type",
     "status",
-    "canonical_path"
+    "evidence_level",
+    "materialized",
+    "current_path",
+    "target_path",
+    "canonical_path",
+    "publication_status",
+    "migration_state"
   ],
   "properties": {
     "asset_id": {
@@ -35,9 +41,65 @@
         "validated"
       ]
     },
+    "evidence_level": {
+      "enum": [
+        "hypothesis",
+        "observed",
+        "decided",
+        "verified"
+      ]
+    },
+    "materialized": {
+      "type": "boolean"
+    },
+    "current_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "target_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "canonical_path": {
-      "type": "string",
-      "minLength": 1
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "publication_status": {
+      "enum": [
+        "unpublished",
+        "published"
+      ]
+    },
+    "migration_state": {
+      "enum": [
+        "planned",
+        "in_progress",
+        "complete",
+        "blocked"
+      ]
+    },
+    "superseded_by": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      ]
     }
   }
 }

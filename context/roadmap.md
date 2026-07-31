@@ -24,17 +24,26 @@
 
 状态：**In Progress**
 
-顺序：
+Batch 01 已完成首次仓库落库：
 
-1. 控制面、Context、Platform Registry 和目标目录；
-2. 项目入口与产品体系；
-3. 基础产品能力与理论；
-4. 平台架构与知识系统；
-5. 智能体资产与工作流；
-6. 实验、作品集与来源；
-7. 正式视觉资产；
-8. 全库 Review；
-9. 飞书逐篇 overwrite。
+- [x] 重构仓库入口和 Context；
+- [x] 建立 Platform Registry MVP；
+- [x] 建立目标知识树；
+- [x] 拆分技术目录职责；
+- [x] 迁移 Engineering Insight Registry。
+
+当前：
+
+- [ ] 完成 Batch 01-R1 Registry 与状态一致性修正。
+
+Batch 02 尚未开始：
+
+- [ ] 逐篇生成与 Review `00_项目入口`；
+- [ ] 逐篇生成与 Review `01_产品体系`；
+- [ ] 正式文章落库后更新 Registry；
+- [ ] 完成全部文档后发布飞书。
+
+后续批次再处理基础产品能力与理论、平台架构与知识系统、智能体资产与工作流、实验、作品集、来源、正式视觉资产和全库 Review。
 
 ## Phase 2 Next：Task Control and Trusted Execution
 

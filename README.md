@@ -8,12 +8,25 @@
 
 当前处于 **Phase 2.5：AI Coding Workflow 已完成首个端到端 MVP，进入知识资产重构与平台治理阶段**。
 
-固定事实基线：
+实现事实基线：
 
 ```text
 main
 bd31893ddb9bb2efeb3cb38f67f1add66735cd79
 ```
+
+该提交代表进入知识资产重构前的已验证实现事实，不代表当前知识重构分支已经合并到 `main`。
+
+知识资产重构工作状态：
+
+```text
+Branch: knowledge-rebuild-v2
+Commit: 以该分支实际 HEAD 为准
+Batch 01: 已完成首次仓库落库
+Current Review: Batch 01-R1
+```
+
+Batch 01 已首次落库控制面、Platform Registry、目标知识树和技术目录重构；当前正在进行 Batch 01-R1 状态与 Registry 语义修正，尚未完成最终验收。
 
 已验证链路：
 

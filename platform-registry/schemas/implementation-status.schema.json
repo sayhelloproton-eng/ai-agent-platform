@@ -4,20 +4,43 @@
   "type": "object",
   "required": [
     "id",
-    "status"
+    "status",
+    "implemented_by",
+    "evidence"
   ],
   "properties": {
     "id": {
-      "type": "string"
+      "type": "string",
+      "minLength": 1
     },
     "status": {
-      "type": "string"
+      "enum": [
+        "idea",
+        "candidate",
+        "designing",
+        "partial",
+        "implemented",
+        "verified",
+        "deprecated",
+        "superseded",
+        "archived"
+      ]
     },
     "implemented_by": {
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
     },
     "evidence": {
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
     }
   }
 }

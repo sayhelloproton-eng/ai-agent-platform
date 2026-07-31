@@ -1,0 +1,376 @@
+﻿current_path,kind,title,action,target_path,asset_id,reason,batch
+.gitignore,file,,keep_review,.gitignore,,保留并在相关批次复核,01-control-plane
+.nvmrc,file,,keep_review,.nvmrc,,保留并在相关批次复核,01-control-plane
+AGENTS.md,md,AI Agent Platform Project Constitution,revise,AGENTS.md,,同步角色边界、批次提交与飞书零预读覆盖策略,01-control-plane
+README.md,md,AI Agent Platform,revise,README.md,,重写为平台入口地图，统一当前实现、目标架构与知识导航,01-control-plane
+apps/README.md,md,Applications,revise,apps/README.md,,校准三个真实应用及当前链路,01-control-plane
+apps/action-gateway/README.md,md,Action Gateway,keep_review,apps/action-gateway/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+apps/action-gateway/package.json,json,,keep,apps/action-gateway/package.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/action-gateway/src/README.md,md,Source,keep_review,apps/action-gateway/src/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+apps/action-gateway/src/app.ts,ts,,keep,apps/action-gateway/src/app.ts,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/action-gateway/src/concurrency.ts,ts,,keep,apps/action-gateway/src/concurrency.ts,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/action-gateway/src/rate-limit.ts,ts,,keep,apps/action-gateway/src/rate-limit.ts,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/action-gateway/src/response.ts,ts,,keep,apps/action-gateway/src/response.ts,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/action-gateway/src/runtime-client.ts,ts,,keep,apps/action-gateway/src/runtime-client.ts,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/action-gateway/src/server.ts,ts,,keep,apps/action-gateway/src/server.ts,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/action-gateway/tests/README.md,md,Tests,keep_review,apps/action-gateway/tests/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+apps/action-gateway/tests/gateway.test.mjs,mjs,,keep,apps/action-gateway/tests/gateway.test.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/action-gateway/tsconfig.json,json,,keep,apps/action-gateway/tsconfig.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/dev-tunnel/.gitignore,file,,keep,apps/dev-tunnel/.gitignore,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/dev-tunnel/README.md,md,Microsoft Dev Tunnels 应用,keep_review,apps/dev-tunnel/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+apps/dev-tunnel/openapi/custom-gpt-action.openapi.template.yaml,yaml,,keep,apps/dev-tunnel/openapi/custom-gpt-action.openapi.template.yaml,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/dev-tunnel/package.json,json,,keep,apps/dev-tunnel/package.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/dev-tunnel/scripts/doctor.mjs,mjs,,keep,apps/dev-tunnel/scripts/doctor.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/dev-tunnel/scripts/generate-openapi.mjs,mjs,,keep,apps/dev-tunnel/scripts/generate-openapi.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/dev-tunnel/scripts/install-cli.mjs,mjs,,keep,apps/dev-tunnel/scripts/install-cli.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/dev-tunnel/scripts/lib.mjs,mjs,,keep,apps/dev-tunnel/scripts/lib.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/dev-tunnel/scripts/refresh.mjs,mjs,,keep,apps/dev-tunnel/scripts/refresh.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/dev-tunnel/scripts/setup.mjs,mjs,,keep,apps/dev-tunnel/scripts/setup.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/dev-tunnel/scripts/start.mjs,mjs,,keep,apps/dev-tunnel/scripts/start.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/dev-tunnel/scripts/status.mjs,mjs,,keep,apps/dev-tunnel/scripts/status.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/dev-tunnel/scripts/stop.mjs,mjs,,keep,apps/dev-tunnel/scripts/stop.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/dev-tunnel/scripts/verify.mjs,mjs,,keep,apps/dev-tunnel/scripts/verify.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/dev-tunnel/tests/dev-tunnel.test.mjs,mjs,,keep,apps/dev-tunnel/tests/dev-tunnel.test.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/local-runtime/README.md,md,Local Runtime,keep_review,apps/local-runtime/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+apps/local-runtime/package.json,json,,keep,apps/local-runtime/package.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/local-runtime/src/README.md,md,Local Runtime Source,keep_review,apps/local-runtime/src/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+apps/local-runtime/src/app.ts,ts,,keep,apps/local-runtime/src/app.ts,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/local-runtime/src/concurrency.ts,ts,,keep,apps/local-runtime/src/concurrency.ts,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/local-runtime/src/executor.ts,ts,,keep,apps/local-runtime/src/executor.ts,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/local-runtime/src/handlers.ts,ts,,keep,apps/local-runtime/src/handlers.ts,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/local-runtime/src/response.ts,ts,,keep,apps/local-runtime/src/response.ts,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/local-runtime/src/server.ts,ts,,keep,apps/local-runtime/src/server.ts,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/local-runtime/tests/README.md,md,Local Runtime Tests,keep_review,apps/local-runtime/tests/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+apps/local-runtime/tests/runtime.test.mjs,mjs,,keep,apps/local-runtime/tests/runtime.test.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+apps/local-runtime/tsconfig.json,json,,keep,apps/local-runtime/tsconfig.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+context/README.md,md,Context,replace,context/README.md,,重写为高密度当前上下文入口,01-control-plane
+context/architecture-context.md,md,Architecture Context,replace,context/architecture-context.md,,明确当前实现、目标认知/控制/执行平面和差距,01-control-plane
+context/current-status.md,md,Current Status,replace,context/current-status.md,,以 bd31893 为基线重建当前状态快照,01-control-plane
+context/knowledge-strategy.md,md,Knowledge Strategy,replace,context/knowledge-strategy.md,,纳入 Registry、Knowledge Pack 与零预读覆盖发布,01-control-plane
+context/project-context.md,md,Project Context,replace,context/project-context.md,,去除 Task 001 临时边界，写入长期项目定位,01-control-plane
+context/roadmap.md,md,Roadmap,replace,context/roadmap.md,,重建 Phase 2.5 知识资产重构和后续路线,01-control-plane
+docs/AGENTS.md,md,Documentation and Knowledge Asset Rules,replace,docs/AGENTS.md,,移除正文大段元数据要求，改由 platform-registry 管理,01-control-plane
+docs/README.md,md,Documentation,replace,docs/README.md,,更新文档分层和目标目录,01-control-plane
+docs/adr/ADR-001-github-feishu-dual-source.md,md,ADR-001 GitHub 与飞书双源事实架构,keep,docs/adr/ADR-001-github-feishu-dual-source.md,ADR-001,保留 superseded 决策历史,01-control-plane
+docs/adr/ADR-002-git-single-source-feishu-projection.md,md,ADR-002 Git 唯一真源与飞书投影模型,revise,docs/adr/ADR-002-git-single-source-feishu-projection.md,ADR-002,补充 overwrite 与映射后按篇发布,07-feishu-release
+docs/adr/README.md,md,Architecture Decision Records,revise,docs/adr/README.md,,补充状态、替代关系与 Registry 规则,01-control-plane
+docs/adr/模板/README.md,md,ADR Templates,keep_review,docs/adr/模板/README.md,,保留并在相关批次复核,01-control-plane
+docs/adr/模板/adr.md,md,ADR-xxx Title,keep_review,docs/adr/模板/adr.md,,保留并在相关批次复核,01-control-plane
+docs/knowledge/Agent与能力/README.md,md,Agent与能力,replace_or_remove,,,旧栏目 README 随目标知识树替换；空栏目删除,02-entry-product
+docs/knowledge/Agent与能力/Skill设计/README.md,md,Skill设计,replace_or_remove,,,旧栏目 README 随目标知识树替换；空栏目删除,02-entry-product
+docs/knowledge/Agent与能力/Skill设计/SKL-001-AI知识技能.md,md,SKL-001 AI 知识技能,revise_move,docs/knowledge/06_智能体资产体系/SKL-001-AI知识技能.md,SKL-001,保留 Skill 资产说明，去除正文系统元数据,05-agent-workflow
+docs/knowledge/Agent与能力/Skill设计/SKL-002-工程洞见提炼技能.md,md,SKL-002 工程洞见提炼技能,revise_move,docs/knowledge/06_智能体资产体系/SKL-002-工程洞见提炼技能.md,SKL-002,保留真实 Skill 能力与 Registry 边界,05-agent-workflow
+docs/knowledge/README.md,md,智能体工程探索录,replace,docs/knowledge/README.md,,重建 00～10 知识树入口,02-entry-product
+docs/knowledge/作品集/PRT-001-项目故事.md,md,PRT-001 项目故事,revise_move,docs/knowledge/09_作品集/PRT-001-ai-agent-platform项目故事.md,PRT-001,从提纲升级为证据化项目故事,06-experiments-portfolio
+docs/knowledge/作品集/PRT-002-Demo路线图.md,md,PRT-002 Demo 路线图,revise_move,docs/knowledge/09_作品集/PRT-002-Demo路线图.md,PRT-002,校准已实现 Demo 与未来 Demo,06-experiments-portfolio
+docs/knowledge/作品集/README.md,md,作品集,replace_or_remove,,,旧栏目 README 随目标知识树替换；空栏目删除,02-entry-product
+docs/knowledge/学习路线/README.md,md,学习路线,replace_or_remove,,,旧栏目 README 随目标知识树替换；空栏目删除,02-entry-product
+docs/knowledge/实验与复盘/EXP-001-公开飞书知识库读取实验.md,md,EXP-001 公开飞书知识库读取实验,move,docs/knowledge/08_实验与复盘/EXP-001-公开飞书知识库读取实验.md,EXP-001,保留验证事实,06-experiments-portfolio
+docs/knowledge/实验与复盘/EXP-002-公开飞书知识库递归导出实验.md,md,EXP-002 公开飞书知识库递归导出实验,move,docs/knowledge/08_实验与复盘/EXP-002-公开飞书知识库递归导出实验.md,EXP-002,保留验证事实,06-experiments-portfolio
+docs/knowledge/实验与复盘/EXP-003-知识系统初始化阶段复盘.md,md,EXP-003 知识系统初始化阶段复盘,revise_move,docs/knowledge/08_实验与复盘/EXP-003-知识系统初始化阶段复盘.md,EXP-003,保留真实演进并校准现行路线,06-experiments-portfolio
+docs/knowledge/实验与复盘/EXP-004-工程洞见提炼Skill首轮评测.md,md,EXP-004 工程洞见提炼 Skill 首轮评测,move,docs/knowledge/08_实验与复盘/EXP-004-工程洞见提炼Skill首轮评测.md,EXP-004,保留评测数据和限制,06-experiments-portfolio
+docs/knowledge/实验与复盘/README.md,md,实验与复盘,replace_or_remove,,,旧栏目 README 随目标知识树替换；空栏目删除,02-entry-product
+docs/knowledge/工作流/README.md,md,工作流,replace_or_remove,,,旧栏目 README 随目标知识树替换；空栏目删除,02-entry-product
+docs/knowledge/工作流/WFL-001-知识生命周期.md,md,WFL-001 知识生命周期,revise_move,docs/knowledge/07_工作流与项目治理/WFL-001-知识生命周期与飞书发布.md,WFL-001,扩展为零预读、按文档 overwrite 工作流,05-agent-workflow
+docs/knowledge/工作流/WFL-002-ChatGPT任务到Codex与Git.md,md,WFL-002 ChatGPT 任务到 Codex 与 Git,replace_move,docs/knowledge/07_工作流与项目治理/WFL-002-ChatGPT任务到Codex与Git.md,WFL-002,以已验证 Actions→Gateway→Runtime 链路重写,05-agent-workflow
+docs/knowledge/工作流/WFL-003-AI视频工作流.md,md,WFL-003 AI 视频工作流,revise_move,docs/knowledge/07_工作流与项目治理/WFL-003-AI视频工作流.md,WFL-003,明确未来产品工作流，保持未开始状态,05-agent-workflow
+docs/knowledge/工作流/WFL-004-多模型Agent执行治理与Token预算.md,md,WFL-004 多模型 Agent 执行治理与 Token 预算,revise_move,docs/knowledge/07_工作流与项目治理/WFL-004-多模型Agent执行治理与Token预算.md,WFL-004,保留真实 Token 教训并纳入任务分级,05-agent-workflow
+docs/knowledge/工程经验/INS-001-工程洞见方法与实践.md,md,INS-001 工程洞见方法与实践,revise_move,docs/knowledge/05_上下文与知识系统/INS-001-工程洞见方法与实践.md,INS-001,保留面向人视图，Registry 仍为机器真源,04-knowledge-architecture
+docs/knowledge/技术方案/README.md,md,技术方案,replace_or_remove,,,旧栏目 README 随目标知识树替换；空栏目删除,02-entry-product
+docs/knowledge/技术方案/SOL-004-跨平台文档可移植性与发布适配.md,md,SOL-004 跨平台文档可移植性与发布适配,split_move,docs/technical/技术方案/知识系统/SOL-004-跨平台文档可移植性与发布适配.md,SOL-004,技术实现移入 technical；知识结论并入 ARC-005/WFL-001,04-knowledge-architecture
+docs/knowledge/架构与领域/README.md,md,架构与领域,replace_or_remove,,,旧栏目 README 随目标知识树替换；空栏目删除,02-entry-product
+docs/knowledge/架构与领域/平台架构/ARC-001-平台目标架构.md,md,ARC-001 平台目标架构,replace_move,docs/knowledge/04_平台架构/ARC-001-ai-agent-platform总体架构.md,ARC-001,基于当前实现与目标三平面重写,04-knowledge-architecture
+docs/knowledge/架构与领域/平台架构/ARC-003-六个月交付架构.md,md,ARC-003 六个月交付架构,merge_archive,docs/technical/归档/历史资产/ARC-003-六个月交付架构-v1.md,ARC-003,并入 PRD-005 与 DEC-001，保留历史 ID,03-foundation-theory
+docs/knowledge/架构与领域/平台架构/README.md,md,平台架构,replace_or_remove,,,旧栏目 README 随目标知识树替换；空栏目删除,02-entry-product
+docs/knowledge/架构与领域/领域模型/DOM-001-核心领域模型.md,md,DOM-001 核心领域模型,revise_move,docs/knowledge/04_平台架构/DOM-001-核心领域模型.md,DOM-001,保留 ID，基于最新系统对象重构,04-knowledge-architecture
+docs/knowledge/架构与领域/领域模型/README.md,md,领域模型,replace_or_remove,,,旧栏目 README 随目标知识树替换；空栏目删除,02-entry-product
+docs/knowledge/知识系统/ARC-002-智能体平台知识资产架构.md,md,ARC-002 智能体平台知识资产架构,revise_move,docs/knowledge/05_上下文与知识系统/ARC-002-智能体平台知识资产架构.md,ARC-002,纳入 Agent Profile、Knowledge Pack、Registry,04-knowledge-architecture
+docs/knowledge/知识系统/ARC-005-单一真源与知识投影架构.md,md,ARC-005 单一真源与知识投影架构,revise_move,docs/knowledge/05_上下文与知识系统/ARC-005-单一真源与知识投影架构.md,ARC-005,加入零预读、映射后按篇覆盖,04-knowledge-architecture
+docs/knowledge/知识系统/ARC-006-项目知识分层与Agent上下文架构.md,md,ARC-006 项目知识分层与 Agent 上下文架构,revise_move,docs/knowledge/05_上下文与知识系统/ARC-006-项目知识分层与Agent上下文架构.md,ARC-006,纳入四层上下文与 Checkpoint,04-knowledge-architecture
+docs/knowledge/知识系统/README.md,md,知识系统,replace_or_remove,,,旧栏目 README 随目标知识树替换；空栏目删除,02-entry-product
+docs/knowledge/项目与产品/CTX-001-项目上下文.md,md,CTX-001 项目上下文,revise_move,docs/knowledge/00_项目入口/CTX-001-项目总览.md,CTX-001,融合真实演进、职业目标、仓库资产和成功标准,02-entry-product
+docs/knowledge/项目与产品/CTX-003-项目总览.md,md,CTX-003 项目总览,merge_archive,docs/technical/归档/历史资产/CTX-003-项目总览-v1.md,CTX-003,有效内容并入 CTX-001；原 ID 标记 superseded,02-entry-product
+docs/knowledge/项目与产品/PRD-001-平台愿景.md,md,PRD-001 平台愿景,revise_move,docs/knowledge/00_项目入口/PRD-001-平台愿景.md,PRD-001,保留愿景 ID，补充用户困境、承诺、非目标和度量,02-entry-product
+docs/knowledge/项目与产品/PRD-002-作品集成果.md,md,PRD-002 作品集成果,merge_archive,docs/technical/归档/历史资产/PRD-002-作品集成果-v1.md,PRD-002,并入 PRT-006；避免复用 PRD-002 作为新产品定义,06-experiments-portfolio
+docs/knowledge/项目与产品/README.md,md,项目与产品,replace_or_remove,,,旧栏目 README 随目标知识树替换；空栏目删除,02-entry-product
+docs/learning/README.md,md,Learning,revise,docs/learning/README.md,,明确学习层与正式知识层蒸馏关系,03-foundation-theory
+docs/learning/chatgpt-agent-engineering/00_ChatGPT_Agent_工程体系学习总纲.md,md,ChatGPT Agent 工程体系学习总纲 v1.0,keep_review,docs/learning/chatgpt-agent-engineering/00_ChatGPT_Agent_工程体系学习总纲.md,,学习资产保留，后续拆分与蒸馏,03-foundation-theory
+docs/learning/chatgpt-agent-engineering/01_学习大纲图.md,md,ChatGPT Agent 工程体系学习大纲图,keep_review,docs/learning/chatgpt-agent-engineering/01_学习大纲图.md,,学习资产保留，后续拆分与蒸馏,03-foundation-theory
+docs/learning/chatgpt-agent-engineering/02_第一章_ChatGPT与Codex配置项及能力基线.md,md,第一章：ChatGPT 与 Codex 配置项及能力基线,split_keep_source,docs/learning/chatgpt-agent-engineering/02_第一章_ChatGPT与Codex配置项及能力基线/,LNG-CH01,拆分为章节目录；原文件在验证完成前保留,03-foundation-theory
+docs/learning/chatgpt-agent-engineering/03_渐进式学习执行计划.md,md,渐进式学习执行计划,keep_review,docs/learning/chatgpt-agent-engineering/03_渐进式学习执行计划.md,,学习资产保留，后续拆分与蒸馏,03-foundation-theory
+docs/learning/chatgpt-agent-engineering/04_知识库沉淀规范.md,md,ChatGPT Agent 工程体系知识库沉淀规范,keep_review,docs/learning/chatgpt-agent-engineering/04_知识库沉淀规范.md,,学习资产保留，后续拆分与蒸馏,03-foundation-theory
+docs/learning/chatgpt-agent-engineering/05_ai-agent-platform仓库落位建议.md,md,`ai-agent-platform` 仓库落位建议,supersede_archive,docs/technical/归档/学习资产/05_ai-agent-platform仓库落位建议-v1.md,,由本蓝图 v2.0 替代,01-control-plane
+docs/learning/chatgpt-agent-engineering/06_Codex入库执行任务.md,md,Codex 执行任务：将 ChatGPT Agent 工程体系学习大纲放入仓库,archive,docs/technical/归档/执行提示词/06_Codex入库执行任务-v1.md,,历史执行提示词，不作为现行规则,01-control-plane
+docs/learning/chatgpt-agent-engineering/README.md,md,ChatGPT Agent 工程体系,keep_review,docs/learning/chatgpt-agent-engineering/README.md,,学习资产保留，后续拆分与蒸馏,03-foundation-theory
+docs/learning/chatgpt-agent-engineering/assets/learning-roadmap.mmd,mmd,,keep_review,docs/learning/chatgpt-agent-engineering/assets/learning-roadmap.mmd,,学习资产保留，后续拆分与蒸馏,03-foundation-theory
+docs/learning/chatgpt-agent-engineering/assets/six-layer-architecture.mmd,mmd,,keep_review,docs/learning/chatgpt-agent-engineering/assets/six-layer-architecture.mmd,,学习资产保留，后续拆分与蒸馏,03-foundation-theory
+docs/learning/chatgpt-agent-engineering/sources/原始_Chat03_学习提示词.md,md,Chat03：ChatGPT App 与 Codex 深度学习与工程化应用,keep_review,docs/learning/chatgpt-agent-engineering/sources/原始_Chat03_学习提示词.md,,学习资产保留，后续拆分与蒸馏,03-foundation-theory
+docs/learning/chatgpt-agent-engineering/sources/官方资料索引.md,md,官方资料索引,keep_review,docs/learning/chatgpt-agent-engineering/sources/官方资料索引.md,,学习资产保留，后续拆分与蒸馏,03-foundation-theory
+docs/learning/chatgpt-agent-engineering/templates/ADR决策记录模板.md,md,ADR-XXXX：决策标题,keep_review,docs/learning/chatgpt-agent-engineering/templates/ADR决策记录模板.md,,学习资产保留，后续拆分与蒸馏,03-foundation-theory
+docs/learning/chatgpt-agent-engineering/templates/实验记录模板.md,md,实验名称,keep_review,docs/learning/chatgpt-agent-engineering/templates/实验记录模板.md,,学习资产保留，后续拆分与蒸馏,03-foundation-theory
+docs/learning/chatgpt-agent-engineering/templates/工具能力卡片模板.md,md,工具/能力名称,keep_review,docs/learning/chatgpt-agent-engineering/templates/工具能力卡片模板.md,,学习资产保留，后续拆分与蒸馏,03-foundation-theory
+docs/learning/chatgpt-agent-engineering/templates/章节学习记录模板.md,md,章节名称,keep_review,docs/learning/chatgpt-agent-engineering/templates/章节学习记录模板.md,,学习资产保留，后续拆分与蒸馏,03-foundation-theory
+docs/technical/Archive/README.md,md,Archive,move,docs/technical/归档/README.md,,统一中文归档目录,01-control-plane
+docs/technical/Archive/历史Context/CTX-002-current-state.md,md,CTX-002 Current State,move,docs/technical/归档/历史Context/CTX-002-current-state.md,,统一中文归档目录,01-control-plane
+docs/technical/Archive/历史Context/CTX-004-roadmap-6-months.md,md,CTX-004 Six-Month Roadmap,move,docs/technical/归档/历史Context/CTX-004-roadmap-6-months.md,,统一中文归档目录,01-control-plane
+docs/technical/Archive/历史Context/README.md,md,Project Context,move,docs/technical/归档/历史Context/README.md,,统一中文归档目录,01-control-plane
+docs/technical/Archive/历史Context/recovery-map.md,md,Recovery Map,move,docs/technical/归档/历史Context/recovery-map.md,,统一中文归档目录,01-control-plane
+docs/technical/Archive/历史资产/README.md,md,Archive,move,docs/technical/归档/历史资产/README.md,,统一中文归档目录,01-control-plane
+docs/technical/README.md,md,Technical Documentation,replace,docs/technical/README.md,,改为中文目标结构并移除元数据职责,01-control-plane
+docs/technical/元数据/README.md,md,Knowledge Metadata,replace_move,platform-registry/README.md,,替换为 Platform Registry 入口,01-control-plane
+docs/technical/元数据/assets.yaml,yaml,,move_transform,platform-registry/assets.yaml,,迁移为全平台资产登记，更新路径和类型,01-control-plane
+docs/technical/元数据/engineering-insights/README.md,md,Engineering Insight Registry,move,platform-registry/registries/engineering-insights/README.md,,保留领域 Registry,01-control-plane
+docs/technical/元数据/engineering-insights/governance.json,json,,move,platform-registry/registries/engineering-insights/governance.json,,保留治理配置,01-control-plane
+docs/technical/元数据/engineering-insights/insights/EI-INTENT_ADAPTER_001.json,json,,move,platform-registry/registries/engineering-insights/insights/EI-INTENT_ADAPTER_001.json,,保留工程洞见条目,01-control-plane
+docs/technical/元数据/engineering-insights/insights/EI-LAYERED_AUTH_001.json,json,,move,platform-registry/registries/engineering-insights/insights/EI-LAYERED_AUTH_001.json,,保留工程洞见条目,01-control-plane
+docs/technical/元数据/engineering-insights/insights/EI-PHASE_FIT_EXIT_001.json,json,,move,platform-registry/registries/engineering-insights/insights/EI-PHASE_FIT_EXIT_001.json,,保留工程洞见条目,01-control-plane
+docs/technical/元数据/engineering-insights/insights/EI-REAL_PATH_001.json,json,,move,platform-registry/registries/engineering-insights/insights/EI-REAL_PATH_001.json,,保留工程洞见条目,01-control-plane
+docs/technical/元数据/engineering-insights/insights/EI-RISK_REVIEW_001.json,json,,move,platform-registry/registries/engineering-insights/insights/EI-RISK_REVIEW_001.json,,保留工程洞见条目,01-control-plane
+docs/technical/元数据/engineering-insights/registry.json,json,,move,platform-registry/registries/engineering-insights/registry.json,,保留数据与状态,01-control-plane
+docs/technical/元数据/engineering-insights/relationships.json,json,,move,platform-registry/registries/engineering-insights/relationships.json,,保留领域关系,01-control-plane
+docs/technical/元数据/migration-inventory.yaml,yaml,,move_transform,platform-registry/migrations/current-migration.yaml,,迁移为本轮迁移状态记录,01-control-plane
+docs/technical/元数据/relations.yaml,yaml,,move_transform,platform-registry/relations.yaml,,迁移并使用受控关系词表,01-control-plane
+docs/technical/工程规范/ENG-001-public-repository-standard.md,md,ENG-001 Public Repository Standard,revise,docs/technical/工程规范/ENG-001-public-repository-standard.md,ENG-001,补充 Registry、Agent Profile 和知识包安全边界,01-control-plane
+docs/technical/工程规范/README.md,md,Engineering,revise_or_move,,,随目标技术目录调整并登记文件,01-control-plane
+docs/technical/工程规范/模板/README.md,md,Asset Templates,move_revise,docs/templates/README.md,,统一文档模板目录并移除正文大段 Front Matter,01-control-plane
+docs/technical/工程规范/模板/architecture.md,md,Title,move_revise,docs/templates/architecture.md,,统一文档模板目录并移除正文大段 Front Matter,01-control-plane
+docs/technical/工程规范/模板/common-asset.md,md,Title,move_revise,docs/templates/common-asset.md,,统一文档模板目录并移除正文大段 Front Matter,01-control-plane
+docs/technical/工程规范/模板/experiment.md,md,EXP-xxx Title,move_revise,docs/templates/experiment.md,,统一文档模板目录并移除正文大段 Front Matter,01-control-plane
+docs/technical/工程规范/模板/module-readme.md,md,Module Name,move_revise,docs/templates/module-readme.md,,统一文档模板目录并移除正文大段 Front Matter,01-control-plane
+docs/technical/工程规范/模板/research.md,md,RSH-xxx Title,move_revise,docs/templates/research.md,,统一文档模板目录并移除正文大段 Front Matter,01-control-plane
+docs/technical/工程规范/模板/skill-asset.md,md,Skill Name,move_revise,docs/templates/skill-asset.md,,统一文档模板目录并移除正文大段 Front Matter,01-control-plane
+docs/technical/工程规范/模板/solution.md,md,SOL-xxx Title,move_revise,docs/templates/solution.md,,统一文档模板目录并移除正文大段 Front Matter,01-control-plane
+docs/technical/技术方案/Gateway/README.md,md,Gateway 技术方案,revise_or_move,,,随目标技术目录调整并登记文件,01-control-plane
+docs/technical/技术方案/Gateway/SOL-005-Custom-GPT-Actions与Gateway-MVP渐进式实施方案.md,md,SOL-005: Custom GPT Actions 与 Gateway MVP 渐进式实施方案,archive,docs/technical/归档/技术方案/Gateway/SOL-005-Custom-GPT-Actions与Gateway-MVP渐进式实施方案.md,SOL-005,历史 Cloudflare 方案，当前由 Dev Tunnels 路线替代,01-control-plane
+docs/technical/技术方案/Gateway/SOL-006-Task-Result-Error-Contract-v1.md,md,SOL-006: Task / Result / Error Contract v1,revise_move,docs/technical/技术方案/Task-Control/SOL-006-Task-Result-Error-Contract-v1.md,SOL-006,保留已实现 Contract 方案并同步消费者,04-knowledge-architecture
+docs/technical/技术方案/README.md,md,Solutions,revise_or_move,,,随目标技术目录调整并登记文件,01-control-plane
+docs/technical/技术方案/安全/README.md,md,Security Solutions,revise_or_move,,,随目标技术目录调整并登记文件,01-control-plane
+docs/technical/技术方案/安全/SEC-002-cloudflare-edge安全与运行说明.md,md,Cloudflare Edge Worker 安全、运行与审计说明,archive,docs/technical/归档/技术方案/Cloudflare/SEC-002-cloudflare-edge安全与运行说明.md,SEC-002,保留历史审计，不再作为当前运行指南,01-control-plane
+docs/technical/技术方案/安全/SOL-003-local-private-context.md,md,SOL-003 Local Private Context,keep,docs/technical/技术方案/安全/SOL-003-local-private-context.md,SOL-003,现行安全边界有效,04-knowledge-architecture
+docs/technical/技术方案/知识系统/README.md,md,Knowledge System Solutions,revise_or_move,,,随目标技术目录调整并登记文件,01-control-plane
+docs/technical/技术方案/知识系统/SOL-001-feishu-wiki-initialization.md,md,SOL-001 Feishu Wiki Initialization,revise,docs/technical/技术方案/知识系统/SOL-001-feishu-wiki-initialization.md,SOL-001,保留历史初始化事实，标明不再重建空间,07-feishu-release
+docs/technical/技术方案/知识系统/SOL-002-git-feishu-projection.md,md,SOL-002 Git → Feishu Projection,replace,docs/technical/技术方案/知识系统/SOL-002-Git到飞书覆盖式投影.md,SOL-002,重写为零预读与按篇覆盖发布方案,07-feishu-release
+docs/technical/技术调研/README.md,md,Research,revise_or_move,,,随目标技术目录调整并登记文件,01-control-plane
+docs/technical/技术调研/RSH-001-feishu-cli-capabilities.md,md,RSH-001 Feishu CLI Capabilities,keep,docs/technical/技术调研/飞书/RSH-001-feishu-cli-capabilities.md,RSH-001,保留已验证调研，移动到主题目录,07-feishu-release
+docs/technical/技术调研/external/README.md,md,External Research Sources,move,docs/technical/技术调研/外部证据/README.md,,中文化并保留外部证据,06-experiments-portfolio
+docs/technical/技术调研/external/waytoagi-feishu-cli-export/.gitignore,file,,move,docs/technical/技术调研/外部证据/waytoagi-feishu-cli-export/.gitignore,,中文化并保留外部证据,06-experiments-portfolio
+docs/technical/技术调研/external/waytoagi-feishu-cli-export/README.md,md,WaytoAGI Feishu CLI Export Evidence,move,docs/technical/技术调研/外部证据/waytoagi-feishu-cli-export/README.md,,中文化并保留外部证据,06-experiments-portfolio
+docs/technical/技术调研/external/waytoagi-feishu-cli-export/export-report.md,md,WaytoAGI Feishu Wiki Export Report,move,docs/technical/技术调研/外部证据/waytoagi-feishu-cli-export/export-report.md,,中文化并保留外部证据,06-experiments-portfolio
+docs/technical/技术调研/external/waytoagi-feishu-cli-export/export-waytoagi-wiki.mjs,mjs,,move,docs/technical/技术调研/外部证据/waytoagi-feishu-cli-export/export-waytoagi-wiki.mjs,,中文化并保留外部证据,06-experiments-portfolio
+docs/technical/技术调研/external/waytoagi-feishu-cli-export/integrity-check.json,json,,move,docs/technical/技术调研/外部证据/waytoagi-feishu-cli-export/integrity-check.json,,中文化并保留外部证据,06-experiments-portfolio
+docs/technical/技术调研/external/waytoagi-feishu-cli-export/space-info.json,json,,move,docs/technical/技术调研/外部证据/waytoagi-feishu-cli-export/space-info.json,,中文化并保留外部证据,06-experiments-portfolio
+docs/technical/技术调研/external/waytoagi-feishu-cli-export/wiki-tree.json,json,,move,docs/technical/技术调研/外部证据/waytoagi-feishu-cli-export/wiki-tree.json,,中文化并保留外部证据,06-experiments-portfolio
+docs/technical/技术调研/external/waytoagi-feishu-cli-export/wiki-tree.md,md,WaytoAGI Feishu Wiki Tree Snapshot,move,docs/technical/技术调研/外部证据/waytoagi-feishu-cli-export/wiki-tree.md,,中文化并保留外部证据,06-experiments-portfolio
+docs/technical/架构实现/ARC-004-ai-knowledge-runtime-boundaries.md,md,ARC-004 AI Knowledge Runtime Boundaries,revise_move,docs/technical/架构实现/知识系统/ARC-004-ai-knowledge-runtime-boundaries.md,ARC-004,保留技术实现边界并更新路径,04-knowledge-architecture
+docs/technical/架构实现/README.md,md,架构实现,revise_or_move,,,随目标技术目录调整并登记文件,01-control-plane
+docs/technical/治理规则/Context模板/README.md,md,Context Template,revise_or_move,,,随目标技术目录调整并登记文件,01-control-plane
+docs/technical/治理规则/Context模板/project-context.md,md,Title,keep_review,docs/technical/治理规则/Context模板/project-context.md,,保留并在相关批次复核,01-control-plane
+docs/technical/治理规则/README.md,md,Project Governance,revise_or_move,,,随目标技术目录调整并登记文件,01-control-plane
+docs/technical/治理规则/agent-working-protocol.md,md,Agent Working Protocol,rename_revise,docs/technical/治理规则/GOV-001-Agent工作协议.md,GOV-001,加入 Chat 主导、Codex 精确执行和按批次提交,01-control-plane
+docs/technical/治理规则/documentation-rules.md,md,Documentation and README Rules,rename_revise,docs/technical/治理规则/GOV-002-文档与知识治理规则.md,GOV-002,正文与系统元数据分离,01-control-plane
+docs/technical/治理规则/git-feishu-governance.md,md,Git and Feishu Knowledge Governance,rename_replace,docs/technical/治理规则/GOV-003-Git与飞书投影治理.md,GOV-003,固化零预读、overwrite、无反向同步,07-feishu-release
+docs/technical/治理规则/private-context-and-sensitive-assets.md,md,Private Context and Sensitive Assets,rename_revise,docs/technical/治理规则/GOV-009-私有上下文与敏感资产.md,GOV-009,保留安全边界,01-control-plane
+docs/technical/运维与迁移/README.md,md,Operations,revise_or_move,,,随目标技术目录调整并登记文件,01-control-plane
+docs/technical/运维与迁移/execution-history/2026-07-26/README.md,md,2026-07-26 Execution Summary,move,docs/technical/运维与事件/execution-history/2026-07-26/README.md,,拆分运维与迁移职责,01-control-plane
+docs/technical/运维与迁移/execution-history/README.md,md,Execution History,move,docs/technical/运维与事件/execution-history/README.md,,拆分运维与迁移职责,01-control-plane
+docs/technical/运维与迁移/feishu/OPS-001-knowledge-base-initialization.md,md,OPS-001 Feishu Knowledge Base Initialization,move,docs/technical/运维与事件/feishu/OPS-001-knowledge-base-initialization.md,,拆分运维与迁移职责,07-feishu-release
+docs/technical/运维与迁移/feishu/OPS-002-homepage-publication.md,md,OPS-002 Feishu Homepage Publication,move,docs/technical/运维与事件/feishu/OPS-002-homepage-publication.md,,拆分运维与迁移职责,07-feishu-release
+docs/technical/运维与迁移/feishu/OPS-003-knowledge-base-rename.md,md,OPS-003 Feishu Knowledge Base Rename Check,move,docs/technical/运维与事件/feishu/OPS-003-knowledge-base-rename.md,,拆分运维与迁移职责,07-feishu-release
+docs/technical/运维与迁移/feishu/README.md,md,Feishu Operations,move,docs/technical/运维与事件/feishu/README.md,,拆分运维与迁移职责,07-feishu-release
+docs/technical/运维与迁移/feishu/plans/README.md,md,Feishu Plans,move,docs/technical/运维与事件/feishu/plans/README.md,,拆分运维与迁移职责,07-feishu-release
+docs/technical/运维与迁移/feishu/snapshots/README.md,md,Feishu Snapshots,move,docs/technical/运维与事件/feishu/snapshots/README.md,,拆分运维与迁移职责,07-feishu-release
+docs/technical/运维与迁移/feishu/snapshots/homepage-v1.0.xml,xml,,move,docs/technical/运维与事件/feishu/snapshots/homepage-v1.0.xml,,拆分运维与迁移职责,07-feishu-release
+docs/technical/运维与迁移/knowledge-assets-review-2026-07-28.md,md,Image Asset Branch Review — 2026-07-28,archive,docs/technical/归档/审计记录/knowledge-assets-review-2026-07-28.md,,保留图片方案演进证据,01-control-plane
+docs/technical/运维与迁移/migration/MIG-001-repository-audit-and-migration-2026-07-27.md,md,MIG-001 Repository Audit and Migration — 2026-07-27,move,docs/technical/迁移计划/历史/MIG-001-repository-audit-and-migration-2026-07-27.md,MIG-001,保留历史迁移证据,01-control-plane
+docs/technical/运维与迁移/migration/README.md,md,Migration,revise_or_move,,,随目标技术目录调整并登记文件,01-control-plane
+docs/technical/运维与迁移/migration/asset-inventory-2026-07-26.md,md,Historical Asset Inventory — 2026-07-26,move,docs/technical/迁移计划/历史/asset-inventory-2026-07-26.md,,保留历史盘点,01-control-plane
+knowledge.config.yaml,yaml,,replace,knowledge.config.yaml,,切换到 v4 路径与 platform-registry；保留 Git→Feishu overwrite,01-control-plane
+package-lock.json,json,,keep_review,package-lock.json,,保留并在相关批次复核,01-control-plane
+package.json,json,,revise,package.json,,将工程洞见 Registry 校验纳入根 verify，并校准 workspace 说明,01-control-plane
+packages/README.md,md,Shared Packages,revise,packages/README.md,,校准三个共享包和未来包不预建原则,01-control-plane
+packages/auth/README.md,md,Auth,keep_review,packages/auth/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+packages/auth/package.json,json,,keep,packages/auth/package.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+packages/auth/src/README.md,md,Source,keep_review,packages/auth/src/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+packages/auth/src/bearer.ts,ts,,keep,packages/auth/src/bearer.ts,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+packages/auth/src/index.ts,ts,,keep,packages/auth/src/index.ts,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+packages/auth/tests/README.md,md,Tests,keep_review,packages/auth/tests/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+packages/auth/tests/auth.test.mjs,mjs,,keep,packages/auth/tests/auth.test.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+packages/auth/tsconfig.json,json,,keep,packages/auth/tsconfig.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+packages/contracts/README.md,md,Contracts,revise,packages/contracts/README.md,,移除“尚无消费者”，同步 Gateway/Runtime 真实使用,01-control-plane
+packages/contracts/package.json,json,,keep,packages/contracts/package.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+packages/contracts/src/README.md,md,Contracts Source,keep_review,packages/contracts/src/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+packages/contracts/src/capability.ts,ts,,keep,packages/contracts/src/capability.ts,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+packages/contracts/src/error.ts,ts,,keep,packages/contracts/src/error.ts,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+packages/contracts/src/index.ts,ts,,keep,packages/contracts/src/index.ts,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+packages/contracts/src/json.ts,ts,,keep,packages/contracts/src/json.ts,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+packages/contracts/src/result.ts,ts,,keep,packages/contracts/src/result.ts,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+packages/contracts/src/task.ts,ts,,keep,packages/contracts/src/task.ts,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+packages/contracts/src/validation.ts,ts,,keep,packages/contracts/src/validation.ts,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+packages/contracts/tests/README.md,md,Contracts Tests,keep_review,packages/contracts/tests/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+packages/contracts/tests/contracts.test.mjs,mjs,,keep,packages/contracts/tests/contracts.test.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+packages/contracts/tsconfig.json,json,,keep,packages/contracts/tsconfig.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+packages/policy/README.md,md,Capability Policy,revise,packages/policy/README.md,,修复默认 Policy 只列 gateway.ping 的文档漂移,01-control-plane
+packages/policy/package.json,json,,keep,packages/policy/package.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+packages/policy/src/README.md,md,Source,keep_review,packages/policy/src/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+packages/policy/src/index.ts,ts,,keep,packages/policy/src/index.ts,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+packages/policy/src/policy.ts,ts,,keep,packages/policy/src/policy.ts,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+packages/policy/tests/README.md,md,Tests,keep_review,packages/policy/tests/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+packages/policy/tests/policy.test.mjs,mjs,,keep,packages/policy/tests/policy.test.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+packages/policy/tsconfig.json,json,,keep,packages/policy/tsconfig.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+scripts/README.md,md,Repository Scripts,revise,scripts/README.md,,登记新增 Registry 验证和迁移校验入口,01-control-plane
+scripts/local-chain-test.mjs,mjs,,keep,scripts/local-chain-test.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+scripts/local-stack-test.mjs,mjs,,keep,scripts/local-stack-test.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+scripts/local-stack.mjs,mjs,,keep,scripts/local-stack.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+scripts/repo-check.mjs,mjs,,keep,scripts/repo-check.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/AGENTS.md,md,Skill Engineering Rules,keep,skills/AGENTS.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/README.md,md,Skills,revise,skills/README.md,,校准四个真实 Skill 与知识治理关系,01-control-plane
+skills/ai-knowledge/CHANGELOG.md,md,Changelog,keep_review,skills/ai-knowledge/CHANGELOG.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/ai-knowledge/MANIFEST.json,json,,keep_review,skills/ai-knowledge/MANIFEST.json,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/ai-knowledge/README.md,md,ai-knowledge Skill,keep_review,skills/ai-knowledge/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/ai-knowledge/SKILL.md,md,AI Knowledge,keep_review,skills/ai-knowledge/SKILL.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/ai-knowledge/assets/README.md,md,Assets,keep_review,skills/ai-knowledge/assets/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/ai-knowledge/assets/ai-agent-platform.json,json,,keep,skills/ai-knowledge/assets/ai-agent-platform.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/assets/project-profile.example.json,json,,keep,skills/ai-knowledge/assets/project-profile.example.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/assets/schemas/README.md,md,Schemas,keep_review,skills/ai-knowledge/assets/schemas/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/ai-knowledge/assets/schemas/context-package.schema.json,json,,keep,skills/ai-knowledge/assets/schemas/context-package.schema.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/assets/schemas/knowledge-event.schema.json,json,,keep,skills/ai-knowledge/assets/schemas/knowledge-event.schema.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/assets/schemas/knowledge-item.schema.json,json,,keep,skills/ai-knowledge/assets/schemas/knowledge-item.schema.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/assets/schemas/project-status.schema.json,json,,keep,skills/ai-knowledge/assets/schemas/project-status.schema.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/assets/schemas/write-plan.schema.json,json,,keep,skills/ai-knowledge/assets/schemas/write-plan.schema.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/assets/templates/README.md,md,Templates,keep_review,skills/ai-knowledge/assets/templates/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/ai-knowledge/assets/templates/adr.md,md,ADR-{{number}}：{{title}},keep,skills/ai-knowledge/assets/templates/adr.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/assets/templates/experiment.md,md,{{title}},keep,skills/ai-knowledge/assets/templates/experiment.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/assets/templates/knowledge-note.md,md,{{title}},keep,skills/ai-knowledge/assets/templates/knowledge-note.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/assets/templates/learning-path.md,md,{{title}},keep,skills/ai-knowledge/assets/templates/learning-path.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/assets/templates/project-status.md,md,Project Status,keep,skills/ai-knowledge/assets/templates/project-status.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/references/00-shared-rules.md,md,共享规则：认证、安全与停止条件,keep,skills/ai-knowledge/references/00-shared-rules.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/references/01-architecture-and-boundaries.md,md,架构与边界,keep,skills/ai-knowledge/references/01-architecture-and-boundaries.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/references/02-project-profile.md,md,ai-agent-platform Project Profile,keep,skills/ai-knowledge/references/02-project-profile.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/references/03-knowledge-model.md,md,Knowledge Model,keep,skills/ai-knowledge/references/03-knowledge-model.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/references/04-retrieval-policy.md,md,Retrieval and Token Policy,keep,skills/ai-knowledge/references/04-retrieval-policy.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/references/05-write-governance.md,md,Write Governance,keep,skills/ai-knowledge/references/05-write-governance.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/references/06-feishu-provider.md,md,Feishu Provider,keep,skills/ai-knowledge/references/06-feishu-provider.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/references/07-workflows.md,md,Workflows,keep,skills/ai-knowledge/references/07-workflows.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/references/08-waytoagi-findings.md,md,WaytoAGI 飞书 CLI 资料的工程启发,keep,skills/ai-knowledge/references/08-waytoagi-findings.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/references/09-command-cookbook.md,md,命令速查,keep,skills/ai-knowledge/references/09-command-cookbook.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/references/10-evaluation.md,md,Skill 评估与验收,keep,skills/ai-knowledge/references/10-evaluation.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/references/11-feishu-publishing.md,md,Feishu Knowledge Publishing,keep,skills/ai-knowledge/references/11-feishu-publishing.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/references/README.md,md,References,keep_review,skills/ai-knowledge/references/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/ai-knowledge/references/examples/01-query-context.md,md,示例：查询项目上下文,keep,skills/ai-knowledge/references/examples/01-query-context.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/references/examples/02-capture-experiment.md,md,示例：沉淀实验,keep,skills/ai-knowledge/references/examples/02-capture-experiment.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/references/examples/03-sync-status.md,md,示例：更新项目状态,keep,skills/ai-knowledge/references/examples/03-sync-status.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/references/examples/04-import-public-wiki.md,md,示例：导入公开 Wiki,keep,skills/ai-knowledge/references/examples/04-import-public-wiki.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/references/examples/05-record-adr.md,md,示例：记录 ADR,keep,skills/ai-knowledge/references/examples/05-record-adr.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/references/examples/06-build-learning-path.md,md,示例：生成学习路径,keep,skills/ai-knowledge/references/examples/06-build-learning-path.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/references/examples/README.md,md,Examples,keep_review,skills/ai-knowledge/references/examples/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/ai-knowledge/scripts/README.md,md,Scripts,keep_review,skills/ai-knowledge/scripts/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/ai-knowledge/scripts/build_index.mjs,mjs,,keep,skills/ai-knowledge/scripts/build_index.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/scripts/lark_read.mjs,mjs,,keep,skills/ai-knowledge/scripts/lark_read.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/scripts/lark_write.mjs,mjs,,keep,skills/ai-knowledge/scripts/lark_write.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/scripts/lib/README.md,md,Script Library,keep_review,skills/ai-knowledge/scripts/lib/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/ai-knowledge/scripts/lib/cli.mjs,mjs,,keep,skills/ai-knowledge/scripts/lib/cli.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/scripts/lib/files.mjs,mjs,,keep,skills/ai-knowledge/scripts/lib/files.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/scripts/query_index.mjs,mjs,,keep,skills/ai-knowledge/scripts/query_index.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/scripts/render_draft.mjs,mjs,,keep,skills/ai-knowledge/scripts/render_draft.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/scripts/validate_bundle.mjs,mjs,,keep,skills/ai-knowledge/scripts/validate_bundle.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/tests/README.md,md,Tests,keep_review,skills/ai-knowledge/tests/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/ai-knowledge/tests/fixtures/README.md,md,Fixtures,keep_review,skills/ai-knowledge/tests/fixtures/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/ai-knowledge/tests/fixtures/pages/README.md,md,Fixture Pages,keep_review,skills/ai-knowledge/tests/fixtures/pages/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/ai-knowledge/tests/fixtures/pages/adr.md,md,ADR,keep,skills/ai-knowledge/tests/fixtures/pages/adr.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/tests/fixtures/pages/gateway.md,md,Gateway 总体架构,keep,skills/ai-knowledge/tests/fixtures/pages/gateway.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/tests/fixtures/pages/video.md,md,AI 视频,keep,skills/ai-knowledge/tests/fixtures/pages/video.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/tests/fixtures/sample-event.json,json,,keep,skills/ai-knowledge/tests/fixtures/sample-event.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/tests/fixtures/sample-tree.json,json,,keep,skills/ai-knowledge/tests/fixtures/sample-tree.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/ai-knowledge/tests/self-test.mjs,mjs,,keep,skills/ai-knowledge/tests/self-test.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/custom-gpt-actions/README.md,md,Custom GPT Actions Skill,keep_review,skills/custom-gpt-actions/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/custom-gpt-actions/SKILL.md,md,Custom GPT Actions,keep_review,skills/custom-gpt-actions/SKILL.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/custom-gpt-actions/agents/openai.yaml,yaml,,keep,skills/custom-gpt-actions/agents/openai.yaml,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/custom-gpt-actions/references/action-adapter-pattern.md,md,Action Adapter Pattern,keep,skills/custom-gpt-actions/references/action-adapter-pattern.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/custom-gpt-actions/references/openapi-builder-compatibility.md,md,OpenAPI Builder Compatibility,keep,skills/custom-gpt-actions/references/openapi-builder-compatibility.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/custom-gpt-actions/references/testing-and-debugging.md,md,Testing and Debugging,keep,skills/custom-gpt-actions/references/testing-and-debugging.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/custom-gpt-actions/references/troubleshooting.md,md,Troubleshooting,keep,skills/custom-gpt-actions/references/troubleshooting.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/CHANGELOG.md,md,Changelog,keep_review,skills/engineering-insight-distillation/CHANGELOG.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/engineering-insight-distillation/MANIFEST.json,json,,keep_review,skills/engineering-insight-distillation/MANIFEST.json,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/engineering-insight-distillation/README.md,md,Engineering Insight Distillation,keep_review,skills/engineering-insight-distillation/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/engineering-insight-distillation/SKILL.md,md,Engineering Insight Distillation,keep_review,skills/engineering-insight-distillation/SKILL.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/engineering-insight-distillation/agents/openai.yaml,yaml,,keep,skills/engineering-insight-distillation/agents/openai.yaml,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/assets/README.md,md,Assets,keep_review,skills/engineering-insight-distillation/assets/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/engineering-insight-distillation/assets/schemas/distillation-result.schema.json,json,,keep,skills/engineering-insight-distillation/assets/schemas/distillation-result.schema.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/assets/schemas/engineering-insight-registry.schema.json,json,,keep,skills/engineering-insight-distillation/assets/schemas/engineering-insight-registry.schema.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/assets/schemas/engineering-insight.schema.json,json,,keep,skills/engineering-insight-distillation/assets/schemas/engineering-insight.schema.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/assets/schemas/experience-candidate.schema.json,json,,keep,skills/engineering-insight-distillation/assets/schemas/experience-candidate.schema.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/assets/schemas/screening-result.schema.json,json,,keep,skills/engineering-insight-distillation/assets/schemas/screening-result.schema.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/assets/templates/distillation-result.yaml,yaml,,keep,skills/engineering-insight-distillation/assets/templates/distillation-result.yaml,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/assets/templates/engineering-insight.yaml,yaml,,keep,skills/engineering-insight-distillation/assets/templates/engineering-insight.yaml,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/assets/templates/experience-candidate.yaml,yaml,,keep,skills/engineering-insight-distillation/assets/templates/experience-candidate.yaml,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/assets/templates/screening-result.yaml,yaml,,keep,skills/engineering-insight-distillation/assets/templates/screening-result.yaml,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/references/01-输入资格与证据规则.md,md,输入资格与证据规则,keep,skills/engineering-insight-distillation/references/01-输入资格与证据规则.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/references/02-工程经验抽象方法.md,md,工程经验抽象方法,keep,skills/engineering-insight-distillation/references/02-工程经验抽象方法.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/references/03-模式反模式与启发式.md,md,模式、反模式与启发式,keep,skills/engineering-insight-distillation/references/03-模式反模式与启发式.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/references/04-适用边界与错误泛化.md,md,适用边界与错误泛化,keep,skills/engineering-insight-distillation/references/04-适用边界与错误泛化.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/references/05-查重冲突与经验演进.md,md,查重、冲突与经验演进,keep,skills/engineering-insight-distillation/references/05-查重冲突与经验演进.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/references/06-成熟度与版本治理.md,md,成熟度、生命周期与版本治理,keep,skills/engineering-insight-distillation/references/06-成熟度与版本治理.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/references/07-输出契约与质量门.md,md,输出契约与质量门,keep,skills/engineering-insight-distillation/references/07-输出契约与质量门.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/references/08-上下游协作边界.md,md,上下游协作边界,keep,skills/engineering-insight-distillation/references/08-上下游协作边界.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/references/09-运行模式与成本控制.md,md,运行模式与成本控制,keep,skills/engineering-insight-distillation/references/09-运行模式与成本控制.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/references/10-工程洞见注册表协议.md,md,工程洞见注册表协议,keep,skills/engineering-insight-distillation/references/10-工程洞见注册表协议.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/references/README.md,md,References,keep_review,skills/engineering-insight-distillation/references/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/engineering-insight-distillation/scripts/README.md,md,Scripts,keep_review,skills/engineering-insight-distillation/scripts/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/engineering-insight-distillation/scripts/eval.mjs,mjs,,keep,skills/engineering-insight-distillation/scripts/eval.mjs,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/README.md,md,Tests and Evaluation Fixtures,keep_review,skills/engineering-insight-distillation/tests/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/engineering-insight-distillation/tests/evals/README.md,md,Evals,keep_review,skills/engineering-insight-distillation/tests/evals/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/engineering-insight-distillation/tests/evals/pilot-01/EVAL_REPORT.md,md,engineering-insight-distillation v0.1.1 — 第一轮真实 Pilot Eval,keep,skills/engineering-insight-distillation/tests/evals/pilot-01/EVAL_REPORT.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-01/METHODOLOGY.md,md,Eval Methodology,keep,skills/engineering-insight-distillation/tests/evals/pilot-01/METHODOLOGY.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-01/baseline-outputs/EVAL-01.md,md,,keep,skills/engineering-insight-distillation/tests/evals/pilot-01/baseline-outputs/EVAL-01.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-01/baseline-outputs/EVAL-02.md,md,,keep,skills/engineering-insight-distillation/tests/evals/pilot-01/baseline-outputs/EVAL-02.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-01/baseline-outputs/EVAL-03.md,md,,keep,skills/engineering-insight-distillation/tests/evals/pilot-01/baseline-outputs/EVAL-03.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-01/baseline-outputs/EVAL-04.md,md,,keep,skills/engineering-insight-distillation/tests/evals/pilot-01/baseline-outputs/EVAL-04.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-01/baseline-outputs/EVAL-05.md,md,,keep,skills/engineering-insight-distillation/tests/evals/pilot-01/baseline-outputs/EVAL-05.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-01/baseline-outputs/EVAL-06.md,md,,keep,skills/engineering-insight-distillation/tests/evals/pilot-01/baseline-outputs/EVAL-06.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-01/baseline-outputs/EVAL-07.md,md,,keep,skills/engineering-insight-distillation/tests/evals/pilot-01/baseline-outputs/EVAL-07.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-01/cases/EVAL-01.json,json,,keep,skills/engineering-insight-distillation/tests/evals/pilot-01/cases/EVAL-01.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-01/cases/EVAL-02.json,json,,keep,skills/engineering-insight-distillation/tests/evals/pilot-01/cases/EVAL-02.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-01/cases/EVAL-03.json,json,,keep,skills/engineering-insight-distillation/tests/evals/pilot-01/cases/EVAL-03.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-01/cases/EVAL-04.json,json,,keep,skills/engineering-insight-distillation/tests/evals/pilot-01/cases/EVAL-04.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-01/cases/EVAL-05.json,json,,keep,skills/engineering-insight-distillation/tests/evals/pilot-01/cases/EVAL-05.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-01/cases/EVAL-06.json,json,,keep,skills/engineering-insight-distillation/tests/evals/pilot-01/cases/EVAL-06.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-01/cases/EVAL-07.json,json,,keep,skills/engineering-insight-distillation/tests/evals/pilot-01/cases/EVAL-07.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-01/scores/rubric-scores.csv,csv,,keep,skills/engineering-insight-distillation/tests/evals/pilot-01/scores/rubric-scores.csv,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-01/scores/rubric.json,json,,keep,skills/engineering-insight-distillation/tests/evals/pilot-01/scores/rubric.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-01/scores/summary.json,json,,keep,skills/engineering-insight-distillation/tests/evals/pilot-01/scores/summary.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-01/skill-outputs/EVAL-01.json,json,,keep,skills/engineering-insight-distillation/tests/evals/pilot-01/skill-outputs/EVAL-01.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-01/skill-outputs/EVAL-02.json,json,,keep,skills/engineering-insight-distillation/tests/evals/pilot-01/skill-outputs/EVAL-02.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-01/skill-outputs/EVAL-03.json,json,,keep,skills/engineering-insight-distillation/tests/evals/pilot-01/skill-outputs/EVAL-03.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-01/skill-outputs/EVAL-04.json,json,,keep,skills/engineering-insight-distillation/tests/evals/pilot-01/skill-outputs/EVAL-04.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-01/skill-outputs/EVAL-05.json,json,,keep,skills/engineering-insight-distillation/tests/evals/pilot-01/skill-outputs/EVAL-05.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-01/skill-outputs/EVAL-06.json,json,,keep,skills/engineering-insight-distillation/tests/evals/pilot-01/skill-outputs/EVAL-06.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-01/skill-outputs/EVAL-07.json,json,,keep,skills/engineering-insight-distillation/tests/evals/pilot-01/skill-outputs/EVAL-07.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-02/EVAL_REPORT.md,md,Pilot 02 — Screening Mode,keep,skills/engineering-insight-distillation/tests/evals/pilot-02/EVAL_REPORT.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-02/expected-decisions.json,json,,keep,skills/engineering-insight-distillation/tests/evals/pilot-02/expected-decisions.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-02/screening-outputs/EVAL-01.json,json,,keep,skills/engineering-insight-distillation/tests/evals/pilot-02/screening-outputs/EVAL-01.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-02/screening-outputs/EVAL-02.json,json,,keep,skills/engineering-insight-distillation/tests/evals/pilot-02/screening-outputs/EVAL-02.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-02/screening-outputs/EVAL-03.json,json,,keep,skills/engineering-insight-distillation/tests/evals/pilot-02/screening-outputs/EVAL-03.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-02/screening-outputs/EVAL-04.json,json,,keep,skills/engineering-insight-distillation/tests/evals/pilot-02/screening-outputs/EVAL-04.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-02/screening-outputs/EVAL-05.json,json,,keep,skills/engineering-insight-distillation/tests/evals/pilot-02/screening-outputs/EVAL-05.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-02/screening-outputs/EVAL-06.json,json,,keep,skills/engineering-insight-distillation/tests/evals/pilot-02/screening-outputs/EVAL-06.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/pilot-02/screening-outputs/EVAL-07.json,json,,keep,skills/engineering-insight-distillation/tests/evals/pilot-02/screening-outputs/EVAL-07.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/rubric.json,json,,keep,skills/engineering-insight-distillation/tests/evals/rubric.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/sample-rubric-scores.json,json,,keep,skills/engineering-insight-distillation/tests/evals/sample-rubric-scores.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/sample-trigger-predictions.json,json,,keep,skills/engineering-insight-distillation/tests/evals/sample-trigger-predictions.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/evals/trigger-cases.json,json,,keep,skills/engineering-insight-distillation/tests/evals/trigger-cases.json,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/fixtures/conflicting-evidence.yaml,yaml,,keep,skills/engineering-insight-distillation/tests/fixtures/conflicting-evidence.yaml,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/fixtures/duplicate-insight.yaml,yaml,,keep,skills/engineering-insight-distillation/tests/fixtures/duplicate-insight.yaml,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/fixtures/insufficient-evidence.yaml,yaml,,keep,skills/engineering-insight-distillation/tests/fixtures/insufficient-evidence.yaml,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/fixtures/maturity-lifecycle-separation.yaml,yaml,,keep,skills/engineering-insight-distillation/tests/fixtures/maturity-lifecycle-separation.yaml,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/fixtures/over-generalized-output.yaml,yaml,,keep,skills/engineering-insight-distillation/tests/fixtures/over-generalized-output.yaml,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/fixtures/over-specific-output.yaml,yaml,,keep,skills/engineering-insight-distillation/tests/fixtures/over-specific-output.yaml,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/engineering-insight-distillation/tests/fixtures/valid-candidate.yaml,yaml,,keep,skills/engineering-insight-distillation/tests/fixtures/valid-candidate.yaml,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/microsoft-dev-tunnels/README.md,md,Microsoft Dev Tunnels Skill,keep_review,skills/microsoft-dev-tunnels/README.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/microsoft-dev-tunnels/SKILL.md,md,Microsoft Dev Tunnels,keep_review,skills/microsoft-dev-tunnels/SKILL.md,,实现资产保留，校准导航、状态和关联文档,01-control-plane
+skills/microsoft-dev-tunnels/agents/openai.yaml,yaml,,keep,skills/microsoft-dev-tunnels/agents/openai.yaml,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/microsoft-dev-tunnels/references/custom-gpt-actions.md,md,Custom GPT Actions,keep,skills/microsoft-dev-tunnels/references/custom-gpt-actions.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/microsoft-dev-tunnels/references/mvp-runbook.md,md,MVP Runbook,keep,skills/microsoft-dev-tunnels/references/mvp-runbook.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/microsoft-dev-tunnels/references/official-cli-baseline.md,md,Official CLI Baseline,keep,skills/microsoft-dev-tunnels/references/official-cli-baseline.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/microsoft-dev-tunnels/references/security-and-limits.md,md,Security and Limits,keep,skills/microsoft-dev-tunnels/references/security-and-limits.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+skills/microsoft-dev-tunnels/references/troubleshooting.md,md,Troubleshooting,keep,skills/microsoft-dev-tunnels/references/troubleshooting.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
+tsconfig.base.json,json,,keep_review,tsconfig.base.json,,保留并在相关批次复核,01-control-plane
