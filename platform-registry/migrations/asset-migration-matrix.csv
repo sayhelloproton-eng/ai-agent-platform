@@ -397,3 +397,22 @@ tsconfig.base.json,json,,keep_review,tsconfig.base.json,,保留并在相关批�
 ,md,DDD 与 Agent 系统边界建模,materialize,docs/knowledge/03_架构思想与理论/THY-004-DDD与Agent系统边界建模.md,THY-004,基于官方产品事实、仓库实现、已接受知识和工程证据综合生成正式正文,03bc-codex-and-agent-theory
 ,md,可信 Agent 系统基本原则,materialize,docs/knowledge/03_架构思想与理论/THY-005-可信Agent系统基本原则.md,THY-005,基于官方产品事实、仓库实现、已接受知识和工程证据综合生成正式正文,03bc-codex-and-agent-theory
 ,md,项目方法论与可复用工程启发,materialize,docs/knowledge/03_架构思想与理论/THY-006-项目方法论与可复用工程启发.md,THY-006,基于官方产品事实、仓库实现、已接受知识和工程证据综合生成正式正文,03bc-codex-and-agent-theory
+,md,多窗口多角色多任务并行架构,materialize,docs/knowledge/04_平台架构/ARC-007-多窗口多角色多任务并行架构.md,ARC-007,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
+,md,ai-agent-platform-DDD领域蓝图,materialize,docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图.md,ARC-008,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
+,md,轻量Task-Control架构,materialize,docs/knowledge/04_平台架构/ARC-009-轻量Task-Control架构.md,ARC-009,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
+,md,Execution-Lane执行通道模型,materialize,docs/knowledge/04_平台架构/ARC-010-Execution-Lane执行通道模型.md,ARC-010,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
+,md,Git-Branch-Worktree与任务隔离,materialize,docs/knowledge/04_平台架构/ARC-011-Git-Branch-Worktree与任务隔离.md,ARC-011,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
+,md,Agent-Profile与Skills资产化,materialize,docs/knowledge/04_平台架构/ARC-012-Agent-Profile与Skills资产化.md,ARC-012,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
+,md,审批证据与副作用账本,materialize,docs/knowledge/04_平台架构/ARC-013-审批证据与副作用账本.md,ARC-013,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
+,md,健康与恢复治理架构,materialize,docs/knowledge/04_平台架构/ARC-014-健康与恢复治理架构.md,ARC-014,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
+,md,架构能力与仓库实现映射,materialize,docs/knowledge/04_平台架构/ARC-016-架构能力与仓库实现映射.md,ARC-016,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
+,md,AGENTS上下文契约与跨平台治理,materialize,docs/knowledge/05_上下文与知识系统/KNO-001-AGENTS上下文契约与跨平台治理.md,KNO-001,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
+,md,多级领域上下文架构,materialize,docs/knowledge/05_上下文与知识系统/KNO-002-多级领域上下文架构.md,KNO-002,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
+,md,上下文Token与证据治理,materialize,docs/knowledge/05_上下文与知识系统/KNO-003-上下文Token与证据治理.md,KNO-003,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
+,md,Custom-GPT内置知识外部知识与记忆,materialize,docs/knowledge/05_上下文与知识系统/KNO-004-Custom-GPT内置知识外部知识与记忆.md,KNO-004,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
+,md,项目知识生命周期,materialize,docs/knowledge/05_上下文与知识系统/KNO-005-项目知识生命周期.md,KNO-005,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
+,md,Knowledge-Pack设计,materialize,docs/knowledge/05_上下文与知识系统/KNO-006-Knowledge-Pack设计.md,KNO-006,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
+,md,平台资产关联模型,materialize,docs/knowledge/05_上下文与知识系统/KNO-007-平台资产关联模型.md,KNO-007,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
+,md,知识与资产变更影响分析,materialize,docs/knowledge/05_上下文与知识系统/KNO-008-知识与资产变更影响分析.md,KNO-008,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
+,md,项目会话知识综合与仓库沉淀,materialize,docs/knowledge/05_上下文与知识系统/KNO-009-项目会话知识综合与仓库沉淀.md,KNO-009,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
+,md,工程洞见提炼与注册表治理,materialize,docs/knowledge/05_上下文与知识系统/KNO-010-工程洞见提炼与注册表治理.md,KNO-010,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system

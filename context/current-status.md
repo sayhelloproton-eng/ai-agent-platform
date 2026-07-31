@@ -91,8 +91,7 @@ Phase: 2.5 — Knowledge Asset Rebuild and Platform Governance
 后续总体顺序：
 
 ```text
-→ Review 并接受 CAP-006～CAP-008 与 THY-001～THY-006
-→ 处理平台架构与上下文知识系统
+→ Review 并接受 ARC-007～ARC-014、ARC-016 与 KNO-001～KNO-010
 → 处理智能体资产、工作流和项目治理
 → 处理实验、作品集、术语与来源
 → 全库一致性 Review

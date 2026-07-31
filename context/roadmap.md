@@ -58,10 +58,18 @@ Batch 03：基础产品能力与架构理论
 - [x] 生成并落库 CAP-001～CAP-005；
 - [x] 按真实 Commit Review 并接受 CAP-001～CAP-005；
 - [x] 生成 CAP-006～CAP-008 与 THY-001～THY-006 确定正文和执行包；
-- [ ] 按真实 Commit Review CAP-006～CAP-008 与 THY-001～THY-006；
-- [ ] 将通过 Review 的九篇正文升级为 `accepted`。
+- [x] 按真实 Commit Review CAP-006～CAP-008 与 THY-001～THY-006；
+- [x] 将通过 Review 的九篇正文升级为 `accepted`。
 
-后续批次再处理平台架构与知识系统、智能体资产与工作流、实验、作品集、来源、正式视觉资产和全库 Review。
+Batch 04：平台架构与上下文知识系统
+
+- [x] 生成 ARC-007～ARC-014 与 ARC-016；
+- [x] 生成 KNO-001～KNO-010；
+- [x] 同步 Registry、关系、迁移矩阵和 Release；
+- [ ] 按真实 Commit Review 十九篇正文；
+- [ ] 将通过 Review 的十九篇正文升级为 `accepted`。
+
+后续批次再处理智能体资产与工作流、实验、作品集、来源、正式视觉资产和全库 Review。
 
 ## Phase 2 Next：Task Control and Trusted Execution
 

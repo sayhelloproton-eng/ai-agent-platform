@@ -1,20 +1,16 @@
 # 上下文与知识系统
 
 ## 目录职责
+维护 AGENTS、上下文分层、Token 与证据、Custom GPT Knowledge、知识生命周期、Knowledge Pack、Registry、影响分析、会话综合和工程洞见。
 
-知识资产、单一真源、Agent 上下文、Knowledge Pack、Registry、工程洞见和变更影响。
+## 正式资产
+`KNO-001～KNO-010`
 
-## 计划资产
-
-`ARC-002、ARC-005、ARC-006、INS-001、KNO-001～KNO-010`
-
-## 当前状态
-
-目标目录已经建立；正式文章将在对应内容批次生成。目录存在不代表计划文章已经实现。
+历史 ARC-002、ARC-005、ARC-006、INS-001 和 WFL-001 继续保留原职责。
 
 ## 维护规则
-
-- 正文进入 Git Review 后才成为正式事实；
-- 系统元数据进入 `platform-registry/`；
-- 复杂图在正文冻结后生成；
-- 本目录内容可作为飞书覆盖式投影源。
+- Git 是唯一真源；
+- Knowledge Pack、Feishu 和 Host 配置是派生发布；
+- Memory、Context、Knowledge 和 Task State 分概念；
+- Private Context 进入 Public Git 前必须最小化和 Review；
+- 首次物化为 `partial`，全库 Review 前保持 `unpublished`。

@@ -582,7 +582,7 @@ assets:
 - asset_id: CAP-006
   title: Codex 产品与执行体系
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/02_基础产品与能力/CAP-006-Codex产品与执行体系.md
@@ -593,7 +593,7 @@ assets:
 - asset_id: CAP-007
   title: Codex 配置、权限与执行基线
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/02_基础产品与能力/CAP-007-Codex配置权限与执行基线.md
@@ -604,7 +604,7 @@ assets:
 - asset_id: CAP-008
   title: Agent 扩展与治理：AGENTS、Rules、Skills、Hooks、MCP 与 Plugins
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/02_基础产品与能力/CAP-008-Agent扩展与治理-AGENTSRulesSkillsHooksMCP与Plugins.md
@@ -615,7 +615,7 @@ assets:
 - asset_id: THY-001
   title: 从 AI 工具到 Agent 工程平台
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/03_架构思想与理论/THY-001-从AI工具到Agent工程平台.md
@@ -626,7 +626,7 @@ assets:
 - asset_id: THY-002
   title: AI 开发范式演进
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/03_架构思想与理论/THY-002-AI开发范式演进.md
@@ -637,7 +637,7 @@ assets:
 - asset_id: THY-003
   title: Agent + Skills 开发范式
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/03_架构思想与理论/THY-003-Agent与Skills开发范式.md
@@ -648,7 +648,7 @@ assets:
 - asset_id: THY-004
   title: DDD 与 Agent 系统边界建模
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/03_架构思想与理论/THY-004-DDD与Agent系统边界建模.md
@@ -659,7 +659,7 @@ assets:
 - asset_id: THY-005
   title: 可信 Agent 系统基本原则
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/03_架构思想与理论/THY-005-可信Agent系统基本原则.md
@@ -670,7 +670,7 @@ assets:
 - asset_id: THY-006
   title: 项目方法论与可复用工程启发
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/03_架构思想与理论/THY-006-项目方法论与可复用工程启发.md
@@ -681,91 +681,91 @@ assets:
 - asset_id: ARC-007
   title: 多窗口多角色多任务并行架构
   asset_type: architecture
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/04_平台架构/ARC-007-多窗口多角色多任务并行架构.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/04_平台架构/ARC-007-多窗口多角色多任务并行架构.md
+  target_path: null
+  canonical_path: docs/knowledge/04_平台架构/ARC-007-多窗口多角色多任务并行架构.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: ARC-008
   title: ai-agent-platform-DDD领域蓝图
   asset_type: architecture
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图.md
+  target_path: null
+  canonical_path: docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: ARC-009
   title: 轻量Task-Control架构
   asset_type: architecture
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/04_平台架构/ARC-009-轻量Task-Control架构.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/04_平台架构/ARC-009-轻量Task-Control架构.md
+  target_path: null
+  canonical_path: docs/knowledge/04_平台架构/ARC-009-轻量Task-Control架构.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: ARC-010
   title: Execution-Lane执行通道模型
   asset_type: architecture
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/04_平台架构/ARC-010-Execution-Lane执行通道模型.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/04_平台架构/ARC-010-Execution-Lane执行通道模型.md
+  target_path: null
+  canonical_path: docs/knowledge/04_平台架构/ARC-010-Execution-Lane执行通道模型.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: ARC-011
   title: Git-Branch-Worktree与任务隔离
   asset_type: architecture
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/04_平台架构/ARC-011-Git-Branch-Worktree与任务隔离.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/04_平台架构/ARC-011-Git-Branch-Worktree与任务隔离.md
+  target_path: null
+  canonical_path: docs/knowledge/04_平台架构/ARC-011-Git-Branch-Worktree与任务隔离.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: ARC-012
   title: Agent-Profile与Skills资产化
   asset_type: architecture
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/04_平台架构/ARC-012-Agent-Profile与Skills资产化.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/04_平台架构/ARC-012-Agent-Profile与Skills资产化.md
+  target_path: null
+  canonical_path: docs/knowledge/04_平台架构/ARC-012-Agent-Profile与Skills资产化.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: ARC-013
   title: 审批证据与副作用账本
   asset_type: architecture
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/04_平台架构/ARC-013-审批证据与副作用账本.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/04_平台架构/ARC-013-审批证据与副作用账本.md
+  target_path: null
+  canonical_path: docs/knowledge/04_平台架构/ARC-013-审批证据与副作用账本.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: ARC-014
   title: 健康与恢复治理架构
   asset_type: architecture
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/04_平台架构/ARC-014-健康与恢复治理架构.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/04_平台架构/ARC-014-健康与恢复治理架构.md
+  target_path: null
+  canonical_path: docs/knowledge/04_平台架构/ARC-014-健康与恢复治理架构.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: ARC-015
   title: 多平台执行器与Usher适配架构
   asset_type: architecture
@@ -780,14 +780,14 @@ assets:
 - asset_id: ARC-016
   title: 架构能力与仓库实现映射
   asset_type: architecture
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/04_平台架构/ARC-016-架构能力与仓库实现映射.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/04_平台架构/ARC-016-架构能力与仓库实现映射.md
+  target_path: null
+  canonical_path: docs/knowledge/04_平台架构/ARC-016-架构能力与仓库实现映射.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: ARC-017
   title: 产品孵化与需求治理体系
   asset_type: architecture
@@ -813,113 +813,113 @@ assets:
 - asset_id: KNO-001
   title: AGENTS上下文契约与跨平台治理
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/05_上下文与知识系统/KNO-001-AGENTS上下文契约与跨平台治理.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/05_上下文与知识系统/KNO-001-AGENTS上下文契约与跨平台治理.md
+  target_path: null
+  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-001-AGENTS上下文契约与跨平台治理.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: KNO-002
   title: 多级领域上下文架构
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/05_上下文与知识系统/KNO-002-多级领域上下文架构.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/05_上下文与知识系统/KNO-002-多级领域上下文架构.md
+  target_path: null
+  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-002-多级领域上下文架构.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: KNO-003
   title: 上下文Token与证据治理
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/05_上下文与知识系统/KNO-003-上下文Token与证据治理.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/05_上下文与知识系统/KNO-003-上下文Token与证据治理.md
+  target_path: null
+  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-003-上下文Token与证据治理.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: KNO-004
   title: Custom-GPT内置知识外部知识与记忆
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/05_上下文与知识系统/KNO-004-Custom-GPT内置知识外部知识与记忆.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/05_上下文与知识系统/KNO-004-Custom-GPT内置知识外部知识与记忆.md
+  target_path: null
+  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-004-Custom-GPT内置知识外部知识与记忆.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: KNO-005
   title: 项目知识生命周期
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/05_上下文与知识系统/KNO-005-项目知识生命周期.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/05_上下文与知识系统/KNO-005-项目知识生命周期.md
+  target_path: null
+  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-005-项目知识生命周期.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: KNO-006
   title: Knowledge-Pack设计
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/05_上下文与知识系统/KNO-006-Knowledge-Pack设计.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/05_上下文与知识系统/KNO-006-Knowledge-Pack设计.md
+  target_path: null
+  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-006-Knowledge-Pack设计.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: KNO-007
   title: 平台资产关联模型
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/05_上下文与知识系统/KNO-007-平台资产关联模型.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/05_上下文与知识系统/KNO-007-平台资产关联模型.md
+  target_path: null
+  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-007-平台资产关联模型.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: KNO-008
   title: 知识与资产变更影响分析
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/05_上下文与知识系统/KNO-008-知识与资产变更影响分析.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/05_上下文与知识系统/KNO-008-知识与资产变更影响分析.md
+  target_path: null
+  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-008-知识与资产变更影响分析.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: KNO-009
   title: 项目会话知识综合与仓库沉淀
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/05_上下文与知识系统/KNO-009-项目会话知识综合与仓库沉淀.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/05_上下文与知识系统/KNO-009-项目会话知识综合与仓库沉淀.md
+  target_path: null
+  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-009-项目会话知识综合与仓库沉淀.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: KNO-010
   title: 工程洞见提炼与注册表治理
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/05_上下文与知识系统/KNO-010-工程洞见提炼与注册表治理.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/05_上下文与知识系统/KNO-010-工程洞见提炼与注册表治理.md
+  target_path: null
+  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-010-工程洞见提炼与注册表治理.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: AGT-001
   title: Agent角色体系
   asset_type: knowledge-document

@@ -10,8 +10,9 @@ completed_batches:
 - 02-post-commit-repository-review
 - 03-content-audit-and-design
 - 03a-chatgpt-and-custom-gpt-documents
-current_batch: 03bc-codex-and-agent-theory-documents
-next_batch: Review CAP-006～CAP-008 and THY-001～THY-006 from the real implementation commit before acceptance
+- 03bc-codex-and-agent-theory-documents
+current_batch: 04-platform-architecture-and-knowledge-system-documents
+next_batch: Review ARC-007～ARC-014、ARC-016 and KNO-001～KNO-010 from the real implementation commit before acceptance
 matrix: platform-registry/migrations/asset-migration-matrix.csv
 rules:
   preserve_stable_ids: true
