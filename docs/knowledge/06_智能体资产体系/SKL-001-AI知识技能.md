@@ -5,7 +5,7 @@ title: AI 知识技能
 status: implemented
 evidence_level: verified
 canonical_source: git
-canonical_path: docs/knowledge/Agent与能力/Skill设计/SKL-001-AI知识技能.md
+canonical_path: docs/knowledge/06_智能体资产体系/SKL-001-AI知识技能.md
 implementation_path: skills/ai-knowledge
 related_assets: [ARC-002, ARC-004, WFL-001, ADR-002, EXP-001, EXP-002]
 ---
@@ -35,7 +35,7 @@ related_assets: [ARC-002, ARC-004, WFL-001, ADR-002, EXP-001, EXP-002]
 
 ## 实现
 
-运行时资产位于 [`skills/ai-knowledge/`](../../../../skills/ai-knowledge)。Provider 通过 `lark-cli` / OpenAPI 读取飞书；脚本只处理确定性工作，语义判断由 Agent 完成。
+运行时资产位于 [`skills/ai-knowledge/`](../../../skills/ai-knowledge)。Provider 通过 `lark-cli` / OpenAPI 读取飞书；脚本只处理确定性工作，语义判断由 Agent 完成。
 
 ## 验证
 

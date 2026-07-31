@@ -112,44 +112,44 @@ assets:
   status: implemented
   evidence_level: verified
   materialized: true
-  current_path: docs/knowledge/Agent与能力/Skill设计/SKL-001-AI知识技能.md
-  target_path: docs/knowledge/06_智能体资产体系/SKL-001-AI知识技能.md
-  canonical_path: docs/knowledge/Agent与能力/Skill设计/SKL-001-AI知识技能.md
+  current_path: docs/knowledge/06_智能体资产体系/SKL-001-AI知识技能.md
+  target_path: null
+  canonical_path: docs/knowledge/06_智能体资产体系/SKL-001-AI知识技能.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: WFL-001
   title: Knowledge Lifecycle
   asset_type: workflow
   status: implemented
   evidence_level: observed
   materialized: true
-  current_path: docs/knowledge/工作流/WFL-001-知识生命周期.md
-  target_path: docs/knowledge/07_工作流与项目治理/WFL-001-知识生命周期与飞书发布.md
-  canonical_path: docs/knowledge/工作流/WFL-001-知识生命周期.md
+  current_path: docs/knowledge/07_工作流与项目治理/WFL-001-知识生命周期与飞书发布.md
+  target_path: null
+  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-001-知识生命周期与飞书发布.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: WFL-002
   title: ChatGPT Task Codex Git
   asset_type: workflow
   status: proposed
   evidence_level: hypothesis
   materialized: true
-  current_path: docs/knowledge/工作流/WFL-002-ChatGPT任务到Codex与Git.md
-  target_path: docs/knowledge/07_工作流与项目治理/WFL-002-ChatGPT任务到Codex与Git.md
-  canonical_path: docs/knowledge/工作流/WFL-002-ChatGPT任务到Codex与Git.md
+  current_path: docs/knowledge/07_工作流与项目治理/WFL-002-ChatGPT任务到Codex与Git.md
+  target_path: null
+  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-002-ChatGPT任务到Codex与Git.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: WFL-003
   title: AI Video Workflow
   asset_type: workflow
   status: proposed
   evidence_level: hypothesis
   materialized: true
-  current_path: docs/knowledge/工作流/WFL-003-AI视频工作流.md
-  target_path: docs/knowledge/07_工作流与项目治理/WFL-003-AI视频工作流.md
-  canonical_path: docs/knowledge/工作流/WFL-003-AI视频工作流.md
+  current_path: docs/knowledge/07_工作流与项目治理/WFL-003-AI视频工作流.md
+  target_path: null
+  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-003-AI视频工作流.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: ARC-002
   title: Knowledge Asset Architecture
   asset_type: architecture
@@ -387,22 +387,22 @@ assets:
   status: proposed
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/工作流/WFL-004-多模型Agent执行治理与Token预算.md
-  target_path: docs/knowledge/07_工作流与项目治理/WFL-004-多模型Agent执行治理与Token预算.md
-  canonical_path: docs/knowledge/工作流/WFL-004-多模型Agent执行治理与Token预算.md
+  current_path: docs/knowledge/07_工作流与项目治理/WFL-004-多模型Agent执行治理与Token预算.md
+  target_path: null
+  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-004-多模型Agent执行治理与Token预算.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: SKL-002
   title: Engineering Insight Distillation Skill
   asset_type: skill
   status: implemented
   evidence_level: verified
   materialized: true
-  current_path: docs/knowledge/Agent与能力/Skill设计/SKL-002-工程洞见提炼技能.md
-  target_path: docs/knowledge/06_智能体资产体系/SKL-002-工程洞见提炼技能.md
-  canonical_path: docs/knowledge/Agent与能力/Skill设计/SKL-002-工程洞见提炼技能.md
+  current_path: docs/knowledge/06_智能体资产体系/SKL-002-工程洞见提炼技能.md
+  target_path: null
+  canonical_path: docs/knowledge/06_智能体资产体系/SKL-002-工程洞见提炼技能.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: EXP-004
   title: Engineering Insight Distillation Skill Pilot Evaluation
   asset_type: experiment
@@ -769,14 +769,14 @@ assets:
 - asset_id: ARC-015
   title: 多平台执行器与Usher适配架构
   asset_type: architecture
-  status: candidate
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/04_平台架构/ARC-015-多平台执行器与Usher适配架构.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/04_平台架构/ARC-015-多平台执行器与Usher适配架构.md
+  target_path: null
+  canonical_path: docs/knowledge/04_平台架构/ARC-015-多平台执行器与Usher适配架构.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: ARC-016
   title: 架构能力与仓库实现映射
   asset_type: architecture
@@ -791,7 +791,7 @@ assets:
 - asset_id: ARC-017
   title: 产品孵化与需求治理体系
   asset_type: architecture
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/04_平台架构/ARC-017-产品孵化与需求治理体系.md
@@ -802,7 +802,7 @@ assets:
 - asset_id: ARC-018
   title: 项目治理与汇报架构
   asset_type: architecture
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/04_平台架构/ARC-018-项目治理与汇报架构.md
@@ -923,7 +923,7 @@ assets:
 - asset_id: AGT-001
   title: Agent角色体系
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/06_智能体资产体系/AGT-001-Agent角色体系.md
@@ -934,7 +934,7 @@ assets:
 - asset_id: AGT-002
   title: Agent-Profile设计规范
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/06_智能体资产体系/AGT-002-Agent-Profile设计规范.md
@@ -945,7 +945,7 @@ assets:
 - asset_id: AGT-003
   title: Agent知识记忆与行为模型
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/06_智能体资产体系/AGT-003-Agent知识记忆与行为模型.md
@@ -956,7 +956,7 @@ assets:
 - asset_id: AGT-004
   title: Agent工具权限与审批边界
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/06_智能体资产体系/AGT-004-Agent工具权限与审批边界.md
@@ -967,7 +967,7 @@ assets:
 - asset_id: AGT-005
   title: Agent-Skill设计与治理
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/06_智能体资产体系/AGT-005-Agent-Skill设计与治理.md
@@ -978,7 +978,7 @@ assets:
 - asset_id: AGT-006
   title: 多Agent协作角色模型
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/06_智能体资产体系/AGT-006-多Agent协作角色模型.md
@@ -989,7 +989,7 @@ assets:
 - asset_id: AGT-007
   title: Agent评估测试与发布
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/06_智能体资产体系/AGT-007-Agent评估测试与发布.md
@@ -1000,7 +1000,7 @@ assets:
 - asset_id: AGT-008
   title: 专业智能体目录
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/06_智能体资产体系/AGT-008-专业智能体目录.md
@@ -1011,7 +1011,7 @@ assets:
 - asset_id: AGT-009
   title: 需求与产品孵化智能体
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/06_智能体资产体系/AGT-009-需求与产品孵化智能体.md
@@ -1022,7 +1022,7 @@ assets:
 - asset_id: AGT-010
   title: 项目治理与汇报智能体
   asset_type: knowledge-document
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/06_智能体资产体系/AGT-010-项目治理与汇报智能体.md
@@ -1033,7 +1033,7 @@ assets:
 - asset_id: WFL-005
   title: 多角色任务合同
   asset_type: workflow
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/07_工作流与项目治理/WFL-005-多角色任务合同.md
@@ -1044,7 +1044,7 @@ assets:
 - asset_id: WFL-006
   title: 规划实现测试复审与集成
   asset_type: workflow
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/07_工作流与项目治理/WFL-006-规划实现测试复审与集成.md
@@ -1055,7 +1055,7 @@ assets:
 - asset_id: WFL-007
   title: 上下文Checkpoint与任务移交
   asset_type: workflow
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/07_工作流与项目治理/WFL-007-上下文Checkpoint与任务移交.md
@@ -1066,7 +1066,7 @@ assets:
 - asset_id: WFL-008
   title: 任务暂停恢复与安全终止
   asset_type: workflow
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/07_工作流与项目治理/WFL-008-任务暂停恢复与安全终止.md
@@ -1077,7 +1077,7 @@ assets:
 - asset_id: WFL-009
   title: 审批工作流
   asset_type: workflow
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/07_工作流与项目治理/WFL-009-审批工作流.md
@@ -1088,7 +1088,7 @@ assets:
 - asset_id: WFL-010
   title: 资产变更与关联同步工作流
   asset_type: workflow
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/07_工作流与项目治理/WFL-010-资产变更与关联同步工作流.md
@@ -1099,7 +1099,7 @@ assets:
 - asset_id: WFL-011
   title: 新产品孵化与资产生成工作流
   asset_type: workflow
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/07_工作流与项目治理/WFL-011-新产品孵化与资产生成工作流.md
@@ -1110,7 +1110,7 @@ assets:
 - asset_id: WFL-012
   title: 项目状态汇总与阶段汇报
   asset_type: workflow
-  status: partial
+  status: accepted
   evidence_level: decided
   materialized: true
   current_path: docs/knowledge/07_工作流与项目治理/WFL-012-项目状态汇总与阶段汇报.md
@@ -1121,157 +1121,157 @@ assets:
 - asset_id: EXP-005
   title: Custom-GPT-Actions链路实验
   asset_type: experiment
-  status: designing
+  status: partial
   evidence_level: observed
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/08_实验与复盘/EXP-005-Custom-GPT-Actions链路实验.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/08_实验与复盘/EXP-005-Custom-GPT-Actions链路实验.md
+  target_path: null
+  canonical_path: docs/knowledge/08_实验与复盘/EXP-005-Custom-GPT-Actions链路实验.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: EXP-006
   title: Gateway-Local-Runtime与Dev-Tunnels实验
   asset_type: experiment
-  status: designing
+  status: partial
   evidence_level: observed
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/08_实验与复盘/EXP-006-Gateway-Local-Runtime与Dev-Tunnels实验.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/08_实验与复盘/EXP-006-Gateway-Local-Runtime与Dev-Tunnels实验.md
+  target_path: null
+  canonical_path: docs/knowledge/08_实验与复盘/EXP-006-Gateway-Local-Runtime与Dev-Tunnels实验.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: EXP-007
   title: Cloudflare路线替代复盘
   asset_type: experiment
-  status: designing
+  status: partial
   evidence_level: observed
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/08_实验与复盘/EXP-007-Cloudflare路线替代复盘.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/08_实验与复盘/EXP-007-Cloudflare路线替代复盘.md
+  target_path: null
+  canonical_path: docs/knowledge/08_实验与复盘/EXP-007-Cloudflare路线替代复盘.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: EXP-008
   title: 长上下文与知识综合复盘
   asset_type: experiment
-  status: designing
+  status: partial
   evidence_level: observed
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/08_实验与复盘/EXP-008-长上下文与知识综合复盘.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/08_实验与复盘/EXP-008-长上下文与知识综合复盘.md
+  target_path: null
+  canonical_path: docs/knowledge/08_实验与复盘/EXP-008-长上下文与知识综合复盘.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: EXP-009
   title: 健康恢复与任务快照实验
   asset_type: experiment
-  status: candidate
+  status: partial
   evidence_level: hypothesis
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/08_实验与复盘/EXP-009-健康恢复与任务快照实验.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/08_实验与复盘/EXP-009-健康恢复与任务快照实验.md
+  target_path: null
+  canonical_path: docs/knowledge/08_实验与复盘/EXP-009-健康恢复与任务快照实验.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: PRT-003
   title: 核心架构亮点
   asset_type: portfolio
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/09_作品集/PRT-003-核心架构亮点.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/09_作品集/PRT-003-核心架构亮点.md
+  target_path: null
+  canonical_path: docs/knowledge/09_作品集/PRT-003-核心架构亮点.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: PRT-004
   title: 工程能力证明
   asset_type: portfolio
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/09_作品集/PRT-004-工程能力证明.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/09_作品集/PRT-004-工程能力证明.md
+  target_path: null
+  canonical_path: docs/knowledge/09_作品集/PRT-004-工程能力证明.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: PRT-005
   title: 关键问题与解决过程
   asset_type: portfolio
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/09_作品集/PRT-005-关键问题与解决过程.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/09_作品集/PRT-005-关键问题与解决过程.md
+  target_path: null
+  canonical_path: docs/knowledge/09_作品集/PRT-005-关键问题与解决过程.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: PRT-006
   title: 项目成果索引
   asset_type: portfolio
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/09_作品集/PRT-006-项目成果索引.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/09_作品集/PRT-006-项目成果索引.md
+  target_path: null
+  canonical_path: docs/knowledge/09_作品集/PRT-006-项目成果索引.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: REF-001
   title: 核心术语表
   asset_type: reference
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/10_术语与来源/REF-001-核心术语表.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/10_术语与来源/REF-001-核心术语表.md
+  target_path: null
+  canonical_path: docs/knowledge/10_术语与来源/REF-001-核心术语表.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: REF-002
   title: 官方资料来源索引
   asset_type: reference
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/10_术语与来源/REF-002-官方资料来源索引.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/10_术语与来源/REF-002-官方资料来源索引.md
+  target_path: null
+  canonical_path: docs/knowledge/10_术语与来源/REF-002-官方资料来源索引.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: REF-003
   title: 开源项目与框架索引
   asset_type: reference
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/10_术语与来源/REF-003-开源项目与框架索引.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/10_术语与来源/REF-003-开源项目与框架索引.md
+  target_path: null
+  canonical_path: docs/knowledge/10_术语与来源/REF-003-开源项目与框架索引.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: REF-004
   title: 架构图索引
   asset_type: reference
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/10_术语与来源/REF-004-架构图索引.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/10_术语与来源/REF-004-架构图索引.md
+  target_path: null
+  canonical_path: docs/knowledge/10_术语与来源/REF-004-架构图索引.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: REF-005
   title: 知识文章与仓库资产索引
   asset_type: reference
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/10_术语与来源/REF-005-知识文章与仓库资产索引.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/10_术语与来源/REF-005-知识文章与仓库资产索引.md
+  target_path: null
+  canonical_path: docs/knowledge/10_术语与来源/REF-005-知识文章与仓库资产索引.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: APP-GATEWAY
   title: Action Gateway
   asset_type: application

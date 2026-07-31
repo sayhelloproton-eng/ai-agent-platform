@@ -436,3 +436,24 @@ tsconfig.base.json,json,,keep_review,tsconfig.base.json,,保留并在相关批�
 ,md,资产变更与关联同步工作流,materialize,docs/knowledge/07_工作流与项目治理/WFL-010-资产变更与关联同步工作流.md,WFL-010,基于已接受架构、知识系统、项目实践与治理规则综合生成正式正文,05-agent-assets-and-workflow-governance
 ,md,新产品孵化与资产生成工作流,materialize,docs/knowledge/07_工作流与项目治理/WFL-011-新产品孵化与资产生成工作流.md,WFL-011,基于已接受架构、知识系统、项目实践与治理规则综合生成正式正文,05-agent-assets-and-workflow-governance
 ,md,项目状态汇总与阶段汇报,materialize,docs/knowledge/07_工作流与项目治理/WFL-012-项目状态汇总与阶段汇报.md,WFL-012,基于已接受架构、知识系统、项目实践与治理规则综合生成正式正文,05-agent-assets-and-workflow-governance
+,md,多平台执行器与Usher适配架构,materialize,docs/knowledge/04_平台架构/ARC-015-多平台执行器与Usher适配架构.md,ARC-015,基于真实实验、已接受架构、代码证据和来源索引生成正式正文,06-experiments-portfolio-references-and-path-closure
+,md,Custom-GPT-Actions链路实验,materialize,docs/knowledge/08_实验与复盘/EXP-005-Custom-GPT-Actions链路实验.md,EXP-005,基于真实实验、已接受架构、代码证据和来源索引生成正式正文,06-experiments-portfolio-references-and-path-closure
+,md,Gateway-Local-Runtime与Dev-Tunnels实验,materialize,docs/knowledge/08_实验与复盘/EXP-006-Gateway-Local-Runtime与Dev-Tunnels实验.md,EXP-006,基于真实实验、已接受架构、代码证据和来源索引生成正式正文,06-experiments-portfolio-references-and-path-closure
+,md,Cloudflare路线替代复盘,materialize,docs/knowledge/08_实验与复盘/EXP-007-Cloudflare路线替代复盘.md,EXP-007,基于真实实验、已接受架构、代码证据和来源索引生成正式正文,06-experiments-portfolio-references-and-path-closure
+,md,长上下文与知识综合复盘,materialize,docs/knowledge/08_实验与复盘/EXP-008-长上下文与知识综合复盘.md,EXP-008,基于真实实验、已接受架构、代码证据和来源索引生成正式正文,06-experiments-portfolio-references-and-path-closure
+,md,健康恢复与任务快照实验,materialize,docs/knowledge/08_实验与复盘/EXP-009-健康恢复与任务快照实验.md,EXP-009,基于真实实验、已接受架构、代码证据和来源索引生成正式正文,06-experiments-portfolio-references-and-path-closure
+,md,核心架构亮点,materialize,docs/knowledge/09_作品集/PRT-003-核心架构亮点.md,PRT-003,基于真实实验、已接受架构、代码证据和来源索引生成正式正文,06-experiments-portfolio-references-and-path-closure
+,md,工程能力证明,materialize,docs/knowledge/09_作品集/PRT-004-工程能力证明.md,PRT-004,基于真实实验、已接受架构、代码证据和来源索引生成正式正文,06-experiments-portfolio-references-and-path-closure
+,md,关键问题与解决过程,materialize,docs/knowledge/09_作品集/PRT-005-关键问题与解决过程.md,PRT-005,基于真实实验、已接受架构、代码证据和来源索引生成正式正文,06-experiments-portfolio-references-and-path-closure
+,md,项目成果索引,materialize,docs/knowledge/09_作品集/PRT-006-项目成果索引.md,PRT-006,基于真实实验、已接受架构、代码证据和来源索引生成正式正文,06-experiments-portfolio-references-and-path-closure
+,md,核心术语表,materialize,docs/knowledge/10_术语与来源/REF-001-核心术语表.md,REF-001,基于真实实验、已接受架构、代码证据和来源索引生成正式正文,06-experiments-portfolio-references-and-path-closure
+,md,官方资料来源索引,materialize,docs/knowledge/10_术语与来源/REF-002-官方资料来源索引.md,REF-002,基于真实实验、已接受架构、代码证据和来源索引生成正式正文,06-experiments-portfolio-references-and-path-closure
+,md,开源项目与框架索引,materialize,docs/knowledge/10_术语与来源/REF-003-开源项目与框架索引.md,REF-003,基于真实实验、已接受架构、代码证据和来源索引生成正式正文,06-experiments-portfolio-references-and-path-closure
+,md,架构图索引,materialize,docs/knowledge/10_术语与来源/REF-004-架构图索引.md,REF-004,基于真实实验、已接受架构、代码证据和来源索引生成正式正文,06-experiments-portfolio-references-and-path-closure
+,md,知识文章与仓库资产索引,materialize,docs/knowledge/10_术语与来源/REF-005-知识文章与仓库资产索引.md,REF-005,基于真实实验、已接受架构、代码证据和来源索引生成正式正文,06-experiments-portfolio-references-and-path-closure
+docs/knowledge/Agent与能力/Skill设计/SKL-001-AI知识技能.md,md,AI Knowledge Skill,move,docs/knowledge/06_智能体资产体系/SKL-001-AI知识技能.md,SKL-001,完成目标知识树路径收口并保持稳定资产 ID,06-experiments-portfolio-references-and-path-closure
+docs/knowledge/Agent与能力/Skill设计/SKL-002-工程洞见提炼技能.md,md,Engineering Insight Distillation Skill,move,docs/knowledge/06_智能体资产体系/SKL-002-工程洞见提炼技能.md,SKL-002,完成目标知识树路径收口并保持稳定资产 ID,06-experiments-portfolio-references-and-path-closure
+docs/knowledge/工作流/WFL-001-知识生命周期.md,md,Knowledge Lifecycle,move,docs/knowledge/07_工作流与项目治理/WFL-001-知识生命周期与飞书发布.md,WFL-001,完成目标知识树路径收口并保持稳定资产 ID,06-experiments-portfolio-references-and-path-closure
+docs/knowledge/工作流/WFL-002-ChatGPT任务到Codex与Git.md,md,ChatGPT Task Codex Git,move,docs/knowledge/07_工作流与项目治理/WFL-002-ChatGPT任务到Codex与Git.md,WFL-002,完成目标知识树路径收口并保持稳定资产 ID,06-experiments-portfolio-references-and-path-closure
+docs/knowledge/工作流/WFL-003-AI视频工作流.md,md,AI Video Workflow,move,docs/knowledge/07_工作流与项目治理/WFL-003-AI视频工作流.md,WFL-003,完成目标知识树路径收口并保持稳定资产 ID,06-experiments-portfolio-references-and-path-closure
+docs/knowledge/工作流/WFL-004-多模型Agent执行治理与Token预算.md,md,Multi-Model Agent Execution Governance and Token Budget,move,docs/knowledge/07_工作流与项目治理/WFL-004-多模型Agent执行治理与Token预算.md,WFL-004,完成目标知识树路径收口并保持稳定资产 ID,06-experiments-portfolio-references-and-path-closure

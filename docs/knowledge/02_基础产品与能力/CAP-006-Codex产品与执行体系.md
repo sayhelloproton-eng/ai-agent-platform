@@ -173,7 +173,7 @@ Codex 的可靠性来自工程边界，而不是模型承诺：
 - [CAP-007 Codex 配置、权限与执行基线](./CAP-007-Codex配置权限与执行基线.md)
 - [CAP-008 Agent 扩展与治理](./CAP-008-Agent扩展与治理-AGENTSRulesSkillsHooksMCP与Plugins.md)
 - [CTX-007 当前实现与目标架构](../00_项目入口/CTX-007-当前实现与目标架构.md)
-- [WFL-004 多模型 Agent 执行治理与 Token 预算](../工作流/WFL-004-多模型Agent执行治理与Token预算.md)
+- [WFL-004 多模型 Agent 执行治理与 Token 预算](../07_工作流与项目治理/WFL-004-多模型Agent执行治理与Token预算.md)
 
 ## 11. 产品事实核验基线
 

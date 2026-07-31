@@ -442,11 +442,11 @@ Agent 越能行动，越需要：
 
 ## 13. 参考资料
 
-- OpenAI: A Practical Guide to Building Agents  
+- OpenAI: A Practical Guide to Building Agents
   https://openai.com/business/guides-and-resources/a-practical-guide-to-building-ai-agents/
-- GitHub Copilot Repository Instructions  
+- GitHub Copilot Repository Instructions
   https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/add-custom-instructions/add-repository-instructions
-- GitHub Copilot CLI Custom Instructions  
+- GitHub Copilot CLI Custom Instructions
   https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions
-- Anthropic Claude Code Memory  
+- Anthropic Claude Code Memory
   https://docs.anthropic.com/zh-CN/docs/claude-code/memory

@@ -4,7 +4,7 @@ asset_type: workflow
 title: AI 视频工作流
 status: proposed
 evidence_level: hypothesis
-canonical_path: docs/knowledge/工作流/WFL-003-AI视频工作流.md
+canonical_path: docs/knowledge/07_工作流与项目治理/WFL-003-AI视频工作流.md
 related_assets: [ARC-003, DOM-001, PRD-001, PRD-002]
 ---
 

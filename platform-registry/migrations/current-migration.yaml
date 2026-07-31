@@ -12,8 +12,9 @@ completed_batches:
 - 03a-chatgpt-and-custom-gpt-documents
 - 03bc-codex-and-agent-theory-documents
 - 04-platform-architecture-and-knowledge-system-documents
-current_batch: 05-agent-assets-and-workflow-governance-documents
-next_batch: Review ARC-017～ARC-018、AGT-001～AGT-010 and WFL-005～WFL-012 from the real implementation commit before acceptance
+- 05-agent-assets-and-workflow-governance-documents
+current_batch: 06-experiments-portfolio-references-and-path-closure
+next_batch: Review Batch 06 real implementation commit, then run full-library consistency review and formal visual asset generation
 matrix: platform-registry/migrations/asset-migration-matrix.csv
 rules:
   preserve_stable_ids: true
