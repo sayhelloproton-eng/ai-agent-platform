@@ -56,39 +56,35 @@ Phase: 2.5 — Knowledge Asset Rebuild and Platform Governance
 
 ## Knowledge Rebuild Status
 
-### Batch 01 — First Repository Materialization Completed
+### Batch 01 and Batch 01-R1 — Completed
 
 - 根入口与 Context 控制面；
 - Platform Registry MVP；
 - Engineering Insight Registry 迁移；
 - `00～10` 目标知识树；
 - 技术目录职责拆分；
-- Registry 校验入口。
+- Registry 校验入口；
+- Context 当前状态与 Registry 计划资产语义修正；
+- 迁移矩阵纳入 Git；
+- `canonical_path`、`current_path` 与 `target_path` 语义修正；
+- 空 Generated 索引清理与 Registry 校验增强。
 
-Batch 01 已完成首次仓库落库，但仍处于 Review 阶段，不能描述为最终验收通过。
+### Current — Batch 02 Repository Review
 
-### Current — Batch 01-R1
+- `00_项目入口` 六篇正文已经进入仓库；
+- `01_产品体系` 五篇正文已经进入仓库；
+- 十一篇正文当前均为 `partial`，等待基于本次真实 Commit 的仓库级整体 Review；
+- 图片尚未生成；
+- HTML 尚未生成；
+- 飞书尚未发布。
 
-- 修复 Context 当前状态；
-- 修复 Registry 计划资产与正式资产的状态混淆；
-- 将迁移矩阵纳入 Git；
-- 修复 `canonical_path`、`current_path` 与 `target_path` 语义；
-- 清理空 Generated 索引；
-- 增强 Registry 校验。
-
-### Not Started — Batch 02
-
-- `00_项目入口` 正式文章；
-- `01_产品体系` 正式文章；
-- 正式文章逐篇 Review；
-- 图片资产；
-- 飞书发布。
+下一步是根据本次真实 Commit 对 Batch 02 做集中 Review 和内容修正，不提前进入后续批次。
 
 后续总体顺序：
 
 ```text
-→ 批量生成和落库正式文档
-→ 全库 Review
+→ 完成 Batch 02 仓库级整体 Review 和内容修正
+→ 后续批次正式文档落库与全库 Review
 → 生成正式视觉资产
 → 建立 Feishu 映射
 → 对正式文档逐篇 overwrite

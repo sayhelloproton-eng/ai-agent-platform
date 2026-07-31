@@ -6,14 +6,14 @@ assets:
 - asset_id: CTX-001
   title: Project Context
   asset_type: context
-  status: accepted
+  status: partial
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/项目与产品/CTX-001-项目上下文.md
-  target_path: docs/knowledge/00_项目入口/CTX-001-项目总览.md
-  canonical_path: docs/knowledge/项目与产品/CTX-001-项目上下文.md
+  current_path: docs/knowledge/00_项目入口/CTX-001-项目总览.md
+  target_path: null
+  canonical_path: docs/knowledge/00_项目入口/CTX-001-项目总览.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: CTX-002
   title: Current State
   asset_type: status
@@ -31,11 +31,11 @@ assets:
   status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/项目与产品/CTX-003-项目总览.md
-  target_path: docs/technical/归档/历史资产/CTX-003-项目总览-v1.md
-  canonical_path: docs/knowledge/项目与产品/CTX-003-项目总览.md
+  current_path: docs/technical/归档/历史资产/CTX-003-项目总览-v1.md
+  target_path: null
+  canonical_path: docs/technical/归档/历史资产/CTX-003-项目总览-v1.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
   superseded_by: CTX-001
 - asset_id: CTX-004
   title: Six-Month Roadmap
@@ -51,25 +51,25 @@ assets:
 - asset_id: PRD-001
   title: Platform Vision
   asset_type: product
-  status: accepted
+  status: partial
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/项目与产品/PRD-001-平台愿景.md
-  target_path: docs/knowledge/00_项目入口/PRD-001-平台愿景.md
-  canonical_path: docs/knowledge/项目与产品/PRD-001-平台愿景.md
+  current_path: docs/knowledge/00_项目入口/PRD-001-平台愿景.md
+  target_path: null
+  canonical_path: docs/knowledge/00_项目入口/PRD-001-平台愿景.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: PRD-002
   title: Portfolio Outcomes
   asset_type: product
   status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/项目与产品/PRD-002-作品集成果.md
-  target_path: docs/technical/归档/历史资产/PRD-002-作品集成果-v1.md
-  canonical_path: docs/knowledge/项目与产品/PRD-002-作品集成果.md
+  current_path: docs/technical/归档/历史资产/PRD-002-作品集成果-v1.md
+  target_path: null
+  canonical_path: docs/technical/归档/历史资产/PRD-002-作品集成果-v1.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
   superseded_by: PRT-006
 - asset_id: ARC-001
   title: Platform Target Architecture
@@ -429,102 +429,102 @@ assets:
 - asset_id: CTX-005
   title: 当前能力地图
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/00_项目入口/CTX-005-当前能力地图.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/00_项目入口/CTX-005-当前能力地图.md
+  target_path: null
+  canonical_path: docs/knowledge/00_项目入口/CTX-005-当前能力地图.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: CTX-006
   title: 知识库阅读导航
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/00_项目入口/CTX-006-知识库阅读导航.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/00_项目入口/CTX-006-知识库阅读导航.md
+  target_path: null
+  canonical_path: docs/knowledge/00_项目入口/CTX-006-知识库阅读导航.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: CTX-007
   title: 当前实现与目标架构
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/00_项目入口/CTX-007-当前实现与目标架构.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/00_项目入口/CTX-007-当前实现与目标架构.md
+  target_path: null
+  canonical_path: docs/knowledge/00_项目入口/CTX-007-当前实现与目标架构.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: DEC-001
   title: 架构决策演进摘要
   asset_type: knowledge-document
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/00_项目入口/DEC-001-架构决策演进摘要.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/00_项目入口/DEC-001-架构决策演进摘要.md
+  target_path: null
+  canonical_path: docs/knowledge/00_项目入口/DEC-001-架构决策演进摘要.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: PRD-003
   title: ai-agent-platform产品定义
   asset_type: product
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/01_产品体系/PRD-003-ai-agent-platform产品定义.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/01_产品体系/PRD-003-ai-agent-platform产品定义.md
+  target_path: null
+  canonical_path: docs/knowledge/01_产品体系/PRD-003-ai-agent-platform产品定义.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: PRD-004
   title: 用户价值与核心场景
   asset_type: product
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/01_产品体系/PRD-004-用户价值与核心场景.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/01_产品体系/PRD-004-用户价值与核心场景.md
+  target_path: null
+  canonical_path: docs/knowledge/01_产品体系/PRD-004-用户价值与核心场景.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: PRD-005
   title: 能力地图与演进路线
   asset_type: product
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/01_产品体系/PRD-005-能力地图与演进路线.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/01_产品体系/PRD-005-能力地图与演进路线.md
+  target_path: null
+  canonical_path: docs/knowledge/01_产品体系/PRD-005-能力地图与演进路线.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: PRD-006
   title: AI视频工作流产品概念
   asset_type: product
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/01_产品体系/PRD-006-AI视频工作流产品概念.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/01_产品体系/PRD-006-AI视频工作流产品概念.md
+  target_path: null
+  canonical_path: docs/knowledge/01_产品体系/PRD-006-AI视频工作流产品概念.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: PRD-007
   title: 平台与上层产品边界
   asset_type: product
-  status: designing
+  status: partial
   evidence_level: decided
-  materialized: false
-  current_path: null
-  target_path: docs/knowledge/01_产品体系/PRD-007-平台与上层产品边界.md
-  canonical_path: null
+  materialized: true
+  current_path: docs/knowledge/01_产品体系/PRD-007-平台与上层产品边界.md
+  target_path: null
+  canonical_path: docs/knowledge/01_产品体系/PRD-007-平台与上层产品边界.md
   publication_status: unpublished
-  migration_state: planned
+  migration_state: complete
 - asset_id: CAP-001
   title: 什么是ChatGPT
   asset_type: knowledge-document

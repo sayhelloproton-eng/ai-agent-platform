@@ -32,15 +32,20 @@ Batch 01 已完成首次仓库落库：
 - [x] 拆分技术目录职责；
 - [x] 迁移 Engineering Insight Registry。
 
-当前：
+Batch 01-R1 已完成：
 
-- [ ] 完成 Batch 01-R1 Registry 与状态一致性修正。
+- [x] 完成 Registry 与状态一致性修正；
+- [x] 将迁移矩阵纳入 Git；
+- [x] 增强 Registry 校验。
 
-Batch 02 尚未开始：
+Batch 02 已进入仓库级整体 Review：
 
-- [ ] 逐篇生成与 Review `00_项目入口`；
-- [ ] 逐篇生成与 Review `01_产品体系`；
-- [ ] 正式文章落库后更新 Registry；
+- [x] 将 `00_项目入口` 六篇正文落库；
+- [x] 将 `01_产品体系` 五篇正文落库；
+- [x] 同步 Registry、迁移矩阵与 Release；
+- [ ] 根据本次真实 Commit 做集中 Review 和内容修正；
+- [ ] 生成正式图片；
+- [ ] 生成 HTML；
 - [ ] 完成全部文档后发布飞书。
 
 后续批次再处理基础产品能力与理论、平台架构与知识系统、智能体资产与工作流、实验、作品集、来源、正式视觉资产和全库 Review。

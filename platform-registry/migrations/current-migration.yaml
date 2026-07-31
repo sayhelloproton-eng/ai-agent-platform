@@ -4,8 +4,9 @@ source_commit: bd31893ddb9bb2efeb3cb38f67f1add66735cd79
 status: in_review
 completed_batches:
 - 01-control-plane
-current_batch: 01-r1-registry-consistency
-next_batch: 02-entry-and-product-documents
+- 01-r1-registry-consistency
+current_batch: 02-entry-and-product-documents
+next_batch: Batch 02 repository review and content correction
 matrix: platform-registry/migrations/asset-migration-matrix.csv
 rules:
   preserve_stable_ids: true

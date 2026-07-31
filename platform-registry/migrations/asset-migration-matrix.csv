@@ -88,11 +88,20 @@ docs/knowledge/知识系统/ARC-002-智能体平台知识资产架构.md,md,ARC-
 docs/knowledge/知识系统/ARC-005-单一真源与知识投影架构.md,md,ARC-005 单一真源与知识投影架构,revise_move,docs/knowledge/05_上下文与知识系统/ARC-005-单一真源与知识投影架构.md,ARC-005,加入零预读、映射后按篇覆盖,04-knowledge-architecture
 docs/knowledge/知识系统/ARC-006-项目知识分层与Agent上下文架构.md,md,ARC-006 项目知识分层与 Agent 上下文架构,revise_move,docs/knowledge/05_上下文与知识系统/ARC-006-项目知识分层与Agent上下文架构.md,ARC-006,纳入四层上下文与 Checkpoint,04-knowledge-architecture
 docs/knowledge/知识系统/README.md,md,知识系统,replace_or_remove,,,旧栏目 README 随目标知识树替换；空栏目删除,02-entry-product
-docs/knowledge/项目与产品/CTX-001-项目上下文.md,md,CTX-001 项目上下文,revise_move,docs/knowledge/00_项目入口/CTX-001-项目总览.md,CTX-001,融合真实演进、职业目标、仓库资产和成功标准,02-entry-product
-docs/knowledge/项目与产品/CTX-003-项目总览.md,md,CTX-003 项目总览,merge_archive,docs/technical/归档/历史资产/CTX-003-项目总览-v1.md,CTX-003,有效内容并入 CTX-001；原 ID 标记 superseded,02-entry-product
-docs/knowledge/项目与产品/PRD-001-平台愿景.md,md,PRD-001 平台愿景,revise_move,docs/knowledge/00_项目入口/PRD-001-平台愿景.md,PRD-001,保留愿景 ID，补充用户困境、承诺、非目标和度量,02-entry-product
-docs/knowledge/项目与产品/PRD-002-作品集成果.md,md,PRD-002 作品集成果,merge_archive,docs/technical/归档/历史资产/PRD-002-作品集成果-v1.md,PRD-002,并入 PRT-006；避免复用 PRD-002 作为新产品定义,06-experiments-portfolio
-docs/knowledge/项目与产品/README.md,md,项目与产品,replace_or_remove,,,旧栏目 README 随目标知识树替换；空栏目删除,02-entry-product
+docs/knowledge/00_项目入口/CTX-001-项目总览.md,md,CTX-001 项目总览,keep_review,docs/knowledge/00_项目入口/CTX-001-项目总览.md,CTX-001,迁移并替换完成；等待仓库级整体 Review,02-entry-and-product-documents
+docs/technical/归档/历史资产/CTX-003-项目总览-v1.md,md,CTX-003 项目总览 v1,archive,docs/technical/归档/历史资产/CTX-003-项目总览-v1.md,CTX-003,归档完成；有效内容由 CTX-001 承接,02-entry-and-product-documents
+docs/knowledge/00_项目入口/PRD-001-平台愿景.md,md,PRD-001 平台愿景,keep_review,docs/knowledge/00_项目入口/PRD-001-平台愿景.md,PRD-001,迁移并替换完成；等待仓库级整体 Review,02-entry-and-product-documents
+docs/technical/归档/历史资产/PRD-002-作品集成果-v1.md,md,PRD-002 作品集成果 v1,archive,docs/technical/归档/历史资产/PRD-002-作品集成果-v1.md,PRD-002,归档完成；保留既有 superseded_by 关系,02-entry-and-product-documents
+docs/knowledge/项目与产品/README.md,md,项目与产品,replace_or_remove,,,旧栏目及其目录已清理完成,02-entry-and-product-documents
+docs/knowledge/00_项目入口/CTX-005-当前能力地图.md,md,CTX-005 当前能力地图,keep_review,docs/knowledge/00_项目入口/CTX-005-当前能力地图.md,CTX-005,正文物化完成；等待仓库级整体 Review,02-entry-and-product-documents
+docs/knowledge/00_项目入口/CTX-006-知识库阅读导航.md,md,CTX-006 知识库阅读导航,keep_review,docs/knowledge/00_项目入口/CTX-006-知识库阅读导航.md,CTX-006,正文物化完成；等待仓库级整体 Review,02-entry-and-product-documents
+docs/knowledge/00_项目入口/CTX-007-当前实现与目标架构.md,md,CTX-007 当前实现与目标架构,keep_review,docs/knowledge/00_项目入口/CTX-007-当前实现与目标架构.md,CTX-007,正文物化完成；等待仓库级整体 Review,02-entry-and-product-documents
+docs/knowledge/00_项目入口/DEC-001-架构决策演进摘要.md,md,DEC-001 架构决策演进摘要,keep_review,docs/knowledge/00_项目入口/DEC-001-架构决策演进摘要.md,DEC-001,正文物化完成；等待仓库级整体 Review,02-entry-and-product-documents
+docs/knowledge/01_产品体系/PRD-003-ai-agent-platform产品定义.md,md,PRD-003 ai-agent-platform 产品定义,keep_review,docs/knowledge/01_产品体系/PRD-003-ai-agent-platform产品定义.md,PRD-003,正文物化完成；等待仓库级整体 Review,02-entry-and-product-documents
+docs/knowledge/01_产品体系/PRD-004-用户价值与核心场景.md,md,PRD-004 用户价值与核心场景,keep_review,docs/knowledge/01_产品体系/PRD-004-用户价值与核心场景.md,PRD-004,正文物化完成；等待仓库级整体 Review,02-entry-and-product-documents
+docs/knowledge/01_产品体系/PRD-005-能力地图与演进路线.md,md,PRD-005 能力地图与演进路线,keep_review,docs/knowledge/01_产品体系/PRD-005-能力地图与演进路线.md,PRD-005,正文物化完成；等待仓库级整体 Review,02-entry-and-product-documents
+docs/knowledge/01_产品体系/PRD-006-AI视频工作流产品概念.md,md,PRD-006 AI 视频工作流产品概念,keep_review,docs/knowledge/01_产品体系/PRD-006-AI视频工作流产品概念.md,PRD-006,正文物化完成；等待仓库级整体 Review,02-entry-and-product-documents
+docs/knowledge/01_产品体系/PRD-007-平台与上层产品边界.md,md,PRD-007 平台与上层产品边界,keep_review,docs/knowledge/01_产品体系/PRD-007-平台与上层产品边界.md,PRD-007,正文物化完成；等待仓库级整体 Review,02-entry-and-product-documents
 docs/learning/README.md,md,Learning,revise,docs/learning/README.md,,明确学习层与正式知识层蒸馏关系,03-foundation-theory
 docs/learning/chatgpt-agent-engineering/00_ChatGPT_Agent_工程体系学习总纲.md,md,ChatGPT Agent 工程体系学习总纲 v1.0,keep_review,docs/learning/chatgpt-agent-engineering/00_ChatGPT_Agent_工程体系学习总纲.md,,学习资产保留，后续拆分与蒸馏,03-foundation-theory
 docs/learning/chatgpt-agent-engineering/01_学习大纲图.md,md,ChatGPT Agent 工程体系学习大纲图,keep_review,docs/learning/chatgpt-agent-engineering/01_学习大纲图.md,,学习资产保留，后续拆分与蒸馏,03-foundation-theory

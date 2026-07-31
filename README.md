@@ -22,11 +22,12 @@ bd31893ddb9bb2efeb3cb38f67f1add66735cd79
 ```text
 Branch: knowledge-rebuild-v2
 Commit: 以该分支实际 HEAD 为准
-Batch 01: 已完成首次仓库落库
-Current Review: Batch 01-R1
+Batch 01: 已完成
+Batch 01-R1: 已完成 Review
+Current Review: Batch 02 repository review and content correction
 ```
 
-Batch 01 已首次落库控制面、Platform Registry、目标知识树和技术目录重构；当前正在进行 Batch 01-R1 状态与 Registry 语义修正，尚未完成最终验收。
+Batch 01 已完成控制面、Platform Registry、目标知识树和技术目录重构，Batch 01-R1 已完成状态与 Registry 语义修正。Batch 02 的十一篇项目入口与产品体系正文已经进入仓库，当前等待基于本次真实 Commit 的仓库级整体 Review 和集中修正；图片、HTML 与飞书发布均尚未开始。
 
 已验证链路：
 

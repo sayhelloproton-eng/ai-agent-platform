@@ -187,3 +187,24 @@ relations:
 - from: WFL-001
   type: implements
   to: SOL-002
+- from: CTX-007
+  type: explains
+  to: ARC-001
+- from: DEC-001
+  type: explains
+  to: ADR-002
+- from: PRD-003
+  type: derived_from
+  to: PRD-001
+- from: PRD-004
+  type: depends_on
+  to: PRD-003
+- from: PRD-005
+  type: depends_on
+  to: PRD-003
+- from: PRD-006
+  type: depends_on
+  to: PRD-003
+- from: PRD-006
+  type: governed_by
+  to: PRD-007
