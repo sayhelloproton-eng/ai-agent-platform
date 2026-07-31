@@ -79,20 +79,21 @@ Phase: 2.5 — Knowledge Asset Rebuild and Platform Governance
 - HTML 尚未生成；
 - 飞书尚未发布。
 
-### Current — Batch 03 Planning
+### Current — Batch 03A In Review
 
-- 审计 CAP-001～CAP-008 的旧学习与产品资料；
-- 审计 THY-001～THY-006 的架构理论资料；
-- 确定复用、重写、归档和证据关系；
-- 在生成正文前完成内容边界与外部事实核验。
-
-CAP / THY 正文尚未生成。
+- Batch 03 的十四项资产来源、标题和内容边界审计已经完成；
+- CAP-001～CAP-005 已根据 OpenAI 官方产品事实、仓库实现和已接受知识生成正文；
+- 五篇文章已物化为 `partial`，保持 `unpublished`；
+- 当前等待本次真实 Commit 的仓库级 Review；
+- CAP-006～CAP-008 与 THY-001～THY-006 尚未生成；
+- 图片、HTML 和飞书尚未开始。
 
 后续总体顺序：
 
 ```text
-→ 完成 Batch 03 内容审计、设计和事实核验
-→ CAP / THY 正式文档落库与 Review
+→ 完成 CAP-001～CAP-005 的真实 Commit Review
+→ 生成并 Review CAP-006～CAP-008
+→ 生成并 Review THY-001～THY-006
 → 生成正式视觉资产
 → 建立 Feishu 映射
 → 对正式文档逐篇 overwrite

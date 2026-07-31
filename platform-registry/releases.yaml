@@ -5,8 +5,7 @@ releases:
   type: repository-baseline
   source_commit: bd31893ddb9bb2efeb3cb38f67f1add66735cd79
   status: verified
-  notes: Custom GPT Actions + Gateway + Local Runtime MVP and Engineering Insight
-    Registry baseline.
+  notes: Custom GPT Actions + Gateway + Local Runtime MVP and Engineering Insight Registry baseline.
 - release_id: KNOWLEDGE-REBUILD-V2
   type: knowledge-rebuild
   source_commit: bd31893ddb9bb2efeb3cb38f67f1add66735cd79
@@ -43,5 +42,14 @@ releases:
   implementation_commit: cbc9dc020d8a3503381980032ea76935e249f7b2
   content_correction_status: completed
   repository_review_status: accepted
+  publication_status: unpublished
+  feishu_status: not_started
+- release_id: KNOWLEDGE-REBUILD-V2-BATCH-03A
+  type: knowledge-rebuild
+  status: in_review
+  branch: knowledge-rebuild-v2
+  base_commit: 4712cd05e1faf7e8a6ed06eb0fccae7d395d1be3
+  content_scope: CAP-001～CAP-005
+  repository_review_status: pending
   publication_status: unpublished
   feishu_status: not_started

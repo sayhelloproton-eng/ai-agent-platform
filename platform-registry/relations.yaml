@@ -208,3 +208,36 @@ relations:
 - from: PRD-006
   type: governed_by
   to: PRD-007
+- from: CAP-001
+  type: derived_from
+  to: CTX-001
+- from: CAP-001
+  type: depends_on
+  to: PRD-001
+- from: CAP-002
+  type: depends_on
+  to: CAP-001
+- from: CAP-002
+  type: derived_from
+  to: PRD-001
+- from: CAP-003
+  type: depends_on
+  to: CAP-002
+- from: CAP-004
+  type: depends_on
+  to: CAP-001
+- from: CAP-004
+  type: derived_from
+  to: DEC-001
+- from: CAP-005
+  type: depends_on
+  to: CAP-004
+- from: CAP-005
+  type: explains
+  to: SKILL-CUSTOM-GPT-ACTIONS
+- from: CAP-005
+  type: validated_by
+  to: APP-GATEWAY
+- from: CAP-005
+  type: validated_by
+  to: APP-DEV-TUNNEL

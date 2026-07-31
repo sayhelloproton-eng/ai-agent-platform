@@ -8,8 +8,9 @@ completed_batches:
 - 02-entry-and-product-documents
 - 02-r1-content-lifecycle-cleanup
 - 02-post-commit-repository-review
-current_batch: 03-foundation-capabilities-and-architecture-theory-planning
-next_batch: Materialize CAP-001～CAP-008 and THY-001～THY-006 after content review
+- 03-content-audit-and-design
+current_batch: 03a-chatgpt-and-custom-gpt-documents
+next_batch: Review CAP-001～CAP-005 from the real implementation commit before acceptance
 matrix: platform-registry/migrations/asset-migration-matrix.csv
 rules:
   preserve_stable_ids: true
