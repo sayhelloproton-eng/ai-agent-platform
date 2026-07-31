@@ -1,0 +1,128 @@
+{
+  "schema_version": "1.1",
+  "insight_id": "EI-RISK_REVIEW_001",
+  "title": "复审强度应由变更增量、风险边界与既有证据共同决定",
+  "primary_type": "heuristic",
+  "secondary_types": [
+    "judgment",
+    "checklist"
+  ],
+  "generalized_problem": "在已有全量审计仍有效时，对范围明确且不跨越高风险边界的窄修复重复执行完整审计，增加成本却未产生相称的新证据。",
+  "underlying_mechanism": "复审没有复用既有证据，也没有把变化范围、可逆性和信任边界作为审计深度的输入。",
+  "principle": "审计应按变更增量、风险等级和既有证据有效性分层；低风险窄修复优先采用差异审查、相关测试和边界确认。",
+  "applicability": {
+    "contexts": [
+      "代码复审",
+      "配置审计",
+      "文档窄修复",
+      "已有基线后的增量验证"
+    ],
+    "preconditions": [
+      "存在近期有效的完整审计或稳定基线",
+      "新变化范围可精确识别"
+    ],
+    "exclusions": [
+      "认证、权限、密钥、数据迁移、不可逆操作或运行边界变化仍应触发更强审计"
+    ]
+  },
+  "recommended_actions": [
+    "在复审前列出自上次可信基线以来的精确变化。",
+    "按是否跨越安全、权限、数据和运行边界选择审计等级。",
+    "复用仍有效的测试和扫描证据，只补充受变更影响的验证。"
+  ],
+  "prevention_checks": [
+    "上次全量审计后究竟改变了哪些文件和行为？",
+    "变更是否触及认证、授权、敏感数据或不可逆操作？",
+    "哪些旧证据仍有效，哪些必须重跑？"
+  ],
+  "evidence_strength": "medium",
+  "maturity_level": "candidate",
+  "lifecycle_status": "active",
+  "maturity_rationale": "The incident is directly observed and the mechanism is plausible, but only one collaboration context is available; retain as a candidate heuristic until repeated in another review workflow.",
+  "lifecycle_rationale": null,
+  "source_references": [
+    {
+      "source_id": "SRC-E05-DIFF",
+      "type": "execution_report",
+      "reference": "Five-file narrow-fix report",
+      "supports": "变更被限定在五个已知文件且相关测试通过。",
+      "confidence": "medium"
+    },
+    {
+      "source_id": "SRC-E05-HUM",
+      "type": "human_observation",
+      "reference": "Reviewer acknowledged repeated full bundle request was excessive",
+      "supports": "复审者确认全量重审要求与风险不匹配。",
+      "confidence": "medium"
+    }
+  ],
+  "occurrences": [
+    {
+      "occurrence_id": "OCC-RISK_REVIEW_001-001",
+      "observed_on": "2026-07-30",
+      "context_summary": "一次低风险窄修复在已有全量审计后仍被要求重做完整审计，随后改为接受增量证据。",
+      "source_refs": [
+        "SRC-E05-DIFF",
+        "SRC-E05-HUM"
+      ],
+      "independent_evidence": true,
+      "notes": null
+    }
+  ],
+  "deduplication": {
+    "status": "verified",
+    "decision": "new",
+    "compared_insight_ids": [
+      "EI-INTENT_ADAPTER_001",
+      "EI-LAYERED_AUTH_001",
+      "EI-PHASE_FIT_EXIT_001",
+      "EI-REAL_PATH_001"
+    ],
+    "notes": "已对 engineering-insights Registry v1.0.0 中全部现有洞见进行机制、原则、动作和适用边界比较；未发现需要合并的重复条目。后续新增记录必须重新运行查重。"
+  },
+  "related_insights": [
+    {
+      "insight_id": "EI-PHASE_FIT_EXIT_001",
+      "relationship": "related_to",
+      "note": "本洞见处理复审证据与风险增量；Phase Fit and Exit Criteria 处理探索阶段的路线选择和停止条件。"
+    }
+  ],
+  "governance": {
+    "requires_human_approval": true,
+    "approval_status": "approved",
+    "approval_reference": "docs/technical/元数据/engineering-insights/governance.json#delegation-2026-07-31",
+    "requested_actions": []
+  },
+  "revision_history": [
+    {
+      "revision": "0.1",
+      "date": "2026-07-31",
+      "change_type": "created",
+      "summary": "Created during the first controlled pilot evaluation.",
+      "source_refs": [
+        "SRC-E05-DIFF",
+        "SRC-E05-HUM"
+      ]
+    },
+    {
+      "revision": "0.2",
+      "date": "2026-07-31",
+      "change_type": "revised",
+      "summary": "完成 Pilot 01 同批提案关系复核，调整标题表达、关联关系和查重说明；审批状态与成熟度未提升。",
+      "source_refs": [
+        "SRC-E05-DIFF",
+        "SRC-E05-HUM"
+      ]
+    },
+    {
+      "revision": "1.0",
+      "date": "2026-07-31",
+      "change_type": "maturity_changed",
+      "summary": "经项目负责人授权的专业复核委托后进入工程洞见注册表；保持既有 maturity level，不执行跨场景晋级。",
+      "source_refs": [
+        "SRC-E05-DIFF",
+        "SRC-E05-HUM"
+      ]
+    }
+  ]
+}

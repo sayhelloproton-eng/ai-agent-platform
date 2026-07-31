@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.0",
+  "registry_id": "ENGINEERING_INSIGHT_REGISTRY",
+  "registry_version": "1.0.0",
+  "canonical_root": "docs/technical/元数据/engineering-insights/",
+  "updated_at": "2026-07-31",
+  "insight_count": 5,
+  "insights": [
+    {
+      "insight_id": "EI-INTENT_ADAPTER_001",
+      "title": "不受信任调用方只表达意图，内部控制字段由受信任边界生成",
+      "path": "insights/EI-INTENT_ADAPTER_001.json",
+      "category": "trust-and-external-calls",
+      "primary_type": "pattern",
+      "maturity_level": "provisional",
+      "lifecycle_status": "active",
+      "evidence_strength": "high",
+      "approval_status": "approved"
+    },
+    {
+      "insight_id": "EI-LAYERED_AUTH_001",
+      "title": "网络访问、身份认证、能力授权、用户确认与运行策略应分层建模",
+      "path": "insights/EI-LAYERED_AUTH_001.json",
+      "category": "security-and-authorization",
+      "primary_type": "pattern",
+      "maturity_level": "provisional",
+      "lifecycle_status": "active",
+      "evidence_strength": "high",
+      "approval_status": "approved"
+    },
+    {
+      "insight_id": "EI-PHASE_FIT_EXIT_001",
+      "title": "探索性方案应匹配当前验证目标并预设退出条件",
+      "path": "insights/EI-PHASE_FIT_EXIT_001.json",
+      "category": "exploration-and-decisions",
+      "primary_type": "heuristic",
+      "maturity_level": "provisional",
+      "lifecycle_status": "active",
+      "evidence_strength": "medium",
+      "approval_status": "approved"
+    },
+    {
+      "insight_id": "EI-REAL_PATH_001",
+      "title": "最终自动验收必须覆盖真实用户路径，而非技术上相似的替代路径",
+      "path": "insights/EI-REAL_PATH_001.json",
+      "category": "verification-and-testing",
+      "primary_type": "pattern",
+      "maturity_level": "provisional",
+      "lifecycle_status": "active",
+      "evidence_strength": "high",
+      "approval_status": "approved"
+    },
+    {
+      "insight_id": "EI-RISK_REVIEW_001",
+      "title": "复审强度应由变更增量、风险边界与既有证据共同决定",
+      "path": "insights/EI-RISK_REVIEW_001.json",
+      "category": "review-and-governance",
+      "primary_type": "heuristic",
+      "maturity_level": "candidate",
+      "lifecycle_status": "active",
+      "evidence_strength": "medium",
+      "approval_status": "approved"
+    }
+  ],
+  "governance_path": "governance.json",
+  "relationships_path": "relationships.json"
+}

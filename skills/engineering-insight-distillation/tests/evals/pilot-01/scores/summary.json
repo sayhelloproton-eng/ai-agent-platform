@@ -1,0 +1,17 @@
+{
+  "skill_version": "0.1.1",
+  "cases": 7,
+  "positive_cases": 5,
+  "needs_evidence_cases": 1,
+  "negative_controls": 1,
+  "schema_validation_pass": true,
+  "baseline_average": 5.71,
+  "skill_average": 14.71,
+  "max_score": 16,
+  "average_gain": 9.0,
+  "average_length_multiplier": 52.13,
+  "functional_eval_conclusion": "promising",
+  "trigger_eval_executed": false,
+  "blind_comparison_executed": false,
+  "repeat_sampling_executed": false
+}

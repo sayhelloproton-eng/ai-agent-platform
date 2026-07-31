@@ -1,0 +1,149 @@
+{
+  "schema_version": "1.1",
+  "candidate_id": "EVAL-01",
+  "result_status": "insight_proposed",
+  "insight": {
+    "schema_version": "1.1",
+    "insight_id": "EI-INTENT_ADAPTER_001",
+    "title": "不受信任调用方只表达意图，内部控制字段由受信任边界生成",
+    "primary_type": "pattern",
+    "secondary_types": [
+      "judgment",
+      "checklist"
+    ],
+    "generalized_problem": "外部智能调用方被允许构造内部执行协议中的身份、权限、路由或生命周期字段，导致错误、越权或契约不稳定。",
+    "underlying_mechanism": "概率性且不受信任的调用方被放入内部控制平面；结构化输出约束不能替代受信任服务端的权限映射与字段生成。",
+    "principle": "外部调用方应只提交业务意图和必要业务参数；受信任服务端负责身份注入、权限白名单、协议补全和内部任务构造。",
+    "applicability": {
+      "contexts": [
+        "智能工具调用",
+        "外部代理接入内部工作流",
+        "公共 API 到内部执行系统的适配"
+      ],
+      "preconditions": [
+        "调用方不属于内部控制平面",
+        "内部协议含身份、权限、路由或生命周期字段"
+      ],
+      "exclusions": [
+        "完全受信任且处于同一权限域的内部服务间通信可使用内部契约，但仍需版本与授权控制"
+      ]
+    },
+    "recommended_actions": [
+      "为外部调用设计意图级窄接口，并移除可由服务端推导的内部字段。",
+      "在受信任服务端执行身份注入、能力白名单映射和完整契约校验。",
+      "分别测试外部适配契约和内部任务契约。"
+    ],
+    "prevention_checks": [
+      "外部调用方是否能够指定身份、权限、执行者、路由或任务生命周期？",
+      "任一控制字段能否由受信任服务端从认证上下文和端点语义中生成？",
+      "错误或缺失参数是否会在进入内部执行层前被拒绝？"
+    ],
+    "evidence_strength": "high",
+    "maturity_level": "provisional",
+    "lifecycle_status": "active",
+    "maturity_rationale": "The source event and corrective verification support a reusable proposal, but only one governed occurrence is available and formal promotion has not been approved.",
+    "lifecycle_rationale": null,
+    "source_references": [
+      {
+        "source_id": "SRC-E01-REQ",
+        "type": "runtime_observation",
+        "reference": "MVP conversation synthesis / actual rejected request",
+        "supports": "外部请求实际包含错误控制字段并被严格契约拒绝。",
+        "confidence": "high"
+      },
+      {
+        "source_id": "SRC-E01-VER",
+        "type": "test",
+        "reference": "MVP final action and live verification evidence",
+        "supports": "窄意图接口和服务端任务构造通过正式调用与自动验证。",
+        "confidence": "high"
+      }
+    ],
+    "occurrences": [
+      {
+        "occurrence_id": "OCC-INTENT_ADAPTER_001-001",
+        "observed_on": "2026-07-30",
+        "context_summary": "一次外部模型直接构造内部任务协议失败，改为服务端 Intent Adapter 后成功。",
+        "source_refs": [
+          "SRC-E01-REQ",
+          "SRC-E01-VER"
+        ],
+        "independent_evidence": true,
+        "notes": null
+      }
+    ],
+    "deduplication": {
+      "status": "unverified",
+      "decision": "undetermined",
+      "compared_insight_ids": [],
+      "notes": "The governed insight index was not available in this isolated pilot eval; no uniqueness claim is made."
+    },
+    "related_insights": [],
+    "governance": {
+      "requires_human_approval": true,
+      "approval_status": "pending",
+      "approval_reference": null,
+      "requested_actions": [
+        "Review the abstraction, boundaries, maturity, and downstream placement before formal adoption."
+      ]
+    },
+    "revision_history": [
+      {
+        "revision": "0.1",
+        "date": "2026-07-31",
+        "change_type": "created",
+        "summary": "Created during the first controlled pilot evaluation.",
+        "source_refs": [
+          "SRC-E01-REQ",
+          "SRC-E01-VER"
+        ]
+      }
+    ]
+  },
+  "quality_gates": {
+    "evidence": {
+      "status": "pass",
+      "notes": "The disposition follows the supplied evidence without inventing facts."
+    },
+    "abstraction": {
+      "status": "pass",
+      "notes": "The result identifies a transferable mechanism rather than repeating one implementation."
+    },
+    "boundary": {
+      "status": "pass",
+      "notes": "Applicable contexts, preconditions, and exclusions are explicit."
+    },
+    "actionability": {
+      "status": "pass",
+      "notes": "The result contains executable actions or prevention checks."
+    },
+    "deduplication": {
+      "status": "pass",
+      "notes": "No governed index was available; the result marks uniqueness as unverified."
+    },
+    "maturity": {
+      "status": "pass",
+      "notes": "The maturity level is conservative for the number and quality of occurrences."
+    },
+    "traceability": {
+      "status": "pass",
+      "notes": "Claims and occurrence records retain stable source references."
+    },
+    "governance": {
+      "status": "pass",
+      "notes": "Formal adoption and promotion remain pending human review."
+    }
+  },
+  "unresolved_uncertainties": [],
+  "missing_evidence": [],
+  "downstream_placement_suggestions": [
+    {
+      "asset_type": "engineering_standard",
+      "target_hint": "外部智能调用接口设计规范",
+      "rationale": "该模式可转化为外部 Agent、Tool 和 Webhook 接入内部执行系统的信任边界规则。",
+      "requires_human_approval": true
+    }
+  ],
+  "rejection_reason": null,
+  "governance_summary": "This is a governed proposal only. It may be reviewed for later placement, but it is not yet an adopted cross-project engineering rule."
+}

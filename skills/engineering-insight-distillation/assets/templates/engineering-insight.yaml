@@ -1,0 +1,59 @@
+# This is a governed proposal. Formal adoption and maturity promotion require human review.
+schema_version: "1.1"
+insight_id: "EI-EXAMPLE_001"
+title: "State the reusable engineering insight"
+primary_type: "pattern"
+secondary_types:
+  - "checklist"
+generalized_problem: "Describe the recurring problem without depending on one product, supplier, or interface name."
+underlying_mechanism: "Explain the trust, control, information, state, validation, role, or dependency mechanism that causes the problem."
+principle: "State a bounded principle that guides future engineering action."
+applicability:
+  contexts:
+    - "Describe a context where this insight is useful."
+  preconditions:
+    - "Describe a condition that must be true before applying it."
+  exclusions:
+    - "Describe a reasonable case where the insight should not be applied unchanged."
+recommended_actions:
+  - "Provide an executable design, planning, test, or review action."
+prevention_checks:
+  - "Provide a check that can be answered with evidence."
+evidence_strength: "medium"
+maturity_level: "provisional"
+lifecycle_status: "active"
+maturity_rationale: "Explain why evidence and reuse history support this maturity and no higher."
+lifecycle_rationale: null
+source_references:
+  - source_id: "SRC-001"
+    type: "test"
+    reference: "stable-reference-or-path"
+    supports: "Explain the part of the insight supported by this source."
+    confidence: "medium"
+occurrences:
+  - occurrence_id: "OCC-EXAMPLE_001"
+    observed_on: null
+    context_summary: "Summarize the concrete governed occurrence that supports this insight."
+    source_refs:
+      - "SRC-001"
+    independent_evidence: true
+    notes: null
+deduplication:
+  status: "unverified"
+  decision: "undetermined"
+  compared_insight_ids: []
+  notes: "No governed insight index was available during this draft."
+related_insights: []
+governance:
+  requires_human_approval: true
+  approval_status: "pending"
+  approval_reference: null
+  requested_actions:
+    - "Review the abstraction, applicability, maturity, lifecycle, and downstream placement."
+revision_history:
+  - revision: "0.1"
+    date: "2026-07-31"
+    change_type: "created"
+    summary: "Created as a provisional engineering insight proposal."
+    source_refs:
+      - "SRC-001"

@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:engineering-insight-distillation:screening-result:1.0",
+  "title": "Engineering Insight Screening Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "candidate_id",
+    "decision",
+    "retention_value",
+    "materiality",
+    "transferability",
+    "evidence_readiness",
+    "signals",
+    "rationale",
+    "missing_evidence",
+    "recommended_next_step"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "candidate_id": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_-]{2,63}$"
+    },
+    "decision": {
+      "enum": [
+        "proceed_full",
+        "needs_evidence",
+        "reject"
+      ]
+    },
+    "retention_value": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "materiality": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "transferability": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "evidence_readiness": {
+      "enum": [
+        "insufficient",
+        "partial",
+        "sufficient"
+      ]
+    },
+    "signals": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "trust_boundary",
+          "architecture_boundary",
+          "authorization_boundary",
+          "state_ownership",
+          "role_boundary",
+          "failed_assumption",
+          "decision_sequence",
+          "verification_gap",
+          "repeated_workflow_failure",
+          "material_rework",
+          "reusable_prevention",
+          "cross_context_transfer",
+          "conflicting_evidence",
+          "trivial_one_off",
+          "unresolved_mechanism"
+        ]
+      }
+    },
+    "rationale": {
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 1600
+    },
+    "missing_evidence": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 5,
+        "maxLength": 1000
+      }
+    },
+    "recommended_next_step": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 1200
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "decision": {
+            "const": "proceed_full"
+          }
+        },
+        "required": [
+          "decision"
+        ]
+      },
+      "then": {
+        "properties": {
+          "retention_value": {
+            "enum": [
+              "medium",
+              "high"
+            ]
+          },
+          "transferability": {
+            "enum": [
+              "medium",
+              "high"
+            ]
+          },
+          "evidence_readiness": {
+            "enum": [
+              "partial",
+              "sufficient"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "decision": {
+            "const": "needs_evidence"
+          }
+        },
+        "required": [
+          "decision"
+        ]
+      },
+      "then": {
+        "properties": {
+          "missing_evidence": {
+            "minItems": 1
+          },
+          "evidence_readiness": {
+            "enum": [
+              "insufficient",
+              "partial"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "decision": {
+            "const": "reject"
+          }
+        },
+        "required": [
+          "decision"
+        ]
+      },
+      "then": {
+        "properties": {
+          "retention_value": {
+            "const": "low"
+          }
+        }
+      }
+    }
+  ]
+}

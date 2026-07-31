@@ -284,3 +284,27 @@ assets:
     evidence_level: decided
     canonical_path: docs/knowledge/工作流/WFL-004-多模型Agent执行治理与Token预算.md
     migration_state: complete
+
+  - asset_id: SKL-002
+    title: Engineering Insight Distillation Skill
+    asset_type: skill
+    status: implemented
+    evidence_level: verified
+    canonical_path: docs/knowledge/Agent与能力/Skill设计/SKL-002-工程洞见提炼技能.md
+    migration_state: complete
+
+  - asset_id: EXP-004
+    title: Engineering Insight Distillation Skill Pilot Evaluation
+    asset_type: experiment
+    status: validated
+    evidence_level: verified
+    canonical_path: docs/knowledge/实验与复盘/EXP-004-工程洞见提炼Skill首轮评测.md
+    migration_state: complete
+
+  - asset_id: INS-001
+    title: Engineering Insight Method and Practice
+    asset_type: insight
+    status: accepted
+    evidence_level: observed
+    canonical_path: docs/knowledge/工程经验/INS-001-工程洞见方法与实践.md
+    migration_state: complete

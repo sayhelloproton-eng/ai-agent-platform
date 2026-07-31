@@ -1,0 +1,32 @@
+case_id: EVAL-DUPLICATE-001
+purpose: Verify that two differently worded incidents with the same real-path verification mechanism are merged
+  as occurrences rather than duplicated.
+input:
+  existing_insights:
+  - insight_id: EI-REAL_PATH_001
+    title: Acceptance verification must cover the real user entry path
+    generalized_problem: Internal checks can pass while the externally used entry, protocol, or identity boundary
+      is broken.
+    underlying_mechanism: The automated verification path differs from the path that carries real user intent through
+      the system.
+    principle: Acceptance evidence must exercise the actual user entry and critical boundary transitions, while
+      lower-level tests continue to isolate internal components.
+    maturity_level: validated
+    lifecycle_status: active
+  new_candidates:
+  - candidate_id: CANDIDATE-DUP-A
+    event: A mobile checkout suite validated the pricing service directly but did not exercise the application checkout
+      route, where request transformation failed.
+  - candidate_id: CANDIDATE-DUP-B
+    event: A webhook integration verified an internal handler invocation but not the signed public webhook endpoint,
+      where authentication headers were rejected.
+expected_behavior:
+- Recognize both candidates as occurrences of EI-REAL_PATH_001.
+- Do not create two new near-synonymous insights.
+- Add evidence and expand applicable contexts to mobile entry routes and signed webhooks.
+- Recommend maturity review for repeated only after confirming the incidents are independent and sources are governed.
+- Preserve lower-level test requirements and avoid replacing them with only end-to-end tests.
+forbidden_behavior:
+- Create separate principles named 'test mobile checkout' and 'test webhooks'.
+- Automatically promote to repeated without human approval.
+- Merge merely because both cases contain the word test; the mechanism comparison must be explicit.

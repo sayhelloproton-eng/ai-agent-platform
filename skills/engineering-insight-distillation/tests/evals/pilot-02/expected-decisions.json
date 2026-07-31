@@ -1,0 +1,30 @@
+[
+  {
+    "case_id": "EVAL-01",
+    "decision": "proceed_full"
+  },
+  {
+    "case_id": "EVAL-02",
+    "decision": "proceed_full"
+  },
+  {
+    "case_id": "EVAL-03",
+    "decision": "proceed_full"
+  },
+  {
+    "case_id": "EVAL-04",
+    "decision": "proceed_full"
+  },
+  {
+    "case_id": "EVAL-05",
+    "decision": "proceed_full"
+  },
+  {
+    "case_id": "EVAL-06",
+    "decision": "needs_evidence"
+  },
+  {
+    "case_id": "EVAL-07",
+    "decision": "reject"
+  }
+]

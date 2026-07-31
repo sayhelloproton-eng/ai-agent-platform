@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "candidate_id": "EVAL-05",
+  "decision": "proceed_full",
+  "retention_value": "medium",
+  "materiality": "medium",
+  "transferability": "medium",
+  "evidence_readiness": "partial",
+  "signals": [
+    "role_boundary",
+    "decision_sequence",
+    "material_rework",
+    "reusable_prevention"
+  ],
+  "rationale": "The review process caused avoidable work and suggests a reusable risk-proportional review heuristic, but only one collaboration context currently supports it.",
+  "missing_evidence": [],
+  "recommended_next_step": "Run Full mode as a candidate heuristic with narrow boundaries and no cross-project promotion."
+}

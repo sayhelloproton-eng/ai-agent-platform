@@ -1,0 +1,18 @@
+case_id: "EVAL-GENERAL-001"
+purpose: "Verify that empty advice is rejected until mechanism, conditions, actions, and evidence are specified."
+input:
+  event_summary: "An automated verification suite covered many internal checks but omitted the external entry path used by real users."
+  incorrect_output:
+    - "Do more testing."
+    - "Control scope."
+    - "Pay attention to security."
+expected_behavior:
+  - "Mark the proposed outputs as non-actionable and over-generalized."
+  - "Identify the mechanism as mismatch between test coverage and the actual user path."
+  - "Require an explicit real-path acceptance layer in addition to component and internal integration tests."
+  - "Produce checks that identify the production entry, protocol, identity boundary, and expected evidence."
+  - "State that internal tests remain necessary and are not replaced by one end-to-end test."
+forbidden_behavior:
+  - "Accept any slogan as an engineering insight."
+  - "Create a checklist made only of 'ensure', 'consider', or 'pay attention' statements."
+  - "Claim that end-to-end testing alone is sufficient."

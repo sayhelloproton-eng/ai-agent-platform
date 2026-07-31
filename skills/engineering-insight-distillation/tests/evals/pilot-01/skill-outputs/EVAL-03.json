@@ -1,0 +1,152 @@
+{
+  "schema_version": "1.1",
+  "candidate_id": "EVAL-03",
+  "result_status": "insight_proposed",
+  "insight": {
+    "schema_version": "1.1",
+    "insight_id": "EI-PHASE_FIT_EXIT_001",
+    "title": "探索性方案应按阶段目标选型并预设退出条件",
+    "primary_type": "heuristic",
+    "secondary_types": [
+      "judgment",
+      "checklist"
+    ],
+    "generalized_problem": "验证阶段选择了长期能力更完整但组件、远端状态和配置面更大的方案，导致外围工程工作淹没核心可行性验证。",
+    "underlying_mechanism": "选型优化目标与当前阶段不一致，同时没有在投入前定义成功证据、最大预算、停止条件和替代路线，形成沉没成本循环。",
+    "principle": "探索阶段应优先匹配当前要验证的假设，并用时间盒、失败条件和替代方案控制试错边界。",
+    "applicability": {
+      "contexts": [
+        "技术预研",
+        "MVP",
+        "第三方基础设施选型",
+        "不可控外部依赖验证"
+      ],
+      "preconditions": [
+        "当前首要目标是证明可行性而非完成生产化",
+        "存在多个可替代技术路线"
+      ],
+      "exclusions": [
+        "需要长期生产治理、全球路由或边缘计算时，更完整的基础设施可能是正确首选"
+      ]
+    },
+    "recommended_actions": [
+      "在实验开始前记录核心假设、成功证据、最大投入、停止条件和备选路线。",
+      "按组件数量、远端状态、配置漂移、可观察性和回滚成本比较方案。",
+      "当修复持续发生在核心目标之外的外围层时，触发路线重新评估。"
+    ],
+    "prevention_checks": [
+      "当前方案优化的是本阶段目标还是未来完整性？",
+      "失败后最多允许追加几轮补丁或投入多少时间？",
+      "替代方案能否用更少组件验证同一核心假设？"
+    ],
+    "evidence_strength": "medium",
+    "maturity_level": "provisional",
+    "lifecycle_status": "active",
+    "maturity_rationale": "The source event and corrective verification support a reusable proposal, but only one governed occurrence is available and formal promotion has not been approved.",
+    "lifecycle_rationale": null,
+    "source_references": [
+      {
+        "source_id": "SRC-E03-HIST",
+        "type": "document",
+        "reference": "MVP decision and migration synthesis",
+        "supports": "记录了原路线的外围复杂度与后续迁移。",
+        "confidence": "medium"
+      },
+      {
+        "source_id": "SRC-E03-END",
+        "type": "runtime_observation",
+        "reference": "Stable public endpoint and formal action verification",
+        "supports": "替代路线完成了稳定入口与正式用户路径验证。",
+        "confidence": "high"
+      }
+    ],
+    "occurrences": [
+      {
+        "occurrence_id": "OCC-PHASE_FIT_EXIT_001-001",
+        "observed_on": "2026-07-30",
+        "context_summary": "一次公网入口选型因阶段不匹配和缺少退出条件持续返工，切换到更短路径后完成验证。",
+        "source_refs": [
+          "SRC-E03-HIST",
+          "SRC-E03-END"
+        ],
+        "independent_evidence": true,
+        "notes": null
+      }
+    ],
+    "deduplication": {
+      "status": "unverified",
+      "decision": "undetermined",
+      "compared_insight_ids": [],
+      "notes": "The governed insight index was not available in this isolated pilot eval; no uniqueness claim is made."
+    },
+    "related_insights": [],
+    "governance": {
+      "requires_human_approval": true,
+      "approval_status": "pending",
+      "approval_reference": null,
+      "requested_actions": [
+        "Review the abstraction, boundaries, maturity, and downstream placement before formal adoption."
+      ]
+    },
+    "revision_history": [
+      {
+        "revision": "0.1",
+        "date": "2026-07-31",
+        "change_type": "created",
+        "summary": "Created during the first controlled pilot evaluation.",
+        "source_refs": [
+          "SRC-E03-HIST",
+          "SRC-E03-END"
+        ]
+      }
+    ]
+  },
+  "quality_gates": {
+    "evidence": {
+      "status": "pass",
+      "notes": "The disposition follows the supplied evidence without inventing facts."
+    },
+    "abstraction": {
+      "status": "pass",
+      "notes": "The result identifies a transferable mechanism rather than repeating one implementation."
+    },
+    "boundary": {
+      "status": "pass",
+      "notes": "Applicable contexts, preconditions, and exclusions are explicit."
+    },
+    "actionability": {
+      "status": "pass",
+      "notes": "The result contains executable actions or prevention checks."
+    },
+    "deduplication": {
+      "status": "pass",
+      "notes": "No governed index was available; the result marks uniqueness as unverified."
+    },
+    "maturity": {
+      "status": "pass",
+      "notes": "The maturity level is conservative for the number and quality of occurrences."
+    },
+    "traceability": {
+      "status": "pass",
+      "notes": "Claims and occurrence records retain stable source references."
+    },
+    "governance": {
+      "status": "pass",
+      "notes": "Formal adoption and promotion remain pending human review."
+    }
+  },
+  "unresolved_uncertainties": [
+    "原方案失败由多个配置和环境因素共同造成，不能据此推断该技术在其他阶段普遍不适用。"
+  ],
+  "missing_evidence": [],
+  "downstream_placement_suggestions": [
+    {
+      "asset_type": "workflow",
+      "target_hint": "探索性技术选型与退出条件模板",
+      "rationale": "可以转化为预研和 MVP 启动前的决策检查流程。",
+      "requires_human_approval": true
+    }
+  ],
+  "rejection_reason": null,
+  "governance_summary": "This is a governed proposal only. It may be reviewed for later placement, but it is not yet an adopted cross-project engineering rule."
+}

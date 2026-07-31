@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "candidate_id": "EVAL-06",
+  "decision": "needs_evidence",
+  "retention_value": "medium",
+  "materiality": "medium",
+  "transferability": "medium",
+  "evidence_readiness": "insufficient",
+  "signals": [
+    "unresolved_mechanism"
+  ],
+  "rationale": "The timeout may become useful if it repeats, but the current evidence cannot distinguish client, network, gateway, runtime, or dependency failure.",
+  "missing_evidence": [
+    "Correlated client, network, gateway, and runtime logs for the failed request.",
+    "A request identifier, timestamp, or reproducible condition."
+  ],
+  "recommended_next_step": "Collect correlated evidence and repeat Screening before Full distillation."
+}

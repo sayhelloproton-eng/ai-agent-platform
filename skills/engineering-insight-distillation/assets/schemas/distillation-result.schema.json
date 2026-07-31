@@ -1,0 +1,385 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:engineering-insight-distillation:distillation-result:1.1",
+  "title": "Engineering Insight Distillation Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "candidate_id",
+    "result_status",
+    "insight",
+    "quality_gates",
+    "unresolved_uncertainties",
+    "missing_evidence",
+    "downstream_placement_suggestions",
+    "rejection_reason",
+    "governance_summary"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.1"
+    },
+    "candidate_id": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_-]{2,63}$"
+    },
+    "result_status": {
+      "enum": [
+        "insight_proposed",
+        "needs_evidence",
+        "rejected"
+      ]
+    },
+    "insight": {
+      "oneOf": [
+        {
+          "$ref": "urn:engineering-insight-distillation:engineering-insight:1.1"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "quality_gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence",
+        "abstraction",
+        "boundary",
+        "actionability",
+        "deduplication",
+        "maturity",
+        "traceability",
+        "governance"
+      ],
+      "properties": {
+        "evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "notes"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "pass",
+                "fail",
+                "not_applicable"
+              ]
+            },
+            "notes": {
+              "type": "string",
+              "minLength": 5,
+              "maxLength": 1200
+            }
+          }
+        },
+        "abstraction": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "notes"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "pass",
+                "fail",
+                "not_applicable"
+              ]
+            },
+            "notes": {
+              "type": "string",
+              "minLength": 5,
+              "maxLength": 1200
+            }
+          }
+        },
+        "boundary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "notes"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "pass",
+                "fail",
+                "not_applicable"
+              ]
+            },
+            "notes": {
+              "type": "string",
+              "minLength": 5,
+              "maxLength": 1200
+            }
+          }
+        },
+        "actionability": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "notes"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "pass",
+                "fail",
+                "not_applicable"
+              ]
+            },
+            "notes": {
+              "type": "string",
+              "minLength": 5,
+              "maxLength": 1200
+            }
+          }
+        },
+        "deduplication": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "notes"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "pass",
+                "fail",
+                "not_applicable"
+              ]
+            },
+            "notes": {
+              "type": "string",
+              "minLength": 5,
+              "maxLength": 1200
+            }
+          }
+        },
+        "maturity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "notes"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "pass",
+                "fail",
+                "not_applicable"
+              ]
+            },
+            "notes": {
+              "type": "string",
+              "minLength": 5,
+              "maxLength": 1200
+            }
+          }
+        },
+        "traceability": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "notes"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "pass",
+                "fail",
+                "not_applicable"
+              ]
+            },
+            "notes": {
+              "type": "string",
+              "minLength": 5,
+              "maxLength": 1200
+            }
+          }
+        },
+        "governance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "notes"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "pass",
+                "fail",
+                "not_applicable"
+              ]
+            },
+            "notes": {
+              "type": "string",
+              "minLength": 5,
+              "maxLength": 1200
+            }
+          }
+        }
+      }
+    },
+    "unresolved_uncertainties": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 5,
+        "maxLength": 1000
+      },
+      "uniqueItems": true
+    },
+    "missing_evidence": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 5,
+        "maxLength": 1000
+      },
+      "uniqueItems": true
+    },
+    "downstream_placement_suggestions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "asset_type",
+          "target_hint",
+          "rationale",
+          "requires_human_approval"
+        ],
+        "properties": {
+          "asset_type": {
+            "enum": [
+              "engineering_standard",
+              "architecture_decision",
+              "test_strategy",
+              "workflow",
+              "retrospective",
+              "knowledge_asset",
+              "task_template",
+              "code_review_rule",
+              "other"
+            ]
+          },
+          "target_hint": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 1000
+          },
+          "requires_human_approval": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "rejection_reason": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 10,
+      "maxLength": 1500
+    },
+    "governance_summary": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 1500
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "result_status": {
+            "const": "insight_proposed"
+          }
+        },
+        "required": [
+          "result_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "insight": {
+            "$ref": "urn:engineering-insight-distillation:engineering-insight:1.1"
+          },
+          "rejection_reason": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "result_status": {
+            "const": "needs_evidence"
+          }
+        },
+        "required": [
+          "result_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "insight": {
+            "type": "null"
+          },
+          "missing_evidence": {
+            "minItems": 1
+          },
+          "rejection_reason": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "result_status": {
+            "const": "rejected"
+          }
+        },
+        "required": [
+          "result_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "insight": {
+            "type": "null"
+          },
+          "rejection_reason": {
+            "type": "string",
+            "minLength": 10
+          }
+        }
+      }
+    }
+  ]
+}

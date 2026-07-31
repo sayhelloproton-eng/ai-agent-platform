@@ -1,0 +1,198 @@
+[
+  {
+    "case_id": "EVAL-01",
+    "variant": "baseline",
+    "scores": {
+      "evidence_discipline": 1,
+      "abstraction_quality": 2,
+      "applicability_boundaries": 1,
+      "actionability": 2,
+      "traceability": 0,
+      "maturity_governance": 0,
+      "dedup_evolution": 0,
+      "disposition_correctness": 2
+    }
+  },
+  {
+    "case_id": "EVAL-01",
+    "variant": "skill",
+    "scores": {
+      "evidence_discipline": 2,
+      "abstraction_quality": 2,
+      "applicability_boundaries": 2,
+      "actionability": 2,
+      "traceability": 2,
+      "maturity_governance": 2,
+      "dedup_evolution": 1,
+      "disposition_correctness": 2
+    }
+  },
+  {
+    "case_id": "EVAL-02",
+    "variant": "baseline",
+    "scores": {
+      "evidence_discipline": 1,
+      "abstraction_quality": 2,
+      "applicability_boundaries": 1,
+      "actionability": 2,
+      "traceability": 0,
+      "maturity_governance": 0,
+      "dedup_evolution": 0,
+      "disposition_correctness": 2
+    }
+  },
+  {
+    "case_id": "EVAL-02",
+    "variant": "skill",
+    "scores": {
+      "evidence_discipline": 2,
+      "abstraction_quality": 2,
+      "applicability_boundaries": 2,
+      "actionability": 2,
+      "traceability": 2,
+      "maturity_governance": 2,
+      "dedup_evolution": 1,
+      "disposition_correctness": 2
+    }
+  },
+  {
+    "case_id": "EVAL-03",
+    "variant": "baseline",
+    "scores": {
+      "evidence_discipline": 1,
+      "abstraction_quality": 1,
+      "applicability_boundaries": 0,
+      "actionability": 2,
+      "traceability": 0,
+      "maturity_governance": 0,
+      "dedup_evolution": 0,
+      "disposition_correctness": 2
+    }
+  },
+  {
+    "case_id": "EVAL-03",
+    "variant": "skill",
+    "scores": {
+      "evidence_discipline": 2,
+      "abstraction_quality": 2,
+      "applicability_boundaries": 2,
+      "actionability": 2,
+      "traceability": 2,
+      "maturity_governance": 2,
+      "dedup_evolution": 1,
+      "disposition_correctness": 2
+    }
+  },
+  {
+    "case_id": "EVAL-04",
+    "variant": "baseline",
+    "scores": {
+      "evidence_discipline": 1,
+      "abstraction_quality": 2,
+      "applicability_boundaries": 1,
+      "actionability": 2,
+      "traceability": 0,
+      "maturity_governance": 0,
+      "dedup_evolution": 0,
+      "disposition_correctness": 2
+    }
+  },
+  {
+    "case_id": "EVAL-04",
+    "variant": "skill",
+    "scores": {
+      "evidence_discipline": 2,
+      "abstraction_quality": 2,
+      "applicability_boundaries": 2,
+      "actionability": 2,
+      "traceability": 2,
+      "maturity_governance": 2,
+      "dedup_evolution": 1,
+      "disposition_correctness": 2
+    }
+  },
+  {
+    "case_id": "EVAL-05",
+    "variant": "baseline",
+    "scores": {
+      "evidence_discipline": 1,
+      "abstraction_quality": 2,
+      "applicability_boundaries": 1,
+      "actionability": 1,
+      "traceability": 0,
+      "maturity_governance": 0,
+      "dedup_evolution": 0,
+      "disposition_correctness": 1
+    }
+  },
+  {
+    "case_id": "EVAL-05",
+    "variant": "skill",
+    "scores": {
+      "evidence_discipline": 2,
+      "abstraction_quality": 2,
+      "applicability_boundaries": 2,
+      "actionability": 2,
+      "traceability": 2,
+      "maturity_governance": 2,
+      "dedup_evolution": 1,
+      "disposition_correctness": 2
+    }
+  },
+  {
+    "case_id": "EVAL-06",
+    "variant": "baseline",
+    "scores": {
+      "evidence_discipline": 0,
+      "abstraction_quality": 1,
+      "applicability_boundaries": 0,
+      "actionability": 1,
+      "traceability": 0,
+      "maturity_governance": 0,
+      "dedup_evolution": 0,
+      "disposition_correctness": 0
+    }
+  },
+  {
+    "case_id": "EVAL-06",
+    "variant": "skill",
+    "scores": {
+      "evidence_discipline": 2,
+      "abstraction_quality": 2,
+      "applicability_boundaries": 2,
+      "actionability": 1,
+      "traceability": 2,
+      "maturity_governance": 2,
+      "dedup_evolution": 1,
+      "disposition_correctness": 2
+    }
+  },
+  {
+    "case_id": "EVAL-07",
+    "variant": "baseline",
+    "scores": {
+      "evidence_discipline": 1,
+      "abstraction_quality": 0,
+      "applicability_boundaries": 0,
+      "actionability": 1,
+      "traceability": 0,
+      "maturity_governance": 0,
+      "dedup_evolution": 0,
+      "disposition_correctness": 0
+    }
+  },
+  {
+    "case_id": "EVAL-07",
+    "variant": "skill",
+    "scores": {
+      "evidence_discipline": 2,
+      "abstraction_quality": 2,
+      "applicability_boundaries": 2,
+      "actionability": 1,
+      "traceability": 2,
+      "maturity_governance": 2,
+      "dedup_evolution": 1,
+      "disposition_correctness": 2
+    }
+  }
+]

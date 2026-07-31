@@ -1,0 +1,16 @@
+{
+  "case_id": "EVAL-07",
+  "title": "一次性文件名拼写错误",
+  "should_trigger": false,
+  "incident": {
+    "expected_outcome": "创建一个名称正确的临时草稿文件。",
+    "observed_behavior": "操作者把临时文件名中的一个字母拼错，发现后立即改正，没有造成传播或返工。",
+    "assumptions": [],
+    "evidence": [
+      "版本差异显示一次拼写修正。"
+    ],
+    "cause_analysis": "普通输入错误。",
+    "resolution": "修正文件名。",
+    "verification": "文件名已正确。"
+  }
+}

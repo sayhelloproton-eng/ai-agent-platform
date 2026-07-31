@@ -1,0 +1,36 @@
+schema_version: "1.1"
+candidate_id: "CANDIDATE_EXAMPLE_001"
+result_status: "needs_evidence"
+insight: null
+quality_gates:
+  evidence:
+    status: "fail"
+    notes: "Required verification evidence is missing."
+  abstraction:
+    status: "not_applicable"
+    notes: "No formal abstraction was attempted before evidence qualification."
+  boundary:
+    status: "not_applicable"
+    notes: "No formal insight was produced."
+  actionability:
+    status: "not_applicable"
+    notes: "No formal insight was produced."
+  deduplication:
+    status: "not_applicable"
+    notes: "No insight comparison was required at this stage."
+  maturity:
+    status: "pass"
+    notes: "The result remains below formal insight maturity."
+  traceability:
+    status: "pass"
+    notes: "Available sources remain referenced without unsupported additions."
+  governance:
+    status: "pass"
+    notes: "No formal write or maturity promotion was attempted."
+unresolved_uncertainties:
+  - "State an unresolved mechanism or boundary question."
+missing_evidence:
+  - "State the exact evidence required before formal distillation."
+downstream_placement_suggestions: []
+rejection_reason: null
+governance_summary: "Retain this candidate for evidence collection; do not create or promote a formal insight."

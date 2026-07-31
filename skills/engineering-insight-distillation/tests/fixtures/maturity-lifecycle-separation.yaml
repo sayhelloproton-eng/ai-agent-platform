@@ -1,0 +1,19 @@
+case_id: "EVAL-MATURITY-LIFECYCLE-001"
+purpose: "Verify that revision and deprecation are lifecycle states rather than maturity levels."
+input:
+  existing_insight:
+    insight_id: "EI-BOUNDARY_001"
+    maturity_level: "validated"
+    lifecycle_status: "active"
+    principle: "A bounded rule that was previously validated in one operating context."
+  new_evidence:
+    - "A later environment change invalidates one applicability condition but does not erase the original validation."
+expected_behavior:
+  - "Keep maturity_level separate from lifecycle_status."
+  - "Set lifecycle_status to revised or deprecated according to the evidence and governance decision."
+  - "Preserve the prior maturity evidence and revision history."
+  - "Require human review before a governed lifecycle change."
+forbidden_behavior:
+  - "Replace maturity_level with revised or deprecated."
+  - "Delete prior evidence because the lifecycle changed."
+  - "Treat deprecation as proof that the original event never happened."

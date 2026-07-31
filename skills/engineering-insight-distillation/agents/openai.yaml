@@ -1,0 +1,4 @@
+interface:
+  display_name: "Engineering Insight Distillation"
+  short_description: "Screen and distill evidence-backed events into governed engineering insights"
+  default_prompt: "Use $engineering-insight-distillation in auto mode. First decide whether this event needs screening or full distillation. Preserve evidence and uncertainty, reject trivial events, request missing evidence when necessary, and never auto-promote the result into a formal rule."

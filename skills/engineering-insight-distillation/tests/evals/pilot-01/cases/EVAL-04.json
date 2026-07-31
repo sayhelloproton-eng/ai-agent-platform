@@ -1,0 +1,20 @@
+{
+  "case_id": "EVAL-04",
+  "title": "把公网访问、API 认证和用户审批当成同一种权限",
+  "should_trigger": true,
+  "incident": {
+    "expected_outcome": "减少外部工具调用时的人工批准，同时保持系统安全。",
+    "observed_behavior": "讨论中一度认为只要把公网入口或 API 权限完全放开，界面中的允许/拒绝就会消失；实际网络可达性、Bearer 身份认证和平台用户审批分别由不同层控制。",
+    "assumptions": [
+      "取消某一层认证可以同时取消其他层的权限确认。"
+    ],
+    "evidence": [
+      "Tunnel 可以匿名访问，但 Gateway 仍独立要求 Bearer。",
+      "Bearer 调用成功后，正式对话仍出现平台级允许/拒绝。",
+      "只读操作的后果性声明只影响平台审批策略，不替代 API 身份认证。"
+    ],
+    "cause_analysis": "把网络入口、身份认证、能力授权和用户意图确认混成单一开关。",
+    "resolution": "分别建模和验证网络访问、API 身份、能力授权、用户确认与运行时策略。",
+    "verification": "在保持 Bearer 认证的同时完成正式调用，并识别出只读操作的独立审批优化路径。"
+  }
+}

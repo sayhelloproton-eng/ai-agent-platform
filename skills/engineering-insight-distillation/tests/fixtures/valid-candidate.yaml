@@ -1,0 +1,112 @@
+case_id: EVAL-VALID-001
+purpose: Verify that a concrete model-integration failure is abstracted into a trust-boundary and intent-adapter
+  pattern rather than an interface-specific rule.
+input:
+  schema_version: '1.1'
+  candidate_id: CANDIDATE_MVP_001
+  title: External model generated invalid internal task-control fields
+  context:
+    domain: agent integration
+    project: ai-agent-platform
+    milestone: Custom GPT Actions and Gateway MVP
+  intent:
+    expected_outcome: Allow a Custom GPT Action to request the local Runtime status through the public Gateway.
+  event:
+    observed_behavior: The Action called POST /v1/tasks and generated an unsupported capability, an invalid requestedBy
+      type, and no required input object. Strict internal contract validation rejected the request.
+    impact: The formal integration path could not complete even though the internal Gateway and Runtime chain was
+      healthy.
+  assumptions:
+  - A detailed OpenAPI request schema and prompt would make the model construct the internal TaskRequest correctly.
+  - The external Action could safely control internal task identity and routing fields.
+  claims:
+  - claim_id: CLM-001
+    statement: The rejected request contained model-generated internal control fields that did not satisfy the platform
+      contract.
+    classification: verified_fact
+    evidence_refs:
+    - EVD-001
+    - EVD-002
+  - claim_id: CLM-002
+    statement: Placing the model inside the internal control-contract trust boundary was the underlying architecture
+      defect.
+    classification: engineering_inference
+    evidence_refs:
+    - EVD-001
+    - EVD-003
+  - claim_id: CLM-003
+    statement: External intelligent callers should express intent while a trusted server owns identity, authorization,
+      routing, and lifecycle fields.
+    classification: recommendation
+    evidence_refs:
+    - EVD-003
+    - EVD-004
+  evidence:
+  - evidence_id: EVD-001
+    type: log
+    summary: Captured the rejected request and strict contract validation errors.
+    reference: sanitized-action-request-and-validation-record
+    confidence: high
+  - evidence_id: EVD-002
+    type: code
+    summary: The internal task contract restricts capability, requester type, input, and metadata.
+    reference: packages/contracts and gateway validation
+    confidence: high
+  - evidence_id: EVD-003
+    type: code
+    summary: A zero-request-body POST /v1/runtime/status adapter constructs the internal TaskRequest on the trusted
+      server.
+    reference: apps/action-gateway adapter route
+    confidence: high
+  - evidence_id: EVD-004
+    type: runtime_observation
+    summary: The created Custom GPT completed getRuntimeStatus through the adapter and returned the real local Runtime
+      status.
+    reference: formal Custom GPT conversation acceptance evidence
+    confidence: high
+  analysis:
+    root_cause: An untrusted probabilistic caller was allowed to construct identity, capability, routing, and lifecycle
+      fields belonging to the trusted internal execution contract.
+    root_cause_confidence: high
+    contributing_factors:
+    - The public Action contract mirrored the internal general-purpose task contract.
+    - Prompt compliance was treated as a security and contract-control mechanism.
+    open_questions:
+    - How should the same boundary be adapted for write operations with user-provided business parameters?
+  resolution:
+    action: Expose a narrow zero-request-body business-intent endpoint and construct the complete internal TaskRequest
+      inside the authenticated Gateway.
+    verification: Local tests, public live verification, Builder Preview, and a created Custom GPT formal conversation
+      all completed through the narrow adapter.
+  proposed_lesson: External intelligent callers should express business intent; trusted services should create and
+    validate internal control contracts.
+  source_references:
+  - source_id: SRC-001
+    type: code
+    reference: adapter implementation and strict internal contract
+    summary: Shows the separation between public intent endpoint and internal task construction.
+  - source_id: SRC-002
+    type: runtime_observation
+    reference: formal Action acceptance evidence
+    summary: Shows that the corrected boundary completed the intended real path.
+  status: ready_for_distillation
+  comparison_context:
+    insight_index_available: false
+    compared_insight_ids: []
+    notes: This fixture validates abstraction; uniqueness is not claimed.
+expected_behavior:
+- Accept the candidate for distillation.
+- Classify the central mechanism as a trust-boundary and control-contract ownership problem.
+- Produce a reusable pattern close to an Intent Adapter Pattern.
+- State that untrusted external callers express necessary business intent while trusted server-side code injects
+  identity, authorization, routing, and lifecycle fields.
+- Include applicability to model tools, third-party agents, webhooks, and other external-to-internal adapters.
+- Include an exclusion for fully trusted internal services sharing the same contract and authorization boundary.
+- Produce executable design and review checks.
+- Keep maturity at provisional or validated only with explicit rationale and pending human approval; never mark
+  repeated or established from this case alone.
+forbidden_behavior:
+- Output only that POST /v1/tasks must never be used.
+- Make Custom GPT, Gateway, or this repository mandatory parts of the generalized principle.
+- Claim that a successful correction proves every root-cause hypothesis beyond the observed mechanism.
+- Auto-write a formal engineering rule or auto-approve maturity.

@@ -1,0 +1,20 @@
+{
+  "case_id": "EVAL-02",
+  "title": "自动验证覆盖了相似内部接口而非真实用户入口",
+  "should_trigger": true,
+  "incident": {
+    "expected_outcome": "通过自动验证持续证明正式外部调用入口可用。",
+    "observed_behavior": "正式用户经过专用适配入口，但 live verify 最后调用的是内部通用任务入口。因此专用入口即使损坏，自动验证仍可能通过。",
+    "assumptions": [
+      "内部通用入口成功可以代表外部专用入口成功。"
+    ],
+    "evidence": [
+      "正式 Action 的真实路径与 live verify 的路径不同。",
+      "审计发现该偏差后，验证脚本改为真实专用入口。",
+      "修改后专项测试、根验证和公网 live verify 均通过。"
+    ],
+    "cause_analysis": "测试目标被定义为内部能力可用，而不是用户真实路径完整可用。",
+    "resolution": "把 live verify 改为用户真实入口，并验证请求形态、服务端标识和关键响应字段。",
+    "verification": "修改后的公网验证直接命中正式入口并成功返回真实运行状态。"
+  }
+}

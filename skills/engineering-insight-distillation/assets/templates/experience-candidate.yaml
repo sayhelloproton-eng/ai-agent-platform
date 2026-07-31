@@ -1,0 +1,47 @@
+# Fields marked optional may be null. Missing evidence must remain explicit.
+schema_version: "1.1"
+candidate_id: "CANDIDATE_EXAMPLE_001"
+title: "Describe the concrete event without turning it into a conclusion"
+context:
+  domain: null
+  project: null
+  milestone: null
+intent:
+  expected_outcome: "Describe the result that the work was expected to achieve."
+event:
+  observed_behavior: "Describe what was directly observed, including relevant sequence and conditions."
+  impact: "Describe material impact on outcome, time, quality, safety, or cost."
+assumptions:
+  - "List an assumption that influenced the original approach."
+claims:
+  - claim_id: "CLM-001"
+    statement: "State one fact, inference, hypothesis, or recommendation."
+    classification: "verified_fact"
+    evidence_refs:
+      - "EVD-001"
+evidence:
+  - evidence_id: "EVD-001"
+    type: "test"
+    summary: "Summarize what this source directly supports."
+    reference: "stable-reference-or-path"
+    confidence: "medium"
+analysis:
+  root_cause: null
+  root_cause_confidence: "unknown"
+  contributing_factors: []
+  open_questions:
+    - "State evidence or analysis still required."
+resolution:
+  action: null
+  verification: null
+proposed_lesson: null
+source_references:
+  - source_id: "SRC-001"
+    type: "test"
+    reference: "stable-reference-or-path"
+    summary: "Explain why this source is relevant."
+comparison_context:
+  insight_index_available: false
+  compared_insight_ids: []
+  notes: "No governed insight index was available for this draft."
+status: "needs_evidence"

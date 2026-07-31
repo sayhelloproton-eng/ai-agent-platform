@@ -1,0 +1,10 @@
+{
+  "evidence_discipline": "0 invents/ignores evidence; 1 partially grounded; 2 explicitly preserves evidence and uncertainty.",
+  "abstraction_quality": "0 concrete or empty; 1 useful but partly bound; 2 transferable mechanism at correct abstraction.",
+  "applicability_boundaries": "0 absent/absolute; 1 partial; 2 contexts, preconditions and exclusions are explicit.",
+  "actionability": "0 slogan; 1 broad action; 2 executable actions and checks.",
+  "traceability": "0 no source path; 1 implicit; 2 stable references and occurrence linkage.",
+  "maturity_governance": "0 overclaims; 1 cautious prose; 2 explicit maturity/lifecycle/approval.",
+  "dedup_evolution": "0 ignored; 1 acknowledges unknown; 2 compares/merges or explicitly records unverified state.",
+  "disposition_correctness": "0 wrong retain/reject decision; 1 arguable; 2 correct propose/needs-evidence/reject disposition."
+}

@@ -1,0 +1,18 @@
+{
+  "case_id": "EVAL-06",
+  "title": "一次无法复现的偶发超时",
+  "should_trigger": true,
+  "incident": {
+    "expected_outcome": "解释一次偶发请求超时并提炼长期规则。",
+    "observed_behavior": "某次请求超时，重启客户端后恢复；没有保存日志、请求标识、网络状态或稳定复现步骤。",
+    "assumptions": [
+      "重启后恢复意味着根因是客户端缓存。"
+    ],
+    "evidence": [
+      "仅有人类观察到一次超时和重启后恢复。"
+    ],
+    "cause_analysis": null,
+    "resolution": "重启客户端。",
+    "verification": "后续一次请求成功，但没有证明原始根因。"
+  }
+}

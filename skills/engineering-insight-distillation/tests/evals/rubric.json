@@ -1,0 +1,18 @@
+{
+  "version": "1.0",
+  "scale": {
+    "0": "missing, incorrect, or unsafe",
+    "1": "partially correct but incomplete",
+    "2": "complete and appropriate for the case"
+  },
+  "dimensions": {
+    "evidence_discipline": "Preserves facts, inference, uncertainty, and verification without inventing evidence.",
+    "abstraction_quality": "Finds a transferable mechanism without remaining product-bound or becoming empty advice.",
+    "applicability_boundaries": "States contexts, preconditions, exclusions, and counterconditions.",
+    "actionability": "Produces executable actions, checks, gates, or stop conditions.",
+    "traceability": "Retains stable sources and occurrence relationships.",
+    "maturity_governance": "Uses conservative maturity, separate lifecycle, and explicit human approval.",
+    "dedup_evolution": "Handles new, duplicate, occurrence, refinement, contradiction, and unavailable-index states.",
+    "disposition_correctness": "Correctly proposes, requests evidence, or rejects the event."
+  }
+}

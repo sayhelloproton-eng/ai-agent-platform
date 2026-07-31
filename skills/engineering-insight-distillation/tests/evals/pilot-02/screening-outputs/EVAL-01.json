@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "candidate_id": "EVAL-01",
+  "decision": "proceed_full",
+  "retention_value": "high",
+  "materiality": "high",
+  "transferability": "high",
+  "evidence_readiness": "sufficient",
+  "signals": [
+    "trust_boundary",
+    "authorization_boundary",
+    "failed_assumption",
+    "reusable_prevention",
+    "cross_context_transfer"
+  ],
+  "rationale": "The incident crossed a trust boundary, changed the interface design, has direct failure and verification evidence, and can guide many external-to-internal integrations.",
+  "missing_evidence": [],
+  "recommended_next_step": "Run Full mode to define the intent-adapter pattern, applicability boundaries, checks, maturity, and governance."
+}

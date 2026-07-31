@@ -1,0 +1,128 @@
+{
+  "schema_version": "1.1",
+  "insight_id": "EI-PHASE_FIT_EXIT_001",
+  "title": "探索性方案应匹配当前验证目标并预设退出条件",
+  "primary_type": "heuristic",
+  "secondary_types": [
+    "judgment",
+    "checklist"
+  ],
+  "generalized_problem": "验证阶段选择了长期能力更完整但组件、远端状态和配置面更大的方案，导致外围工程工作淹没核心可行性验证。",
+  "underlying_mechanism": "选型优化目标与当前阶段不一致，同时没有在投入前定义成功证据、最大预算、停止条件和替代路线，形成沉没成本循环。",
+  "principle": "探索阶段应优先匹配当前要验证的假设，并用时间盒、失败条件和替代方案控制试错边界。",
+  "applicability": {
+    "contexts": [
+      "技术预研",
+      "MVP",
+      "第三方基础设施选型",
+      "不可控外部依赖验证"
+    ],
+    "preconditions": [
+      "当前首要目标是证明可行性而非完成生产化",
+      "存在多个可替代技术路线"
+    ],
+    "exclusions": [
+      "需要长期生产治理、全球路由或边缘计算时，更完整的基础设施可能是正确首选"
+    ]
+  },
+  "recommended_actions": [
+    "在实验开始前记录核心假设、成功证据、最大投入、停止条件和备选路线。",
+    "按组件数量、远端状态、配置漂移、可观察性和回滚成本比较方案。",
+    "当修复持续发生在核心目标之外的外围层时，触发路线重新评估。"
+  ],
+  "prevention_checks": [
+    "当前方案优化的是本阶段目标还是未来完整性？",
+    "失败后最多允许追加几轮补丁或投入多少时间？",
+    "替代方案能否用更少组件验证同一核心假设？"
+  ],
+  "evidence_strength": "medium",
+  "maturity_level": "provisional",
+  "lifecycle_status": "active",
+  "maturity_rationale": "The source event and corrective verification support a reusable proposal, but only one governed occurrence is available and formal promotion has not been approved.",
+  "lifecycle_rationale": null,
+  "source_references": [
+    {
+      "source_id": "SRC-E03-HIST",
+      "type": "document",
+      "reference": "MVP decision and migration synthesis",
+      "supports": "记录了原路线的外围复杂度与后续迁移。",
+      "confidence": "medium"
+    },
+    {
+      "source_id": "SRC-E03-END",
+      "type": "runtime_observation",
+      "reference": "Stable public endpoint and formal action verification",
+      "supports": "替代路线完成了稳定入口与正式用户路径验证。",
+      "confidence": "high"
+    }
+  ],
+  "occurrences": [
+    {
+      "occurrence_id": "OCC-PHASE_FIT_EXIT_001-001",
+      "observed_on": "2026-07-30",
+      "context_summary": "一次公网入口选型因阶段不匹配和缺少退出条件持续返工，切换到更短路径后完成验证。",
+      "source_refs": [
+        "SRC-E03-HIST",
+        "SRC-E03-END"
+      ],
+      "independent_evidence": true,
+      "notes": null
+    }
+  ],
+  "deduplication": {
+    "status": "verified",
+    "decision": "new",
+    "compared_insight_ids": [
+      "EI-INTENT_ADAPTER_001",
+      "EI-LAYERED_AUTH_001",
+      "EI-REAL_PATH_001",
+      "EI-RISK_REVIEW_001"
+    ],
+    "notes": "已对 engineering-insights Registry v1.0.0 中全部现有洞见进行机制、原则、动作和适用边界比较；未发现需要合并的重复条目。后续新增记录必须重新运行查重。"
+  },
+  "related_insights": [
+    {
+      "insight_id": "EI-RISK_REVIEW_001",
+      "relationship": "related_to",
+      "note": "两者都要求投入与风险匹配，但本洞见用于探索性方案选型和退出，Risk-Proportional Review 用于已有基线后的增量复审。"
+    }
+  ],
+  "governance": {
+    "requires_human_approval": true,
+    "approval_status": "approved",
+    "approval_reference": "docs/technical/元数据/engineering-insights/governance.json#delegation-2026-07-31",
+    "requested_actions": []
+  },
+  "revision_history": [
+    {
+      "revision": "0.1",
+      "date": "2026-07-31",
+      "change_type": "created",
+      "summary": "Created during the first controlled pilot evaluation.",
+      "source_refs": [
+        "SRC-E03-HIST",
+        "SRC-E03-END"
+      ]
+    },
+    {
+      "revision": "0.2",
+      "date": "2026-07-31",
+      "change_type": "revised",
+      "summary": "完成 Pilot 01 同批提案关系复核，调整标题表达、关联关系和查重说明；审批状态与成熟度未提升。",
+      "source_refs": [
+        "SRC-E03-HIST",
+        "SRC-E03-END"
+      ]
+    },
+    {
+      "revision": "1.0",
+      "date": "2026-07-31",
+      "change_type": "maturity_changed",
+      "summary": "经项目负责人授权的专业复核委托后进入工程洞见注册表；保持既有 maturity level，不执行跨场景晋级。",
+      "source_refs": [
+        "SRC-E03-HIST",
+        "SRC-E03-END"
+      ]
+    }
+  ]
+}

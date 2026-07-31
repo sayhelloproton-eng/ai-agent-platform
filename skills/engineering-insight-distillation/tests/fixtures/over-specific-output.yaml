@@ -1,0 +1,15 @@
+case_id: "EVAL-SPECIFIC-001"
+purpose: "Verify that a product-bound conclusion is rejected and replaced by a mechanism- and stage-bound judgment."
+input:
+  event_summary: "A Cloudflare-based public-entry route accumulated remote configuration drift and delayed an MVP, while Microsoft Dev Tunnels provided a shorter path for the current local-development validation."
+  incorrect_output: "Cloudflare should never be used; always use Microsoft Dev Tunnels."
+expected_behavior:
+  - "Reject the absolute product comparison as over-specific and unsupported outside the source context."
+  - "Identify the mechanism as stage-fit, number of remote stateful components, configuration-drift risk, observability, and rollback cost."
+  - "Produce a bounded judgment for exploratory or MVP infrastructure selection."
+  - "State exclusions for production ingress, edge-compute, organizational governance, or scale requirements that may justify a different platform."
+  - "Keep product names only in source references or case explanation, not in the generalized principle."
+forbidden_behavior:
+  - "Declare either product universally superior."
+  - "Remove all context and output only 'choose simple tools'."
+  - "Treat one project outcome as repeated cross-project evidence."

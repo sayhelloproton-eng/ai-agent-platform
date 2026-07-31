@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "registry_version": "1.0.0",
+  "relationships": [
+    {
+      "from": "EI-INTENT_ADAPTER_001",
+      "type": "complementary_to",
+      "to": "EI-LAYERED_AUTH_001",
+      "reason": "Intent Adapter controls which fields an external caller may express; Layered Authorization models the complete set of permission layers."
+    },
+    {
+      "from": "EI-REAL_PATH_001",
+      "type": "validates",
+      "to": "EI-INTENT_ADAPTER_001",
+      "reason": "The external adapter must be verified through the actual user route, not only through the internal task contract."
+    },
+    {
+      "from": "EI-REAL_PATH_001",
+      "type": "validates",
+      "to": "EI-LAYERED_AUTH_001",
+      "reason": "Authorization layers must be exercised in the real request path to prove that the composition behaves as intended."
+    },
+    {
+      "from": "EI-PHASE_FIT_EXIT_001",
+      "type": "related_to",
+      "to": "EI-RISK_REVIEW_001",
+      "reason": "Both align effort with risk, but one governs exploratory route selection and the other governs incremental review after a trusted baseline."
+    }
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "schema_version": "1.1",
+  "insight_id": "EI-REAL_PATH_001",
+  "title": "最终自动验收必须覆盖真实用户路径，而非技术上相似的替代路径",
+  "primary_type": "pattern",
+  "secondary_types": [
+    "checklist",
+    "anti_pattern"
+  ],
+  "generalized_problem": "自动测试覆盖了内部组件或相似接口，却没有覆盖用户在正式环境中实际经过的入口、协议和状态转换。",
+  "underlying_mechanism": "测试对象被定义为底层能力可用，而不是用户路径完整可用；相似路径共享部分实现，但不能证明适配层和正式协议没有退化。",
+  "principle": "分层测试各司其职，最终自动验收必须复现真实用户入口的请求形态、认证、路由和关键响应语义。",
+  "applicability": {
+    "contexts": [
+      "外部 API 适配",
+      "UI 到服务端工作流",
+      "代理工具调用",
+      "多层网关系统"
+    ],
+    "preconditions": [
+      "存在用户专用入口或协议适配层",
+      "内部接口成功不能完全覆盖外部路径"
+    ],
+    "exclusions": [
+      "纯内部组件单元测试无需模拟完整用户入口，但不能被描述为端到端验收"
+    ]
+  },
+  "recommended_actions": [
+    "绘制正式用户请求路径，并为每一层标注对应测试。",
+    "让 live verification 使用正式入口、实际方法、实际认证和实际请求形态。",
+    "对正式路径返回的服务端标识和关键业务字段建立断言。"
+  ],
+  "prevention_checks": [
+    "自动验收调用的路径是否与正式用户调用完全一致？",
+    "预览环境成功是否被错误当作正式环境成功？",
+    "适配层损坏时，现有测试是否仍可能全部通过？"
+  ],
+  "evidence_strength": "high",
+  "maturity_level": "provisional",
+  "lifecycle_status": "active",
+  "maturity_rationale": "The source event and corrective verification support a reusable proposal, but only one governed occurrence is available and formal promotion has not been approved.",
+  "lifecycle_rationale": null,
+  "source_references": [
+    {
+      "source_id": "SRC-E02-DIFF",
+      "type": "code",
+      "reference": "Pre-fix live verify and formal action route comparison",
+      "supports": "验证脚本与正式入口使用了不同路径。",
+      "confidence": "high"
+    },
+    {
+      "source_id": "SRC-E02-PASS",
+      "type": "test",
+      "reference": "Post-fix targeted and public live verification",
+      "supports": "修改后自动验证命中真实入口并通过。",
+      "confidence": "high"
+    }
+  ],
+  "occurrences": [
+    {
+      "occurrence_id": "OCC-REAL_PATH_001-001",
+      "observed_on": "2026-07-30",
+      "context_summary": "一次 live verify 只覆盖内部通用接口，后改为正式外部入口。",
+      "source_refs": [
+        "SRC-E02-DIFF",
+        "SRC-E02-PASS"
+      ],
+      "independent_evidence": true,
+      "notes": null
+    }
+  ],
+  "deduplication": {
+    "status": "verified",
+    "decision": "new",
+    "compared_insight_ids": [
+      "EI-INTENT_ADAPTER_001",
+      "EI-LAYERED_AUTH_001",
+      "EI-PHASE_FIT_EXIT_001",
+      "EI-RISK_REVIEW_001"
+    ],
+    "notes": "已对 engineering-insights Registry v1.0.0 中全部现有洞见进行机制、原则、动作和适用边界比较；未发现需要合并的重复条目。后续新增记录必须重新运行查重。"
+  },
+  "related_insights": [
+    {
+      "insight_id": "EI-INTENT_ADAPTER_001",
+      "relationship": "related_to",
+      "note": "Intent Adapter 的正确性最终需要由真实用户路径验收，而不能只由内部任务契约测试证明。"
+    },
+    {
+      "insight_id": "EI-LAYERED_AUTH_001",
+      "relationship": "related_to",
+      "note": "权限分层的配置必须在真实请求路径中逐层验证，否则仅能证明局部控制有效。"
+    }
+  ],
+  "governance": {
+    "requires_human_approval": true,
+    "approval_status": "approved",
+    "approval_reference": "docs/technical/元数据/engineering-insights/governance.json#delegation-2026-07-31",
+    "requested_actions": []
+  },
+  "revision_history": [
+    {
+      "revision": "0.1",
+      "date": "2026-07-31",
+      "change_type": "created",
+      "summary": "Created during the first controlled pilot evaluation.",
+      "source_refs": [
+        "SRC-E02-DIFF",
+        "SRC-E02-PASS"
+      ]
+    },
+    {
+      "revision": "0.2",
+      "date": "2026-07-31",
+      "change_type": "revised",
+      "summary": "完成 Pilot 01 同批提案关系复核，调整标题表达、关联关系和查重说明；审批状态与成熟度未提升。",
+      "source_refs": [
+        "SRC-E02-DIFF",
+        "SRC-E02-PASS"
+      ]
+    },
+    {
+      "revision": "1.0",
+      "date": "2026-07-31",
+      "change_type": "maturity_changed",
+      "summary": "经项目负责人授权的专业复核委托后进入工程洞见注册表；保持既有 maturity level，不执行跨场景晋级。",
+      "source_refs": [
+        "SRC-E02-DIFF",
+        "SRC-E02-PASS"
+      ]
+    }
+  ]
+}

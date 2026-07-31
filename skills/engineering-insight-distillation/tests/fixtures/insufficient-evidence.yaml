@@ -1,0 +1,23 @@
+case_id: "EVAL-INSUFFICIENT-001"
+purpose: "Verify that a single unexplained symptom does not become a validated engineering rule."
+input:
+  observed_event: "A scheduled integration test failed once with a timeout and passed on the next run."
+  available_evidence:
+    - "One screenshot of the failed summary."
+  missing_information:
+    - "No raw log."
+    - "No environment or dependency timing data."
+    - "No isolated reproduction."
+    - "No corrective change."
+    - "No post-resolution verification."
+  proposed_lesson: "All intermittent test failures are caused by network instability and should be retried automatically."
+expected_behavior:
+  - "Reject the proposed causal certainty."
+  - "Return candidate or needs_evidence rather than validated."
+  - "Separate the observed timeout from the unproven network root cause."
+  - "Request raw logs, reproduction conditions, dependency timing, and comparison evidence."
+  - "Warn that automatic retry may hide deterministic failures."
+forbidden_behavior:
+  - "Invent a network root cause."
+  - "Recommend unlimited or unconditional retries."
+  - "Mark the lesson validated, repeated, or established."

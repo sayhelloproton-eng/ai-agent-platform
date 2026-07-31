@@ -1,0 +1,593 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:engineering-insight-distillation:engineering-insight:1.1",
+  "title": "Engineering Insight",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "insight_id",
+    "title",
+    "primary_type",
+    "secondary_types",
+    "generalized_problem",
+    "underlying_mechanism",
+    "principle",
+    "applicability",
+    "recommended_actions",
+    "prevention_checks",
+    "evidence_strength",
+    "maturity_level",
+    "lifecycle_status",
+    "maturity_rationale",
+    "lifecycle_rationale",
+    "source_references",
+    "occurrences",
+    "deduplication",
+    "related_insights",
+    "governance",
+    "revision_history"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.1"
+    },
+    "insight_id": {
+      "type": "string",
+      "pattern": "^EI-[A-Z0-9_-]{3,63}$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 160
+    },
+    "primary_type": {
+      "enum": [
+        "judgment",
+        "pattern",
+        "anti_pattern",
+        "heuristic",
+        "checklist"
+      ]
+    },
+    "secondary_types": {
+      "type": "array",
+      "maxItems": 3,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "judgment",
+          "pattern",
+          "anti_pattern",
+          "heuristic",
+          "checklist"
+        ]
+      }
+    },
+    "generalized_problem": {
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 2500
+    },
+    "underlying_mechanism": {
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 2500
+    },
+    "principle": {
+      "type": "string",
+      "minLength": 12,
+      "maxLength": 1500
+    },
+    "applicability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contexts",
+        "preconditions",
+        "exclusions"
+      ],
+      "properties": {
+        "contexts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "uniqueItems": true
+        },
+        "preconditions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "uniqueItems": true
+        },
+        "exclusions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "recommended_actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 5,
+        "maxLength": 800
+      },
+      "uniqueItems": true
+    },
+    "prevention_checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 5,
+        "maxLength": 800
+      },
+      "uniqueItems": true
+    },
+    "evidence_strength": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "maturity_level": {
+      "enum": [
+        "candidate",
+        "provisional",
+        "validated",
+        "repeated",
+        "established"
+      ]
+    },
+    "lifecycle_status": {
+      "enum": [
+        "active",
+        "revised",
+        "deprecated"
+      ]
+    },
+    "maturity_rationale": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 1500
+    },
+    "lifecycle_rationale": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 10,
+      "maxLength": 1500
+    },
+    "source_references": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/source_reference"
+      }
+    },
+    "occurrences": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/occurrence"
+      }
+    },
+    "deduplication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "decision",
+        "compared_insight_ids"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "verified",
+            "unverified"
+          ]
+        },
+        "decision": {
+          "enum": [
+            "new",
+            "merge_occurrence",
+            "add_evidence",
+            "refine",
+            "specialize",
+            "broaden",
+            "revise",
+            "contradiction",
+            "undetermined"
+          ]
+        },
+        "compared_insight_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^EI-[A-Z0-9_-]{3,63}$"
+          },
+          "uniqueItems": true
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 5,
+          "maxLength": 1200
+        }
+      }
+    },
+    "related_insights": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/related_insight"
+      }
+    },
+    "governance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requires_human_approval",
+        "approval_status",
+        "requested_actions"
+      ],
+      "properties": {
+        "requires_human_approval": {
+          "type": "boolean"
+        },
+        "approval_status": {
+          "enum": [
+            "not_required",
+            "pending",
+            "approved",
+            "rejected"
+          ]
+        },
+        "approval_reference": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "requested_actions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 800
+          },
+          "uniqueItems": true
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "requires_human_approval": {
+                "const": true
+              }
+            },
+            "required": [
+              "requires_human_approval"
+            ]
+          },
+          "then": {
+            "properties": {
+              "approval_status": {
+                "enum": [
+                  "pending",
+                  "approved",
+                  "rejected"
+                ]
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "approval_status": {
+                "const": "not_required"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "revision_history": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/revision"
+      }
+    }
+  },
+  "$defs": {
+    "source_reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id",
+        "type",
+        "reference",
+        "supports",
+        "confidence"
+      ],
+      "properties": {
+        "source_id": {
+          "type": "string",
+          "pattern": "^SRC-[A-Za-z0-9_-]{1,40}$"
+        },
+        "type": {
+          "enum": [
+            "test",
+            "runtime_observation",
+            "log",
+            "code",
+            "commit",
+            "document",
+            "screenshot",
+            "execution_report",
+            "human_observation"
+          ]
+        },
+        "reference": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "supports": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 1200
+        },
+        "confidence": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        }
+      }
+    },
+    "occurrence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "occurrence_id",
+        "context_summary",
+        "source_refs",
+        "independent_evidence"
+      ],
+      "properties": {
+        "occurrence_id": {
+          "type": "string",
+          "pattern": "^OCC-[A-Z0-9_-]{3,63}$"
+        },
+        "observed_on": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "context_summary": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 1200
+        },
+        "source_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "uniqueItems": true
+        },
+        "independent_evidence": {
+          "type": "boolean"
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 5,
+          "maxLength": 800
+        }
+      }
+    },
+    "related_insight": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "insight_id",
+        "relationship",
+        "note"
+      ],
+      "properties": {
+        "insight_id": {
+          "type": "string",
+          "pattern": "^EI-[A-Z0-9_-]{3,63}$"
+        },
+        "relationship": {
+          "enum": [
+            "same_as",
+            "occurrence_of",
+            "evidence_for",
+            "refines",
+            "specializes",
+            "broadens",
+            "contradicts",
+            "supersedes",
+            "related_to"
+          ]
+        },
+        "note": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 800
+        }
+      }
+    },
+    "revision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "revision",
+        "date",
+        "change_type",
+        "summary",
+        "source_refs"
+      ],
+      "properties": {
+        "revision": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+$"
+        },
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "change_type": {
+          "enum": [
+            "created",
+            "evidence_added",
+            "boundary_changed",
+            "maturity_changed",
+            "lifecycle_changed",
+            "revised",
+            "deprecated"
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 1000
+        },
+        "source_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "uniqueItems": true
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "maturity_level": {
+            "enum": [
+              "repeated",
+              "established"
+            ]
+          }
+        },
+        "required": [
+          "maturity_level"
+        ]
+      },
+      "then": {
+        "properties": {
+          "occurrences": {
+            "minItems": 2
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "maturity_level": {
+            "const": "established"
+          }
+        },
+        "required": [
+          "maturity_level"
+        ]
+      },
+      "then": {
+        "properties": {
+          "governance": {
+            "properties": {
+              "approval_status": {
+                "const": "approved"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "lifecycle_status": {
+            "enum": [
+              "revised",
+              "deprecated"
+            ]
+          }
+        },
+        "required": [
+          "lifecycle_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "lifecycle_rationale": {
+            "type": "string",
+            "minLength": 10
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "lifecycle_status": {
+            "const": "active"
+          }
+        },
+        "required": [
+          "lifecycle_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "lifecycle_rationale": {
+            "type": "null"
+          }
+        }
+      }
+    }
+  ]
+}

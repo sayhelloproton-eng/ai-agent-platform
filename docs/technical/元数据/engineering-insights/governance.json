@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "governance_id": "ENGINEERING_INSIGHT_GOVERNANCE",
+  "canonical_source": "git",
+  "projection": {
+    "feishu_source": false,
+    "reason": "The registry is technical machine-readable metadata. Human-facing knowledge may derive from it, but cannot overwrite it."
+  },
+  "review_authority": {
+    "owner": "project-owner",
+    "delegation": {
+      "delegation_id": "delegation-2026-07-31",
+      "status": "active",
+      "delegated_to": "chatgpt-architecture-advisor",
+      "effective_date": "2026-07-31",
+      "scope": [
+        "detailed technical content review",
+        "initial abstraction and boundary review",
+        "batch deduplication",
+        "initial candidate or provisional maturity assignment",
+        "approval for entry into this registry"
+      ],
+      "excluded_actions": [
+        "delete formal assets",
+        "change repository visibility",
+        "change credentials or permissions",
+        "rewrite git history",
+        "promote an insight to established without new multi-context evidence"
+      ],
+      "override_rule": "The project owner may revise or revoke any delegated decision. Later contradictory evidence must create a governed revision rather than silent overwrite."
+    }
+  },
+  "maturity_rules": {
+    "new_entry_maximum": "provisional",
+    "validated_requires": [
+      "direct verification of the generalized mechanism in a governed application",
+      "recorded review"
+    ],
+    "repeated_requires": [
+      "at least two independent occurrences",
+      "separate source evidence"
+    ],
+    "established_requires": [
+      "multi-context evidence",
+      "stable applicability boundaries",
+      "explicit project-owner approval"
+    ]
+  },
+  "write_rules": [
+    "run screening or full distillation before registry write",
+    "compare against the complete registry",
+    "prefer occurrence or revision over duplicate creation",
+    "preserve revision history",
+    "validate the registry after every change"
+  ]
+}

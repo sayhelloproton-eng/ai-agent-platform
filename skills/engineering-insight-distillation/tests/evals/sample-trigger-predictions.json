@@ -1,0 +1,82 @@
+[
+  {
+    "id": "TRIGGER-001",
+    "predicted_trigger": true
+  },
+  {
+    "id": "TRIGGER-002",
+    "predicted_trigger": true
+  },
+  {
+    "id": "TRIGGER-003",
+    "predicted_trigger": true
+  },
+  {
+    "id": "TRIGGER-004",
+    "predicted_trigger": true
+  },
+  {
+    "id": "TRIGGER-005",
+    "predicted_trigger": true
+  },
+  {
+    "id": "TRIGGER-006",
+    "predicted_trigger": true
+  },
+  {
+    "id": "TRIGGER-007",
+    "predicted_trigger": true
+  },
+  {
+    "id": "TRIGGER-008",
+    "predicted_trigger": true
+  },
+  {
+    "id": "TRIGGER-009",
+    "predicted_trigger": true
+  },
+  {
+    "id": "TRIGGER-010",
+    "predicted_trigger": true
+  },
+  {
+    "id": "TRIGGER-011",
+    "predicted_trigger": false
+  },
+  {
+    "id": "TRIGGER-012",
+    "predicted_trigger": false
+  },
+  {
+    "id": "TRIGGER-013",
+    "predicted_trigger": false
+  },
+  {
+    "id": "TRIGGER-014",
+    "predicted_trigger": false
+  },
+  {
+    "id": "TRIGGER-015",
+    "predicted_trigger": false
+  },
+  {
+    "id": "TRIGGER-016",
+    "predicted_trigger": false
+  },
+  {
+    "id": "TRIGGER-017",
+    "predicted_trigger": false
+  },
+  {
+    "id": "TRIGGER-018",
+    "predicted_trigger": false
+  },
+  {
+    "id": "TRIGGER-019",
+    "predicted_trigger": false
+  },
+  {
+    "id": "TRIGGER-020",
+    "predicted_trigger": false
+  }
+]

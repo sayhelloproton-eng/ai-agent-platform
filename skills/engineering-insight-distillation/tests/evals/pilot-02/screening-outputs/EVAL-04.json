@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "candidate_id": "EVAL-04",
+  "decision": "proceed_full",
+  "retention_value": "high",
+  "materiality": "high",
+  "transferability": "high",
+  "evidence_readiness": "sufficient",
+  "signals": [
+    "trust_boundary",
+    "authorization_boundary",
+    "failed_assumption",
+    "cross_context_transfer"
+  ],
+  "rationale": "Multiple independently controlled permission layers were confused, direct observations distinguished them, and the resulting model transfers to external automation systems.",
+  "missing_evidence": [],
+  "recommended_next_step": "Run Full mode to define the layered authorization model and layer-by-layer validation checks."
+}

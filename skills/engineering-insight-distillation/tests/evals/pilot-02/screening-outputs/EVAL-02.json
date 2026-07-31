@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "candidate_id": "EVAL-02",
+  "decision": "proceed_full",
+  "retention_value": "high",
+  "materiality": "high",
+  "transferability": "high",
+  "evidence_readiness": "sufficient",
+  "signals": [
+    "verification_gap",
+    "failed_assumption",
+    "reusable_prevention",
+    "cross_context_transfer"
+  ],
+  "rationale": "The validation path differed from the real user path, the defect was corrected and reverified, and the mechanism transfers to layered systems and adapters.",
+  "missing_evidence": [],
+  "recommended_next_step": "Run Full mode to produce a real-path verification pattern and acceptance checks."
+}

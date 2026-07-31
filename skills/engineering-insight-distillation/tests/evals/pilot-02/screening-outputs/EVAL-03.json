@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "candidate_id": "EVAL-03",
+  "decision": "proceed_full",
+  "retention_value": "high",
+  "materiality": "high",
+  "transferability": "high",
+  "evidence_readiness": "partial",
+  "signals": [
+    "failed_assumption",
+    "decision_sequence",
+    "material_rework",
+    "reusable_prevention",
+    "cross_context_transfer"
+  ],
+  "rationale": "The route change materially affected delivery and exposes reusable stage-fit and exit-criteria decisions, although the abandoned route had multiple contributing factors.",
+  "missing_evidence": [],
+  "recommended_next_step": "Run Full mode with conservative causal wording and explicit exclusions for later production-stage use."
+}

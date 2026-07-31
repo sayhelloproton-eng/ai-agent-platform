@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.1",
+  "candidate_id": "EVAL-06",
+  "result_status": "needs_evidence",
+  "insight": null,
+  "quality_gates": {
+    "evidence": {
+      "status": "fail",
+      "notes": "A single human observation and one successful retry do not identify the timeout mechanism or root cause."
+    },
+    "abstraction": {
+      "status": "not_applicable",
+      "notes": "A reusable mechanism cannot be selected without distinguishing client, network, server, and dependency failure."
+    },
+    "boundary": {
+      "status": "not_applicable",
+      "notes": "No formal insight is produced, so applicability boundaries cannot yet be evaluated."
+    },
+    "actionability": {
+      "status": "not_applicable",
+      "notes": "Logging and retry changes would be speculative before the failure mode is observed."
+    },
+    "deduplication": {
+      "status": "not_applicable",
+      "notes": "No insight is produced, so duplicate comparison is not applicable."
+    },
+    "maturity": {
+      "status": "pass",
+      "notes": "The result correctly remains below formal insight maturity."
+    },
+    "traceability": {
+      "status": "fail",
+      "notes": "No request identifier, log, timestamped network evidence, or reproducible trace is available."
+    },
+    "governance": {
+      "status": "pass",
+      "notes": "The process stops instead of manufacturing a root cause or formal rule."
+    }
+  },
+  "unresolved_uncertainties": [
+    "The failure could have occurred in the client, network path, public endpoint, gateway, runtime, or an external dependency.",
+    "A successful retry does not establish that client cache was causal."
+  ],
+  "missing_evidence": [
+    "Timestamped request and correlation identifier.",
+    "Client, network, gateway, and runtime logs for the same failed request.",
+    "A reproducible condition or multiple comparable occurrences.",
+    "Evidence that distinguishes recovery correlation from root cause."
+  ],
+  "downstream_placement_suggestions": [],
+  "rejection_reason": null,
+  "governance_summary": "Retain the event as an unresolved candidate and collect evidence; do not create a timeout rule or prescribe retries yet."
+}

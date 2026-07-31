@@ -1,0 +1,35 @@
+case_id: EVAL-CONFLICT-001
+purpose: Verify that a later counterexample narrows an existing heuristic instead of silently overwriting or preserving
+  an absolute statement.
+input:
+  existing_insight:
+    insight_id: EI-EXTERNAL_RISK_001
+    primary_type: heuristic
+    principle: Always validate the highest-uncertainty external dependency before taking any internal engineering
+      action.
+    maturity_level: provisional
+    lifecycle_status: active
+  new_evidence:
+    event: During an active credential-exposure incident, immediate containment and credential revocation had to
+      occur before controlled testing of the external dependency.
+    evidence:
+    - type: runtime_observation
+      summary: Continued operation would have increased exposure while validation was being designed.
+      confidence: high
+    - type: document
+      summary: The incident procedure requires containment before diagnosis when ongoing harm is plausible.
+      confidence: high
+expected_behavior:
+- Identify a boundary conflict rather than treating the old heuristic as universally true.
+- 'Recommend revision: in exploratory design, validate high-uncertainty external dependencies early; in active high-impact
+  incidents, contain ongoing harm before experimentation.'
+- Add exclusions or preconditions based on urgency, reversibility, and active harm.
+- Keep the maturity level evidence-based and set lifecycle_status to revised, or propose a related incident-response
+  specialization.
+- Preserve the original wording and sources in revision history.
+- Require human review before changing a governed rule.
+forbidden_behavior:
+- Delete the original insight or source evidence.
+- Ignore the counterexample and keep 'always'.
+- Replace the old heuristic with the opposite absolute rule.
+- Auto-approve the revision.

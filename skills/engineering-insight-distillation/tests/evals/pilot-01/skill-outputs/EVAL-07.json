@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.1",
+  "candidate_id": "EVAL-07",
+  "result_status": "rejected",
+  "insight": null,
+  "quality_gates": {
+    "evidence": {
+      "status": "pass",
+      "notes": "The typo and correction are directly observable."
+    },
+    "abstraction": {
+      "status": "fail",
+      "notes": "The event exposes no recurring mechanism, material impact, or transferable engineering decision."
+    },
+    "boundary": {
+      "status": "not_applicable",
+      "notes": "No formal insight is produced."
+    },
+    "actionability": {
+      "status": "not_applicable",
+      "notes": "A project-wide control would be disproportionate to the event."
+    },
+    "deduplication": {
+      "status": "not_applicable",
+      "notes": "No insight is produced, so duplicate comparison is not applicable."
+    },
+    "maturity": {
+      "status": "pass",
+      "notes": "The event is correctly prevented from entering the governed insight lifecycle."
+    },
+    "traceability": {
+      "status": "pass",
+      "notes": "The one-line correction is traceable, but traceability alone does not create retention value."
+    },
+    "governance": {
+      "status": "pass",
+      "notes": "The result rejects unnecessary knowledge growth."
+    }
+  },
+  "unresolved_uncertainties": [],
+  "missing_evidence": [],
+  "downstream_placement_suggestions": [],
+  "rejection_reason": "This is a corrected, low-impact one-off input error with no repeated mechanism, material consequence, or reusable prevention value.",
+  "governance_summary": "Do not add this event to the long-term engineering insight system unless similar naming failures recur with material impact."
+}

@@ -1,0 +1,122 @@
+[
+  {
+    "id": "TRIGGER-001",
+    "prompt": "这个故障已经解决了，请把问题、根因和验证结果提炼成以后能复用的工程经验。",
+    "should_trigger": true,
+    "rationale": "Explicitly requests screening, distillation, retention, generalization, or revision of engineering experience."
+  },
+  {
+    "id": "TRIGGER-002",
+    "prompt": "我们连续三次在不同项目里犯了同一种测试错误，帮我判断是新经验还是已有模式的新证据。",
+    "should_trigger": true,
+    "rationale": "Explicitly requests screening, distillation, retention, generalization, or revision of engineering experience."
+  },
+  {
+    "id": "TRIGGER-003",
+    "prompt": "技术路线切换完成了，别写项目总结，只提炼适用条件、反模式和退出检查项。",
+    "should_trigger": true,
+    "rationale": "Explicitly requests screening, distillation, retention, generalization, or revision of engineering experience."
+  },
+  {
+    "id": "TRIGGER-004",
+    "prompt": "这次复盘里有事实、推断和建议混在一起，请先校准证据再形成工程洞见。",
+    "should_trigger": true,
+    "rationale": "Explicitly requests screening, distillation, retention, generalization, or revision of engineering experience."
+  },
+  {
+    "id": "TRIGGER-005",
+    "prompt": "一个安全假设被真实运行证据推翻了，帮我形成带成熟度和适用边界的经验条目。",
+    "should_trigger": true,
+    "rationale": "Explicitly requests screening, distillation, retention, generalization, or revision of engineering experience."
+  },
+  {
+    "id": "TRIGGER-006",
+    "prompt": "这是已有经验的反例，判断应该修订边界、建立特化关系还是废弃原规则。",
+    "should_trigger": true,
+    "rationale": "Explicitly requests screening, distillation, retention, generalization, or revision of engineering experience."
+  },
+  {
+    "id": "TRIGGER-007",
+    "prompt": "把这次严重返工转成以后任务启动前的检查清单，但不要过度泛化。",
+    "should_trigger": true,
+    "rationale": "Explicitly requests screening, distillation, retention, generalization, or revision of engineering experience."
+  },
+  {
+    "id": "TRIGGER-008",
+    "prompt": "里程碑完成了，筛选哪些问题值得长期沉淀，哪些只是一次性小错误。",
+    "should_trigger": true,
+    "rationale": "Explicitly requests screening, distillation, retention, generalization, or revision of engineering experience."
+  },
+  {
+    "id": "TRIGGER-009",
+    "prompt": "我们没有完整日志，只有一次偶发现象。判断现在能不能形成正式工程规则。",
+    "should_trigger": true,
+    "rationale": "Explicitly requests screening, distillation, retention, generalization, or revision of engineering experience."
+  },
+  {
+    "id": "TRIGGER-010",
+    "prompt": "从这次 Agent 协作失误中提炼角色边界和防复发机制。",
+    "should_trigger": true,
+    "rationale": "Explicitly requests screening, distillation, retention, generalization, or revision of engineering experience."
+  },
+  {
+    "id": "TRIGGER-011",
+    "prompt": "把这段 README 翻译成英文。",
+    "should_trigger": false,
+    "rationale": "Requests a different capability or lacks a resolved evidence-backed experience-distillation goal."
+  },
+  {
+    "id": "TRIGGER-012",
+    "prompt": "帮我修正这个文件名拼写。",
+    "should_trigger": false,
+    "rationale": "Requests a different capability or lacks a resolved evidence-backed experience-distillation goal."
+  },
+  {
+    "id": "TRIGGER-013",
+    "prompt": "总结一下今天的聊天内容。",
+    "should_trigger": false,
+    "rationale": "Requests a different capability or lacks a resolved evidence-backed experience-distillation goal."
+  },
+  {
+    "id": "TRIGGER-014",
+    "prompt": "解释什么是 HTTP 401。",
+    "should_trigger": false,
+    "rationale": "Requests a different capability or lacks a resolved evidence-backed experience-distillation goal."
+  },
+  {
+    "id": "TRIGGER-015",
+    "prompt": "帮我写一个新的 API 接口实现。",
+    "should_trigger": false,
+    "rationale": "Requests a different capability or lacks a resolved evidence-backed experience-distillation goal."
+  },
+  {
+    "id": "TRIGGER-016",
+    "prompt": "查询当前 Runtime 状态。",
+    "should_trigger": false,
+    "rationale": "Requests a different capability or lacks a resolved evidence-backed experience-distillation goal."
+  },
+  {
+    "id": "TRIGGER-017",
+    "prompt": "把 Git 仓库发布到飞书。",
+    "should_trigger": false,
+    "rationale": "Requests a different capability or lacks a resolved evidence-backed experience-distillation goal."
+  },
+  {
+    "id": "TRIGGER-018",
+    "prompt": "生成一份项目时间线和全部决策清单。",
+    "should_trigger": false,
+    "rationale": "Requests a different capability or lacks a resolved evidence-backed experience-distillation goal."
+  },
+  {
+    "id": "TRIGGER-019",
+    "prompt": "我遇到一个错误但还没排查，直接告诉我根因。",
+    "should_trigger": false,
+    "rationale": "Requests a different capability or lacks a resolved evidence-backed experience-distillation goal."
+  },
+  {
+    "id": "TRIGGER-020",
+    "prompt": "请为这个功能生成单元测试代码。",
+    "should_trigger": false,
+    "rationale": "Requests a different capability or lacks a resolved evidence-backed experience-distillation goal."
+  }
+]

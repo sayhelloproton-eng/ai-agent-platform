@@ -1,0 +1,13 @@
+schema_version: "1.0"
+candidate_id: "CANDIDATE_EXAMPLE_001"
+decision: "needs_evidence" # proceed_full | needs_evidence | reject
+retention_value: "medium"
+materiality: "medium"
+transferability: "medium"
+evidence_readiness: "insufficient"
+signals:
+  - "unresolved_mechanism"
+rationale: "Explain briefly why the event should proceed, wait for evidence, or be rejected."
+missing_evidence:
+  - "Name the exact evidence needed before full distillation."
+recommended_next_step: "Collect the missing evidence before requesting full mode."

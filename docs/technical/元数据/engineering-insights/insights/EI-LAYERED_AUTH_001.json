@@ -1,0 +1,140 @@
+{
+  "schema_version": "1.1",
+  "insight_id": "EI-LAYERED_AUTH_001",
+  "title": "网络访问、身份认证、能力授权、用户确认与运行策略应分层建模",
+  "primary_type": "pattern",
+  "secondary_types": [
+    "judgment",
+    "checklist"
+  ],
+  "generalized_problem": "系统把网络可达性、调用者认证、能力授权和用户批准视为同一权限开关，导致错误的安全与自动化预期。",
+  "underlying_mechanism": "不同控制层由不同主体执行并保护不同风险：网络层控制可达性，认证层确认主体，授权层限制能力，用户确认层表达本次意图，运行时策略约束实际执行。",
+  "principle": "权限设计必须分层建模、分别配置和逐层验证，不能通过放开其中一层替代其他层。",
+  "applicability": {
+    "contexts": [
+      "外部工具调用",
+      "多层网关",
+      "代理执行系统",
+      "高风险自动化"
+    ],
+    "preconditions": [
+      "请求会穿越多个信任或产品边界",
+      "至少存在网络、身份或用户确认中的两层控制"
+    ],
+    "exclusions": [
+      "完全离线且单一信任域内的纯本地函数调用可能不需要所有层，但仍应明确省略理由"
+    ]
+  },
+  "recommended_actions": [
+    "绘制请求经过的权限层及每层控制主体。",
+    "为网络可达、身份认证、能力授权、用户确认和运行时策略分别定义测试。",
+    "优化审批体验时保持身份认证和能力授权不被隐式移除。"
+  ],
+  "prevention_checks": [
+    "服务可访问是否被错误等同于调用者已认证？",
+    "调用者已认证是否被错误等同于拥有目标能力？",
+    "拥有能力是否被错误等同于用户同意本次操作？",
+    "用户同意后运行时策略是否仍能拒绝不安全操作？"
+  ],
+  "evidence_strength": "high",
+  "maturity_level": "provisional",
+  "lifecycle_status": "active",
+  "maturity_rationale": "The source event and corrective verification support a reusable proposal, but only one governed occurrence is available and formal promotion has not been approved.",
+  "lifecycle_rationale": null,
+  "source_references": [
+    {
+      "source_id": "SRC-E04-NET",
+      "type": "runtime_observation",
+      "reference": "Anonymous tunnel plus bearer-protected gateway verification",
+      "supports": "网络入口匿名与 API Bearer 认证同时存在。",
+      "confidence": "high"
+    },
+    {
+      "source_id": "SRC-E04-UI",
+      "type": "screenshot",
+      "reference": "Formal action approval UI and successful call",
+      "supports": "API 认证成功后仍存在独立平台用户批准。",
+      "confidence": "high"
+    },
+    {
+      "source_id": "SRC-E04-DOC",
+      "type": "document",
+      "reference": "Consequential-operation behavior research",
+      "supports": "只读操作声明影响平台审批而不替代 API 认证。",
+      "confidence": "medium"
+    }
+  ],
+  "occurrences": [
+    {
+      "occurrence_id": "OCC-LAYERED_AUTH_001-001",
+      "observed_on": "2026-07-30",
+      "context_summary": "一次权限讨论将网络、API 和界面审批混同，实际验证表明它们是独立控制层。",
+      "source_refs": [
+        "SRC-E04-NET",
+        "SRC-E04-UI",
+        "SRC-E04-DOC"
+      ],
+      "independent_evidence": true,
+      "notes": null
+    }
+  ],
+  "deduplication": {
+    "status": "verified",
+    "decision": "new",
+    "compared_insight_ids": [
+      "EI-INTENT_ADAPTER_001",
+      "EI-PHASE_FIT_EXIT_001",
+      "EI-REAL_PATH_001",
+      "EI-RISK_REVIEW_001"
+    ],
+    "notes": "已对 engineering-insights Registry v1.0.0 中全部现有洞见进行机制、原则、动作和适用边界比较；未发现需要合并的重复条目。后续新增记录必须重新运行查重。"
+  },
+  "related_insights": [
+    {
+      "insight_id": "EI-INTENT_ADAPTER_001",
+      "relationship": "related_to",
+      "note": "Layered Authorization 提供总体权限分层；Intent Adapter 是外部调用接入内部控制面的具体接口模式。"
+    }
+  ],
+  "governance": {
+    "requires_human_approval": true,
+    "approval_status": "approved",
+    "approval_reference": "docs/technical/元数据/engineering-insights/governance.json#delegation-2026-07-31",
+    "requested_actions": []
+  },
+  "revision_history": [
+    {
+      "revision": "0.1",
+      "date": "2026-07-31",
+      "change_type": "created",
+      "summary": "Created during the first controlled pilot evaluation.",
+      "source_refs": [
+        "SRC-E04-NET",
+        "SRC-E04-UI",
+        "SRC-E04-DOC"
+      ]
+    },
+    {
+      "revision": "0.2",
+      "date": "2026-07-31",
+      "change_type": "revised",
+      "summary": "完成 Pilot 01 同批提案关系复核，调整标题表达、关联关系和查重说明；审批状态与成熟度未提升。",
+      "source_refs": [
+        "SRC-E04-NET",
+        "SRC-E04-UI",
+        "SRC-E04-DOC"
+      ]
+    },
+    {
+      "revision": "1.0",
+      "date": "2026-07-31",
+      "change_type": "maturity_changed",
+      "summary": "经项目负责人授权的专业复核委托后进入工程洞见注册表；保持既有 maturity level，不执行跨场景晋级。",
+      "source_refs": [
+        "SRC-E04-NET",
+        "SRC-E04-UI",
+        "SRC-E04-DOC"
+      ]
+    }
+  ]
+}

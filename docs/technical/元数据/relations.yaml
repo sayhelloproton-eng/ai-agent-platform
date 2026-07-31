@@ -156,3 +156,19 @@ relations:
   - from: PRT-002
     type: depends_on
     to: CTX-004
+
+  - from: SKL-002
+    type: implements
+    to: ARC-002
+
+  - from: SKL-002
+    type: validated_by
+    to: EXP-004
+
+  - from: INS-001
+    type: depends_on
+    to: SKL-002
+
+  - from: INS-001
+    type: derived_from
+    to: EXP-004

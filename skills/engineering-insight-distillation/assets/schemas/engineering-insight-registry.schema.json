@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:engineering-insight-distillation:registry:1.0",
+  "title": "Engineering Insight Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "registry_id",
+    "registry_version",
+    "canonical_root",
+    "updated_at",
+    "insight_count",
+    "insights",
+    "governance_path",
+    "relationships_path"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "registry_id": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_-]{2,63}$"
+    },
+    "registry_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "canonical_root": {
+      "type": "string",
+      "minLength": 5
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date"
+    },
+    "insight_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "insights": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "insight_id",
+          "title",
+          "path",
+          "category",
+          "primary_type",
+          "maturity_level",
+          "lifecycle_status",
+          "evidence_strength",
+          "approval_status"
+        ],
+        "properties": {
+          "insight_id": {
+            "type": "string",
+            "pattern": "^EI-[A-Z0-9_-]{3,63}$"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 8
+          },
+          "path": {
+            "type": "string",
+            "minLength": 5
+          },
+          "category": {
+            "enum": [
+              "trust-and-external-calls",
+              "verification-and-testing",
+              "exploration-and-decisions",
+              "security-and-authorization",
+              "review-and-governance"
+            ]
+          },
+          "primary_type": {
+            "enum": [
+              "judgment",
+              "pattern",
+              "anti_pattern",
+              "heuristic",
+              "checklist"
+            ]
+          },
+          "maturity_level": {
+            "enum": [
+              "candidate",
+              "provisional",
+              "validated",
+              "repeated",
+              "established"
+            ]
+          },
+          "lifecycle_status": {
+            "enum": [
+              "active",
+              "revised",
+              "deprecated"
+            ]
+          },
+          "evidence_strength": {
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "approval_status": {
+            "enum": [
+              "not_required",
+              "pending",
+              "approved",
+              "rejected"
+            ]
+          }
+        }
+      }
+    },
+    "governance_path": {
+      "type": "string",
+      "minLength": 5
+    },
+    "relationships_path": {
+      "type": "string",
+      "minLength": 5
+    }
+  }
+}

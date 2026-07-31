@@ -1,0 +1,15 @@
+﻿case_id,title,variant,evidence_discipline,abstraction_quality,applicability_boundaries,actionability,traceability,maturity_governance,dedup_evolution,disposition_correctness,total,max,character_count
+EVAL-01,外部智能调用者生成内部控制字段,baseline,1,2,1,2,0,0,0,2,8,16,86
+EVAL-01,外部智能调用者生成内部控制字段,skill,2,2,2,2,2,2,1,2,15,16,3956
+EVAL-02,自动验证覆盖了相似内部接口而非真实用户入口,baseline,1,2,1,2,0,0,0,2,8,16,74
+EVAL-02,自动验证覆盖了相似内部接口而非真实用户入口,skill,2,2,2,2,2,2,1,2,15,16,3878
+EVAL-03,探索性公网方案持续追加补丁但偏离 MVP 目标,baseline,1,1,0,2,0,0,0,2,6,16,75
+EVAL-03,探索性公网方案持续追加补丁但偏离 MVP 目标,skill,2,2,2,2,2,2,1,2,15,16,3921
+EVAL-04,把公网访问、API 认证和用户审批当成同一种权限,baseline,1,2,1,2,0,0,0,2,8,16,62
+EVAL-04,把公网访问、API 认证和用户审批当成同一种权限,skill,2,2,2,2,2,2,1,2,15,16,4130
+EVAL-05,窄修复后仍重复要求全量审计,baseline,1,2,1,1,0,0,0,1,6,16,60
+EVAL-05,窄修复后仍重复要求全量审计,skill,2,2,2,2,2,2,1,2,15,16,3881
+EVAL-06,一次无法复现的偶发超时,baseline,0,1,0,1,0,0,0,0,2,16,46
+EVAL-06,一次无法复现的偶发超时,skill,2,2,2,1,2,2,1,2,14,16,1932
+EVAL-07,一次性文件名拼写错误,baseline,1,0,0,1,0,0,0,0,2,16,41
+EVAL-07,一次性文件名拼写错误,skill,2,2,2,1,2,2,1,2,14,16,1448

@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "candidate_id": "EVAL-07",
+  "decision": "reject",
+  "retention_value": "low",
+  "materiality": "low",
+  "transferability": "low",
+  "evidence_readiness": "sufficient",
+  "signals": [
+    "trivial_one_off"
+  ],
+  "rationale": "The event was a corrected low-impact typo with no repeated mechanism, material consequence, changed engineering decision, or reusable prevention value.",
+  "missing_evidence": [],
+  "recommended_next_step": "Do not retain it in the engineering insight system unless materially similar failures recur."
+}
