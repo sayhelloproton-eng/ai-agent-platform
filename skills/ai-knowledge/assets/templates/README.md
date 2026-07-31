@@ -5,7 +5,7 @@ Deterministic Markdown templates used by `render_draft.mjs`. Templates create dr
 | Template | Model | Canonical Root | Projection |
 |---|---|---|---|
 | `knowledge-note.md` | Knowledge | `docs/knowledge/` | Eligible after Git review |
-| `experiment.md` | Knowledge | `docs/knowledge/实验与复盘/` | Eligible after Git review |
+| `experiment.md` | Knowledge | `docs/knowledge/08_实验与复盘/` | Eligible after Git review |
 | `learning-path.md` | Knowledge | `docs/knowledge/` | Eligible after Git review |
 | `project-status.md` | Context | `context/` | Prohibited |
 | `adr.md` | Decision | `docs/adr/` | Prohibited as knowledge body |

@@ -1,7 +1,7 @@
 ---
 asset_id: {{asset_id}}
 asset_layer: knowledge
-canonical_root: docs/knowledge/实验与复盘/
+canonical_root: docs/knowledge/08_实验与复盘/
 projection_eligible: true
 ---
 # {{title}}

@@ -424,13 +424,13 @@ Context Engineering 不是把所有信息都保存起来，而是设计：
 
 ## 10. 参考资料
 
-- Diátaxis  
+- Diátaxis
   https://diataxis.fr/start-here/
-- GitHub Copilot Repository Instructions  
+- GitHub Copilot Repository Instructions
   https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/add-custom-instructions/add-repository-instructions
-- GitHub Copilot CLI Custom Instructions  
+- GitHub Copilot CLI Custom Instructions
   https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions
-- Anthropic Claude Code Memory  
+- Anthropic Claude Code Memory
   https://docs.anthropic.com/zh-CN/docs/claude-code/memory
-- Model Context Protocol Architecture  
+- Model Context Protocol Architecture
   https://modelcontextprotocol.io/docs/learn/architecture

@@ -87,10 +87,21 @@ Batch 06：实验、作品集、术语与知识树路径收口
 - [x] 生成 REF-001～REF-005；
 - [x] 迁移 SKL-001～SKL-002 与 WFL-001～WFL-004；
 - [x] 同步 Registry、关系、迁移矩阵和 Release；
-- [ ] 按真实 Commit Review 十五篇新正文；
-- [ ] 将通过 Review 的十五篇正文升级为 `accepted`。
+- [x] 按真实 Commit Review 十五篇新正文；
+- [x] 将通过 Review 的十五篇正文升级为 `accepted`。
 
-后续进入全库一致性 Review、剩余 Registry 迁移审计、正式视觉资产、main 合并和飞书覆盖式发布。
+Batch 07：全库一致性与 Registry 迁移收口
+
+- [x] 修正 Context 与栏目 README 状态漂移；
+- [x] 执行 15 个 Registry 批准路径迁移；
+- [x] 完成 17 个原位资产迁移审计；
+- [x] 删除旧知识目录导航文件，使 `docs/knowledge/` 只保留 `00～10`；
+- [x] 清理正式知识正文中的旧系统 Front Matter；
+- [x] 更新全仓内部链接与 Skill 路径引用；
+- [ ] 按真实 Commit Review Batch 07；
+- [ ] 将整体知识迁移状态升级为 completed。
+
+后续进入正式视觉资产、main 合并和飞书覆盖式发布。
 
 ## Phase 2 Next：Task Control and Trusted Execution
 

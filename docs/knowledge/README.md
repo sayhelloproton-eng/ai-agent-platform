@@ -32,6 +32,6 @@
 - 发布不读取飞书旧正文，不比较、不合并，只按映射逐篇 overwrite；
 - 目录中的计划清单不代表文章已经实现。
 
-## 迁移期说明
+## 路径收口状态
 
-00～10 是正式知识目标树。部分早期 ARC、EXP、PRT、INS 和技术资产仍保留原路径，是否移动由 Registry 迁移计划决定；只有 Registry 中标记为当前 canonical 的文档属于正式发布清单。
+`00～10` 已成为 `docs/knowledge/` 唯一正式顶层知识树。历史或 superseded 资产移入 `docs/technical/归档/`；工程方案移入 `docs/technical/`。机器路径、生命周期和发布资格以 Platform Registry 为准。

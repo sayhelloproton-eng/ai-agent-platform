@@ -13,8 +13,9 @@ completed_batches:
 - 03bc-codex-and-agent-theory-documents
 - 04-platform-architecture-and-knowledge-system-documents
 - 05-agent-assets-and-workflow-governance-documents
-current_batch: 06-experiments-portfolio-references-and-path-closure
-next_batch: Review Batch 06 real implementation commit, then run full-library consistency review and formal visual asset generation
+- 06-experiments-portfolio-references-and-path-closure
+current_batch: 07-full-library-consistency-and-registry-closure
+next_batch: Review Batch 07 real implementation commit, complete the overall migration, then generate formal visual assets
 matrix: platform-registry/migrations/asset-migration-matrix.csv
 rules:
   preserve_stable_ids: true

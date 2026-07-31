@@ -1,15 +1,3 @@
----
-asset_id: ARC-001
-asset_type: architecture
-title: 平台目标架构
-status: accepted
-evidence_level: decided
-updated_at: 2026-07-27
-canonical_source: git
-canonical_path: docs/knowledge/架构与领域/平台架构/ARC-001-平台目标架构.md
-related_assets: [PRD-001, DOM-001, ARC-003]
----
-
 # ARC-001 平台目标架构
 
 > 本文描述长期目标架构，不代表全部已经实现。当前代码和可执行资产主要集中在 AI Knowledge Skill 与 Knowledge Foundation；Gateway、Runtime、Coding Workflow 和 Video Workflow 分属 Next 或 Later。

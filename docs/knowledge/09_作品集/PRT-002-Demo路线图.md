@@ -1,13 +1,3 @@
----
-asset_id: PRT-002
-asset_type: portfolio
-title: Demo 路线图
-status: proposed
-evidence_level: hypothesis
-canonical_path: docs/knowledge/作品集/PRT-002-Demo路线图.md
-related_assets: [PRD-002, CTX-004, WFL-002, WFL-003]
----
-
 # PRT-002 Demo 路线图
 
 1. **Knowledge Demo**：给定任务，生成最小 Context Package；生成 Git Draft 和 Feishu Projection Preview；检测 Drift。

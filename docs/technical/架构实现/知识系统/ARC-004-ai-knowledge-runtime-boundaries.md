@@ -3,7 +3,7 @@ asset_id: ARC-004
 asset_type: architecture
 status: accepted
 evidence_level: decided
-canonical_path: docs/technical/架构实现/ARC-004-ai-knowledge-runtime-boundaries.md
+canonical_path: docs/technical/架构实现/知识系统/ARC-004-ai-knowledge-runtime-boundaries.md
 related_assets: [ARC-002, SKL-001, ADR-002, SOL-002]
 ---
 

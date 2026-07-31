@@ -32,4 +32,4 @@ related_assets: [RSH-001, OPS-001, OPS-002, OPS-003]
 
 ## Validation
 
-初始化和 15 个一级节点已经验证，见 [`OPS-001`](../../运维与迁移/feishu/OPS-001-knowledge-base-initialization.md)。首页见 [`OPS-002`](../../运维与迁移/feishu/OPS-002-homepage-publication.md)。
+初始化和 15 个一级节点已经验证，见 [`OPS-001`](../../运维与事件/feishu/OPS-001-knowledge-base-initialization.md)。首页见 [`OPS-002`](../../运维与事件/feishu/OPS-002-homepage-publication.md)。

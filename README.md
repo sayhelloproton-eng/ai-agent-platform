@@ -26,10 +26,10 @@ Batch 01: 已完成
 Batch 01-R1: 已完成
 Batch 02: 已完成并通过 Review
 Batch 02-R1: 已完成并通过 Review
-Current Work: Batch 06 实验、作品集、术语与路径收口已物化，等待真实 Commit Review
+Current Work: Batch 07 全库一致性与 Registry 迁移收口已执行，等待真实 Commit Review
 ```
 
-Batch 02 的十一篇项目入口与产品体系正文已经成为 accepted Git 正式知识。CAP-001～CAP-008、THY-001～THY-006、ARC-007～ARC-014、ARC-016 与 KNO-001～KNO-010 已通过真实 Commit Review 并成为 accepted。ARC-017～ARC-018、AGT-001～AGT-010 与 WFL-005～WFL-012 已通过真实 Commit Review 并成为 accepted。ARC-015、EXP-005～EXP-009、PRT-003～PRT-006 与 REF-001～REF-005 已首次物化为 partial；SKL-001～SKL-002 与 WFL-001～WFL-004 已完成目标路径迁移。图片、HTML 与飞书发布仍未开始。
+Batch 02～Batch 06 的正式正文均已完成真实 Commit Review；Batch 06 的十五篇新正文已升级为 accepted。Registry 中 126 个资产已经全部物化，32 个剩余迁移状态已收口，其中 15 个资产执行目标路径迁移、17 个资产完成原位审计。`docs/knowledge/` 顶层只保留 `00～10` 正式知识树。图片、HTML 与飞书发布仍未开始。
 
 已验证链路：
 

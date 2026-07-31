@@ -8,14 +8,14 @@
 
 | ID | 文件 | 当前状态 |
 |---|---|---|
-| THY-001 | `THY-001-从AI工具到Agent工程平台.md` | partial |
-| THY-002 | `THY-002-AI开发范式演进.md` | partial |
-| THY-003 | `THY-003-Agent与Skills开发范式.md` | partial |
-| THY-004 | `THY-004-DDD与Agent系统边界建模.md` | partial |
-| THY-005 | `THY-005-可信Agent系统基本原则.md` | partial |
-| THY-006 | `THY-006-项目方法论与可复用工程启发.md` | partial |
+| THY-001 | `THY-001-从AI工具到Agent工程平台.md` | accepted |
+| THY-002 | `THY-002-AI开发范式演进.md` | accepted |
+| THY-003 | `THY-003-Agent与Skills开发范式.md` | accepted |
+| THY-004 | `THY-004-DDD与Agent系统边界建模.md` | accepted |
+| THY-005 | `THY-005-可信Agent系统基本原则.md` | accepted |
+| THY-006 | `THY-006-项目方法论与可复用工程启发.md` | accepted |
 
-六篇正文已经物化，等待真实 Commit Review。复杂图在正文冻结后集中生成。
+六篇正文已通过真实 Commit Review。复杂图在正文冻结后集中生成。
 
 ## 维护规则
 

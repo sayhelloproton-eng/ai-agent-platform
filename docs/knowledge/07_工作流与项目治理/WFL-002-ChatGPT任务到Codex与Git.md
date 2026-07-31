@@ -1,13 +1,3 @@
----
-asset_id: WFL-002
-asset_type: workflow
-title: ChatGPT 任务到 Codex 与 Git
-status: proposed
-evidence_level: hypothesis
-canonical_path: docs/knowledge/07_工作流与项目治理/WFL-002-ChatGPT任务到Codex与Git.md
-related_assets: [ARC-003, DOM-001, CTX-004]
----
-
 # WFL-002 ChatGPT 任务到 Codex 与 Git
 
 ## 目标流程

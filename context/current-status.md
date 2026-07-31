@@ -92,8 +92,7 @@ Phase: 2.5 — Knowledge Asset Rebuild and Platform Governance
 后续总体顺序：
 
 ```text
-→ Review 并接受 Batch 06 十五篇新正文
-→ 全库一致性 Review 与剩余 Registry 迁移审计
+→ Review 并接受 Batch 07 全库一致性与迁移收口
 → 生成正式视觉资产
 → 合并 main
 → 建立 Feishu 映射并逐篇 overwrite

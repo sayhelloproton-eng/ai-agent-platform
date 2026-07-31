@@ -13,11 +13,11 @@
 | CAP-003 | `CAP-003-ChatGPT配置权限与使用基线.md` | accepted |
 | CAP-004 | `CAP-004-CustomGPT产品能力与边界.md` | accepted |
 | CAP-005 | `CAP-005-CustomGPT-Instructions-Knowledge-Actions与发布配置.md` | accepted |
-| CAP-006 | `CAP-006-Codex产品与执行体系.md` | partial |
-| CAP-007 | `CAP-007-Codex配置权限与执行基线.md` | partial |
-| CAP-008 | `CAP-008-Agent扩展与治理-AGENTSRulesSkillsHooksMCP与Plugins.md` | partial |
+| CAP-006 | `CAP-006-Codex产品与执行体系.md` | accepted |
+| CAP-007 | `CAP-007-Codex配置权限与执行基线.md` | accepted |
+| CAP-008 | `CAP-008-Agent扩展与治理-AGENTSRulesSkillsHooksMCP与Plugins.md` | accepted |
 
-CAP-006～CAP-008 首次落库后等待真实 Commit Review；目录正文在全库发布前保持 `unpublished`。
+CAP-001～CAP-008 已通过真实 Commit Review；目录正文在正式发布前保持 `unpublished`。
 
 ## 维护规则
 

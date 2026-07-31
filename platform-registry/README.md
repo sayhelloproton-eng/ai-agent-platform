@@ -29,3 +29,7 @@ Registry 不保存聊天全文、Secret、运行缓存或飞书正文副本。
 - `materialized: false` 的计划资产不得拥有 `canonical_path`；
 - 只有正文已生成并通过 Review 后，文档资产才能进入 `accepted`；
 - 计划资产必须保持 `unpublished`，不得拥有飞书节点映射。
+
+## Migration Closure
+
+Batch 07 将所有资产的 `migration_state` 收口为 `complete`。`materialized` 描述资产是否存在，`status` 描述领域生命周期，`migration_state` 只描述路径迁移是否完成，三者不能混用。

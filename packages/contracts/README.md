@@ -99,6 +99,6 @@ Contract v1 只允许：
 
 ## Related Docs
 
-- [SOL-006：Task / Result / Error Contract v1](../../docs/technical/技术方案/Task-Control/SOL-006-Task-Result-Error-Contract-v1.md)
+- [SOL-006：Task / Result / Error Contract v1](../../docs/technical/技术方案/Gateway/SOL-006-Task-Result-Error-Contract-v1.md)
 - [源码说明](src/README.md)
 - [测试说明](tests/README.md)

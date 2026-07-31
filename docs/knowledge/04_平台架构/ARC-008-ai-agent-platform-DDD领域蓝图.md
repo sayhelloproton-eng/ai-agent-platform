@@ -40,4 +40,4 @@ Context 通过 Command、Event、Query、Port 和 Registry Reference 交流，�
 
 - [THY-004 DDD 与 Agent 系统边界建模](../03_架构思想与理论/THY-004-DDD与Agent系统边界建模.md)
 - [PRD-007 平台与上层产品边界](../01_产品体系/PRD-007-平台与上层产品边界.md)
-- [ARC-001 历史平台目标架构](../架构与领域/平台架构/ARC-001-平台目标架构.md)
+- [ARC-001 历史平台目标架构](ARC-001-ai-agent-platform总体架构.md)

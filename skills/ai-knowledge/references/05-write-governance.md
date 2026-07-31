@@ -51,4 +51,4 @@ Feishu 是 Human Readable Knowledge Projection。它不能成为独立规范源�
 
 只有真实取舍并经确认才能 Accepted。ADR 写入 `docs/adr/`，不作为知识库正文。
 
-Experiment 必须包含环境、步骤、观察、结果和限制；面向人类发布的实验总结可进入 `docs/knowledge/实验与复盘/`。
+Experiment 必须包含环境、步骤、观察、结果和限制；面向人类发布的实验总结可进入 `docs/knowledge/08_实验与复盘/`。

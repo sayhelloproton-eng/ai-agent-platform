@@ -1,15 +1,3 @@
----
-asset_id: SKL-001
-asset_type: skill-design
-title: AI 知识技能
-status: implemented
-evidence_level: verified
-canonical_source: git
-canonical_path: docs/knowledge/06_智能体资产体系/SKL-001-AI知识技能.md
-implementation_path: skills/ai-knowledge
-related_assets: [ARC-002, ARC-004, WFL-001, ADR-002, EXP-001, EXP-002]
----
-
 # SKL-001 AI 知识技能
 
 ## 目的

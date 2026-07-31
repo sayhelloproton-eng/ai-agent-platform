@@ -12,7 +12,7 @@
 - Learning Assets：`docs/learning/`
 - ADR：`docs/adr/`
 - Asset / Relation Index：`docs/technical/元数据/`
-- Skill Design：`docs/knowledge/Agent与能力/Skill设计/SKL-001-ai-knowledge.md`
+- Skill Design：`docs/knowledge/06_智能体资产体系/SKL-001-AI知识技能.md`
 
 ## Layer Rules
 

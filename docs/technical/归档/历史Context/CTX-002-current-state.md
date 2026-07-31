@@ -48,9 +48,9 @@ related_assets: [CTX-001, CTX-003, CTX-004, ADR-002, MIG-001]
 
 ## Evidence
 
-- 迁移审计：[`MIG-001`](../../运维与迁移/migration/MIG-001-repository-audit-and-migration-2026-07-27.md)
+- 迁移审计：[`MIG-001`](../../迁移计划/历史/MIG-001-repository-audit-and-migration-2026-07-27.md)
 - Skill 验证：`node scripts/validate_bundle.mjs`、`node tests/self-test.mjs`
-- 索引：[`docs/_index/`](../../元数据)
+- 索引：[`docs/_index/`](../../../../platform-registry/)
 
 ## Next Actions
 
