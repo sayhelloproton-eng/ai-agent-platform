@@ -5,8 +5,10 @@ status: in_review
 completed_batches:
 - 01-control-plane
 - 01-r1-registry-consistency
-current_batch: 02-entry-and-product-documents
-next_batch: Batch 02 repository review and content correction
+- 02-entry-and-product-documents
+- 02-r1-content-lifecycle-cleanup
+current_batch: 02-post-commit-repository-review
+next_batch: Batch 02 review decision and follow-up correction
 matrix: platform-registry/migrations/asset-migration-matrix.csv
 rules:
   preserve_stable_ids: true

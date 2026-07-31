@@ -24,3 +24,12 @@ releases:
   base_commit: 42306077c4d11773c510222abc7a79d83384bb36
   publication_status: unpublished
   feishu_status: not_started
+- release_id: KNOWLEDGE-REBUILD-V2-BATCH-02-R1
+  type: knowledge-rebuild-review-fix
+  status: in_review
+  branch: knowledge-rebuild-v2
+  base_commit: 3206cd4da7ecb66eb4e706d2908a1d59e1a483fe
+  content_correction_status: completed
+  repository_review_status: pending_post_commit
+  publication_status: unpublished
+  feishu_status: not_started

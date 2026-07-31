@@ -1,7 +1,6 @@
 # PRD-006 AI 视频工作流产品概念
-> **资产状态**：本文正文已在 Batch 02 交付包中完成内容 Review；进入仓库后先标记为 `partial / unpublished`，待真实 Commit 整体复审通过后再升级为 `accepted`。
 
-> 状态：`designing / not-started`。AI 视频工作流是未来依托 `ai-agent-platform` 的上层产品，用于验证复杂领域、多个模型 Provider、人工 Review、成本和恢复；当前仓库没有其业务实现。
+> AI 视频工作流当前处于产品概念与领域验证阶段，仓库尚无业务应用、Provider 调用或 Demo 实现。它是未来依托 `ai-agent-platform` 的上层产品，用于验证复杂领域、多个模型 Provider、人工 Review、成本和恢复。
 
 ## 1. 产品机会
 
@@ -46,7 +45,7 @@ AI 视频创作不是单次“文生视频”。一个可控作品通常需要�
 平台提供：Task/Result、身份和权限、Execution Lane、Provider Adapter、Evidence、成本记录、Health/Recovery、Git/Registry、Agent/Skill。<br>
 AI 视频产品提供：故事、人物、场景、分镜、创作体验、业务规则、专属评估和作品资产。
 
-因此不创建根级 `products/`。真正开始开发时，按资产类型建立：`apps/ai-video-workflow/`、相关 packages、知识文章、Agent Profile 和 Skill。
+因此不创建根级 `products/`。真实开发开始后可能使用的候选落位包括 `apps/ai-video-workflow/`、相关 packages、知识文章、Agent Profile 和 Skill；这些路径当前都不代表已存在实现。
 
 ## 6. 智能体角色候选
 

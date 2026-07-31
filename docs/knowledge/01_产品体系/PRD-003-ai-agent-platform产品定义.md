@@ -1,5 +1,4 @@
 # PRD-003 ai-agent-platform 产品定义
-> **资产状态**：本文正文已在 Batch 02 交付包中完成内容 Review；进入仓库后先标记为 `partial / unpublished`，待真实 Commit 整体复审通过后再升级为 `accepted`。
 
 > `ai-agent-platform` 是面向个人 Agent 工程师的工程协作与能力资产平台：它用稳定 Contract、受控 Runtime、知识真源和证据治理，把分散的 Chat、专业 Agent、Codex、Skills 与本地工具组织成可持续推进的工作系统。
 
@@ -21,6 +20,8 @@
 
 ## 3. 用户核心 Jobs
 
+本节同时包含当前能力和目标能力，当前实现状态以 [CTX-005 当前能力地图](../00_项目入口/CTX-005-当前能力地图.md) 为准。
+
 1. **恢复项目**：新 Agent 能快速知道当前事实、规则和下一步；
 2. **形成任务**：把自然语言目标转成有约束、有验收的 Task Contract；
 3. **安全执行**：让 Codex、Work 或 Skill 在明确权限和环境中执行；
@@ -32,7 +33,7 @@
 
 | 能力域 | 当前 | 下一步 |
 | --- | --- | --- |
-| Context & Knowledge | Git 真源、Context、四层文档、AI Knowledge Skill | Registry、影响分析、Knowledge Pack |
+| Context & Knowledge | Git 真源、Context、四层文档、AI Knowledge Skill、Platform Registry | 生成索引、自动影响分析、Agent Profile 与 Knowledge Pack |
 | Contracts & Security | Task/Result/Error、Auth、双层 Policy | 动态身份、Scope、expected\_version |
 | Gateway & Runtime | 安全窄链路、两个 Capability、限流/并发 | Task State、队列/重试边界、执行适配 |
 | Agent Assets | Custom GPT + Actions Skill | Agent Profile、评估、Release |
@@ -51,6 +52,8 @@
 - 不让作品集只剩宣传描述。
 
 ## 6. 产品输入与输出
+
+本节同时包含当前能力和目标能力，当前实现状态以 [CTX-005 当前能力地图](../00_项目入口/CTX-005-当前能力地图.md) 为准。
 
 ### 输入
 
@@ -81,4 +84,4 @@ TaskResult、Artifact、Diff、Commit/PR、测试证据、Approval Record、Snap
 
 ## 10. 关联文章
 
-用户价值见 `PRD-004`；能力路线见 `PRD-005`；AI 视频上层产品见 `PRD-006`；平台边界见 `PRD-007`；当前事实见 `CTX-005`。
+用户价值见 [PRD-004 用户价值与核心场景](./PRD-004-用户价值与核心场景.md)；能力路线见 [PRD-005 能力地图与演进路线](./PRD-005-能力地图与演进路线.md)；AI 视频上层产品见 [PRD-006 AI 视频工作流产品概念](./PRD-006-AI视频工作流产品概念.md)；平台边界见 [PRD-007 平台与上层产品边界](./PRD-007-平台与上层产品边界.md)；当前事实见 [CTX-005 当前能力地图](../00_项目入口/CTX-005-当前能力地图.md)。
