@@ -2,7 +2,7 @@
   "visual_asset_id": "VIS-001",
   "title": "平台六层总体架构",
   "version": 1,
-  "status": "verified",
+  "status": "accepted",
   "target_document": "docs/knowledge/04_平台架构/ARC-001-ai-agent-platform总体架构.md",
   "target_document_asset_id": "ARC-001",
   "source_documents": [

@@ -22,7 +22,7 @@
 
 ## Phase 2.5：Knowledge Asset Rebuild and Platform Governance
 
-状态：**Knowledge and Execution Governance Completed / Visual Assets In Review**
+状态：**Merged to main / Final Review Pending**
 
 Batch 01 已完成首次仓库落库：
 
@@ -118,9 +118,20 @@ Batch 09：正式视觉资产与双分支交付
 - [x] 建立 `VIS-*` 稳定 ID、Manifest、Hash 和 Registry 关系；
 - [x] 在目标正文中使用 `asset://` 引用；
 - [x] 建立 SVG 安全、PNG 尺寸与跨分支映射校验；
-- [ ] 按真实 Commit Review `knowledge-assets` 与 `knowledge-rebuild-v2`；
+- [x] 按真实 Commit Review `knowledge-assets` 与 `knowledge-rebuild-v2`；
 
-后续进入最终仓库 Review、main 合并和飞书覆盖式发布。
+Batch 10：最终收口并合并 main
+
+- [x] 接受 Batch 09 十张正式视觉资产；
+- [x] 将 Batch 09 标记为 completed / accepted；
+- [x] 完成最终仓库 Review；
+- [x] 使用 fast-forward only 合并 `knowledge-rebuild-v2` 到 `main`；
+- [x] 在合并后的 `main` 上重新运行完整验证；
+- [x] 保留 `knowledge-assets` 作为图片源资产分支；
+- [x] 停止在飞书发布之前，等待项目整体回顾；
+- [ ] 完成 Batch 10 合并后 Review。
+
+后续先进行项目整体回顾；飞书覆盖式发布需要单独授权。
 
 ## Phase 2 Next：Task Control and Trusted Execution
 

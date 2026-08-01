@@ -2,7 +2,7 @@
   "visual_asset_id": "VIS-002",
   "title": "Custom GPT 到 Local Runtime 真实链路",
   "version": 1,
-  "status": "verified",
+  "status": "accepted",
   "target_document": "docs/knowledge/08_实验与复盘/EXP-005-Custom-GPT-Actions链路实验.md",
   "target_document_asset_id": "EXP-005",
   "source_documents": [

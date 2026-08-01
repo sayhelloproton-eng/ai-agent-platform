@@ -2,7 +2,7 @@
   "visual_asset_id": "VIS-006",
   "title": "Agent Profile、Skill 与 Knowledge Pack",
   "version": 1,
-  "status": "verified",
+  "status": "accepted",
   "target_document": "docs/knowledge/04_平台架构/ARC-012-Agent-Profile与Skills资产化.md",
   "target_document_asset_id": "ARC-012",
   "source_documents": [

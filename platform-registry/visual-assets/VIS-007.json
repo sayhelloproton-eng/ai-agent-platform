@@ -2,7 +2,7 @@
   "visual_asset_id": "VIS-007",
   "title": "审批、证据与副作用账本",
   "version": 1,
-  "status": "verified",
+  "status": "accepted",
   "target_document": "docs/knowledge/04_平台架构/ARC-013-审批证据与副作用账本.md",
   "target_document_asset_id": "ARC-013",
   "source_documents": [

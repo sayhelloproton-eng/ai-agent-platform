@@ -2,7 +2,7 @@
   "visual_asset_id": "VIS-008",
   "title": "健康、恢复与终止快照",
   "version": 1,
-  "status": "verified",
+  "status": "accepted",
   "target_document": "docs/knowledge/04_平台架构/ARC-014-健康与恢复治理架构.md",
   "target_document_asset_id": "ARC-014",
   "source_documents": [

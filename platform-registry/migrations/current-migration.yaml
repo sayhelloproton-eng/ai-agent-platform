@@ -1,7 +1,7 @@
 version: 1
 migration_id: MIG-KNOWLEDGE-V2
 source_commit: bd31893ddb9bb2efeb3cb38f67f1add66735cd79
-status: completed
+status: in_review
 completed_batches:
 - 01-control-plane
 - 01-r1-registry-consistency
@@ -15,8 +15,9 @@ completed_batches:
 - 05-agent-assets-and-workflow-governance-documents
 - 06-experiments-portfolio-references-and-path-closure
 - 07-full-library-consistency-and-registry-closure
-current_batch: knowledge-rebuild-v2-completed
-next_batch: Review Batch 09 dual-branch visual assets, then run final repository review and merge main
+- 09-formal-visual-assets
+current_batch: 10-final-closure-and-main-merge
+next_batch: Review Batch 10 merge result and run the project retrospective; Feishu publication requires separate authorization
 matrix: platform-registry/migrations/asset-migration-matrix.csv
 rules:
   preserve_stable_ids: true

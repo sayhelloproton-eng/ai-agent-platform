@@ -2,7 +2,7 @@
   "visual_asset_id": "VIS-009",
   "title": "产品孵化与需求治理",
   "version": 1,
-  "status": "verified",
+  "status": "accepted",
   "target_document": "docs/knowledge/04_平台架构/ARC-017-产品孵化与需求治理体系.md",
   "target_document_asset_id": "ARC-017",
   "source_documents": [

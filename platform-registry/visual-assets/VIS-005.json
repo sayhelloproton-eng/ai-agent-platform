@@ -2,7 +2,7 @@
   "visual_asset_id": "VIS-005",
   "title": "Execution Lane 与多执行器",
   "version": 1,
-  "status": "verified",
+  "status": "accepted",
   "target_document": "docs/knowledge/04_平台架构/ARC-010-Execution-Lane执行通道模型.md",
   "target_document_asset_id": "ARC-010",
   "source_documents": [

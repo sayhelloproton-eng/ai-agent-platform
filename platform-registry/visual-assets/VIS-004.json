@@ -2,7 +2,7 @@
   "visual_asset_id": "VIS-004",
   "title": "Task Control 状态机",
   "version": 1,
-  "status": "verified",
+  "status": "accepted",
   "target_document": "docs/knowledge/04_平台架构/ARC-009-轻量Task-Control架构.md",
   "target_document_asset_id": "ARC-009",
   "source_documents": [

@@ -6,30 +6,27 @@
 
 ## 当前状态
 
-当前处于 **Phase 2.5：AI Coding Workflow 已完成首个端到端 MVP，进入知识资产重构与平台治理阶段**。
+当前处于 **Phase 2.5 最终 Review：知识资产重构、执行治理和正式视觉资产已收口，Batch 10 将其合并到 `main`**。
 
-实现事实基线：
+当前正式基线：
 
 ```text
 main
-bd31893ddb9bb2efeb3cb38f67f1add66735cd79
+以 origin/main 实际 HEAD 为准
 ```
 
-该提交代表进入知识资产重构前的已验证实现事实，不代表当前知识重构分支已经合并到 `main`。
+`main` 是合并后的正式代码与知识基线；`knowledge-assets` 继续保存正式 SVG / PNG 源资产。
 
 知识资产重构工作状态：
 
 ```text
-Branch: knowledge-rebuild-v2
-Commit: 以该分支实际 HEAD 为准
-Batch 01: 已完成
-Batch 01-R1: 已完成
-Batch 02: 已完成并通过 Review
-Batch 02-R1: 已完成并通过 Review
-Current Work: Batch 09 十张正式视觉资产已生成，等待双分支真实 Commit Review
+Branch: main
+Batch 01～Batch 09: 已完成
+Knowledge Assets: 已完成并保留独立 source branch
+Current Work: Batch 10 执行 main 合并，等待合并后 Review 与项目回顾
 ```
 
-Batch 02～Batch 08 已全部完成真实 Commit Review。知识资产重构迁移与确定性交付治理已经完成；Registry 原有知识资产全部物化并完成迁移审计。Batch 09 已生成十张正式 SVG / PNG，并通过 `asset://` 关联知识正文；当前等待 `knowledge-assets` 与 `knowledge-rebuild-v2` 双分支真实 Commit Review。HTML 与飞书发布仍未开始。
+Batch 02～Batch 09 已全部完成真实 Commit Review。知识正文、Registry 迁移、确定性交付治理和十张正式视觉资产均已收口；Batch 10 使用 fast-forward only 将 `knowledge-rebuild-v2` 合并到 `main`，完成后等待本项目整体回顾。`knowledge-assets` 继续作为正式 SVG / PNG 源资产分支。HTML 与飞书发布仍未开始，后续操作需要单独授权。
 
 已验证链路：
 

@@ -2,7 +2,7 @@
   "visual_asset_id": "VIS-003",
   "title": "DDD Bounded Context 蓝图",
   "version": 1,
-  "status": "verified",
+  "status": "accepted",
   "target_document": "docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图.md",
   "target_document_asset_id": "ARC-008",
   "source_documents": [

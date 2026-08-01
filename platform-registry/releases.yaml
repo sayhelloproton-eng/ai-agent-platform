@@ -13,10 +13,11 @@ releases:
   branch: knowledge-rebuild-v2
   publication_status: unpublished
   feishu_status: not_started
-  notes: Knowledge content materialization and registry migration closure completed; visual assets and publication remain
-    pending.
+  notes: Knowledge content, registry migration, deterministic delivery governance, and ten formal visual assets completed
+    and accepted; final integration is merged to main by Batch 10. Feishu publication remains not started.
   repository_review_status: accepted
-  implementation_commit: 3ef6b7a74d0626edad1179336df618e372a7588f
+  implementation_commit: f377303025a260def940206ac264668913f6618b
+  asset_implementation_commit: d2c628b5f1b201eea9f267d60ca92a03898525ba
 - release_id: KNOWLEDGE-REBUILD-V2-BATCH-01
   type: knowledge-rebuild
   source_commit: c9c44380e06a7263fbf9525ed961a3825e4a9a08
@@ -122,12 +123,26 @@ releases:
   implementation_commit: 80b91622198a9adc7dec787b1e4180baf6e90cce
 - release_id: KNOWLEDGE-REBUILD-V2-BATCH-09
   type: formal-visual-assets
-  status: in_review
+  status: completed
   branch: knowledge-rebuild-v2
   base_commit: 80b91622198a9adc7dec787b1e4180baf6e90cce
   content_scope: ten reviewed SVG/PNG visual assets, asset:// document integration, visual registry, and cross-branch delivery
     validation
-  repository_review_status: pending
+  repository_review_status: accepted
   asset_branch: knowledge-assets
   publication_status: unpublished
   feishu_status: not_started
+  implementation_commit: f377303025a260def940206ac264668913f6618b
+  asset_implementation_commit: d2c628b5f1b201eea9f267d60ca92a03898525ba
+- release_id: KNOWLEDGE-REBUILD-V2-BATCH-10
+  type: final-repository-closure
+  status: in_review
+  branch: main
+  source_branch: knowledge-rebuild-v2
+  content_scope: Batch 09 acceptance, final repository closure, fast-forward-only main integration, and post-merge verification
+  repository_review_status: pending
+  publication_status: unpublished
+  feishu_status: not_started
+  merge_strategy: fast-forward-only
+  source_implementation_commit: f377303025a260def940206ac264668913f6618b
+  asset_implementation_commit: d2c628b5f1b201eea9f267d60ca92a03898525ba

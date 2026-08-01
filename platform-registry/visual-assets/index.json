@@ -7,7 +7,7 @@
       "visual_asset_id": "VIS-001",
       "title": "平台六层总体架构",
       "version": 1,
-      "status": "verified",
+      "status": "accepted",
       "target_document": "docs/knowledge/04_平台架构/ARC-001-ai-agent-platform总体架构.md",
       "target_document_asset_id": "ARC-001",
       "source_documents": [
@@ -29,7 +29,7 @@
       "visual_asset_id": "VIS-002",
       "title": "Custom GPT 到 Local Runtime 真实链路",
       "version": 1,
-      "status": "verified",
+      "status": "accepted",
       "target_document": "docs/knowledge/08_实验与复盘/EXP-005-Custom-GPT-Actions链路实验.md",
       "target_document_asset_id": "EXP-005",
       "source_documents": [
@@ -50,7 +50,7 @@
       "visual_asset_id": "VIS-003",
       "title": "DDD Bounded Context 蓝图",
       "version": 1,
-      "status": "verified",
+      "status": "accepted",
       "target_document": "docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图.md",
       "target_document_asset_id": "ARC-008",
       "source_documents": [
@@ -70,7 +70,7 @@
       "visual_asset_id": "VIS-004",
       "title": "Task Control 状态机",
       "version": 1,
-      "status": "verified",
+      "status": "accepted",
       "target_document": "docs/knowledge/04_平台架构/ARC-009-轻量Task-Control架构.md",
       "target_document_asset_id": "ARC-009",
       "source_documents": [
@@ -90,7 +90,7 @@
       "visual_asset_id": "VIS-005",
       "title": "Execution Lane 与多执行器",
       "version": 1,
-      "status": "verified",
+      "status": "accepted",
       "target_document": "docs/knowledge/04_平台架构/ARC-010-Execution-Lane执行通道模型.md",
       "target_document_asset_id": "ARC-010",
       "source_documents": [
@@ -111,7 +111,7 @@
       "visual_asset_id": "VIS-006",
       "title": "Agent Profile、Skill 与 Knowledge Pack",
       "version": 1,
-      "status": "verified",
+      "status": "accepted",
       "target_document": "docs/knowledge/04_平台架构/ARC-012-Agent-Profile与Skills资产化.md",
       "target_document_asset_id": "ARC-012",
       "source_documents": [
@@ -133,7 +133,7 @@
       "visual_asset_id": "VIS-007",
       "title": "审批、证据与副作用账本",
       "version": 1,
-      "status": "verified",
+      "status": "accepted",
       "target_document": "docs/knowledge/04_平台架构/ARC-013-审批证据与副作用账本.md",
       "target_document_asset_id": "ARC-013",
       "source_documents": [
@@ -153,7 +153,7 @@
       "visual_asset_id": "VIS-008",
       "title": "健康、恢复与终止快照",
       "version": 1,
-      "status": "verified",
+      "status": "accepted",
       "target_document": "docs/knowledge/04_平台架构/ARC-014-健康与恢复治理架构.md",
       "target_document_asset_id": "ARC-014",
       "source_documents": [
@@ -174,7 +174,7 @@
       "visual_asset_id": "VIS-009",
       "title": "产品孵化与需求治理",
       "version": 1,
-      "status": "verified",
+      "status": "accepted",
       "target_document": "docs/knowledge/04_平台架构/ARC-017-产品孵化与需求治理体系.md",
       "target_document_asset_id": "ARC-017",
       "source_documents": [
@@ -195,7 +195,7 @@
       "visual_asset_id": "VIS-010",
       "title": "知识生命周期与单向投影",
       "version": 1,
-      "status": "verified",
+      "status": "accepted",
       "target_document": "docs/knowledge/05_上下文与知识系统/KNO-005-项目知识生命周期.md",
       "target_document_asset_id": "KNO-005",
       "source_documents": [

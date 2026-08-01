@@ -4,11 +4,11 @@
 
 ```text
 Branch: main
-Commit: bd31893ddb9bb2efeb3cb38f67f1add66735cd79
-Phase: 2.5 — Knowledge Asset Rebuild and Platform Governance
+Commit: 以 origin/main 实际 HEAD 为准
+Phase: 2.5 — Knowledge Asset Rebuild and Platform Governance Completed
 ```
 
-该提交是进入知识资产重构前的实现事实基线。知识重构工作位于 `knowledge-rebuild-v2`，当前提交以该分支实际 HEAD 为准，不代表已经合并到 `main`。
+`main` 是 Batch 10 合并后的正式基线；`knowledge-assets` 继续保存正式视觉源文件。
 
 ## Verified Implementation
 
@@ -79,25 +79,22 @@ Phase: 2.5 — Knowledge Asset Rebuild and Platform Governance
 - HTML 尚未生成；
 - 飞书尚未发布。
 
-### Current — Batch 09 Formal Visual Assets In Review
+### Current — Batch 10 Main Integration In Review
 
-- Batch 02～Batch 07 已全部通过真实 Commit Review；
-- 知识资产重构迁移状态已完成：126 个资产全部 `materialized`，126 个资产全部 `migration_state: complete`；
-- `docs/knowledge/` 顶层只保留 `00～10` 正式知识树；
-- Batch 08 将 `ai-knowledge` 收紧为知识语义能力，不再为冻结交付包的机械落库重复加载完整知识规则；
-- Batch 08 新增 `deterministic-delivery` Skill，负责冻结 Contract 的校验、Overlay/Delete 白名单、验证、暂存、Commit、Push 与安全续跑；
-- 本批不生成图片或 HTML，不操作飞书，不修改业务 Runtime；
-- Batch 08 已通过真实 Commit Review；
-- Batch 09 已生成十张正式 SVG / PNG，并在十篇目标正文中加入 `asset://` 引用；
-- 十张图的稳定 `VIS-*` ID、来源、目标、尺寸与 Hash 已进入 Visual Asset Registry；
-- 当前等待 `knowledge-assets` 与 `knowledge-rebuild-v2` 双分支真实 Commit Review。
+- Batch 02～Batch 09 已全部通过真实 Commit Review；
+- 137 个 Registry 资产全部 `materialized`，全部 `migration_state: complete`；
+- 十张正式视觉资产 `VIS-001～VIS-010` 已升级为 `accepted`；
+- `knowledge-assets` 保留为正式 SVG / PNG 源资产分支；
+- `knowledge-rebuild-v2` 已通过 fast-forward only 合并到 `main`；
+- 合并后的 `main` 已重新执行完整验证；
+- HTML 与飞书发布均未开始；
+- 当前等待 Batch 10 合并结果 Review 与项目整体回顾，不自动进入发布。
 
 后续总体顺序:
 
 ```text
-→ Review 并接受 Batch 09 正式视觉资产
-→ 最终仓库 Review 并合并 main
-→ 建立 Feishu 映射并逐篇 overwrite
+→ 回顾知识重构、执行治理与视觉资产阶段
+→ 单独决定是否以及何时进入 Feishu 发布
 ```
 
 ## Not Implemented
