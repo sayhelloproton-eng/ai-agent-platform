@@ -4,6 +4,16 @@
 
 本文记录从 Custom GPT 到本机可信执行链的真实实验，区分 Builder 配置、公网入口、Gateway、Runtime 与最终证据。
 
+
+## 正式视觉资产
+
+![Custom GPT 到 Local Runtime 真实链路](asset://08_实验与复盘/EXP-005-Custom-GPT-Actions链路实验/VIS-002-Custom-GPT到Runtime真实链路.png)
+
+- Visual Asset ID：`VIS-002`；
+- SVG 源文件：`knowledge-assets:images/08_实验与复盘/EXP-005-Custom-GPT-Actions链路实验/VIS-002-Custom-GPT到Runtime真实链路.svg`；
+- PNG 预览：`knowledge-assets:images/08_实验与复盘/EXP-005-Custom-GPT-Actions链路实验/VIS-002-Custom-GPT到Runtime真实链路.png`；
+- 事实边界：该图只覆盖已经验证的窄 Capability 链路，不代表生产公网或完整 Agent 平台。
+
 ## 2. 实验目标
 
 验证自然语言请求是否能够沿以下链路到达本机受控 Capability：

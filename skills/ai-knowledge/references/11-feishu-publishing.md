@@ -121,7 +121,7 @@ status: active
 
 ### 图片与资源引用
 
-Publisher 必须从 payload 中移除 Markdown 图片引用和资源型链接，不得把本地路径改写成公网 URL。
+Publisher 必须把已经 Review 的 `asset://` PNG 引用转换为 Feishu image block；其他 Markdown 图片引用和资源型链接从 payload 中移除，不得把本地路径改写成公网 URL。
 
 如果图片承载不可缺少的信息，该知识资产在发布前必须先经过独立的 Git Review，把信息写成：
 
@@ -179,7 +179,7 @@ Publisher 保留已经 Review 的 `text` 代码块，不执行 Mermaid 渲染、
 
 ## 6. 普通链接处理
 
-Publisher 只处理 Markdown 文档链接，不处理图片或二进制资源链接：
+普通链接转换只处理 Markdown 文档链接；`asset://` 图片由独立图片流程处理，其他图片或二进制资源链接不进入 payload：
 
 ```text
 Git Relative Document Link
@@ -196,7 +196,7 @@ Immutable GitHub URL
 - `docs/knowledge/README.md`：转换为飞书首页链接；
 - 目录 README、非发布 Markdown 或其他 Git 文本资产：转换为带完整 commit SHA 的 GitHub URL；
 - 外部 `http://` 或 `https://` 普通链接保持不变；
-- 图片、Mermaid、draw.io 或二进制资源链接按 Projection Filter 移除；
+- 已 Review 的 `asset://` PNG 进入图片上传流程；其他图片、Mermaid、draw.io 或二进制资源链接按 Projection Filter 移除；
 - 无法解析、越界或目标不存在的普通文档链接必须在发布前失败。
 
 链接转换只作用于发布 payload，不反写 Git Markdown。
@@ -209,7 +209,8 @@ Immutable GitHub URL
 | 普通 `.md` | 过滤后发布为文档 |
 | 目录 `README.md` | 不发布正文 |
 | 已 Review 的 `text` 代码块 | 保留为文本图或代码 |
-| 图片、Mermaid、draw.io、二进制文件 | 不发布 |
+| 已 Review 的 `asset://` PNG | 从 `knowledge-assets` 提取并上传为 image block |
+| 其他图片、Mermaid、draw.io、二进制文件 | 不发布 |
 | 代码目录、Skill、Schema 和其他 Git Layer | 不发布 |
 
 资源文件可以继续存在于 Git；Publisher 不扫描其内容，也不把它们创建为飞书节点。

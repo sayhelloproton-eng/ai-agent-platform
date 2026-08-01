@@ -1,0 +1,21 @@
+{
+  "visual_asset_id": "VIS-009",
+  "title": "产品孵化与需求治理",
+  "version": 1,
+  "status": "verified",
+  "target_document": "docs/knowledge/04_平台架构/ARC-017-产品孵化与需求治理体系.md",
+  "target_document_asset_id": "ARC-017",
+  "source_documents": [
+    "ARC-017",
+    "WFL-011"
+  ],
+  "source_branch": "knowledge-assets",
+  "source_svg": "images/04_平台架构/ARC-017-产品孵化与需求治理体系/VIS-009-产品孵化与需求治理.svg",
+  "preview_png": "images/04_平台架构/ARC-017-产品孵化与需求治理体系/VIS-009-产品孵化与需求治理.png",
+  "asset_uri": "asset://04_平台架构/ARC-017-产品孵化与需求治理体系/VIS-009-产品孵化与需求治理.png",
+  "width": 1800,
+  "height": 1100,
+  "svg_sha256": "252c97a6a11e554ef3a91aac3106383b99d33061991d673751300dd56545cdb5",
+  "png_sha256": "22f4d52363cac216a92dec095ef45fd6c75f647b4606bd99d09c6101bbc4e03d",
+  "review_notes": "阶段升级依赖证据、负责人、风险、预算和停止条件；candidate 不等于正式承诺。"
+}

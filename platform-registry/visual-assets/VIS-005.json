@@ -1,0 +1,21 @@
+{
+  "visual_asset_id": "VIS-005",
+  "title": "Execution Lane 与多执行器",
+  "version": 1,
+  "status": "verified",
+  "target_document": "docs/knowledge/04_平台架构/ARC-010-Execution-Lane执行通道模型.md",
+  "target_document_asset_id": "ARC-010",
+  "source_documents": [
+    "ARC-010",
+    "ARC-015"
+  ],
+  "source_branch": "knowledge-assets",
+  "source_svg": "images/04_平台架构/ARC-010-Execution-Lane执行通道模型/VIS-005-Execution-Lane与多执行器.svg",
+  "preview_png": "images/04_平台架构/ARC-010-Execution-Lane执行通道模型/VIS-005-Execution-Lane与多执行器.png",
+  "asset_uri": "asset://04_平台架构/ARC-010-Execution-Lane执行通道模型/VIS-005-Execution-Lane与多执行器.png",
+  "width": 1800,
+  "height": 1100,
+  "svg_sha256": "fb3da0eb9a68d3b513b41e881f612b28b15deb8e5bd13947cd38db653b9341ab",
+  "png_sha256": "33e766015920d92903609959e0c98a93b14d6a336e84e057f3fd3d76959b9b31",
+  "review_notes": "Lane 是稳定执行协议；执行器和 Provider 差异限制在 Adapter。"
+}

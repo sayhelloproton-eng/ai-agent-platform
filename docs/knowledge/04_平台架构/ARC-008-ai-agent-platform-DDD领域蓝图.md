@@ -4,6 +4,16 @@
 
 把平台长期能力划分为 Bounded Context，说明领域模型、状态所有权和集成方式。蓝图用于控制复杂度，不代表所有 Context 已拆成服务。
 
+
+## 正式视觉资产
+
+![DDD Bounded Context 蓝图](asset://04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图/VIS-003-DDD领域蓝图.png)
+
+- Visual Asset ID：`VIS-003`；
+- SVG 源文件：`knowledge-assets:images/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图/VIS-003-DDD领域蓝图.svg`；
+- PNG 预览：`knowledge-assets:images/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图/VIS-003-DDD领域蓝图.png`；
+- 事实边界：Context 表示规则与状态所有权，不表示当前已经拆成独立服务。
+
 ## 2. Bounded Context
 
 核心上下文包括 Task Control、Agent Governance、Execution、Knowledge Asset、Publishing、Engineering Insight、Product Domain 与 Infrastructure Adapter。

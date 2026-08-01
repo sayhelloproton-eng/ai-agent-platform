@@ -4,6 +4,16 @@
 
 定义不依赖重型图编排框架的最小 Task Control。优先解决状态、版本、权限、证据和恢复，不提前建设任意复杂 Workflow。
 
+
+## 正式视觉资产
+
+![Task Control 状态机](asset://04_平台架构/ARC-009-轻量Task-Control架构/VIS-004-Task-Control状态机.png)
+
+- Visual Asset ID：`VIS-004`；
+- SVG 源文件：`knowledge-assets:images/04_平台架构/ARC-009-轻量Task-Control架构/VIS-004-Task-Control状态机.svg`；
+- PNG 预览：`knowledge-assets:images/04_平台架构/ARC-009-轻量Task-Control架构/VIS-004-Task-Control状态机.png`；
+- 事实边界：状态迁移受 expected_version、Approval、Acceptance 和 Evidence 约束。
+
 ## 2. Task Contract
 
 最小字段包括 task_id、goal、version、status、requested_by、capability、scope、dependencies、acceptance、assigned_executor、approvals 与 evidence_refs。

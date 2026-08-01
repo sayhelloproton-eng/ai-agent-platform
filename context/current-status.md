@@ -79,7 +79,7 @@ Phase: 2.5 — Knowledge Asset Rebuild and Platform Governance
 - HTML 尚未生成；
 - 飞书尚未发布。
 
-### Current — Batch 08 Execution Governance In Review
+### Current — Batch 09 Formal Visual Assets In Review
 
 - Batch 02～Batch 07 已全部通过真实 Commit Review；
 - 知识资产重构迁移状态已完成：126 个资产全部 `materialized`，126 个资产全部 `migration_state: complete`；
@@ -87,14 +87,16 @@ Phase: 2.5 — Knowledge Asset Rebuild and Platform Governance
 - Batch 08 将 `ai-knowledge` 收紧为知识语义能力，不再为冻结交付包的机械落库重复加载完整知识规则；
 - Batch 08 新增 `deterministic-delivery` Skill，负责冻结 Contract 的校验、Overlay/Delete 白名单、验证、暂存、Commit、Push 与安全续跑；
 - 本批不生成图片或 HTML，不操作飞书，不修改业务 Runtime；
-- 当前等待 Batch 08 真实 Commit Review。
+- Batch 08 已通过真实 Commit Review；
+- Batch 09 已生成十张正式 SVG / PNG，并在十篇目标正文中加入 `asset://` 引用；
+- 十张图的稳定 `VIS-*` ID、来源、目标、尺寸与 Hash 已进入 Visual Asset Registry；
+- 当前等待 `knowledge-assets` 与 `knowledge-rebuild-v2` 双分支真实 Commit Review。
 
 后续总体顺序:
 
 ```text
-→ Review 并接受 Batch 08 执行治理收口
-→ 生成正式视觉资产
-→ 合并 main
+→ Review 并接受 Batch 09 正式视觉资产
+→ 最终仓库 Review 并合并 main
 → 建立 Feishu 映射并逐篇 overwrite
 ```
 

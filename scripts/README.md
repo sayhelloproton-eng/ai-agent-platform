@@ -36,3 +36,7 @@ npm run verify
 ```
 
 根脚本不得读取或输出 Secret，不得把 Gateway/Runtime 改为非 loopback 监听，也不得自行管理远端 Tunnel 资源。
+
+## Visual Asset Check
+
+- `visual-asset-check.mjs`：验证 `VIS-*` Manifest、正文 `asset://` 引用、尺寸和 Hash；设置 `KNOWLEDGE_ASSETS_ROOT` 时同时检查 `knowledge-assets` 工作树中的 SVG / PNG。

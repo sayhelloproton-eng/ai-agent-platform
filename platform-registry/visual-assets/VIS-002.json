@@ -1,0 +1,21 @@
+{
+  "visual_asset_id": "VIS-002",
+  "title": "Custom GPT 到 Local Runtime 真实链路",
+  "version": 1,
+  "status": "verified",
+  "target_document": "docs/knowledge/08_实验与复盘/EXP-005-Custom-GPT-Actions链路实验.md",
+  "target_document_asset_id": "EXP-005",
+  "source_documents": [
+    "EXP-005",
+    "EXP-006"
+  ],
+  "source_branch": "knowledge-assets",
+  "source_svg": "images/08_实验与复盘/EXP-005-Custom-GPT-Actions链路实验/VIS-002-Custom-GPT到Runtime真实链路.svg",
+  "preview_png": "images/08_实验与复盘/EXP-005-Custom-GPT-Actions链路实验/VIS-002-Custom-GPT到Runtime真实链路.png",
+  "asset_uri": "asset://08_实验与复盘/EXP-005-Custom-GPT-Actions链路实验/VIS-002-Custom-GPT到Runtime真实链路.png",
+  "width": 1800,
+  "height": 1100,
+  "svg_sha256": "265bfebbc40c7cfe71918658a97a4364c5ef52fb3edd4396ad24fee967f9e056",
+  "png_sha256": "aa86b237322002d852f4b0f7cac0d6551b7b40ebfd60e86ce93fd9f14bbccda5",
+  "review_notes": "该图只覆盖已经验证的窄 Capability 链路，不代表生产公网或完整 Agent 平台。"
+}

@@ -111,11 +111,23 @@ releases:
   implementation_commit: 3ef6b7a74d0626edad1179336df618e372a7588f
 - release_id: KNOWLEDGE-REBUILD-V2-BATCH-08
   type: execution-governance
-  status: in_review
+  status: completed
   branch: knowledge-rebuild-v2
   base_commit: 3ef6b7a74d0626edad1179336df618e372a7588f
   content_scope: ai-knowledge trigger narrowing, deterministic delivery skill, continuation/resume protocol, and migration
     status closure
+  repository_review_status: accepted
+  publication_status: unpublished
+  feishu_status: not_started
+  implementation_commit: 80b91622198a9adc7dec787b1e4180baf6e90cce
+- release_id: KNOWLEDGE-REBUILD-V2-BATCH-09
+  type: formal-visual-assets
+  status: in_review
+  branch: knowledge-rebuild-v2
+  base_commit: 80b91622198a9adc7dec787b1e4180baf6e90cce
+  content_scope: ten reviewed SVG/PNG visual assets, asset:// document integration, visual registry, and cross-branch delivery
+    validation
   repository_review_status: pending
+  asset_branch: knowledge-assets
   publication_status: unpublished
   feishu_status: not_started

@@ -26,10 +26,10 @@ Batch 01: 已完成
 Batch 01-R1: 已完成
 Batch 02: 已完成并通过 Review
 Batch 02-R1: 已完成并通过 Review
-Current Work: Batch 08 执行治理与确定性交付 Skill 已执行，等待真实 Commit Review
+Current Work: Batch 09 十张正式视觉资产已生成，等待双分支真实 Commit Review
 ```
 
-Batch 02～Batch 07 已全部完成真实 Commit Review。知识资产重构迁移已经完成：Registry 中原有 126 个资产全部物化、全部完成路径迁移审计，`docs/knowledge/` 顶层只保留 `00～10` 正式知识树。Batch 08 新增确定性交付 Skill，并收紧 AI Knowledge Skill 的触发边界；该治理批次等待真实 Commit Review。图片、HTML 与飞书发布仍未开始。
+Batch 02～Batch 08 已全部完成真实 Commit Review。知识资产重构迁移与确定性交付治理已经完成；Registry 原有知识资产全部物化并完成迁移审计。Batch 09 已生成十张正式 SVG / PNG，并通过 `asset://` 关联知识正文；当前等待 `knowledge-assets` 与 `knowledge-rebuild-v2` 双分支真实 Commit Review。HTML 与飞书发布仍未开始。
 
 已验证链路：
 

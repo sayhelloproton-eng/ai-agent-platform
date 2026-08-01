@@ -2,6 +2,16 @@
 
 > 本文描述长期目标架构，不代表全部已经实现。当前代码和可执行资产主要集中在 AI Knowledge Skill 与 Knowledge Foundation；Gateway、Runtime、Coding Workflow 和 Video Workflow 分属 Next 或 Later。
 
+
+## 正式视觉资产
+
+![平台六层总体架构](asset://04_平台架构/ARC-001-ai-agent-platform总体架构/VIS-001-平台六层总体架构.png)
+
+- Visual Asset ID：`VIS-001`；
+- SVG 源文件：`knowledge-assets:images/04_平台架构/ARC-001-ai-agent-platform总体架构/VIS-001-平台六层总体架构.svg`；
+- PNG 预览：`knowledge-assets:images/04_平台架构/ARC-001-ai-agent-platform总体架构/VIS-001-平台六层总体架构.png`；
+- 事实边界：该图描述长期目标分层；右侧“当前边界”明确区分已验证实现与目标设计。
+
 ## 架构驱动因素
 
 - Agent 可恢复、任务可追踪、结果可验证。

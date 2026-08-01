@@ -16,7 +16,7 @@ completed_batches:
 - 06-experiments-portfolio-references-and-path-closure
 - 07-full-library-consistency-and-registry-closure
 current_batch: knowledge-rebuild-v2-completed
-next_batch: Review Batch 08 execution governance, then generate formal visual assets
+next_batch: Review Batch 09 dual-branch visual assets, then run final repository review and merge main
 matrix: platform-registry/migrations/asset-migration-matrix.csv
 rules:
   preserve_stable_ids: true

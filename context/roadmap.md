@@ -22,7 +22,7 @@
 
 ## Phase 2.5：Knowledge Asset Rebuild and Platform Governance
 
-状态：**Knowledge Migration Completed / Execution Governance In Review**
+状态：**Knowledge and Execution Governance Completed / Visual Assets In Review**
 
 Batch 01 已完成首次仓库落库：
 
@@ -46,7 +46,7 @@ Batch 02 与 Batch 02-R1：
 - [x] 完成正文事实校准、动态生命周期语言清理和导航修正；
 - [x] 根据 Batch 02-R1 修正提交完成仓库级整体 Review；
 - [x] 将 11 篇正式文章升级为 `accepted`；
-- [ ] 生成正式图片；
+- [x] 生成第一组十张正式 SVG / PNG；
 - [ ] 生成 HTML；
 - [ ] 完成全部文档后发布飞书。
 
@@ -109,9 +109,18 @@ Batch 08：执行治理与确定性交付 Skill
 - [x] 固化 ZIP、Hash、Overlay/Delete、tracked+untracked、rename-aware staged scope 门禁；
 - [x] 固化 Ruby 中文路径、zsh `path`、空目录和失败续跑规则；
 - [x] 增加 Contract Schema、Example、Validator 和自测；
-- [ ] 按真实 Commit Review Batch 08。
+- [x] 按真实 Commit Review Batch 08。
 
-后续进入正式视觉资产、main 合并和飞书覆盖式发布。
+Batch 09：正式视觉资产与双分支交付
+
+- [x] 生成平台总体架构、真实执行链路、DDD、Task Control、Execution Lane 等十张正式图；
+- [x] 为每张图提供 SVG 源文件和 PNG 预览；
+- [x] 建立 `VIS-*` 稳定 ID、Manifest、Hash 和 Registry 关系；
+- [x] 在目标正文中使用 `asset://` 引用；
+- [x] 建立 SVG 安全、PNG 尺寸与跨分支映射校验；
+- [ ] 按真实 Commit Review `knowledge-assets` 与 `knowledge-rebuild-v2`；
+
+后续进入最终仓库 Review、main 合并和飞书覆盖式发布。
 
 ## Phase 2 Next：Task Control and Trusted Execution
 

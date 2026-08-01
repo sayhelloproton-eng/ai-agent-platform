@@ -4,6 +4,16 @@
 
 定义专业 Agent 的长期配置如何作为 Git 正式资产管理，并与 Skill、Knowledge Pack、Tool、Policy、Task 和发布目标分离。
 
+
+## 正式视觉资产
+
+![Agent Profile、Skill 与 Knowledge Pack](asset://04_平台架构/ARC-012-Agent-Profile与Skills资产化/VIS-006-Agent-Profile-Skill-Knowledge-Pack.png)
+
+- Visual Asset ID：`VIS-006`；
+- SVG 源文件：`knowledge-assets:images/04_平台架构/ARC-012-Agent-Profile与Skills资产化/VIS-006-Agent-Profile-Skill-Knowledge-Pack.svg`；
+- PNG 预览：`knowledge-assets:images/04_平台架构/ARC-012-Agent-Profile与Skills资产化/VIS-006-Agent-Profile-Skill-Knowledge-Pack.png`；
+- 事实边界：Git 中的 Profile、Skill、Knowledge Pack、Tool Contract 与 Policy 组合后派生到不同 Host。
+
 ## 2. Agent Profile
 
 Profile 包含 agent_id、role、goals、responsibilities、input/output contract、skill_refs、knowledge_pack_refs、tool_refs、capability_refs、approval_policy_ref、evaluation_ref 和 release_status。

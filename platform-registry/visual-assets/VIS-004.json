@@ -1,0 +1,20 @@
+{
+  "visual_asset_id": "VIS-004",
+  "title": "Task Control 状态机",
+  "version": 1,
+  "status": "verified",
+  "target_document": "docs/knowledge/04_平台架构/ARC-009-轻量Task-Control架构.md",
+  "target_document_asset_id": "ARC-009",
+  "source_documents": [
+    "ARC-009"
+  ],
+  "source_branch": "knowledge-assets",
+  "source_svg": "images/04_平台架构/ARC-009-轻量Task-Control架构/VIS-004-Task-Control状态机.svg",
+  "preview_png": "images/04_平台架构/ARC-009-轻量Task-Control架构/VIS-004-Task-Control状态机.png",
+  "asset_uri": "asset://04_平台架构/ARC-009-轻量Task-Control架构/VIS-004-Task-Control状态机.png",
+  "width": 1800,
+  "height": 1100,
+  "svg_sha256": "47ad6c262e34bdb492ba15e6559222f41ca12006415421b6fdcb6f5757bba249",
+  "png_sha256": "677b3912feb8d23f4fe292c5fb43b2275811a8b7fd59bb0b5766d0e08bc22207",
+  "review_notes": "状态迁移受 expected_version、Approval、Acceptance 和 Evidence 约束。"
+}

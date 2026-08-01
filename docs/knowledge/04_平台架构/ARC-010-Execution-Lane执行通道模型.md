@@ -4,6 +4,16 @@
 
 Execution Lane 是 Task Control 与具体执行器之间的稳定边界，统一任务分配、环境、权限、Lease、心跳和结果。
 
+
+## 正式视觉资产
+
+![Execution Lane 与多执行器](asset://04_平台架构/ARC-010-Execution-Lane执行通道模型/VIS-005-Execution-Lane与多执行器.png)
+
+- Visual Asset ID：`VIS-005`；
+- SVG 源文件：`knowledge-assets:images/04_平台架构/ARC-010-Execution-Lane执行通道模型/VIS-005-Execution-Lane与多执行器.svg`；
+- PNG 预览：`knowledge-assets:images/04_平台架构/ARC-010-Execution-Lane执行通道模型/VIS-005-Execution-Lane与多执行器.png`；
+- 事实边界：Lane 是稳定执行协议；执行器和 Provider 差异限制在 Adapter。
+
 ## 2. 组成
 
 Lane 记录 lane_id、task_id、task_version、executor_type、executor_id、environment_ref、branch、worktree、capability_set、lease_until、status 和 result_ref。
