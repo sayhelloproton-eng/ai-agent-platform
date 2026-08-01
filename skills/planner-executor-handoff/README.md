@@ -55,4 +55,4 @@ Every handoff must freeze the current branch, target branch, Push target, PR and
 
 ## Status
 
-Version `0.4.0` makes low-capability execution artifact-only, completes strict eight-artifact and cross-artifact validation, and adds Manifest self-verification. It remains `in_review` until the real `knowledge-rebuild-v2` commit is reviewed by Chat.
+Version `0.4.0` makes low-capability execution artifact-only, completes strict eight-artifact and cross-artifact validation, and adds Manifest self-verification. Chat Review `PEH-V040-REVIEW-003` accepted implementation commit `85423d29cc7a6552ada4d2b45e0b8c92dcac3375`; this update only closes the Release status and does not change the Skill implementation.

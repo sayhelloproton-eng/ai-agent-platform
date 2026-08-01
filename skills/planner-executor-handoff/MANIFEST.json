@@ -1,7 +1,7 @@
 {
   "name": "planner-executor-handoff",
   "version": "0.4.0",
-  "status": "in_review",
+  "status": "accepted",
   "files": [
     {
       "path": "AGENTS.md",
@@ -13,7 +13,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "a4de4342b8c5a50b2546358d68eae2417e82cde0256f9e8826878987529f67a3"
+      "sha256": "aa44fe314ad88934952c89627071389ba1295f3834aa0f70644f922349e8eee1"
     },
     {
       "path": "SKILL.md",
@@ -129,7 +129,7 @@
     },
     {
       "path": "tests/self-test.mjs",
-      "sha256": "8fddc7f878777d0dd60bf0cc2a7b7e57377e4c155eab46d9dff7bf0e7d6d85b6"
+      "sha256": "7d76cdda4af55b30a1fbb8d3d73cff7917079159b6582b18a5277c4f1763c003"
     }
   ],
   "schemas": 3,

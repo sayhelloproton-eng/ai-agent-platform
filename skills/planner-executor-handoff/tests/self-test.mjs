@@ -94,7 +94,7 @@ if(protocol.$defs.feedback.oneOf.length!==8)throw new Error("feedback schema mus
 // Manifest file-set and hash self-verification.
 async function allFiles(dir){const out=[];for(const e of await readdir(dir,{withFileTypes:true})){const p=path.join(dir,e.name);if(e.isDirectory())out.push(...await allFiles(p));else out.push(p);}return out;}
 const manifest=JSON.parse(await readFile(path.join(ROOT,"MANIFEST.json"),"utf8"));
-if(manifest.version!=="0.4.0"||manifest.status!=="in_review")throw new Error("manifest version/status mismatch");
+if(manifest.version!=="0.4.0"||manifest.status!=="accepted")throw new Error("manifest version/status mismatch");
 const actual=(await allFiles(ROOT)).filter(p=>path.basename(p)!=="MANIFEST.json").map(p=>path.relative(ROOT,p).split(path.sep).join("/")).sort();
 const declared=manifest.files.map(x=>x.path).sort();
 if(JSON.stringify(actual)!==JSON.stringify(declared))throw new Error("manifest file set mismatch");

@@ -148,11 +148,12 @@ releases:
   asset_implementation_commit: d2c628b5f1b201eea9f267d60ca92a03898525ba
 - release_id: PLANNER-EXECUTOR-HANDOFF-V0.4.0
   type: skill-release
-  status: in_review
+  status: completed
   branch: knowledge-rebuild-v2
   base_commit: 6f7a007760b422a9bca46caf3c62619ce2b56720
   content_scope: planner-owned analysis, execution authority, frozen artifact delivery, strict protocol validation, Git policy, review, resume, and executor switching
-  repository_review_status: pending
+  repository_review_status: accepted
   publication_status: unpublished
   feishu_status: not_started
   skill_version: 0.4.0
+  implementation_commit: 85423d29cc7a6552ada4d2b45e0b8c92dcac3375
