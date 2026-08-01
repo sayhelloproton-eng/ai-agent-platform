@@ -22,7 +22,8 @@
       "requires exact paths and expected outputs",
       "must not infer missing decisions",
       "requires detailed feedback and safe resume points"
-    ]
+    ],
+    "execution_authority": "frozen_artifacts_only"
   },
   "canonical_contract": {
     "task_id": "PEH-EVAL-001",
@@ -104,6 +105,14 @@
       "Git diff stat",
       "Workspace status"
     ],
+    "delivery_mode": "apply_frozen_artifacts",
+    "frozen_artifacts": {
+      "overlay_root": "delivery/overlay",
+      "manifest_path": "delivery/manifest.json",
+      "file_count": 2,
+      "delete_paths": [],
+      "byte_compare_required": true
+    },
     "execution_plan": {
       "phases": [
         "Verify baseline and scope",

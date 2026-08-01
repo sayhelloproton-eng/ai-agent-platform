@@ -45,23 +45,35 @@
       "pattern": "^[0-9a-f]{40}$"
     },
     "review_state": {
-      "enum": ["accepted", "changes_required", "blocked"]
+      "enum": [
+        "accepted",
+        "changes_required",
+        "blocked"
+      ]
     },
     "blocking_findings": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "non_blocking_findings": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "required_changes": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "unchanged_scope": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "resume_from": {
       "type": "string",
@@ -69,7 +81,9 @@
     },
     "new_authorization": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "next_required_action": {
       "type": "string",

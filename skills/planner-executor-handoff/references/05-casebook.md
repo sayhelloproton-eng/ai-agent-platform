@@ -24,3 +24,14 @@ Rule:
 - Freeze the current and target branch explicitly.
 - Default to the current authorized branch when the user asks to continue there.
 - Require exact permission before creating or deleting any remote branch.
+
+## Low-capability implementation failure
+
+Chat gave OpenCode/DeepSeek a detailed development specification for Validator, Schema, and tests. The executor produced code that passed shallow tests but failed independent adversarial review twice.
+
+Rule:
+
+- A longer prompt is not a substitute for capability.
+- For `stepwise_controlled + frozen_artifacts_only`, Chat must author and test every final file.
+- The executor only applies the frozen overlay, verifies hashes and byte equality, runs fixed gates, commits, pushes, and reports.
+

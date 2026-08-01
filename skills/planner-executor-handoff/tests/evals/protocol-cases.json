@@ -35,6 +35,22 @@
     {
       "id": "cross-artifact-consistency",
       "requirement": "review_feedback.review_id must equal review_response.review_id. Executor switch task_id/task_version/source_commit must match the bundle contract."
+    },
+    {
+      "id": "artifact-only-low-capability",
+      "requirement": "A frozen_artifacts_only executor receives final byte-identical artifacts and no implementation discretion."
+    },
+    {
+      "id": "strict-eight-artifact-validation",
+      "requirement": "All eight artifact types reject missing, wrong-type, invalid-enum, unsafe-ref, and extra fields."
+    },
+    {
+      "id": "runtime-cross-artifact",
+      "requirement": "Runtime cross mode validates task, version, executor, commit, review, Git target, and switch identity."
+    },
+    {
+      "id": "manifest-self-verification",
+      "requirement": "Self-test verifies the exact Skill file set and every Manifest SHA-256."
     }
   ]
 }

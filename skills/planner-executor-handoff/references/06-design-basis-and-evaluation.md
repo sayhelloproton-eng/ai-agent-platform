@@ -36,4 +36,4 @@ Compared sources:
 
 Validate trigger behavior, cross-artifact identity, safe paths, secret-like values, both guidance tiers, required feedback fields, and prompt rendering.
 
-After real use, measure clarifications, scope deviations, failed gates, repeated work, review findings, rework, and tier suitability.
+After real use, measure clarifications, scope deviations, failed gates, repeated work, review findings, rework, tier suitability, authority suitability, and whether Chat froze final artifacts before low-capability execution.

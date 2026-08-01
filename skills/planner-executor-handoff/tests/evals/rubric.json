@@ -39,6 +39,18 @@
     {
       "name": "negative_test_coverage",
       "pass": "Negative tests assert non-zero exit codes for type, enum, SHA, branch, and extra-field violations."
+    },
+    {
+      "name": "artifact_readiness",
+      "pass": "Low-capability execution starts only after Chat freezes and tests final artifacts."
+    },
+    {
+      "name": "strict_protocol_validation",
+      "pass": "All nested fields, enums, refs, SHAs, arrays, and extra fields are validated."
+    },
+    {
+      "name": "manifest_integrity",
+      "pass": "Manifest file set and hashes match actual Skill files."
     }
   ]
 }

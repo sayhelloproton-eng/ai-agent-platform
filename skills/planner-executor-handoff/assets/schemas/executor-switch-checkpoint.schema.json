@@ -49,11 +49,15 @@
       "minLength": 1
     },
     "next_execution_guidance_tier": {
-      "enum": ["compact_controlled", "stepwise_controlled"]
+      "enum": [
+        "compact_controlled",
+        "stepwise_controlled"
+      ]
     },
     "branch": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "pattern": "^(?!-)(?!.*\\.\\.)(?!.*\\s)(?!.*@\\{)[^~^:?*\\[\\\\]+$"
     },
     "worktree": {
       "type": "string",
@@ -65,27 +69,40 @@
     },
     "completed_steps": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "remaining_steps": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "passed_gates": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "failure_history": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "side_effects": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "do_not_repeat": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
     },
     "safe_resume_point": {
       "type": "string",

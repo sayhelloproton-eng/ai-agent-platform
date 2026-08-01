@@ -28,7 +28,9 @@
     "references/"
   ],
   "resume_point": "Continue on knowledge-rebuild-v2 at 2c365d3.",
-  "planned_fix": "Rewrite validator with strict types, add schemas, examples, and tests.",
+  "planned_fix": [
+    "Apply the frozen Validator, Schema, Example, and test overlay."
+  ],
   "validation_plan": [
     "node skills/planner-executor-handoff/tests/self-test.mjs",
     "npm run check:handoff",

@@ -1,198 +1,104 @@
 #!/usr/bin/env node
-import { readFile, writeFile, mkdtemp, rm } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const SCRIPTS = path.join(ROOT, "scripts");
+const VALIDATE = path.join(ROOT, "scripts", "validate-handoff.mjs");
+const RENDER = path.join(ROOT, "scripts", "render-executor-prompt.mjs");
 const EXAMPLES = path.join(ROOT, "assets", "examples");
-const VALIDATE = path.join(SCRIPTS, "validate-handoff.mjs");
+function run(args) { const r=spawnSync(process.execPath,args,{encoding:"utf8"}); if(r.status!==0) throw new Error(`${args.join(" ")} failed\n${r.stdout}\n${r.stderr}`); return r.stdout; }
+function failRun(args) { const r=spawnSync(process.execPath,args,{encoding:"utf8"}); if(r.status===0) throw new Error(`${args.join(" ")} should fail`); }
+const load=async name=>JSON.parse(await readFile(path.join(EXAMPLES,name),"utf8"));
+const clone=value=>JSON.parse(JSON.stringify(value));
+const TMP=await mkdtemp(path.join(tmpdir(),"peh-v040-"));
+async function temp(name,value){const p=path.join(TMP,name);await writeFile(p,JSON.stringify(value,null,2));return p;}
+async function mutateFeedback(name, mutator){const v=await load(name);mutator(v);failRun([VALIDATE,"feedback",await temp(`neg-${Math.random()}.json`,v)]);}
+async function mutateBundle(mutator){const v=await load("handoff-bundle-stepwise.json");mutator(v);failRun([VALIDATE,"bundle",await temp(`negb-${Math.random()}.json`,v)]);}
 
-function run(command, args) {
-  const result = spawnSync(command, args, { encoding: "utf8" });
-  if (result.status !== 0) {
-    throw new Error(`${command} ${args.join(" ")} failed\n${result.stdout}\n${result.stderr}`);
-  }
-  return result.stdout;
-}
+const compact=path.join(EXAMPLES,"handoff-bundle-compact.json");
+const stepwise=path.join(EXAMPLES,"handoff-bundle-stepwise.json");
+run([VALIDATE,"bundle",compact]); run([VALIDATE,"bundle",stepwise]);
+const artifacts=["reception-ack.json","clarification-request.json","progress-checkpoint.json","failure-stop-report.json","execution-result.json","review-feedback.json","review-response.json","executor-switch-checkpoint.json"];
+for(const name of artifacts) run([VALIDATE,"feedback",path.join(EXAMPLES,name)]);
+run([VALIDATE,"cross",stepwise,path.join(EXAMPLES,"reception-ack.json"),path.join(EXAMPLES,"review-feedback.json"),path.join(EXAMPLES,"review-response.json"),path.join(EXAMPLES,"executor-switch-checkpoint.json")]);
 
-function runFail(command, args) {
-  const result = spawnSync(command, args, { encoding: "utf8" });
-  if (result.status === 0) {
-    throw new Error(`${command} ${args.join(" ")} should have failed but exited 0`);
-  }
-  return result;
-}
+const compactObj=await load("handoff-bundle-compact.json"); const stepwiseObj=await load("handoff-bundle-stepwise.json");
+for(const field of ["task_id","task_version","goal","source_commit","delivery_mode"]) if(compactObj.canonical_contract[field]!==stepwiseObj.canonical_contract[field]) throw new Error(`tier contract mismatch ${field}`);
+if(stepwiseObj.executor_profile.execution_authority!=="frozen_artifacts_only") throw new Error("stepwise example must be artifact-only");
+const compactPrompt=run([RENDER,compact]); const stepPrompt=run([RENDER,stepwise]);
+for(const marker of ["Execution authority","Delivery mode","Evidence required","Git Operating Policy"]) if(!compactPrompt.includes(marker)||!stepPrompt.includes(marker)) throw new Error(`prompt missing ${marker}`);
+if(!stepPrompt.includes("Execution authority: frozen_artifacts_only")||!stepPrompt.includes("Byte comparison required: true")) throw new Error("stepwise frozen delivery not rendered");
+if(compactPrompt.includes("### S01")) throw new Error("compact prompt must not render exact steps");
+if(!stepPrompt.includes("### S01")) throw new Error("stepwise prompt must render exact steps");
 
-// ── Positive tests ──
+// Strict feedback negatives.
+await mutateFeedback("clarification-request.json",v=>delete v.missing_fact);
+await mutateFeedback("clarification-request.json",v=>v.affected_scope="all");
+await mutateFeedback("progress-checkpoint.json",v=>v.current_step=123);
+await mutateFeedback("progress-checkpoint.json",v=>v.side_effects="none");
+await mutateFeedback("failure-stop-report.json",v=>v.raw_error=[]);
+await mutateFeedback("failure-stop-report.json",v=>v.required_decision=false);
+await mutateFeedback("review-response.json",v=>v.planned_fix="single string");
+await mutateFeedback("review-response.json",v=>v.ready_to_resume="true");
+await mutateFeedback("reception-ack.json",v=>v.workspace_state.unexpected=true);
+await mutateFeedback("reception-ack.json",v=>v.workspace_state.head="bad");
+await mutateFeedback("reception-ack.json",v=>v.git_policy_acknowledged.push_target=false);
+await mutateFeedback("reception-ack.json",v=>v.git_policy_acknowledged.actual_head="bad");
+await mutateFeedback("reception-ack.json",v=>v.ambiguities=["missing"]) ;
+await mutateFeedback("reception-ack.json",v=>v.git_policy_acknowledged.matches_contract=false);
+await mutateFeedback("execution-result.json",v=>v.result_state=123);
+await mutateFeedback("execution-result.json",v=>v.diff_stat=[]);
+await mutateFeedback("execution-result.json",v=>v.commit_sha={});
+await mutateFeedback("execution-result.json",v=>v.tests[0].exit_code="0");
+await mutateFeedback("execution-result.json",v=>v.tests[0].result="success");
+await mutateFeedback("execution-result.json",v=>v.tests[0].unexpected=true);
+await mutateFeedback("execution-result.json",v=>v.git_operations.starting_head="bad");
+await mutateFeedback("execution-result.json",v=>v.git_operations.created_local_branches="none");
+await mutateFeedback("execution-result.json",v=>v.git_operations.final_status="done");
+await mutateFeedback("executor-switch-checkpoint.json",v=>v.safe_resume_point="");
+await mutateFeedback("executor-switch-checkpoint.json",v=>v.do_not_repeat=[]);
 
-const compactBundle = path.join(EXAMPLES, "handoff-bundle-compact.json");
-const stepwiseBundle = path.join(EXAMPLES, "handoff-bundle-stepwise.json");
+// Bundle negatives and authority gate.
+for(const field of ["git_policy","execution_plan","change_control"]) await mutateBundle(v=>v[field]={});
+await mutateBundle(v=>v.executor_profile.tools="shell");
+await mutateBundle(v=>v.canonical_contract.task_version="1");
+await mutateBundle(v=>v.canonical_contract.git_policy.allow_create_remote_branch="false");
+await mutateBundle(v=>v.canonical_contract.source_commit="abc");
+await mutateBundle(v=>v.canonical_contract.git_policy.current_branch="-bad");
+await mutateBundle(v=>v.canonical_contract.execution_plan.stepwise_steps[0].stop_on_failure="yes");
+await mutateBundle(v=>v.canonical_contract.change_control.executor_may_change_approach="false");
+await mutateBundle(v=>{v.canonical_contract.delivery_mode="implement_frozen_design";v.canonical_contract.frozen_artifacts=null;});
+await mutateBundle(v=>v.canonical_contract.frozen_artifacts.byte_compare_required=false);
 
-// 1. Both bundles validate
-run(process.execPath, [VALIDATE, "bundle", compactBundle]);
-run(process.execPath, [VALIDATE, "bundle", stepwiseBundle]);
+// Cross-artifact negatives.
+const crossBase={bundle:await load("handoff-bundle-stepwise.json"),ack:await load("reception-ack.json"),rf:await load("review-feedback.json"),rr:await load("review-response.json"),sw:await load("executor-switch-checkpoint.json")};
+async function crossMutate(mutator){const x=clone(crossBase);mutator(x);const files=await Promise.all([temp(`b-${Math.random()}.json`,x.bundle),temp(`a-${Math.random()}.json`,x.ack),temp(`rf-${Math.random()}.json`,x.rf),temp(`rr-${Math.random()}.json`,x.rr),temp(`s-${Math.random()}.json`,x.sw)]);failRun([VALIDATE,"cross",...files]);}
+await crossMutate(x=>x.rr.review_id="OTHER");
+await crossMutate(x=>x.rr.task_version=2);
+await crossMutate(x=>x.ack.executor_id="other-executor");
+await crossMutate(x=>x.ack.git_policy_acknowledged.push_target="origin/main");
+await crossMutate(x=>x.sw.task_id="OTHER");
+await crossMutate(x=>x.sw.next_executor_id="other-executor");
+await crossMutate(x=>x.sw.next_execution_guidance_tier="compact_controlled");
 
-// 2. All eight artifact types validate
-const allArtifacts = [
-  "reception-ack.json",
-  "clarification-request.json",
-  "progress-checkpoint.json",
-  "failure-stop-report.json",
-  "execution-result.json",
-  "review-feedback.json",
-  "review-response.json",
-  "executor-switch-checkpoint.json",
-];
-for (const filename of allArtifacts) {
-  run(process.execPath, [VALIDATE, "feedback", path.join(EXAMPLES, filename)]);
-}
+// Schemas parse and expose eight strict definitions.
+const protocol=JSON.parse(await readFile(path.join(ROOT,"assets","schemas","planner-executor-handoff-protocol.schema.json"),"utf8"));
+const expectedDefs=["receptionAck","clarificationRequest","progressCheckpoint","failureStopReport","executionResult","reviewFeedback","reviewResponse","executorSwitchCheckpoint"];
+for(const name of expectedDefs){const d=protocol.$defs[name];if(!d||d.additionalProperties!==false)throw new Error(`schema definition ${name} missing or not strict`);}
+if(protocol.$defs.feedback.oneOf.length!==8)throw new Error("feedback schema must contain eight oneOf branches");
 
-// 3. Compact and stepwise share the same contract identity
-const compact = JSON.parse(await readFile(compactBundle, "utf8"));
-const stepwise = JSON.parse(await readFile(stepwiseBundle, "utf8"));
-for (const key of ["task_id", "task_version", "goal", "source_commit"]) {
-  if (compact.canonical_contract[key] !== stepwise.canonical_contract[key]) {
-    throw new Error(`tier bundles disagree on ${key}`);
-  }
-}
+// Manifest file-set and hash self-verification.
+async function allFiles(dir){const out=[];for(const e of await readdir(dir,{withFileTypes:true})){const p=path.join(dir,e.name);if(e.isDirectory())out.push(...await allFiles(p));else out.push(p);}return out;}
+const manifest=JSON.parse(await readFile(path.join(ROOT,"MANIFEST.json"),"utf8"));
+if(manifest.version!=="0.4.0"||manifest.status!=="in_review")throw new Error("manifest version/status mismatch");
+const actual=(await allFiles(ROOT)).filter(p=>path.basename(p)!=="MANIFEST.json").map(p=>path.relative(ROOT,p).split(path.sep).join("/")).sort();
+const declared=manifest.files.map(x=>x.path).sort();
+if(JSON.stringify(actual)!==JSON.stringify(declared))throw new Error("manifest file set mismatch");
+for(const item of manifest.files){const digest=createHash("sha256").update(await readFile(path.join(ROOT,item.path))).digest("hex");if(digest!==item.sha256)throw new Error(`manifest hash mismatch ${item.path}`);}
 
-// 4. review_feedback.review_id == review_response.review_id
-const reviewFb = JSON.parse(await readFile(path.join(EXAMPLES, "review-feedback.json"), "utf8"));
-const reviewResp = JSON.parse(await readFile(path.join(EXAMPLES, "review-response.json"), "utf8"));
-if (reviewFb.review_id !== reviewResp.review_id) {
-  throw new Error("review_feedback.review_id != review_response.review_id");
-}
-
-// 5. Review Feedback and Review Response share task_id and task_version
-if (reviewFb.task_id !== reviewResp.task_id || reviewFb.task_version !== reviewResp.task_version) {
-  throw new Error("review_feedback and review_response task identity mismatch");
-}
-
-// 6. Executor Switch shares task_id, task_version, source_commit with bundle
-const switchCp = JSON.parse(await readFile(path.join(EXAMPLES, "executor-switch-checkpoint.json"), "utf8"));
-const contract = stepwise.canonical_contract;
-if (switchCp.task_id !== contract.task_id || switchCp.task_version !== contract.task_version || switchCp.source_commit !== contract.source_commit) {
-  throw new Error("executor_switch_checkpoint does not match bundle contract identity");
-}
-
-// 7. Reception Ack executor_id matches executor_profile.executor_id
-const receptionAck = JSON.parse(await readFile(path.join(EXAMPLES, "reception-ack.json"), "utf8"));
-if (receptionAck.executor_id !== stepwise.executor_profile.executor_id) {
-  throw new Error("reception_ack.executor_id != executor_profile.executor_id");
-}
-
-// 8. Executor Switch next_executor_id == stepwise executor_profile.executor_id
-if (switchCp.next_executor_id !== stepwise.executor_profile.executor_id) {
-  throw new Error("executor_switch.next_executor_id != stepwise executor_profile.executor_id");
-}
-if (!switchCp.safe_resume_point || switchCp.safe_resume_point.length === 0) {
-  throw new Error("executor_switch safe_resume_point must be non-empty");
-}
-if (!switchCp.do_not_repeat || switchCp.do_not_repeat.length === 0) {
-  throw new Error("executor_switch do_not_repeat must be non-empty");
-}
-
-// Prompt rendering tests
-const compactPrompt = run(process.execPath, [path.join(SCRIPTS, "render-executor-prompt.mjs"), compactBundle]);
-const stepwisePrompt = run(process.execPath, [path.join(SCRIPTS, "render-executor-prompt.mjs"), stepwiseBundle]);
-
-for (const marker of [
-  "PEH-EVAL-001",
-  "374f07b7ede3593400bf8631994fb1e91a4123bd",
-  "Selected approach",
-  "Stop conditions",
-  "Evidence required",
-  "Git Operating Policy",
-]) {
-  if (!compactPrompt.includes(marker) || !stepwisePrompt.includes(marker)) {
-    throw new Error(`both prompt tiers must include ${marker}`);
-  }
-}
-if (compactPrompt.includes("### S01")) {
-  throw new Error("compact prompt must not render step-by-step commands");
-}
-if (!stepwisePrompt.includes("### S01") || !stepwisePrompt.includes("Reception Ack") || !stepwisePrompt.includes("Create remote branch: false")) {
-  throw new Error("stepwise prompt must render exact steps and feedback requirements");
-}
-
-// ── Negative tests ──
-
-const TMP = await mkdtemp(path.join(tmpdir(), "peh-neg-"));
-
-async function writeNeg(name, obj) {
-  const p = path.join(TMP, name);
-  await writeFile(p, JSON.stringify(obj, null, 2));
-  return p;
-}
-
-// Reception Ack: can_start = "yes" (should fail)
-runFail(process.execPath, [VALIDATE, "feedback", await writeNeg("neg01.json", { ...receptionAck, can_start: "yes" })]);
-
-// Reception Ack: git_policy_acknowledged.matches_contract = "no"
-const badAck = JSON.parse(JSON.stringify(receptionAck));
-badAck.git_policy_acknowledged.matches_contract = "no";
-runFail(process.execPath, [VALIDATE, "feedback", await writeNeg("neg02.json", badAck)]);
-
-// Execution Result: tests = "all passed" (should fail)
-const badResult = JSON.parse(await readFile(path.join(EXAMPLES, "execution-result.json"), "utf8"));
-badResult.tests = "all passed";
-runFail(process.execPath, [VALIDATE, "feedback", await writeNeg("neg03.json", badResult)]);
-
-// Execution Result: git_operations.created_local_branches = "none"
-const badResult2 = JSON.parse(await readFile(path.join(EXAMPLES, "execution-result.json"), "utf8"));
-badResult2.git_operations.created_local_branches = "none";
-runFail(process.execPath, [VALIDATE, "feedback", await writeNeg("neg04.json", badResult2)]);
-
-// Bundle: executor_profile.tools = "shell"
-const badBundle1 = JSON.parse(JSON.stringify(stepwise));
-badBundle1.executor_profile.tools = "shell";
-runFail(process.execPath, [VALIDATE, "bundle", await writeNeg("neg05.json", badBundle1)]);
-
-// Bundle: canonical_contract.task_version = "1"
-const badBundle2 = JSON.parse(JSON.stringify(stepwise));
-badBundle2.canonical_contract.task_version = "1";
-runFail(process.execPath, [VALIDATE, "bundle", await writeNeg("neg06.json", badBundle2)]);
-
-// Bundle: git_policy.allow_create_remote_branch = "false"
-const badBundle3 = JSON.parse(JSON.stringify(stepwise));
-badBundle3.canonical_contract.git_policy.allow_create_remote_branch = "false";
-runFail(process.execPath, [VALIDATE, "bundle", await writeNeg("neg07.json", badBundle3)]);
-
-// Bundle: source_commit = "abc"
-const badBundle4 = JSON.parse(JSON.stringify(stepwise));
-badBundle4.canonical_contract.source_commit = "abc";
-runFail(process.execPath, [VALIDATE, "bundle", await writeNeg("neg08.json", badBundle4)]);
-
-// Bundle: git_policy.current_branch = "-bad"
-const badBundle5 = JSON.parse(JSON.stringify(stepwise));
-badBundle5.canonical_contract.git_policy.current_branch = "-bad";
-runFail(process.execPath, [VALIDATE, "bundle", await writeNeg("neg09.json", badBundle5)]);
-
-// Any artifact: unexpected field
-const badAck2 = JSON.parse(JSON.stringify(receptionAck));
-badAck2.unexpected_field = true;
-runFail(process.execPath, [VALIDATE, "feedback", await writeNeg("neg10.json", badAck2)]);
-
-// Review Feedback: review_state is invalid enum
-const badReviewFb = JSON.parse(JSON.stringify(reviewFb));
-badReviewFb.review_state = "pending";
-runFail(process.execPath, [VALIDATE, "feedback", await writeNeg("neg11.json", badReviewFb)]);
-
-// Executor Switch: task_id differs from bundle (validator validates independently, cross-artifact is self-test positive)
-// Replaced with: missing required field in executor_switch
-const badSwitch = JSON.parse(JSON.stringify(switchCp));
-delete badSwitch.branch;
-runFail(process.execPath, [VALIDATE, "feedback", await writeNeg("neg12.json", badSwitch)]);
-
-// Executor Switch: safe_resume_point = ""
-const badSwitch2 = JSON.parse(JSON.stringify(switchCp));
-badSwitch2.safe_resume_point = "";
-runFail(process.execPath, [VALIDATE, "feedback", await writeNeg("neg13.json", badSwitch2)]);
-
-// Cleanup temp dir
-await rm(TMP, { recursive: true, force: true });
-
+await rm(TMP,{recursive:true,force:true});
 console.log("planner-executor-handoff self-test passed");

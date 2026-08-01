@@ -1,23 +1,23 @@
 {
   "name": "planner-executor-handoff",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "status": "in_review",
   "files": [
     {
       "path": "AGENTS.md",
-      "sha256": "da55fec41f3b79694546b0f3b4ab9e709a89c0345caee1272c1a9d043e70a885"
+      "sha256": "7317a619e5b9a6b4435d9cc268608fd09bb0e2cba1e497d0e2d217ac93745b53"
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "e13badd85bcd1f4a519c7e87ccdad4d53f70fa0dd6d954a125efa7b26e4ec677"
+      "sha256": "5bfe014c3c25c0820823fe34863da317b74b81458096ab797b0548973d2e0567"
     },
     {
       "path": "README.md",
-      "sha256": "1d6c565081b109a784d5cbebb30de5ebe48833a7cce7072fc350ee1750bcc81c"
+      "sha256": "a4de4342b8c5a50b2546358d68eae2417e82cde0256f9e8826878987529f67a3"
     },
     {
       "path": "SKILL.md",
-      "sha256": "11dc4da39dc8ccdacf0b65f808075261c6f361afc8ca5981b7f2838a3eb381ed"
+      "sha256": "bcde3fbea9891c828917c4850e521c984abef66a6379a5781ea54e05d1ce5905"
     },
     {
       "path": "agents/openai.yaml",
@@ -41,11 +41,11 @@
     },
     {
       "path": "assets/examples/handoff-bundle-compact.json",
-      "sha256": "cc922b932513aedffb80c86ae54171ad6cde98c3728d410d398f1779aa0f1175"
+      "sha256": "5bdb354accaa3d41618c1bb792295c1970176353cfc3dce1c020ff1d9d8be9ef"
     },
     {
       "path": "assets/examples/handoff-bundle-stepwise.json",
-      "sha256": "5374889230164685e9cbd3f8df620f5132e99f32d3b91b5f31d669bbf1cfd845"
+      "sha256": "c3a796c8b1c558253dee7f98d5d5cbd7c6017ddfa59290acf33d0d80fbc548e4"
     },
     {
       "path": "assets/examples/progress-checkpoint.json",
@@ -61,19 +61,19 @@
     },
     {
       "path": "assets/examples/review-response.json",
-      "sha256": "2eecc925d8752938a6e8690d63ad02dc0692df72155275a10a6f809dc7a86997"
+      "sha256": "8643841b26a0c8d281a1185a0377d676b5df764f04b9d7084c932b822b7dd835"
     },
     {
       "path": "assets/schemas/executor-switch-checkpoint.schema.json",
-      "sha256": "8ff1617e417e05deaf011663111c5dda72a70be0cadd4c6d7ee74149f5870b9c"
+      "sha256": "8e9e769d2d23f7f740471d06e8da44d8e2c008ccbff873d1beb7cab1efae6ab1"
     },
     {
       "path": "assets/schemas/planner-executor-handoff-protocol.schema.json",
-      "sha256": "c7489e169e6359808614e77a9046978cbf030b61ad5d7bb3d8caf5db91e2a202"
+      "sha256": "8fa2e661080263017f85b0f5c0bb635260a255f1890985a920ca104f0356c9fb"
     },
     {
       "path": "assets/schemas/review-feedback.schema.json",
-      "sha256": "5bec7e7d8b29bac8b9300abcd2f21bac0ccc7f735f81d83940db2bd6c35696dc"
+      "sha256": "aa27b0430d5f6f559d59ae8268613dbd2b04d8c7039cb7bd05584d450132a069"
     },
     {
       "path": "references/01-role-boundaries.md",
@@ -81,11 +81,11 @@
     },
     {
       "path": "references/02-guidance-tiers.md",
-      "sha256": "bb712c7119be4b28bb60493f02fdca767df9e4b1ebb2109f7324c6b3200bd694"
+      "sha256": "d2aad01064f05d15e926e2d784bbb93c03d9370d08a882c76cb4d501da3ba729"
     },
     {
       "path": "references/03-contract-context-feedback.md",
-      "sha256": "2383958ae1d3c361b52a91e4e29d1b26f07df971171bc4f9bd1c1814813e7b52"
+      "sha256": "a3b59f50f3c3f5f1b392f0b80caf023d5185ff6d1697e1354b0775bd8e568640"
     },
     {
       "path": "references/04-review-resume-switch.md",
@@ -93,11 +93,11 @@
     },
     {
       "path": "references/05-casebook.md",
-      "sha256": "ec0047deda7beacc5e37b555f899cb776d20c6a9a8cc06a693d90db8329bd422"
+      "sha256": "28b3cb5b7afc9534ceab9ff4ed008ae82340b9d2c547b6f062bbc4ec967fcc5a"
     },
     {
       "path": "references/06-design-basis-and-evaluation.md",
-      "sha256": "bcc560e8d96798121b37a439cf9d15ccdb745787e4b1b3d0db34f4e19f30fdca"
+      "sha256": "fa274c1b6ebedd56aea2aea5072699eedb2d0cc2190aaf4fc1c2ebd3f1e8707c"
     },
     {
       "path": "references/07-related-skills.md",
@@ -109,19 +109,19 @@
     },
     {
       "path": "scripts/render-executor-prompt.mjs",
-      "sha256": "7a091475b4f1bb74b93fe7ae87cc637c638d73c9a221f4fd1c2fa9836a20bdc1"
+      "sha256": "b42672dea63d0e69687a53a765c2457405c4e0b0e2ea40a55703c46e86cc66cb"
     },
     {
       "path": "scripts/validate-handoff.mjs",
-      "sha256": "04f0ddd4674bb5f1e01094b0d80528b49a0368440f201a4b67e4e14d5972a5f0"
+      "sha256": "80b5ffe876d4ad27596075a557aa119630dd8504a4bd952dc7c002640551489f"
     },
     {
       "path": "tests/evals/protocol-cases.json",
-      "sha256": "e1e0811d1f1eafca4c72eeb86d045993f21bfb163aed1b02c792ab39f6a9d096"
+      "sha256": "3dee667d747e5b190286ac670cb2b18978f78e7338e34100f114762f045f9226"
     },
     {
       "path": "tests/evals/rubric.json",
-      "sha256": "8c39d1172a393889e72d8a640616f59b92378822f6bcf942ba4aee6b3df7134f"
+      "sha256": "c8b95886ee58b72b5af269063441547abab8dd582564941dcefb475be7a3b036"
     },
     {
       "path": "tests/evals/trigger-cases.json",
@@ -129,13 +129,17 @@
     },
     {
       "path": "tests/self-test.mjs",
-      "sha256": "4248cc36b65d8a5f3c931364aa455cbe56f0ba37735d9fbb679cefbb11c3a079"
+      "sha256": "8fddc7f878777d0dd60bf0cc2a7b7e57377e4c155eab46d9dff7bf0e7d6d85b6"
     }
   ],
   "schemas": 3,
   "guidance_tiers": [
     "compact_controlled",
     "stepwise_controlled"
+  ],
+  "execution_authorities": [
+    "bounded_implementation",
+    "frozen_artifacts_only"
   ],
   "feedback_types": [
     "reception_ack",
@@ -147,5 +151,6 @@
     "review_response",
     "executor_switch_checkpoint"
   ],
-  "git_operating_policy": true
+  "git_operating_policy": true,
+  "manifest_self_verification": true
 }

@@ -15,7 +15,14 @@ The project repeatedly encountered missing context, multiple task truths, incorr
 - `compact_controlled`: complete analysis with concise execution guidance.
 - `stepwise_controlled`: the same analysis with exact steps, commands, expected results, checkpoints, and fixed feedback.
 
-The tier changes execution guidance, not ownership of analysis.
+The tier changes execution guidance, not ownership of analysis. `execution_authority` separately controls whether the executor may implement a frozen design or may only apply final artifacts.
+
+## Execution authority
+
+- `bounded_implementation`: implement only the Chat-frozen design inside exact scope.
+- `frozen_artifacts_only`: apply byte-identical Overlay artifacts only; no implementation or repair.
+
+Current OpenCode/DeepSeek default is `stepwise_controlled + frozen_artifacts_only`.
 
 ## Commands
 
@@ -27,6 +34,13 @@ node skills/planner-executor-handoff/scripts/render-executor-prompt.mjs \
   skills/planner-executor-handoff/assets/examples/handoff-bundle-stepwise.json
 
 node skills/planner-executor-handoff/tests/self-test.mjs
+
+node skills/planner-executor-handoff/scripts/validate-handoff.mjs cross \
+  skills/planner-executor-handoff/assets/examples/handoff-bundle-stepwise.json \
+  skills/planner-executor-handoff/assets/examples/reception-ack.json \
+  skills/planner-executor-handoff/assets/examples/review-feedback.json \
+  skills/planner-executor-handoff/assets/examples/review-response.json \
+  skills/planner-executor-handoff/assets/examples/executor-switch-checkpoint.json
 ```
 
 Root command:
@@ -41,4 +55,4 @@ Every handoff must freeze the current branch, target branch, Push target, PR and
 
 ## Status
 
-Version `0.3.1` hardens validation with strict type checks, adds `review_feedback` and `executor_switch_checkpoint` schemas, five new examples, negative tests, and cross-artifact consistency tests. It remains `in_review` until the real `knowledge-rebuild-v2` commit is reviewed by Chat.
+Version `0.4.0` makes low-capability execution artifact-only, completes strict eight-artifact and cross-artifact validation, and adds Manifest self-verification. It remains `in_review` until the real `knowledge-rebuild-v2` commit is reviewed by Chat.

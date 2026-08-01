@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.0
+
+- Add `execution_authority` and distinguish `bounded_implementation` from `frozen_artifacts_only`.
+- Default OpenCode/DeepSeek to `stepwise_controlled + frozen_artifacts_only`.
+- Require Chat to author and test final overlays before low-capability handoff.
+- Complete strict validation for all eight artifact types and nested fields.
+- Add runtime cross-artifact validation.
+- Rebuild the protocol JSON Schema with strict per-type definitions.
+- Add adversarial negative tests and Manifest file-set/hash self-verification.
+- Replace the failed pattern of asking a low-capability executor to repair the Skill.
+
 ## 0.3.1
 
 - Add strict type, enum, pattern, and extra-field assertions to the validator.

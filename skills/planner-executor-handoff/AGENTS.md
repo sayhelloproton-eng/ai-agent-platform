@@ -5,7 +5,8 @@
 - Keep Chat as the sole planner, decision maker, contract author, and reviewer.
 - Keep every Codex, Work, OpenCode/DeepSeek, Runtime, or future model in the execution layer.
 - Keep one Canonical Handoff Contract as the task truth.
-- Treat guidance tiers as execution formatting, not authority levels.
+- Treat guidance tiers as execution formatting, not planning authority. Freeze `execution_authority` separately.
+- For OpenCode/DeepSeek, default to `stepwise_controlled + frozen_artifacts_only`; Chat must supply final byte-identical artifacts and the executor must not implement or repair content.
 - Require structured feedback before writes, at checkpoints, on failure, at completion, and after review.
 - Bind artifacts to task ID, version, executor ID, and source commit.
 - Treat branch, Push, PR, merge, rebase, cherry-pick, force-push, deletion, Worktree, and cleanup policy as Chat-owned frozen decisions.

@@ -2,7 +2,9 @@
 
 ## Canonical Handoff Contract
 
-Freeze task identity, repository baseline, goal, confirmed facts, decisions, impact analysis, selected and rejected approaches, cross-file relations, risks, scope, outputs, validation, evidence, stop conditions, execution plan, and change control.
+Freeze task identity, repository baseline, goal, confirmed facts, decisions, impact analysis, selected and rejected approaches, cross-file relations, risks, scope, outputs, validation, evidence, stop conditions, execution plan, delivery mode, frozen artifacts, Git policy, and change control.
+
+For `delivery_mode: apply_frozen_artifacts`, include the overlay root, Manifest path, exact file count, delete list, and byte-comparison requirement. The executor must not modify those artifacts.
 
 Create a new task version when the goal, approach, source commit, scope, acceptance, or authorization changes.
 

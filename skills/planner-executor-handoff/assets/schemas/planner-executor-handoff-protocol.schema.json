@@ -2,6 +2,14 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "planner-executor-handoff-protocol.schema.json",
   "title": "Planner Executor Handoff Protocol",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/handoffBundle"
+    },
+    {
+      "$ref": "#/$defs/feedback"
+    }
+  ],
   "$defs": {
     "executorProfile": {
       "type": "object",
@@ -11,6 +19,7 @@
         "platform",
         "model",
         "execution_guidance_tier",
+        "execution_authority",
         "classification_source",
         "tools",
         "repository_access",
@@ -36,6 +45,12 @@
           "enum": [
             "compact_controlled",
             "stepwise_controlled"
+          ]
+        },
+        "execution_authority": {
+          "enum": [
+            "bounded_implementation",
+            "frozen_artifacts_only"
           ]
         },
         "classification_source": {
@@ -109,9 +124,11 @@
         "validation_plan",
         "stop_conditions",
         "evidence_requirements",
+        "delivery_mode",
+        "frozen_artifacts",
         "execution_plan",
-        "git_policy",
-        "change_control"
+        "change_control",
+        "git_policy"
       ],
       "properties": {
         "task_id": {
@@ -140,7 +157,8 @@
         },
         "source_branch": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "pattern": "^(?!-)(?!.*\\.\\.)(?!.*\\s)(?!.*@\\{)[^~^:?*\\[\\\\]+$"
         },
         "source_commit": {
           "type": "string",
@@ -216,8 +234,7 @@
               "type": "array",
               "items": {
                 "type": "string"
-              },
-              "minItems": 1
+              }
             },
             "forbidden_paths": {
               "type": "array",
@@ -282,6 +299,53 @@
           },
           "minItems": 1
         },
+        "delivery_mode": {
+          "enum": [
+            "implement_frozen_design",
+            "apply_frozen_artifacts"
+          ]
+        },
+        "frozen_artifacts": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "overlay_root",
+                "manifest_path",
+                "file_count",
+                "delete_paths",
+                "byte_compare_required"
+              ],
+              "properties": {
+                "overlay_root": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "manifest_path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "file_count": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "delete_paths": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "byte_compare_required": {
+                  "const": true
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "execution_plan": {
           "type": "object",
           "additionalProperties": false,
@@ -311,16 +375,20 @@
                 ],
                 "properties": {
                   "step_id": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1
                   },
                   "action": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1
                   },
                   "command": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1
                   },
                   "expected_result": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1
                   },
                   "stop_on_failure": {
                     "type": "boolean"
@@ -398,15 +466,18 @@
             },
             "current_branch": {
               "type": "string",
-              "minLength": 1
+              "minLength": 1,
+              "pattern": "^(?!-)(?!.*\\.\\.)(?!.*\\s)(?!.*@\\{)[^~^:?*\\[\\\\]+$"
             },
             "target_branch": {
               "type": "string",
-              "minLength": 1
+              "minLength": 1,
+              "pattern": "^(?!-)(?!.*\\.\\.)(?!.*\\s)(?!.*@\\{)[^~^:?*\\[\\\\]+$"
             },
             "target_remote": {
               "type": "string",
-              "minLength": 1
+              "minLength": 1,
+              "pattern": "^(?!-)(?!.*\\.\\.)(?!.*\\s)(?!.*@\\{)[^~^:?*\\[\\\\]+$"
             },
             "allow_create_local_branch": {
               "type": "boolean"
@@ -437,9 +508,15 @@
               "type": "boolean"
             },
             "push_target": {
-              "type": [
-                "string",
-                "null"
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "^(?!-)(?!.*\\.\\.)(?!.*\\s)(?!.*@\\{)[^~^:?*\\[\\\\]+$"
+                },
+                {
+                  "type": "null"
+                }
               ]
             },
             "pr_required": {
@@ -477,7 +554,9 @@
             "remote_branches_allowed_to_delete": {
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?!-)(?!.*\\.\\.)(?!.*\\s)(?!.*@\\{)[^~^:?*\\[\\\\]+$"
               }
             },
             "remove_worktree_allowed": {
@@ -505,10 +584,12 @@
       ],
       "properties": {
         "task_id": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "task_version": {
-          "type": "integer"
+          "type": "integer",
+          "minimum": 1
         },
         "must_know_facts": {
           "type": "array",
@@ -528,8 +609,7 @@
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "minItems": 1
+          }
         },
         "prohibited_reinterpretations": {
           "type": "array",
@@ -551,8 +631,58 @@
         }
       }
     },
-    "feedback": {
+    "handoffBundle": {
       "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "executor_profile",
+        "canonical_contract",
+        "context_package"
+      ],
+      "properties": {
+        "executor_profile": {
+          "$ref": "#/$defs/executorProfile"
+        },
+        "canonical_contract": {
+          "$ref": "#/$defs/canonicalContract"
+        },
+        "context_package": {
+          "$ref": "#/$defs/contextPackage"
+        }
+      }
+    },
+    "workspaceState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "branch",
+        "head",
+        "status"
+      ],
+      "properties": {
+        "branch": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!-)(?!.*\\.\\.)(?!.*\\s)(?!.*@\\{)[^~^:?*\\[\\\\]+$"
+        },
+        "head": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "status": {
+          "enum": [
+            "clean",
+            "dirty",
+            "staged",
+            "untracked",
+            "unknown"
+          ]
+        }
+      }
+    },
+    "receptionAck": {
+      "type": "object",
+      "additionalProperties": false,
       "required": [
         "feedback_type",
         "task_id",
@@ -563,36 +693,38 @@
         "completed_steps",
         "evidence",
         "workspace_state",
-        "next_required_action"
+        "next_required_action",
+        "understood_goal",
+        "allowed_scope",
+        "forbidden_scope",
+        "planned_validation",
+        "ambiguities",
+        "can_start",
+        "git_policy_acknowledged"
       ],
       "properties": {
         "feedback_type": {
-          "enum": [
-            "reception_ack",
-            "clarification_request",
-            "progress_checkpoint",
-            "failure_stop_report",
-            "execution_result",
-            "review_feedback",
-            "review_response",
-            "executor_switch_checkpoint"
-          ]
+          "const": "reception_ack"
         },
         "task_id": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "task_version": {
-          "type": "integer"
+          "type": "integer",
+          "minimum": 1
         },
         "executor_id": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "source_commit": {
           "type": "string",
           "pattern": "^[0-9a-f]{40}$"
         },
         "current_state": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "completed_steps": {
           "type": "array",
@@ -608,6 +740,7 @@
         },
         "workspace_state": {
           "type": "object",
+          "additionalProperties": false,
           "required": [
             "branch",
             "head",
@@ -615,10 +748,13 @@
           ],
           "properties": {
             "branch": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^(?!-)(?!.*\\.\\.)(?!.*\\s)(?!.*@\\{)[^~^:?*\\[\\\\]+$"
             },
             "head": {
-              "type": "string"
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
             },
             "status": {
               "enum": [
@@ -632,10 +768,43 @@
           }
         },
         "next_required_action": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
+        },
+        "understood_goal": {
+          "type": "string",
+          "minLength": 1
+        },
+        "allowed_scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "forbidden_scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "planned_validation": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ambiguities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "can_start": {
+          "type": "boolean"
         },
         "git_policy_acknowledged": {
           "type": "object",
+          "additionalProperties": false,
           "required": [
             "actual_branch",
             "actual_head",
@@ -646,33 +815,601 @@
           ],
           "properties": {
             "actual_branch": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^(?!-)(?!.*\\.\\.)(?!.*\\s)(?!.*@\\{)[^~^:?*\\[\\\\]+$"
             },
             "actual_head": {
-              "type": "string"
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
             },
             "target_branch": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^(?!-)(?!.*\\.\\.)(?!.*\\s)(?!.*@\\{)[^~^:?*\\[\\\\]+$"
             },
             "push_target": {
-              "type": [
-                "string",
-                "null"
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "^(?!-)(?!.*\\.\\.)(?!.*\\s)(?!.*@\\{)[^~^:?*\\[\\\\]+$"
+                },
+                {
+                  "type": "null"
+                }
               ]
             },
             "remote_delete_targets": {
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?!-)(?!.*\\.\\.)(?!.*\\s)(?!.*@\\{)[^~^:?*\\[\\\\]+$"
               }
             },
             "matches_contract": {
               "type": "boolean"
             }
           }
+        }
+      }
+    },
+    "clarificationRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "feedback_type",
+        "task_id",
+        "task_version",
+        "executor_id",
+        "source_commit",
+        "current_state",
+        "completed_steps",
+        "evidence",
+        "workspace_state",
+        "next_required_action",
+        "current_step",
+        "missing_fact",
+        "why_required",
+        "affected_scope",
+        "available_options",
+        "can_continue_without_answer"
+      ],
+      "properties": {
+        "feedback_type": {
+          "const": "clarification_request"
+        },
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "task_version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "executor_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "current_state": {
+          "type": "string",
+          "minLength": 1
+        },
+        "completed_steps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "workspace_state": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "branch",
+            "head",
+            "status"
+          ],
+          "properties": {
+            "branch": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^(?!-)(?!.*\\.\\.)(?!.*\\s)(?!.*@\\{)[^~^:?*\\[\\\\]+$"
+            },
+            "head": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "status": {
+              "enum": [
+                "clean",
+                "dirty",
+                "staged",
+                "untracked",
+                "unknown"
+              ]
+            }
+          }
+        },
+        "next_required_action": {
+          "type": "string",
+          "minLength": 1
+        },
+        "current_step": {
+          "type": "string",
+          "minLength": 1
+        },
+        "missing_fact": {
+          "type": "string",
+          "minLength": 1
+        },
+        "why_required": {
+          "type": "string",
+          "minLength": 1
+        },
+        "affected_scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "available_options": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "can_continue_without_answer": {
+          "type": "boolean"
+        }
+      }
+    },
+    "progressCheckpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "feedback_type",
+        "task_id",
+        "task_version",
+        "executor_id",
+        "source_commit",
+        "current_state",
+        "completed_steps",
+        "evidence",
+        "workspace_state",
+        "next_required_action",
+        "passed_gates",
+        "current_step",
+        "staged_state",
+        "side_effects",
+        "safe_resume_point"
+      ],
+      "properties": {
+        "feedback_type": {
+          "const": "progress_checkpoint"
+        },
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "task_version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "executor_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "current_state": {
+          "type": "string",
+          "minLength": 1
+        },
+        "completed_steps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "workspace_state": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "branch",
+            "head",
+            "status"
+          ],
+          "properties": {
+            "branch": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^(?!-)(?!.*\\.\\.)(?!.*\\s)(?!.*@\\{)[^~^:?*\\[\\\\]+$"
+            },
+            "head": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "status": {
+              "enum": [
+                "clean",
+                "dirty",
+                "staged",
+                "untracked",
+                "unknown"
+              ]
+            }
+          }
+        },
+        "next_required_action": {
+          "type": "string",
+          "minLength": 1
+        },
+        "passed_gates": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "current_step": {
+          "type": "string",
+          "minLength": 1
+        },
+        "staged_state": {
+          "type": "string",
+          "minLength": 1
+        },
+        "side_effects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "safe_resume_point": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "failureStopReport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "feedback_type",
+        "task_id",
+        "task_version",
+        "executor_id",
+        "source_commit",
+        "current_state",
+        "completed_steps",
+        "evidence",
+        "workspace_state",
+        "next_required_action",
+        "last_successful_gate",
+        "failed_step",
+        "raw_error",
+        "interpreted_cause",
+        "staged_state",
+        "side_effects",
+        "safe_resume_point",
+        "required_decision"
+      ],
+      "properties": {
+        "feedback_type": {
+          "const": "failure_stop_report"
+        },
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "task_version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "executor_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "current_state": {
+          "type": "string",
+          "minLength": 1
+        },
+        "completed_steps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "workspace_state": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "branch",
+            "head",
+            "status"
+          ],
+          "properties": {
+            "branch": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^(?!-)(?!.*\\.\\.)(?!.*\\s)(?!.*@\\{)[^~^:?*\\[\\\\]+$"
+            },
+            "head": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "status": {
+              "enum": [
+                "clean",
+                "dirty",
+                "staged",
+                "untracked",
+                "unknown"
+              ]
+            }
+          }
+        },
+        "next_required_action": {
+          "type": "string",
+          "minLength": 1
+        },
+        "last_successful_gate": {
+          "type": "string",
+          "minLength": 1
+        },
+        "failed_step": {
+          "type": "string",
+          "minLength": 1
+        },
+        "raw_error": {
+          "type": "string",
+          "minLength": 1
+        },
+        "interpreted_cause": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "staged_state": {
+          "type": "string",
+          "minLength": 1
+        },
+        "side_effects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "safe_resume_point": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required_decision": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "executionResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "feedback_type",
+        "task_id",
+        "task_version",
+        "executor_id",
+        "source_commit",
+        "current_state",
+        "completed_steps",
+        "evidence",
+        "workspace_state",
+        "next_required_action",
+        "result_state",
+        "changed_files",
+        "deleted_files",
+        "tests",
+        "diff_stat",
+        "commit_sha",
+        "remote_sha",
+        "artifacts",
+        "limitations",
+        "uncompleted_items",
+        "git_operations"
+      ],
+      "properties": {
+        "feedback_type": {
+          "const": "execution_result"
+        },
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "task_version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "executor_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "current_state": {
+          "type": "string",
+          "minLength": 1
+        },
+        "completed_steps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "workspace_state": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "branch",
+            "head",
+            "status"
+          ],
+          "properties": {
+            "branch": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^(?!-)(?!.*\\.\\.)(?!.*\\s)(?!.*@\\{)[^~^:?*\\[\\\\]+$"
+            },
+            "head": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "status": {
+              "enum": [
+                "clean",
+                "dirty",
+                "staged",
+                "untracked",
+                "unknown"
+              ]
+            }
+          }
+        },
+        "next_required_action": {
+          "type": "string",
+          "minLength": 1
+        },
+        "result_state": {
+          "enum": [
+            "completed",
+            "partially_completed",
+            "blocked",
+            "failed"
+          ]
+        },
+        "changed_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "deleted_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tests": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "command",
+              "exit_code",
+              "result"
+            ],
+            "properties": {
+              "command": {
+                "type": "string",
+                "minLength": 1
+              },
+              "exit_code": {
+                "type": "integer"
+              },
+              "result": {
+                "enum": [
+                  "passed",
+                  "failed",
+                  "not_run"
+                ]
+              }
+            }
+          }
+        },
+        "diff_stat": {
+          "type": "string",
+          "minLength": 1
+        },
+        "commit_sha": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "remote_sha": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "uncompleted_items": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "git_operations": {
           "type": "object",
+          "additionalProperties": false,
           "required": [
             "starting_branch",
             "starting_head",
@@ -691,51 +1428,82 @@
           ],
           "properties": {
             "starting_branch": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^(?!-)(?!.*\\.\\.)(?!.*\\s)(?!.*@\\{)[^~^:?*\\[\\\\]+$"
             },
             "starting_head": {
-              "type": "string"
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
             },
             "created_local_branches": {
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?!-)(?!.*\\.\\.)(?!.*\\s)(?!.*@\\{)[^~^:?*\\[\\\\]+$"
               }
             },
             "created_remote_branches": {
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?!-)(?!.*\\.\\.)(?!.*\\s)(?!.*@\\{)[^~^:?*\\[\\\\]+$"
               }
             },
             "commit_sha": {
-              "type": [
-                "string",
-                "null"
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                {
+                  "type": "null"
+                }
               ]
             },
             "push_target": {
-              "type": [
-                "string",
-                "null"
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "^(?!-)(?!.*\\.\\.)(?!.*\\s)(?!.*@\\{)[^~^:?*\\[\\\\]+$"
+                },
+                {
+                  "type": "null"
+                }
               ]
             },
             "remote_sha": {
-              "type": [
-                "string",
-                "null"
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                {
+                  "type": "null"
+                }
               ]
             },
             "merge_strategy": {
-              "type": "string"
+              "enum": [
+                "none",
+                "fast_forward_only",
+                "merge_commit",
+                "squash"
+              ]
             },
             "merge_result": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             },
             "deleted_remote_branches": {
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?!-)(?!.*\\.\\.)(?!.*\\s)(?!.*@\\{)[^~^:?*\\[\\\\]+$"
               }
             },
             "cleanup_actions": {
@@ -745,35 +1513,387 @@
               }
             },
             "final_branch": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^(?!-)(?!.*\\.\\.)(?!.*\\s)(?!.*@\\{)[^~^:?*\\[\\\\]+$"
             },
             "final_head": {
-              "type": "string"
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
             },
             "final_status": {
-              "type": "string"
+              "enum": [
+                "clean",
+                "dirty",
+                "staged",
+                "untracked",
+                "unknown"
+              ]
             }
           }
         }
       }
-    }
-  },
-  "type": "object",
-  "additionalProperties": false,
-  "required": [
-    "executor_profile",
-    "canonical_contract",
-    "context_package"
-  ],
-  "properties": {
-    "executor_profile": {
-      "$ref": "#/$defs/executorProfile"
     },
-    "canonical_contract": {
-      "$ref": "#/$defs/canonicalContract"
+    "reviewFeedback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "feedback_type",
+        "review_id",
+        "task_id",
+        "task_version",
+        "reviewer_id",
+        "reviewed_commit",
+        "review_state",
+        "blocking_findings",
+        "non_blocking_findings",
+        "required_changes",
+        "unchanged_scope",
+        "resume_from",
+        "new_authorization",
+        "next_required_action"
+      ],
+      "properties": {
+        "feedback_type": {
+          "const": "review_feedback"
+        },
+        "review_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "task_version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "reviewer_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewed_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "review_state": {
+          "enum": [
+            "accepted",
+            "changes_required",
+            "blocked"
+          ]
+        },
+        "blocking_findings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "non_blocking_findings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "required_changes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unchanged_scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "resume_from": {
+          "type": "string",
+          "minLength": 1
+        },
+        "new_authorization": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "next_required_action": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
     },
-    "context_package": {
-      "$ref": "#/$defs/contextPackage"
+    "reviewResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "feedback_type",
+        "task_id",
+        "task_version",
+        "executor_id",
+        "source_commit",
+        "current_state",
+        "completed_steps",
+        "evidence",
+        "workspace_state",
+        "next_required_action",
+        "review_id",
+        "accepted_changes",
+        "unchanged_scope",
+        "resume_point",
+        "planned_fix",
+        "validation_plan",
+        "ready_to_resume"
+      ],
+      "properties": {
+        "feedback_type": {
+          "const": "review_response"
+        },
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "task_version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "executor_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "current_state": {
+          "type": "string",
+          "minLength": 1
+        },
+        "completed_steps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "workspace_state": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "branch",
+            "head",
+            "status"
+          ],
+          "properties": {
+            "branch": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^(?!-)(?!.*\\.\\.)(?!.*\\s)(?!.*@\\{)[^~^:?*\\[\\\\]+$"
+            },
+            "head": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "status": {
+              "enum": [
+                "clean",
+                "dirty",
+                "staged",
+                "untracked",
+                "unknown"
+              ]
+            }
+          }
+        },
+        "next_required_action": {
+          "type": "string",
+          "minLength": 1
+        },
+        "review_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "accepted_changes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unchanged_scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "resume_point": {
+          "type": "string",
+          "minLength": 1
+        },
+        "planned_fix": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "validation_plan": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "ready_to_resume": {
+          "type": "boolean"
+        }
+      }
+    },
+    "executorSwitchCheckpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "feedback_type",
+        "task_id",
+        "task_version",
+        "source_commit",
+        "previous_executor_id",
+        "next_executor_id",
+        "next_execution_guidance_tier",
+        "branch",
+        "worktree",
+        "current_commit",
+        "completed_steps",
+        "remaining_steps",
+        "passed_gates",
+        "failure_history",
+        "side_effects",
+        "do_not_repeat",
+        "safe_resume_point",
+        "next_required_action"
+      ],
+      "properties": {
+        "feedback_type": {
+          "const": "executor_switch_checkpoint"
+        },
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "task_version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "source_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "previous_executor_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "next_executor_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "next_execution_guidance_tier": {
+          "enum": [
+            "compact_controlled",
+            "stepwise_controlled"
+          ]
+        },
+        "branch": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!-)(?!.*\\.\\.)(?!.*\\s)(?!.*@\\{)[^~^:?*\\[\\\\]+$"
+        },
+        "worktree": {
+          "type": "string",
+          "minLength": 1
+        },
+        "current_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "completed_steps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "remaining_steps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "passed_gates": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "failure_history": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "side_effects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "do_not_repeat": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "safe_resume_point": {
+          "type": "string",
+          "minLength": 1
+        },
+        "next_required_action": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "feedback": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/receptionAck"
+        },
+        {
+          "$ref": "#/$defs/clarificationRequest"
+        },
+        {
+          "$ref": "#/$defs/progressCheckpoint"
+        },
+        {
+          "$ref": "#/$defs/failureStopReport"
+        },
+        {
+          "$ref": "#/$defs/executionResult"
+        },
+        {
+          "$ref": "#/$defs/reviewFeedback"
+        },
+        {
+          "$ref": "#/$defs/reviewResponse"
+        },
+        {
+          "$ref": "#/$defs/executorSwitchCheckpoint"
+        }
+      ]
     }
   }
 }

@@ -22,7 +22,8 @@
       "must not change frozen approach",
       "must not expand scope",
       "quota can interrupt execution"
-    ]
+    ],
+    "execution_authority": "bounded_implementation"
   },
   "canonical_contract": {
     "task_id": "PEH-EVAL-001",
@@ -104,6 +105,14 @@
       "Git diff stat",
       "Workspace status"
     ],
+    "delivery_mode": "apply_frozen_artifacts",
+    "frozen_artifacts": {
+      "overlay_root": "delivery/overlay",
+      "manifest_path": "delivery/manifest.json",
+      "file_count": 2,
+      "delete_paths": [],
+      "byte_compare_required": true
+    },
     "execution_plan": {
       "phases": [
         "Verify baseline and scope",
