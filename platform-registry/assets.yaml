@@ -1517,7 +1517,7 @@ assets:
 - asset_id: SKL-003
   title: 规划者与执行器任务交接技能
   asset_type: skill
-  status: verified
+  status: accepted
   evidence_level: verified
   materialized: true
   current_path: docs/knowledge/06_智能体资产体系/SKL-003-规划者与执行器任务交接技能.md
@@ -1528,7 +1528,7 @@ assets:
 - asset_id: SKILL-PLANNER-EXECUTOR-HANDOFF
   title: Planner Executor Handoff Skill
   asset_type: skill
-  status: verified
+  status: accepted
   evidence_level: verified
   materialized: true
   current_path: skills/planner-executor-handoff/
@@ -1545,5 +1545,16 @@ assets:
   current_path: docs/technical/迁移计划/内容Review/README.md
   target_path: null
   canonical_path: docs/technical/迁移计划/内容Review/README.md
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: SOL-KNO-001
+  title: Platform Registry 实现治理与验证
+  asset_type: solution
+  status: implemented
+  evidence_level: verified
+  materialized: true
+  current_path: docs/technical/技术方案/知识系统/SOL-KNO-001-Platform-Registry实现治理与验证.md
+  target_path: null
+  canonical_path: docs/technical/技术方案/知识系统/SOL-KNO-001-Platform-Registry实现治理与验证.md
   publication_status: unpublished
   migration_state: complete

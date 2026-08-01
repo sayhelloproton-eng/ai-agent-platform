@@ -126,7 +126,7 @@ Agent + Skills + Script 已能覆盖大部分需求。提前引入通用图编�
 
 当真实 Workflow 出现复杂分支、补偿和长期状态时，再评估框架。
 
-## 8. 本仓库四个 Skill
+## 8. 本仓库六个正式 Skill
 
 ### AI Knowledge
 
@@ -143,6 +143,14 @@ Agent + Skills + Script 已能覆盖大部分需求。提前引入通用图编�
 ### Engineering Insight Distillation
 
 负责从已解决事件中筛选、提炼、查重和评估工程洞见。
+
+### Deterministic Delivery
+
+负责冻结 Artifact、Manifest、Hash、范围门禁、确定性 Overlay、验证、Commit、Push 与失败续跑。
+
+### Planner Executor Handoff
+
+负责 Chat 规划者与受控执行器之间的合同、指导档位、执行权限、Feedback、切换检查点和 Git Operating Policy。当前 v0.4.0 已接受。
 
 这些 Skill 继续以 Git 为正式真源；Host 安装只是派生使用方式。
 

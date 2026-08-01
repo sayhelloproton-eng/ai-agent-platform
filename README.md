@@ -6,7 +6,7 @@
 
 ## 当前状态
 
-当前处于 **Phase 2.5 最终内容 Review 准备完成：知识资产重构、执行治理、正式视觉资产和 Batch 10 `main` 集成均已收口**。
+当前处于 **Phase 2.5 知识阶段收口：知识资产重构、执行治理、正式视觉资产、Batch 10 `main` 集成和最终集中内容 Review 均已完成**。
 
 当前正式基线：
 
@@ -24,10 +24,10 @@ Formal Baseline: main
 Control Branch: knowledge-rebuild-v2
 Batch 01～Batch 10: 已完成
 Knowledge Assets: 已完成并保留独立 source branch
-Current Work: MIG-002 最终集中内容 Review 控制计划已物化，R-01～R-06 尚未执行
+Current Work: MIG-002 R-01～R-06 已执行并完成，等待独立授权 Feishu 发布、发布回读与最终整仓验收
 ```
 
-Batch 01～Batch 10 的知识资产重构与 `main` 集成已经完成。最终集中内容 Review 将按 MIG-002 的六个域执行，Review 完成后才分别决定 Feishu 单向覆盖发布与最终整仓验收；两者均需独立授权。Git 仍是唯一真源，Feishu 最终发布尚未开始。
+Batch 01～Batch 10 的知识资产重构与 `main` 集成已经完成，MIG-002 六域最终集中内容 Review 也已执行。下一阶段是分别授权 Feishu 单向覆盖发布、发布回读与最终整仓验收。Git 仍是唯一真源，Feishu 最终发布尚未开始。
 
 已验证链路：
 
@@ -61,7 +61,7 @@ Custom GPT
 - MCP；
 - AI 视频工作流；
 - Portfolio Release；
-- 最终正式内容 Review 与 Feishu 最终发布；
+- Feishu 最终发布、发布回读与最终整仓验收；
 - 生产级公网入口；
 - 完整 Agent Profile 和 Knowledge Pack 发布体系。
 

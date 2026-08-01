@@ -5,10 +5,10 @@
 ```text
 ChatGPT 决策
   → Task 契约
-  → Gateway / Bridge
-  → Codex 执行
+  → 受控 Handoff
+  → Codex / Executor 执行
   → 测试与结果
-  → Branch / Commit / PR
+  → 当前任务 Git Operating Policy 允许的 Commit / Push / PR
   → 知识更新提案
 ```
 
@@ -22,4 +22,4 @@ Codex 不得自行改变总体架构、扩大范围、Force Push、修改权限�
 
 ## 状态
 
-尚未实现。Phase 2 首先交付 Task Contract、薄 Bridge 和本地可审计执行，不提前建设复杂编排平台。
+人工规划、Canonical Handoff Contract、冻结 Artifact、确定性交付、Commit / Push 和 Chat Review 已在真实知识批次中使用；是否创建 Branch、Worktree 或 PR 由每个任务的 Git Operating Policy 决定。尚未实现的是动态 Task Store、Gateway 到 Codex 的自动调度、Approval、Evidence、Recovery 和完整闭环。

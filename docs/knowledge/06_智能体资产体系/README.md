@@ -19,4 +19,4 @@
 - `skills/` 是可执行实现真源，本目录解释其设计与治理；
 - Host 安装目录和 Plugin 只是发布目标；
 - 权限、审批与评估必须有机器可校验边界；
-- 本目录在全库 Review 前保持 `unpublished`。
+- 全库 Review 已完成；本目录仍保持 `unpublished`，直到独立授权 Feishu 发布并回读。

@@ -97,7 +97,7 @@ Task
   → Executor / Session
 ```
 
-Task 是稳定身份；Session 和 Executor 可以更换。一个写任务原则上绑定一个明确 Branch / Worktree。
+Task 是稳定身份；Session 和 Executor 可以更换。Branch / Worktree 是按并行和隔离需要选择的执行资源，是否创建、使用或清理由当前任务 Git Operating Policy 明确授权，不是所有写任务的默认动作。
 
 当前知识重构仍在单分支串行完成，尚未实现平台级 Worktree 调度。
 

@@ -18,7 +18,7 @@ completed_batches:
 - 09-formal-visual-assets
 - 10-final-closure-and-main-merge
 current_batch: migration-completed
-next_batch: 进入最终集中内容 Review；Review 完成后再进行 Feishu 单向覆盖发布和最终整仓验收，均需独立授权。
+next_batch: 最终集中内容 Review 已完成；下一阶段为 Feishu 单向覆盖发布、发布回读和最终整仓验收，均需独立授权。
 matrix: platform-registry/migrations/asset-migration-matrix.csv
 rules:
   preserve_stable_ids: true

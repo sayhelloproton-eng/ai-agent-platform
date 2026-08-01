@@ -24,4 +24,4 @@
 - 历史架构文档只作为证据，不自动成为当前事实；
 - provisional / candidate 洞见不能写成普遍定律；
 - 系统元数据进入 `platform-registry/`；
-- 本目录内容在全库 Review 前保持 `unpublished`。
+- 全库 Review 已完成；本目录仍保持 `unpublished`，直到独立授权 Feishu 发布并回读。

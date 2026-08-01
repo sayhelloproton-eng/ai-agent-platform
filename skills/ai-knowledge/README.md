@@ -74,8 +74,8 @@ Feishu Knowledge Publisher 将已 Review 的 `docs/knowledge/**` 确定性发布
 - 目录 README 不发布正文；
 - Git frontmatter 只服务 Git，在 Projection payload 中过滤；
 - 只发布标题、正文、列表、表格、引用、代码块和普通链接；
-- 图片、Mermaid、draw.io 和二进制资源不进入飞书；
-- 重要图形必须先在 Git 中经 Review 转成文字说明和 `text` 代码块图；
+- 已 Review 的正式 `asset://` PNG 由 Publisher 从 `knowledge-assets` 解析、上传为 Feishu media 并插入 image block；
+- Mermaid、draw.io、GitHub Raw URL 和其他未受管二进制引用不进入投影；正文仍需独立表达关键语义；
 - Git 相对文档链接转换为飞书文档链接或不可变 GitHub URL；
 - 不发布代码、Skill、Schema 或其他 Git Layer；
 - 不允许 AI 改写正文、飞书反写 Git 或双向同步。

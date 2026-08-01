@@ -26,7 +26,7 @@ Git `skills/` 保存运行时真源；知识正文解释设计；Registry 关联
 
 ## 6. 当前实现边界
 
-当前已有四个正式 Skill，其中 AI Knowledge 与 Engineering Insight 具有测试和真实使用证据；尚无统一 Skill Registry 查询、Profile 自动绑定或跨 Host Publisher。
+当前已有六个正式 Skill：AI Knowledge、Custom GPT Actions、Deterministic Delivery、Engineering Insight Distillation、Microsoft Dev Tunnels 和 Planner Executor Handoff。六者均有测试或验证证据；尚无统一 Skill Registry 查询、Profile 自动绑定或跨 Host Publisher。
 
 ## 7. 目标设计边界
 
@@ -48,4 +48,5 @@ Git `skills/` 保存运行时真源；知识正文解释设计；Registry 关联
 - [KNO-010 工程洞见提炼与注册表治理](../05_上下文与知识系统/KNO-010-工程洞见提炼与注册表治理.md)
 - [SKL-001 AI Knowledge Skill](SKL-001-AI知识技能.md)
 - [SKL-002 Engineering Insight Distillation Skill](SKL-002-工程洞见提炼技能.md)
+- [SKL-003 规划者与执行器任务交接技能](SKL-003-规划者与执行器任务交接技能.md)
 - [AGT-007 Agent评估测试与发布](AGT-007-Agent评估测试与发布.md)

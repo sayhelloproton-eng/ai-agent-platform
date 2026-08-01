@@ -6,7 +6,7 @@
 
 ## 2. 绑定
 
-`Task → base_commit → branch → worktree → executor/session → commit → review`。一个写 Task 原则上绑定一个 Branch/Worktree。
+`Task → base_commit → Git Operating Policy → executor/session → change → validation → review`。Branch、Worktree、Push、PR、Merge、Rebase、删除与清理是否发生，全部由当前任务明确授权；只要求在现有授权分支迁移或落库时，不默认创建远程 Branch、Worktree 或 PR。
 
 ## 3. 前后门禁
 
@@ -22,7 +22,7 @@ Git 不保存运行中 Lease、Approval 等待、心跳、外部副作用、临�
 
 ## 6. 当前实现边界
 
-当前知识重构在一个长期分支串行提交；已有固定 SHA、Scope Lock、暂存检查与远端回读，尚未自动创建 Worktree。
+知识重构已在一个长期授权分支串行完成；已有固定 SHA、Scope Lock、逐任务 Git Operating Policy、暂存检查与远端回读，尚未自动创建 Worktree。
 
 ## 7. 目标设计边界
 

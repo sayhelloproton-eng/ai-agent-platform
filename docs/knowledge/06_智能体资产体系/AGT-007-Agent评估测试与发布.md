@@ -32,7 +32,7 @@ Instructions、Knowledge、Tool、模型或 Policy 变化都可能触发回归�
 
 ## 6. 当前实现边界
 
-当前 Skill 具有自测和部分离线 Eval，Gateway / Runtime 具有完整测试；Agent Profile、端到端 Agent Eval 和发布 Registry 尚未实现。
+当前六个正式 Skill 具有自测或验证证据，其中 Handoff v0.4.0 还覆盖严格八类 Artifact 校验、跨 Artifact 一致性、Manifest、Feedback、Executor Switch Checkpoint、Git Operating Policy 和负向测试。Gateway / Runtime 具有完整测试；Agent Profile、端到端 Agent Eval 和发布 Registry 尚未实现。
 
 ## 7. 目标设计边界
 

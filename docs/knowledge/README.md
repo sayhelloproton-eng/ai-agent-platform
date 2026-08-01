@@ -34,4 +34,4 @@
 
 ## 路径收口状态
 
-`00～10` 已成为 `docs/knowledge/` 唯一正式顶层知识树。历史或 superseded 资产移入 `docs/technical/归档/`；工程方案移入 `docs/technical/`。机器路径、生命周期和发布资格以 Platform Registry 为准。
+`00～10` 已成为 `docs/knowledge/` 唯一正式顶层知识树，最终六域内容 Review 已完成。历史或 superseded 资产移入 `docs/technical/归档/`；工程方案移入 `docs/technical/`。机器路径、生命周期和发布资格以 Platform Registry 为准；全部正文仍为 `unpublished`，等待独立授权的 Feishu 发布与回读。

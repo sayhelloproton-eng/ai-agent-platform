@@ -32,7 +32,7 @@ Profile 经 draft、review、released、deprecated；发布前验证触发、Ski
 
 ## 6. 当前实现边界
 
-当前有四个正式 Skill、Custom GPT 配置原则和两层 Knowledge Pack 决策，但没有 `agents/`、`knowledge-packs/` 或通用 Publisher。
+当前有六个正式 Skill、Custom GPT 配置原则和两层 Knowledge Pack 决策，但没有 `agents/`、`knowledge-packs/` 或通用跨 Host Publisher。Feishu Knowledge Publisher 是受限知识投影能力，不等于 Agent Profile Publisher。
 
 ## 7. 目标设计边界
 

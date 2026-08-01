@@ -33,9 +33,10 @@
 
 1. Knowledge Foundation：已完成首轮；
 2. AI Coding Workflow：已完成首个 Actions → Gateway → Runtime MVP；
-3. 知识资产重构与平台治理：当前进行中；
-4. Task Control、Approval、Evidence、Recovery：后续；
-5. AI Video Workflow：未来真实业务验证。
+3. 知识资产重构、平台治理与最终内容 Review：已完成；
+4. Feishu 单向发布、发布回读与最终整仓验收：下一阶段，需独立授权；
+5. Task Control、Approval、Evidence、Recovery：后续；
+6. AI Video Workflow：未来真实业务验证。
 
 ## 非目标
 

@@ -7,3 +7,4 @@ Solution 面向一个明确工程问题，组合约束、候选方案、推荐�
 ## 当前技术方案
 
 - [Gateway 技术方案](Gateway/README.md) — Custom GPT Actions、Action Gateway、Local Runtime、权限模型及渐进式 MVP 实施方案。
+- [知识系统技术方案](知识系统/README.md) — Platform Registry、知识投影、索引与 Drift 治理。

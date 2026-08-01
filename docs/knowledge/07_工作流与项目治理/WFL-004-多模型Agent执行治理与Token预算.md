@@ -173,6 +173,8 @@ Claude Code 的项目内存用于保存架构、编码标准和常用工作流�
 - 验收方式；
 - Token 预算。
 
+执行时还要分开声明两个维度：`compact_controlled` / `stepwise_controlled` 决定指导粒度，`bounded_implementation` / `frozen_artifacts_only` 决定执行权限。执行器只拥有获准实现与证据回传权，不自动获得规划权、Artifact 作者权或范围扩张权。
+
 ### 4.4 DeepSeek / OpenCode
 
 适合：

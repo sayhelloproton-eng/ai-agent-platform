@@ -22,7 +22,7 @@
 
 ## Phase 2.5：Knowledge Asset Rebuild and Platform Governance
 
-状态：**Batch 01～10 Completed / Final Content Review Ready**
+状态：**Batch 01～10 Completed / Final Content Review Completed**
 
 Batch 01 已完成首次仓库落库：
 
@@ -135,16 +135,18 @@ Batch 10：最终收口并合并 main
 
 - [x] 确认当前正式 Skill 数量为 6，`planner-executor-handoff v0.4.0` 已标记为 `accepted`；
 - [x] 物化六域 Review 控制计划、开场提示词和 Hash 索引；
-- [ ] R-01 项目入口与上下文；
-- [ ] R-02 产品体系与架构；
-- [ ] R-03 平台核心系统；
-- [ ] R-04 智能体与 Skills；
-- [ ] R-05 工作流、治理与交付；
-- [ ] R-06 实验、反思、遗漏与 Portfolio；
+- [x] R-01 项目入口与上下文；
+- [x] R-02 产品体系与架构；
+- [x] R-03 平台核心系统；
+- [x] R-04 智能体与 Skills；
+- [x] R-05 工作流、治理与交付；
+- [x] R-06 实验、反思、遗漏与 Portfolio；
 - [ ] Review 后独立授权 Feishu 单向覆盖发布；
 - [ ] 发布后独立授权最终整仓验收。
 
 MIG-002 不属于已经完成的 `MIG-KNOWLEDGE-V2`。六个域可以根据实际变更量合并为较少的落库批次，不为域数量制造无意义 Commit、远程 Branch 或 PR。
+
+Feishu 发布、发布回读和最终整仓验收完成后，再评估 **Project Knowledge Synthesis Skill**。该候选状态为 `planned / future`，不创建空壳目录；依赖稳定的知识综合流程、Registry 查询、来源与 Claim 证据、敏感信息检查、确定性交付和 Eval。未来输出包括综合候选、冲突报告、目标资产建议和 Knowledge Pack 构建输入。
 
 ## Phase 2 Next：Task Control and Trusted Execution
 
@@ -163,7 +165,7 @@ MIG-002 不属于已经完成的 `MIG-KNOWLEDGE-V2`。六个域可以根据实�
 
 ## Phase 3：AI Video Workflow
 
-状态：**Not Started**
+状态：**Planned / Not Started**
 
 以真实视频业务验证平台能力，包括故事理解、角色和场景、分镜、提示词、模型 Adapter、评估重试、成本和 Demo。
 
@@ -173,4 +175,4 @@ AI 视频工作流依托 `ai-agent-platform`，不创建根级 `products/`。
 
 状态：**Not Started**
 
-在最终正式内容 Review、必要修正、Feishu 最终发布与整仓验收完成后，建立可验证的 Demo、架构说明、证据索引和对外作品集 Release。Custom GPT 资产化 MVP 仅作为后续占位项，不进入当前执行队列。
+在最终正式内容 Review、必要修正、Feishu 最终发布与整仓验收完成后，建立可验证的 Portfolio Release。交付范围包括：可运行 Demo、架构与能力边界、代码和 Commit 证据、测试结果、真实调用证据、失败与修正、安全和治理、Feishu / Knowledge Projection 展示、README 展示页、简历项目描述、面试讲解材料、Release Tag，以及对外公开前的敏感信息检查。Custom GPT 资产化 MVP 仅作为后续占位项，不进入当前执行队列。

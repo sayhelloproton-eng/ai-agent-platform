@@ -31,4 +31,4 @@ ARC-003 已被 PRD-005 与 DEC-001 取代，并迁入 `docs/technical/归档/历
 - 第三方工具只能位于 Adapter；
 - 复杂架构图在正文冻结后生成正式 SVG / PNG；
 - 系统状态和关系进入 `platform-registry/`；
-- 本目录内容在全库 Review 前保持 `unpublished`。
+- 全库 Review 已完成；本目录仍保持 `unpublished`，直到独立授权 Feishu 发布并回读。

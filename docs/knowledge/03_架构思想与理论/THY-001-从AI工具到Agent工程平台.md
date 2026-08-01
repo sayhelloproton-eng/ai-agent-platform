@@ -172,7 +172,7 @@ Custom GPT
 - 安全 Action 链；
 -Contracts、Auth、Policy；
 -Gateway、Runtime、Dev Tunnel；
--四个正式 Skill；
+-六个正式 Skill，包括确定性交付与规划者—执行器交接治理；
 -Platform Registry；
 -Git 单一真源。
 

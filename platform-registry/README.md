@@ -32,4 +32,6 @@ Registry 不保存聊天全文、Secret、运行缓存或飞书正文副本。
 
 ## Migration Closure
 
-Batch 07 将所有资产的 `migration_state` 收口为 `complete`。`materialized` 描述资产是否存在，`status` 描述领域生命周期，`migration_state` 只描述路径迁移是否完成，三者不能混用。
+Batch 07 将既有资产的 `migration_state` 收口为 `complete`；后续物化资产也必须按真实路径登记。`materialized` 描述资产是否存在，`status` 描述领域生命周期，`migration_state` 只描述路径迁移是否完成，三者不能混用。
+
+完整实现治理与校验说明见 [`SOL-KNO-001`](../docs/technical/技术方案/知识系统/SOL-KNO-001-Platform-Registry实现治理与验证.md)。

@@ -20,4 +20,5 @@
 - 所有能力声明都绑定代码、测试、实验或正式知识；
 - 当前实现与目标设计分开；
 - 未完成能力不得包装为生产经验；
-- 对外版本在全库 Review、视觉资产和 main 合并后生成。
+- Portfolio Release 是 `planned / not_started` 的独立阶段；只有 Feishu 发布、发布回读与最终整仓验收完成后才进入，不因正文和视觉资产完成而自动发布。
+- Release 必须覆盖可运行 Demo、能力边界、代码与 Commit、测试、真实调用、失败修正、安全治理、Knowledge Projection、展示页、简历与面试材料、Release Tag 和敏感信息检查。

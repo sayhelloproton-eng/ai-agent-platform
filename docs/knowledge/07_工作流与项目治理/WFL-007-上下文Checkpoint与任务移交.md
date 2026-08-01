@@ -36,7 +36,7 @@ Checkpoint 保存稳定 ID、路径和 Hash，不复制所有日志。含敏感�
 
 ## 6. 当前实现边界
 
-当前长任务依靠 Chat 摘要、执行报告和 Git Commit 恢复；没有标准 Checkpoint Schema、自动触发或 Lease 验证。
+当前 Handoff v0.4.0 已定义 Feedback Contract、Executor Switch Checkpoint 和安全续跑点，长任务仍依靠 Chat 摘要、Artifact、执行报告和 Git Commit 恢复；尚无平台级自动触发、持久 Task Store 或 Lease 验证。
 
 ## 7. 目标设计边界
 

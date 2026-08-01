@@ -87,7 +87,7 @@ Git Repository 是所有正式项目事实的 Canonical Source。Feishu 只能�
 - **动态 Context**：项目状态从 `context/current-status.md` 读取；`context/` 不参与 Feishu Projection。
 - **唯一发布源**：只有 `docs/knowledge/` 可以生成项目 Feishu Knowledge Projection。
 - **文本化投影**：正文不得由 AI 总结或改写；按 `11-feishu-publishing.md` 过滤 Git frontmatter、图片、Mermaid 和二进制资源引用，只发布可阅读的文本 Markdown。
-- **图形边界**：飞书不接收图片或图形资源。重要图形必须先在 Git 中经 Review 转成文字说明和 `text` 代码块图；Publisher 不在发布时临时解释或重绘。
+- **图形边界**：已 Review 的正式 `asset://` PNG 由 Publisher 从 `knowledge-assets` 解析、上传为 Feishu media 并插入 image block；Mermaid、draw.io、GitHub Raw URL 和未受管二进制引用不进入投影。正文必须独立表达关键语义，Publisher 不临时解释或重绘。
 - **README 边界**：只把 `docs/knowledge/README.md` 作为首页发布；其他目录 README 不发布正文。
 - **禁止反向和双向同步**：Feishu 不得覆盖或自动反写 Git，也不得自动合并差异。
 - **只读优先**：读取、索引和生成草稿默认不需要确认；创建/更新飞书文档必须先预览。

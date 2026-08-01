@@ -946,3 +946,6 @@ relations:
 - from: WFL-007
   type: uses_skill
   to: SKILL-PLANNER-EXECUTOR-HANDOFF
+- from: SOL-KNO-001
+  type: explains
+  to: KNO-007

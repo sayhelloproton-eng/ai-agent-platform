@@ -33,7 +33,7 @@ Custom GPT
 - Control Boundary：Gateway 认证、Policy、Task 构造和 Runtime 转发；
 - Execution Boundary：Runtime 二次认证、二次 Policy、Capability 执行和 TaskResult；
 - Shared Contracts：contracts、auth、policy；
-- Knowledge and Skills：Git 文档、四个 Skill、Engineering Insight Registry；
+- Knowledge and Skills：Git 文档、六个正式 Skill、Engineering Insight Registry；
 - Evidence：测试、验收记录、Commit 和真实调用结果。
 
 ## 目标架构

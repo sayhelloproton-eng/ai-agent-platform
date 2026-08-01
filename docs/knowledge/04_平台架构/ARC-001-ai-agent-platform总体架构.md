@@ -1,6 +1,6 @@
 # ARC-001 平台目标架构
 
-> 本文描述长期目标架构，不代表全部已经实现。当前代码和可执行资产主要集中在 AI Knowledge Skill 与 Knowledge Foundation；Gateway、Runtime、Coding Workflow 和 Video Workflow 分属 Next 或 Later。
+> 本文描述长期目标架构，不代表全部已经实现。当前已验证知识治理、六个正式 Skill，以及 Custom GPT → Dev Tunnels → Action Gateway → Local Runtime 窄链路；动态 Task Control、多执行器编排和 Video Workflow 仍属目标设计。
 
 
 ## 正式视觉资产
@@ -157,7 +157,7 @@ Application Service 编排领域对象和 Port，不包含具体 CLI、模型或
 
 ## 演进策略
 
-- **当前阶段**：Knowledge Asset、Feishu Projection、AI Knowledge Skill。
-- **下一阶段**：Task Contract、Gateway / Bridge、Codex Adapter、Execution Tracking。
-- **后续阶段**：AI Video Workflow、多媒体 Provider 和高级编排。
+- **当前阶段**：Knowledge Asset、Platform Registry、六个正式 Skill 与 Gateway / Runtime 窄链路已经具备验证证据；最终内容 Review 已完成。
+- **下一阶段**：Feishu 单向发布、发布回读和最终整仓验收。
+- **后续阶段**：Task Control、Codex Adapter、Execution Tracking、AI Video Workflow、多媒体 Provider 和高级编排。
 - 只有在真实用例、测试和证据出现后，才将目标组件升级为已实现状态。
