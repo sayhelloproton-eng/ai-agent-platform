@@ -493,14 +493,62 @@ async function main() {
   }
 
   const releaseText = await read("platform-registry/releases.yaml");
-  for (const required of [
-    "release_id: KNOWLEDGE-REBUILD-V2-BATCH-01",
-    "status: in_review",
-    "branch: knowledge-rebuild-v2",
-    "publication_status: unpublished",
-    "feishu_status: not_started",
-  ]) {
-    if (!releaseText.includes(required)) fail(`release record missing ${required}`);
+  const releaseRecords = parseRecords(releaseText, "release_id");
+  const releasesById = new Map();
+  for (const release of releaseRecords) {
+    if (typeof release.release_id !== "string" || release.release_id.length === 0) {
+      fail("release record missing release_id");
+      continue;
+    }
+    if (releasesById.has(release.release_id)) {
+      fail(`duplicate release_id ${release.release_id}`);
+      continue;
+    }
+    releasesById.set(release.release_id, release);
+  }
+
+  function validateRelease(releaseId, expectedFields) {
+    const release = releasesById.get(releaseId);
+    if (!release) {
+      fail(`missing required release ${releaseId}`);
+      return null;
+    }
+    for (const [field, expected] of Object.entries(expectedFields)) {
+      if (release[field] !== expected) {
+        fail(`${releaseId} ${field} must be ${expected}, got ${release[field] ?? "<missing>"}`);
+      }
+    }
+    return release;
+  }
+
+  validateRelease("KNOWLEDGE-REBUILD-V2-BATCH-01", {
+    status: "completed",
+    branch: "knowledge-rebuild-v2",
+    publication_status: "unpublished",
+    feishu_status: "not_started",
+  });
+
+  const batch10 = validateRelease("KNOWLEDGE-REBUILD-V2-BATCH-10", {
+    status: "completed",
+    repository_review_status: "accepted",
+    branch: "main",
+    source_branch: "knowledge-rebuild-v2",
+    publication_status: "unpublished",
+    feishu_status: "not_started",
+    merge_strategy: "fast-forward-only",
+  });
+  if (batch10) {
+    const expectedImplementationCommit = "f377303025a260def940206ac264668913f6618b";
+    const implementationEvidence = [
+      batch10.implementation_commit,
+      batch10.source_implementation_commit,
+    ].filter((value) => value !== null && value !== undefined);
+    if (!implementationEvidence.includes(expectedImplementationCommit)) {
+      fail(`KNOWLEDGE-REBUILD-V2-BATCH-10 missing implementation evidence ${expectedImplementationCommit}`);
+    }
+    if (implementationEvidence.length === 2 && implementationEvidence[0] !== implementationEvidence[1]) {
+      fail("KNOWLEDGE-REBUILD-V2-BATCH-10 implementation evidence fields conflict");
+    }
   }
 
   if (errors.length > 0) {

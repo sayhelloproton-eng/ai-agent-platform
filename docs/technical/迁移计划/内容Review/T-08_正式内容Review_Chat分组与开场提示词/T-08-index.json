@@ -1,0 +1,84 @@
+{
+  "migration_id": "MIG-002",
+  "title": "最终正式内容 Review 计划",
+  "source_commit": "f0699e80e907d11cda9329fa51ce0f6be4593455",
+  "status": "accepted",
+  "review_status": "not_started",
+  "executed": false,
+  "hash_algorithm": "sha256",
+  "review_order": [
+    {
+      "order": 1,
+      "review_id": "R-01",
+      "title": "项目入口与上下文",
+      "file": "01_R-01项目入口与上下文_开场提示词.md",
+      "status": "not_started",
+      "executed": false,
+      "sha256": "9824e9c80b0c2218303a7b770ccee794cf17583c41d32ed58753061bae709c97"
+    },
+    {
+      "order": 2,
+      "review_id": "R-02",
+      "title": "产品体系与架构",
+      "file": "02_R-02产品体系架构_开场提示词.md",
+      "status": "not_started",
+      "executed": false,
+      "sha256": "a5bf7c22f4b96cab67a3cf66337c99a77bfe14bba4db7d735cb9429a5fd19768"
+    },
+    {
+      "order": 3,
+      "review_id": "R-03",
+      "title": "平台核心系统",
+      "file": "03_R-03平台核心系统_开场提示词.md",
+      "status": "not_started",
+      "executed": false,
+      "sha256": "6f785919d150d9040bab7977058906749607b4791f6dc18bd96b238b49e931a7"
+    },
+    {
+      "order": 4,
+      "review_id": "R-04",
+      "title": "智能体与 Skills",
+      "file": "04_R-04智能体与Skills_开场提示词.md",
+      "status": "not_started",
+      "executed": false,
+      "sha256": "68eeec977361ce301ca7f4f9ed13b40830f5e39022497de8032f952b9fba40bf"
+    },
+    {
+      "order": 5,
+      "review_id": "R-05",
+      "title": "工作流、治理与交付",
+      "file": "05_R-05工作流治理与交付_开场提示词.md",
+      "status": "not_started",
+      "executed": false,
+      "sha256": "bee796325aa2d5e0d43b2942a47d6f1922e6329e751da40a7036831dc8f564d2"
+    },
+    {
+      "order": 6,
+      "review_id": "R-06",
+      "title": "实验、反思、遗漏与 Portfolio",
+      "file": "06_R-06实验反思与补充资产_开场提示词.md",
+      "status": "not_started",
+      "executed": false,
+      "sha256": "05e73e530cb28d70e6837fadc5bff5514a79cc7f7d2fe2355340bfcb94ab3138"
+    }
+  ],
+  "control_files": [
+    {
+      "file": "../README.md",
+      "sha256": "d54808b32e586354e3d636cf1b340e74f9b44f559cfb883ffd45ad654309965f"
+    },
+    {
+      "file": "00_T-08总览.md",
+      "sha256": "12a0054135c743e8019f12e171d98bde9406e576e6096d497863479e5e15e422"
+    }
+  ],
+  "corrected_facts": [
+    "R-03 uses apps/action-gateway, apps/local-runtime, apps/dev-tunnel, packages/contracts, packages/auth, packages/policy, scripts/local-chain-test.mjs, scripts/local-stack.mjs, and scripts/local-stack-test.mjs.",
+    "The repository has six formal Skills and planner-executor-handoff v0.4.0 is accepted.",
+    "Chat owns planning and artifacts; executors perform controlled implementation and evidence return.",
+    "Git operations are governed per task and do not default to one remote branch or PR per review domain.",
+    "The Feishu Publisher supports asset URI resolution from knowledge-assets and inserts uploaded image blocks.",
+    "M-01 Platform Registry technical design, M-02 Project Knowledge Synthesis Skill roadmap, and M-03 Portfolio Release remain follow-up gaps.",
+    "Custom GPT assetization MVP is a placeholder and is not in the current execution queue."
+  ]
+}

@@ -1536,3 +1536,14 @@ assets:
   canonical_path: skills/planner-executor-handoff/
   publication_status: unpublished
   migration_state: complete
+- asset_id: MIG-002
+  title: 最终正式内容 Review 计划
+  asset_type: migration
+  status: accepted
+  evidence_level: verified
+  materialized: true
+  current_path: docs/technical/迁移计划/内容Review/README.md
+  target_path: null
+  canonical_path: docs/technical/迁移计划/内容Review/README.md
+  publication_status: unpublished
+  migration_state: complete

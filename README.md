@@ -6,7 +6,7 @@
 
 ## 当前状态
 
-当前处于 **Phase 2.5 最终 Review：知识资产重构、执行治理和正式视觉资产已收口，Batch 10 将其合并到 `main`**。
+当前处于 **Phase 2.5 最终内容 Review 准备完成：知识资产重构、执行治理、正式视觉资产和 Batch 10 `main` 集成均已收口**。
 
 当前正式基线：
 
@@ -15,18 +15,19 @@ main
 以 origin/main 实际 HEAD 为准
 ```
 
-`main` 是合并后的正式代码与知识基线；`knowledge-assets` 继续保存正式 SVG / PNG 源资产。
+`main` 是 Batch 10 合并后的正式代码与知识基线；`knowledge-rebuild-v2` 继续承载 Batch 10 后的控制面与最终内容 Review 收口；`knowledge-assets` 继续保存正式 SVG / PNG 源资产。
 
 知识资产重构工作状态：
 
 ```text
-Branch: main
-Batch 01～Batch 09: 已完成
+Formal Baseline: main
+Control Branch: knowledge-rebuild-v2
+Batch 01～Batch 10: 已完成
 Knowledge Assets: 已完成并保留独立 source branch
-Current Work: Batch 10 执行 main 合并，等待合并后 Review 与项目回顾
+Current Work: MIG-002 最终集中内容 Review 控制计划已物化，R-01～R-06 尚未执行
 ```
 
-Batch 02～Batch 09 已全部完成真实 Commit Review。知识正文、Registry 迁移、确定性交付治理和十张正式视觉资产均已收口；Batch 10 使用 fast-forward only 将 `knowledge-rebuild-v2` 合并到 `main`，完成后等待本项目整体回顾。`knowledge-assets` 继续作为正式 SVG / PNG 源资产分支。HTML 与飞书发布仍未开始，后续操作需要单独授权。
+Batch 01～Batch 10 的知识资产重构与 `main` 集成已经完成。最终集中内容 Review 将按 MIG-002 的六个域执行，Review 完成后才分别决定 Feishu 单向覆盖发布与最终整仓验收；两者均需独立授权。Git 仍是唯一真源，Feishu 最终发布尚未开始。
 
 已验证链路：
 
@@ -46,7 +47,8 @@ Custom GPT
 - 双层 API Key、双层 Capability Policy、Loopback 边界；
 - Rate Limit、并发、Timeout、响应大小和安全错误映射；
 - Custom GPT Builder、Preview 和正式自然语言 Action 调用；
-- AI Knowledge、Deterministic Delivery、Custom GPT Actions、Microsoft Dev Tunnels、Engineering Insight Distillation 五个 Skill；
+- AI Knowledge、Deterministic Delivery、Custom GPT Actions、Microsoft Dev Tunnels、Engineering Insight Distillation、Planner Executor Handoff 六个正式 Skill；
+- `planner-executor-handoff v0.4.0` 已实现、验证并经 Chat Review 标记为 `accepted`；
 - Engineering Insight Registry 与首批五条工程洞见。
 
 尚未实现：
@@ -58,6 +60,8 @@ Custom GPT
 - 多执行器和多 Agent 自动调度；
 - MCP；
 - AI 视频工作流；
+- Portfolio Release；
+- 最终正式内容 Review 与 Feishu 最终发布；
 - 生产级公网入口；
 - 完整 Agent Profile 和 Knowledge Pack 发布体系。
 

@@ -22,7 +22,7 @@
 
 ## Phase 2.5：Knowledge Asset Rebuild and Platform Governance
 
-状态：**Merged to main / Final Review Pending**
+状态：**Batch 01～10 Completed / Final Content Review Ready**
 
 Batch 01 已完成首次仓库落库：
 
@@ -129,9 +129,22 @@ Batch 10：最终收口并合并 main
 - [x] 在合并后的 `main` 上重新运行完整验证；
 - [x] 保留 `knowledge-assets` 作为图片源资产分支；
 - [x] 停止在飞书发布之前，等待项目整体回顾；
-- [ ] 完成 Batch 10 合并后 Review。
+- [x] 完成 Batch 10 合并后 Review并关闭 Release。
 
-后续先进行项目整体回顾；飞书覆盖式发布需要单独授权。
+最终集中内容 Review（MIG-002）：
+
+- [x] 确认当前正式 Skill 数量为 6，`planner-executor-handoff v0.4.0` 已标记为 `accepted`；
+- [x] 物化六域 Review 控制计划、开场提示词和 Hash 索引；
+- [ ] R-01 项目入口与上下文；
+- [ ] R-02 产品体系与架构；
+- [ ] R-03 平台核心系统；
+- [ ] R-04 智能体与 Skills；
+- [ ] R-05 工作流、治理与交付；
+- [ ] R-06 实验、反思、遗漏与 Portfolio；
+- [ ] Review 后独立授权 Feishu 单向覆盖发布；
+- [ ] 发布后独立授权最终整仓验收。
+
+MIG-002 不属于已经完成的 `MIG-KNOWLEDGE-V2`。六个域可以根据实际变更量合并为较少的落库批次，不为域数量制造无意义 Commit、远程 Branch 或 PR。
 
 ## Phase 2 Next：Task Control and Trusted Execution
 
@@ -155,3 +168,9 @@ Batch 10：最终收口并合并 main
 以真实视频业务验证平台能力，包括故事理解、角色和场景、分镜、提示词、模型 Adapter、评估重试、成本和 Demo。
 
 AI 视频工作流依托 `ai-agent-platform`，不创建根级 `products/`。
+
+## Phase 4：Portfolio Release
+
+状态：**Not Started**
+
+在最终正式内容 Review、必要修正、Feishu 最终发布与整仓验收完成后，建立可验证的 Demo、架构说明、证据索引和对外作品集 Release。Custom GPT 资产化 MVP 仅作为后续占位项，不进入当前执行队列。

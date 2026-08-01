@@ -5,10 +5,11 @@
 ```text
 Branch: main
 Commit: 以 origin/main 实际 HEAD 为准
-Phase: 2.5 — Knowledge Asset Rebuild and Platform Governance Completed
+Control Branch: knowledge-rebuild-v2
+Phase: 2.5 — Final Content Review Ready
 ```
 
-`main` 是 Batch 10 合并后的正式基线；`knowledge-assets` 继续保存正式视觉源文件。
+`main` 是 Batch 10 合并后的正式基线；`knowledge-rebuild-v2` 继续承载 Batch 10 后的控制面与最终内容 Review 收口；`knowledge-assets` 继续保存正式视觉源文件。
 
 ## Verified Implementation
 
@@ -47,9 +48,12 @@ Phase: 2.5 — Knowledge Asset Rebuild and Platform Governance Completed
 ### Skills and Knowledge Governance
 
 - AI Knowledge Skill；
+- Deterministic Delivery Skill；
 - Custom GPT Actions Skill；
 - Microsoft Dev Tunnels Skill；
 - Engineering Insight Distillation Skill v0.2.0；
+- Planner Executor Handoff Skill v0.4.0，已实现、验证并标记为 `accepted`；
+- 当前正式 Skill 数量为 6；
 - Engineering Insight Registry；
 - 五条初始洞见，其中四条 provisional、一条 candidate；
 - 两轮离线 Pilot Eval。
@@ -79,43 +83,49 @@ Phase: 2.5 — Knowledge Asset Rebuild and Platform Governance Completed
 - HTML 尚未生成；
 - 飞书尚未发布。
 
-### Current — Batch 10 Main Integration In Review
+### Current — Final Content Review Control Plane Materialized
 
-- Batch 02～Batch 09 已全部通过真实 Commit Review；
-- 137 个 Registry 资产全部 `materialized`，全部 `migration_state: complete`；
+- Batch 01～Batch 10 的知识资产重构与 `main` 集成已经完成并接受；
+- `MIG-KNOWLEDGE-V2` 已完成，不再包含后续内容校准；
+- 140 个 Registry 资产全部 `materialized`，全部 `migration_state: complete`；
 - 十张正式视觉资产 `VIS-001～VIS-010` 已升级为 `accepted`；
 - `knowledge-assets` 保留为正式 SVG / PNG 源资产分支；
-- `knowledge-rebuild-v2` 已通过 fast-forward only 合并到 `main`；
+- `knowledge-rebuild-v2` 继续承载 Batch 10 后的收口工作；
 - 合并后的 `main` 已重新执行完整验证；
-- HTML 与飞书发布均未开始；
-- 当前等待 Batch 10 合并结果 Review 与项目整体回顾，不自动进入发布。
+- MIG-002 最终正式内容 Review 控制计划已物化并接受；
+- R-01～R-06 六个集中 Review 域尚未执行；
+- Feishu 最终发布尚未开始。
 
 后续总体顺序:
 
 ```text
-→ 回顾知识重构、执行治理与视觉资产阶段
-→ 单独决定是否以及何时进入 Feishu 发布
+→ 按 MIG-002 执行最终集中内容 Review
+→ Review 完成后，分别授权 Feishu 单向覆盖发布与最终整仓验收
 ```
 
 ## Not Implemented
 
 - 动态 Task Control；
-- 持久状态；
+- Execution / Result 持久化；
+- Executor Adapter 与 Execution Lane；
 - Approval、Evidence、Side-effect Ledger；
 - Health & Recovery；
-- 多 Agent 自动协作；
+- 多执行器自动调度；
 - MCP；
 - AI 视频工作流；
 - 生产级公网服务；
 - 完整 Agent Profile 与 Knowledge Pack；
-- 新知识树的飞书投影。
+- Project Knowledge Synthesis Skill；
+- Portfolio Release；
+- 最终正式内容 Review；
+- 新知识树的 Feishu 最终发布。
 
 ## Current Restrictions
 
 - 不把首个 MVP 描述为完整 Agent 平台；
 - 不把 Dev Tunnels 描述为生产方案；
 - 不把 provisional / candidate 洞见描述为 accepted；
-- 不操作飞书，直到全部正式文档进入 main 并通过 Review；
+- 不操作飞书，直到最终正式内容 Review 完成并获得独立发布授权；
 - 飞书发布前不读取旧正文、不比较、不合并；
 - 不创建根级 `products/`；
 - 不提前实现未来包。

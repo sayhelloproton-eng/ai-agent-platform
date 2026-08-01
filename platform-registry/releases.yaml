@@ -136,15 +136,17 @@ releases:
   asset_implementation_commit: d2c628b5f1b201eea9f267d60ca92a03898525ba
 - release_id: KNOWLEDGE-REBUILD-V2-BATCH-10
   type: final-repository-closure
-  status: in_review
+  status: completed
   branch: main
   source_branch: knowledge-rebuild-v2
   content_scope: Batch 09 acceptance, final repository closure, fast-forward-only main integration, and post-merge verification
-  repository_review_status: pending
+  repository_review_status: accepted
   publication_status: unpublished
   feishu_status: not_started
   merge_strategy: fast-forward-only
   source_implementation_commit: f377303025a260def940206ac264668913f6618b
+  implementation_commit: f377303025a260def940206ac264668913f6618b
+  integration_commit: 374f07b7ede3593400bf8631994fb1e91a4123bd
   asset_implementation_commit: d2c628b5f1b201eea9f267d60ca92a03898525ba
 - release_id: PLANNER-EXECUTOR-HANDOFF-V0.4.0
   type: skill-release
