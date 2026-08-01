@@ -1,0 +1,24 @@
+{
+  "feedback_type": "progress_checkpoint",
+  "task_id": "PEH-EVAL-001",
+  "task_version": 1,
+  "executor_id": "opencode-deepseek-local",
+  "source_commit": "374f07b7ede3593400bf8631994fb1e91a4123bd",
+  "current_state": "in_progress",
+  "completed_steps": ["S01", "S02", "S03", "S04", "S05"],
+  "evidence": [
+    "overlay cmp 38/38 passed",
+    "scope diff clean"
+  ],
+  "workspace_state": {
+    "branch": "knowledge-rebuild-v2",
+    "head": "374f07b7ede3593400bf8631994fb1e91a4123bd",
+    "status": "dirty"
+  },
+  "next_required_action": "Run S06 validation, await completion.",
+  "passed_gates": ["S01", "S02", "S03", "S04", "S05"],
+  "current_step": "S06",
+  "staged_state": "empty",
+  "side_effects": ["38 files copied to worktree"],
+  "safe_resume_point": "Resume from S06 after worktree state confirmed."
+}

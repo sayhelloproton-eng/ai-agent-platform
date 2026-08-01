@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "review-feedback.schema.json",
+  "title": "Review Feedback",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "feedback_type",
+    "review_id",
+    "task_id",
+    "task_version",
+    "reviewer_id",
+    "reviewed_commit",
+    "review_state",
+    "blocking_findings",
+    "non_blocking_findings",
+    "required_changes",
+    "unchanged_scope",
+    "resume_from",
+    "new_authorization",
+    "next_required_action"
+  ],
+  "properties": {
+    "feedback_type": {
+      "const": "review_feedback"
+    },
+    "review_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "reviewer_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reviewed_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "review_state": {
+      "enum": ["accepted", "changes_required", "blocked"]
+    },
+    "blocking_findings": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "non_blocking_findings": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "required_changes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "unchanged_scope": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "resume_from": {
+      "type": "string",
+      "minLength": 1
+    },
+    "new_authorization": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "next_required_action": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

@@ -41,4 +41,4 @@ Every handoff must freeze the current branch, target branch, Push target, PR and
 
 ## Status
 
-Version `0.3.0` adds the formal Git Operating Policy. It remains `in_review` until the real `knowledge-rebuild-v2` commit is reviewed by Chat.
+Version `0.3.1` hardens validation with strict type checks, adds `review_feedback` and `executor_switch_checkpoint` schemas, five new examples, negative tests, and cross-artifact consistency tests. It remains `in_review` until the real `knowledge-rebuild-v2` commit is reviewed by Chat.

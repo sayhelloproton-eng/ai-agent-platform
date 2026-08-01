@@ -573,7 +573,9 @@
             "progress_checkpoint",
             "failure_stop_report",
             "execution_result",
-            "review_response"
+            "review_feedback",
+            "review_response",
+            "executor_switch_checkpoint"
           ]
         },
         "task_id": {

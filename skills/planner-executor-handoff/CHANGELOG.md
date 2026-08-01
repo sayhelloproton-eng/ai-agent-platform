@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.1
+
+- Add strict type, enum, pattern, and extra-field assertions to the validator.
+- Add missing `review_feedback` and `executor_switch_checkpoint` as formal schemas and validator support.
+- Update the protocol schema to include all eight feedback types with `additionalProperties: false`.
+- Add five new formal examples: clarification-request, progress-checkpoint, review-feedback, review-response, and executor-switch-checkpoint.
+- Add negative tests for type, enum, SHA, branch, and extra-field violations.
+- Add cross-artifact consistency tests (review feedback ↔ review response, executor switch ↔ bundle, reception ack ↔ executor profile).
+- Fix `PEH-V03-REVIEW-001`.
+
 ## 0.3.0
 
 - Add the Chat-owned Git Operating Policy to the Canonical Handoff Contract.

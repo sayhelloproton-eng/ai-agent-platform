@@ -1,0 +1,20 @@
+{
+  "feedback_type": "executor_switch_checkpoint",
+  "task_id": "PEH-EVAL-001",
+  "task_version": 1,
+  "source_commit": "374f07b7ede3593400bf8631994fb1e91a4123bd",
+  "previous_executor_id": "codex-local",
+  "next_executor_id": "opencode-deepseek-local",
+  "next_execution_guidance_tier": "stepwise_controlled",
+  "branch": "knowledge-rebuild-v2",
+  "worktree": "/Users/agent/Desktop/ai-agent-platform",
+  "current_commit": "374f07b7ede3593400bf8631994fb1e91a4123bd",
+  "completed_steps": ["S01", "S02", "S03", "S04", "S05", "S06", "S07"],
+  "remaining_steps": ["S08", "S09", "S10"],
+  "passed_gates": ["S01", "S02", "S03", "S04", "S05", "S06", "S07"],
+  "failure_history": [],
+  "side_effects": ["38 overlay files applied", "validation passed"],
+  "do_not_repeat": ["S01", "S02"],
+  "safe_resume_point": "Resume from S03 after validating the existing checkpoint.",
+  "next_required_action": "New executor must read the contract and verify worktree state."
+}

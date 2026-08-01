@@ -1,0 +1,26 @@
+{
+  "feedback_type": "clarification_request",
+  "task_id": "PEH-EVAL-001",
+  "task_version": 1,
+  "executor_id": "opencode-deepseek-local",
+  "source_commit": "374f07b7ede3593400bf8631994fb1e91a4123bd",
+  "current_state": "blocked",
+  "completed_steps": ["S01", "S02", "S03"],
+  "evidence": [
+    "source_commit=374f07b7ede3593400bf8631994fb1e91a4123bd",
+    "origin/knowledge-rebuild-v2=374f07b7ede3593400bf8631994fb1e91a4123bd",
+    "workspace=clean"
+  ],
+  "workspace_state": {
+    "branch": "knowledge-rebuild-v2",
+    "head": "374f07b7ede3593400bf8631994fb1e91a4123bd",
+    "status": "clean"
+  },
+  "next_required_action": "Chat must answer whether the validator should allow nullable push_target.",
+  "current_step": "S04",
+  "missing_fact": "Whether push_target can be null when push is forbidden.",
+  "why_required": "Validator must know the exact type to enforce.",
+  "affected_scope": ["skills/planner-executor-handoff/assets/schemas/"],
+  "available_options": ["Allow null", "Require string always"],
+  "can_continue_without_answer": false
+}

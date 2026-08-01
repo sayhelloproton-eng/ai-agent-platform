@@ -1,6 +1,6 @@
 {
   "name": "planner-executor-handoff",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "status": "in_review",
   "files": [
     {
@@ -9,11 +9,11 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "996e6fd072b229e4bd759c24c85a85582815b670eb65cb8de8dfa62dd903ed43"
+      "sha256": "e13badd85bcd1f4a519c7e87ccdad4d53f70fa0dd6d954a125efa7b26e4ec677"
     },
     {
       "path": "README.md",
-      "sha256": "0d68ff8a4da0e04a4260cfbe5a737e4dfa8daa1330d34b2d8600c950588d59fe"
+      "sha256": "1d6c565081b109a784d5cbebb30de5ebe48833a7cce7072fc350ee1750bcc81c"
     },
     {
       "path": "SKILL.md",
@@ -24,8 +24,16 @@
       "sha256": "7b4a6e15a5bc25287ab66944ac81d4dceca1f190c3bb3487d3db3f681c7fc576"
     },
     {
+      "path": "assets/examples/clarification-request.json",
+      "sha256": "26a64ede9708590b7d1bd327c53c431ca6884cbfa713b5d801c64c6866ee78c4"
+    },
+    {
       "path": "assets/examples/execution-result.json",
       "sha256": "a3c694e8e1e2cde029c3ce630c278ba38313470c1595a4114ab89aa912911f34"
+    },
+    {
+      "path": "assets/examples/executor-switch-checkpoint.json",
+      "sha256": "a52a543ed5154cfa21af536e805f1044ef3e33021c9e391efeaf8ab7d82fc6f9"
     },
     {
       "path": "assets/examples/failure-stop-report.json",
@@ -40,12 +48,32 @@
       "sha256": "5374889230164685e9cbd3f8df620f5132e99f32d3b91b5f31d669bbf1cfd845"
     },
     {
+      "path": "assets/examples/progress-checkpoint.json",
+      "sha256": "e4da473d14264161c44516572258f89a4fbdb2b463f64544a0bd8ee0549a3f69"
+    },
+    {
       "path": "assets/examples/reception-ack.json",
       "sha256": "68bba0ebee16eec1f6b7ff1b2a38af99d32e88a42366aa448d46ac34aa71f19f"
     },
     {
+      "path": "assets/examples/review-feedback.json",
+      "sha256": "f972bacc80dff7d0b8c84756926774f75b2bfe4efb690679a28e5adcbef14de4"
+    },
+    {
+      "path": "assets/examples/review-response.json",
+      "sha256": "2eecc925d8752938a6e8690d63ad02dc0692df72155275a10a6f809dc7a86997"
+    },
+    {
+      "path": "assets/schemas/executor-switch-checkpoint.schema.json",
+      "sha256": "8ff1617e417e05deaf011663111c5dda72a70be0cadd4c6d7ee74149f5870b9c"
+    },
+    {
       "path": "assets/schemas/planner-executor-handoff-protocol.schema.json",
-      "sha256": "34f0d0aaac16335b44a9e261b0fd49d02f90d2956f4c8c3df272b6a0c80eff3a"
+      "sha256": "c7489e169e6359808614e77a9046978cbf030b61ad5d7bb3d8caf5db91e2a202"
+    },
+    {
+      "path": "assets/schemas/review-feedback.schema.json",
+      "sha256": "5bec7e7d8b29bac8b9300abcd2f21bac0ccc7f735f81d83940db2bd6c35696dc"
     },
     {
       "path": "references/01-role-boundaries.md",
@@ -85,7 +113,7 @@
     },
     {
       "path": "scripts/validate-handoff.mjs",
-      "sha256": "51d306635c6887bccf099a3a181f4b36d0b03ada3803c6f1235e0b0c6cb3efce"
+      "sha256": "04f0ddd4674bb5f1e01094b0d80528b49a0368440f201a4b67e4e14d5972a5f0"
     },
     {
       "path": "tests/evals/protocol-cases.json",
@@ -101,10 +129,10 @@
     },
     {
       "path": "tests/self-test.mjs",
-      "sha256": "70027272fd24b733a41328608851805c633247a73ed12d75304b9475d44369a0"
+      "sha256": "4248cc36b65d8a5f3c931364aa455cbe56f0ba37735d9fbb679cefbb11c3a079"
     }
   ],
-  "schemas": 1,
+  "schemas": 3,
   "guidance_tiers": [
     "compact_controlled",
     "stepwise_controlled"

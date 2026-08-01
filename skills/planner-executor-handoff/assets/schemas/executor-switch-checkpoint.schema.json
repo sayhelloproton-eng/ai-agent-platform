@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "executor-switch-checkpoint.schema.json",
+  "title": "Executor Switch Checkpoint",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "feedback_type",
+    "task_id",
+    "task_version",
+    "source_commit",
+    "previous_executor_id",
+    "next_executor_id",
+    "next_execution_guidance_tier",
+    "branch",
+    "worktree",
+    "current_commit",
+    "completed_steps",
+    "remaining_steps",
+    "passed_gates",
+    "failure_history",
+    "side_effects",
+    "do_not_repeat",
+    "safe_resume_point",
+    "next_required_action"
+  ],
+  "properties": {
+    "feedback_type": {
+      "const": "executor_switch_checkpoint"
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "source_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "previous_executor_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "next_executor_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "next_execution_guidance_tier": {
+      "enum": ["compact_controlled", "stepwise_controlled"]
+    },
+    "branch": {
+      "type": "string",
+      "minLength": 1
+    },
+    "worktree": {
+      "type": "string",
+      "minLength": 1
+    },
+    "current_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "completed_steps": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "remaining_steps": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "passed_gates": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "failure_history": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "side_effects": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "do_not_repeat": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "safe_resume_point": {
+      "type": "string",
+      "minLength": 1
+    },
+    "next_required_action": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

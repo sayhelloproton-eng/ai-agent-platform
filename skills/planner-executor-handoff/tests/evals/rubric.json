@@ -14,7 +14,7 @@
     },
     {
       "name": "feedback_completeness",
-      "pass": "Mandatory feedback fields are present."
+      "pass": "All eight feedback types are supported and validated."
     },
     {
       "name": "resume_safety",
@@ -27,6 +27,18 @@
     {
       "name": "git_policy_control",
       "pass": "Every Git side effect is explicitly authorized and reported."
+    },
+    {
+      "name": "strict_type_enforcement",
+      "pass": "Validator rejects boolean, integer, array, enum, pattern, extra-field, and SHA violations."
+    },
+    {
+      "name": "cross_artifact_consistency",
+      "pass": "Self-test verifies review_id, bundle/switch task identity, and reception-ack executor_id match."
+    },
+    {
+      "name": "negative_test_coverage",
+      "pass": "Negative tests assert non-zero exit codes for type, enum, SHA, branch, and extra-field violations."
     }
   ]
 }

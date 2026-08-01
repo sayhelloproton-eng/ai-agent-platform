@@ -23,6 +23,18 @@
     {
       "id": "review-does-not-create-branch",
       "requirement": "Chat Review alone must not create or push a remote feature branch."
+    },
+    {
+      "id": "eight-artifact-types",
+      "requirement": "Validator must support all eight feedback types: reception_ack, clarification_request, progress_checkpoint, failure_stop_report, execution_result, review_feedback, review_response, and executor_switch_checkpoint."
+    },
+    {
+      "id": "strict-types",
+      "requirement": "Validator must reject boolean-as-string, integer-as-string, array-as-string, enum mismatches, extra fields, unsafe branches, and invalid SHAs."
+    },
+    {
+      "id": "cross-artifact-consistency",
+      "requirement": "review_feedback.review_id must equal review_response.review_id. Executor switch task_id/task_version/source_commit must match the bundle contract."
     }
   ]
 }
