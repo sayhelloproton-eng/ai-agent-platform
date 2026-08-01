@@ -1,0 +1,32 @@
+{
+  "dimensions": [
+    {
+      "name": "analysis_ownership",
+      "pass": "Chat-owned deterministic analysis is explicit."
+    },
+    {
+      "name": "single_source",
+      "pass": "One Canonical Handoff Contract remains authoritative."
+    },
+    {
+      "name": "tier_calibration",
+      "pass": "Only execution guidance changes across tiers."
+    },
+    {
+      "name": "feedback_completeness",
+      "pass": "Mandatory feedback fields are present."
+    },
+    {
+      "name": "resume_safety",
+      "pass": "Checkpoint and review bind continuation to a safe point."
+    },
+    {
+      "name": "evidence_quality",
+      "pass": "Completion is independently reviewable."
+    },
+    {
+      "name": "git_policy_control",
+      "pass": "Every Git side effect is explicitly authorized and reported."
+    }
+  ]
+}

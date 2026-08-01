@@ -1,0 +1,194 @@
+{
+  "executor_profile": {
+    "executor_id": "codex-local",
+    "platform": "Codex",
+    "model": "current configured Codex model",
+    "execution_guidance_tier": "compact_controlled",
+    "classification_source": "project_default",
+    "tools": [
+      "filesystem",
+      "shell",
+      "git"
+    ],
+    "repository_access": "read_write",
+    "network_access": "restricted",
+    "approval_mode": "pre_authorized_scope",
+    "allowed_tactical_discretion": [
+      "choose equivalent read-only commands",
+      "choose equivalent validation commands",
+      "localize a command or environment failure"
+    ],
+    "known_limits": [
+      "must not change frozen approach",
+      "must not expand scope",
+      "quota can interrupt execution"
+    ]
+  },
+  "canonical_contract": {
+    "task_id": "PEH-EVAL-001",
+    "task_version": 1,
+    "title": "Add a reviewed handoff protocol fixture",
+    "goal": "Add one fixture and one test assertion without changing the protocol design.",
+    "why_now": "Validate that both guidance tiers render from the same frozen task.",
+    "repository": "sayhelloproton-eng/ai-agent-platform",
+    "source_branch": "main",
+    "source_commit": "374f07b7ede3593400bf8631994fb1e91a4123bd",
+    "confirmed_facts": [
+      "The repository uses Node.js 20 and npm 10.",
+      "The task is limited to the planner-executor-handoff test fixture."
+    ],
+    "frozen_decisions": [
+      "Do not change schemas.",
+      "Do not add dependencies.",
+      "Use one commit only."
+    ],
+    "analysis": {
+      "impact_analysis": [
+        "One fixture and the self-test assertion change.",
+        "No production code or Registry data changes."
+      ],
+      "cross_file_relations": [
+        "The fixture is consumed by tests/self-test.mjs."
+      ],
+      "selected_approach": "Add the fixture and validate it through the existing self-test.",
+      "rejected_approaches": [
+        "Do not create a second validator."
+      ],
+      "risks": [
+        "A mismatched task version would invalidate the bundle."
+      ]
+    },
+    "scope": {
+      "allowed_paths": [
+        "skills/planner-executor-handoff/tests/fixtures/",
+        "skills/planner-executor-handoff/tests/self-test.mjs"
+      ],
+      "forbidden_paths": [
+        "platform-registry/",
+        "docs/"
+      ],
+      "allowed_actions": [
+        "read",
+        "write allowed paths",
+        "run tests",
+        "commit"
+      ],
+      "forbidden_actions": [
+        "push",
+        "install dependencies",
+        "change schemas"
+      ]
+    },
+    "inputs": [
+      "Existing skill tests"
+    ],
+    "expected_outputs": [
+      "One new fixture",
+      "Updated self-test"
+    ],
+    "acceptance_criteria": [
+      "Self-test passes",
+      "Only allowed paths change"
+    ],
+    "validation_plan": [
+      "node skills/planner-executor-handoff/tests/self-test.mjs",
+      "git diff --check"
+    ],
+    "stop_conditions": [
+      "Source commit mismatch",
+      "Any required change outside allowed paths"
+    ],
+    "evidence_requirements": [
+      "Changed file list",
+      "Test command and exit code",
+      "Git diff stat",
+      "Workspace status"
+    ],
+    "execution_plan": {
+      "phases": [
+        "Verify baseline and scope",
+        "Add fixture and assertion",
+        "Run tests and report evidence"
+      ],
+      "stepwise_steps": [
+        {
+          "step_id": "S01",
+          "action": "Verify source commit",
+          "command": "test \"$(git rev-parse HEAD)\" = \"374f07b7ede3593400bf8631994fb1e91a4123bd\"",
+          "expected_result": "Exit code 0",
+          "stop_on_failure": true
+        },
+        {
+          "step_id": "S02",
+          "action": "Run self-test after the authorized edit",
+          "command": "node skills/planner-executor-handoff/tests/self-test.mjs",
+          "expected_result": "Exit code 0 and handoff self-test passed",
+          "stop_on_failure": true
+        }
+      ]
+    },
+    "change_control": {
+      "single_source_of_truth": "canonical_handoff_contract",
+      "ambiguity_policy": "stop_and_request_clarification",
+      "executor_may_change_approach": false,
+      "new_authorization_required_for": [
+        "scope expansion",
+        "dependency installation",
+        "schema changes",
+        "push"
+      ]
+    },
+    "git_policy": {
+      "workspace_strategy": "current_worktree",
+      "current_branch": "main",
+      "target_branch": "main",
+      "target_remote": "origin",
+      "allow_create_local_branch": false,
+      "allow_create_remote_branch": false,
+      "commit_allowed": true,
+      "commit_count": 1,
+      "commit_message": "test(skills): add one handoff fixture",
+      "fetch_allowed": true,
+      "pull_allowed": false,
+      "push_allowed": false,
+      "push_target": null,
+      "pr_required": false,
+      "pr_creation_allowed": false,
+      "merge_allowed": false,
+      "merge_strategy": "none",
+      "rebase_allowed": false,
+      "cherry_pick_allowed": false,
+      "force_push_allowed": false,
+      "delete_local_branch_allowed": false,
+      "delete_remote_branch_allowed": false,
+      "remote_branches_allowed_to_delete": [],
+      "remove_worktree_allowed": false,
+      "cleanup_delivery_directory_allowed": false
+    }
+  },
+  "context_package": {
+    "task_id": "PEH-EVAL-001",
+    "task_version": 1,
+    "must_know_facts": [
+      "The self-test validates both render tiers.",
+      "This evaluation does not authorize Registry changes."
+    ],
+    "frozen_decisions": [
+      "Keep one canonical contract.",
+      "Do not add dependencies."
+    ],
+    "relevant_files": [
+      "skills/planner-executor-handoff/tests/self-test.mjs",
+      "skills/planner-executor-handoff/tests/fixtures/"
+    ],
+    "prohibited_reinterpretations": [
+      "Do not redesign the protocol.",
+      "Do not treat this as a request to publish the skill."
+    ],
+    "open_questions": [],
+    "excluded_context": [
+      "Full project conversation history",
+      "Unrelated Feishu publication plans"
+    ]
+  }
+}

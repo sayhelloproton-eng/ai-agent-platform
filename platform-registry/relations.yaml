@@ -922,3 +922,27 @@ relations:
 - from: VIS-010
   type: derived_from
   to: ARC-005
+- from: SKL-003
+  type: explains
+  to: SKILL-PLANNER-EXECUTOR-HANDOFF
+- from: SKILL-PLANNER-EXECUTOR-HANDOFF
+  type: depends_on
+  to: WFL-005
+- from: SKILL-PLANNER-EXECUTOR-HANDOFF
+  type: depends_on
+  to: WFL-006
+- from: SKILL-PLANNER-EXECUTOR-HANDOFF
+  type: depends_on
+  to: WFL-007
+- from: SKILL-PLANNER-EXECUTOR-HANDOFF
+  type: depends_on
+  to: KNO-003
+- from: SKILL-PLANNER-EXECUTOR-HANDOFF
+  type: depends_on
+  to: SKILL-DETERMINISTIC-DELIVERY
+- from: WFL-006
+  type: uses_skill
+  to: SKILL-PLANNER-EXECUTOR-HANDOFF
+- from: WFL-007
+  type: uses_skill
+  to: SKILL-PLANNER-EXECUTOR-HANDOFF

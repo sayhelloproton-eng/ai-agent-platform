@@ -2,7 +2,7 @@
 
 ## 1. 目的
 
-本协议定义 Project Owner、ChatGPT、Codex 和 AI Knowledge Skill 在项目任务中的详细职责，以及读取、计划、修改、验证和报告流程。
+本协议定义 Project Owner、ChatGPT、执行层 Agent 和 AI Knowledge Skill 在项目任务中的详细职责，以及读取、计划、修改、验证和报告流程。
 
 它细化根项目宪法，不改变项目愿景、阶段顺序或正式事实边界。
 
@@ -31,7 +31,7 @@
 
 ChatGPT 不把方案自动视为本地实现，也不替代实际测试证据。
 
-### Codex / Execution Agent
+### Execution Agent
 
 负责：
 
@@ -43,7 +43,7 @@ ChatGPT 不把方案自动视为本地实现，也不替代实际测试证据。
 - 报告 diff、证据、限制和未完成项；
 - 仅在明确授权下执行 Commit、Push 或飞书写入。
 
-Codex 不得自行改变项目愿景、阶段顺序、总体架构或已接受决策。
+Codex、GPT Work、OpenCode / DeepSeek 及其他执行器不得自行改变项目愿景、阶段顺序、总体架构、冻结方案或已接受决策。执行器必须按 `planner-executor-handoff` 返回 Reception Ack、Checkpoint、Failure / Stop Report、Execution Result 和 Review Response。
 
 ### AI Knowledge Skill
 
@@ -214,3 +214,20 @@ Skill 不替 Project Owner 接受 ADR，不把飞书 CRUD 当作上层领域能�
 一个完整逻辑批次对应一个主 Commit。每个 Commit 推送后，当前 Chat 必须按固定 SHA 重新读取真实 Diff，再决定修正或下一批。
 
 Codex 不读取飞书正文，不做 Git / 飞书语义 Diff，也不自行改变稳定 ID 和知识树。
+
+## 12. 规划者与执行器交接
+
+- Chat 是唯一大脑，负责确定性分析、方案、影响、范围、验收、停止条件和复审；
+- 执行器只负责执行、观测、举证和结构化反馈；
+- 每个任务使用一个 Canonical Handoff Contract；
+- `compact_controlled` 与 `stepwise_controlled` 只改变执行指导粒度；
+- 执行器反馈必须绑定 Task、Version、Executor 和 Source Commit；
+- 失败、返工和执行器切换必须从复审过的安全续跑点继续。
+
+实现资产：
+
+- [`planner-executor-handoff`](../../../skills/planner-executor-handoff/SKILL.md)
+
+### Git 操作边界
+
+分支、Commit、Push、PR、Merge、Rebase、Cherry-pick、Force Push、分支删除、Worktree 和清理策略必须由 Chat 在 Canonical Handoff Contract 中明确冻结。执行器不得因为需要 Review 就自行创建远程功能分支。

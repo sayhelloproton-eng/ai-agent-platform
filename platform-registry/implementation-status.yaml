@@ -40,3 +40,10 @@ capabilities:
   status: idea
   implemented_by: []
   evidence: []
+- id: CAP-PLANNER-EXECUTOR-HANDOFF
+  status: verified
+  implemented_by:
+  - SKILL-PLANNER-EXECUTOR-HANDOFF
+  evidence:
+  - skills/planner-executor-handoff/tests/self-test.mjs
+  - docs/knowledge/06_智能体资产体系/SKL-003-规划者与执行器任务交接技能.md

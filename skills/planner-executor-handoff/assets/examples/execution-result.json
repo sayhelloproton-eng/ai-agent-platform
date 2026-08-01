@@ -1,0 +1,55 @@
+{
+  "feedback_type": "execution_result",
+  "task_id": "PEH-EVAL-001",
+  "task_version": 1,
+  "executor_id": "opencode-deepseek-local",
+  "source_commit": "374f07b7ede3593400bf8631994fb1e91a4123bd",
+  "current_state": "completed",
+  "completed_steps": [
+    "S01",
+    "S02"
+  ],
+  "evidence": [
+    "self-test exit code 0"
+  ],
+  "workspace_state": {
+    "branch": "main",
+    "head": "374f07b7ede3593400bf8631994fb1e91a4123bd",
+    "status": "clean"
+  },
+  "next_required_action": "Chat reviews the real result.",
+  "result_state": "completed",
+  "changed_files": [
+    "skills/planner-executor-handoff/tests/self-test.mjs"
+  ],
+  "deleted_files": [],
+  "tests": [
+    {
+      "command": "node skills/planner-executor-handoff/tests/self-test.mjs",
+      "exit_code": 0,
+      "result": "passed"
+    }
+  ],
+  "diff_stat": "1 file changed",
+  "commit_sha": null,
+  "remote_sha": null,
+  "artifacts": [],
+  "limitations": [],
+  "uncompleted_items": [],
+  "git_operations": {
+    "starting_branch": "main",
+    "starting_head": "374f07b7ede3593400bf8631994fb1e91a4123bd",
+    "created_local_branches": [],
+    "created_remote_branches": [],
+    "commit_sha": null,
+    "push_target": null,
+    "remote_sha": null,
+    "merge_strategy": "none",
+    "merge_result": "not_performed",
+    "deleted_remote_branches": [],
+    "cleanup_actions": [],
+    "final_branch": "main",
+    "final_head": "374f07b7ede3593400bf8631994fb1e91a4123bd",
+    "final_status": "clean"
+  }
+}

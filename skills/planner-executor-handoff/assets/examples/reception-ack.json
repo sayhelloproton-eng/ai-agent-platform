@@ -1,0 +1,39 @@
+{
+  "feedback_type": "reception_ack",
+  "task_id": "PEH-EVAL-001",
+  "task_version": 1,
+  "executor_id": "opencode-deepseek-local",
+  "source_commit": "374f07b7ede3593400bf8631994fb1e91a4123bd",
+  "current_state": "acknowledged",
+  "completed_steps": [],
+  "evidence": [],
+  "workspace_state": {
+    "branch": "main",
+    "head": "374f07b7ede3593400bf8631994fb1e91a4123bd",
+    "status": "clean"
+  },
+  "next_required_action": "Begin S01.",
+  "understood_goal": "Add one fixture and one test assertion only.",
+  "allowed_scope": [
+    "skills/planner-executor-handoff/tests/fixtures/",
+    "skills/planner-executor-handoff/tests/self-test.mjs"
+  ],
+  "forbidden_scope": [
+    "platform-registry/",
+    "docs/"
+  ],
+  "planned_validation": [
+    "node skills/planner-executor-handoff/tests/self-test.mjs",
+    "git diff --check"
+  ],
+  "ambiguities": [],
+  "can_start": true,
+  "git_policy_acknowledged": {
+    "actual_branch": "main",
+    "actual_head": "374f07b7ede3593400bf8631994fb1e91a4123bd",
+    "target_branch": "main",
+    "push_target": null,
+    "remote_delete_targets": [],
+    "matches_contract": true
+  }
+}

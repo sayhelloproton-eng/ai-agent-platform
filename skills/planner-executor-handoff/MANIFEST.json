@@ -1,0 +1,123 @@
+{
+  "name": "planner-executor-handoff",
+  "version": "0.3.0",
+  "status": "in_review",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "da55fec41f3b79694546b0f3b4ab9e709a89c0345caee1272c1a9d043e70a885"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "sha256": "996e6fd072b229e4bd759c24c85a85582815b670eb65cb8de8dfa62dd903ed43"
+    },
+    {
+      "path": "README.md",
+      "sha256": "0d68ff8a4da0e04a4260cfbe5a737e4dfa8daa1330d34b2d8600c950588d59fe"
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "11dc4da39dc8ccdacf0b65f808075261c6f361afc8ca5981b7f2838a3eb381ed"
+    },
+    {
+      "path": "agents/openai.yaml",
+      "sha256": "7b4a6e15a5bc25287ab66944ac81d4dceca1f190c3bb3487d3db3f681c7fc576"
+    },
+    {
+      "path": "assets/examples/execution-result.json",
+      "sha256": "a3c694e8e1e2cde029c3ce630c278ba38313470c1595a4114ab89aa912911f34"
+    },
+    {
+      "path": "assets/examples/failure-stop-report.json",
+      "sha256": "7f3ae24024a4e99a4d228a63c63d237f20078260c7aed97b6d805b9a1e10a1a8"
+    },
+    {
+      "path": "assets/examples/handoff-bundle-compact.json",
+      "sha256": "cc922b932513aedffb80c86ae54171ad6cde98c3728d410d398f1779aa0f1175"
+    },
+    {
+      "path": "assets/examples/handoff-bundle-stepwise.json",
+      "sha256": "5374889230164685e9cbd3f8df620f5132e99f32d3b91b5f31d669bbf1cfd845"
+    },
+    {
+      "path": "assets/examples/reception-ack.json",
+      "sha256": "68bba0ebee16eec1f6b7ff1b2a38af99d32e88a42366aa448d46ac34aa71f19f"
+    },
+    {
+      "path": "assets/schemas/planner-executor-handoff-protocol.schema.json",
+      "sha256": "34f0d0aaac16335b44a9e261b0fd49d02f90d2956f4c8c3df272b6a0c80eff3a"
+    },
+    {
+      "path": "references/01-role-boundaries.md",
+      "sha256": "361b1a5ca9a957ed478debb9e04e50f0397dbc85679c5b74ce5885300b231701"
+    },
+    {
+      "path": "references/02-guidance-tiers.md",
+      "sha256": "bb712c7119be4b28bb60493f02fdca767df9e4b1ebb2109f7324c6b3200bd694"
+    },
+    {
+      "path": "references/03-contract-context-feedback.md",
+      "sha256": "2383958ae1d3c361b52a91e4e29d1b26f07df971171bc4f9bd1c1814813e7b52"
+    },
+    {
+      "path": "references/04-review-resume-switch.md",
+      "sha256": "fa35adbc414c3aa72626ce4d9bb15ca986c5e3956d82147b3abaa230bda8dda2"
+    },
+    {
+      "path": "references/05-casebook.md",
+      "sha256": "ec0047deda7beacc5e37b555f899cb776d20c6a9a8cc06a693d90db8329bd422"
+    },
+    {
+      "path": "references/06-design-basis-and-evaluation.md",
+      "sha256": "bcc560e8d96798121b37a439cf9d15ccdb745787e4b1b3d0db34f4e19f30fdca"
+    },
+    {
+      "path": "references/07-related-skills.md",
+      "sha256": "a2d68a9dedc2798a5c44ad4875df299299b54f9a2324b3cc472718f2d6f1509a"
+    },
+    {
+      "path": "references/08-git-operating-policy.md",
+      "sha256": "95a810abec36e6ed521389d40cd80409afbd739341629c17b506c6aa79d56a55"
+    },
+    {
+      "path": "scripts/render-executor-prompt.mjs",
+      "sha256": "7a091475b4f1bb74b93fe7ae87cc637c638d73c9a221f4fd1c2fa9836a20bdc1"
+    },
+    {
+      "path": "scripts/validate-handoff.mjs",
+      "sha256": "51d306635c6887bccf099a3a181f4b36d0b03ada3803c6f1235e0b0c6cb3efce"
+    },
+    {
+      "path": "tests/evals/protocol-cases.json",
+      "sha256": "e1e0811d1f1eafca4c72eeb86d045993f21bfb163aed1b02c792ab39f6a9d096"
+    },
+    {
+      "path": "tests/evals/rubric.json",
+      "sha256": "8c39d1172a393889e72d8a640616f59b92378822f6bcf942ba4aee6b3df7134f"
+    },
+    {
+      "path": "tests/evals/trigger-cases.json",
+      "sha256": "e9f171784363964d48d4486dc67ef1857129d68d04523d25ab3947373d51a481"
+    },
+    {
+      "path": "tests/self-test.mjs",
+      "sha256": "70027272fd24b733a41328608851805c633247a73ed12d75304b9475d44369a0"
+    }
+  ],
+  "schemas": 1,
+  "guidance_tiers": [
+    "compact_controlled",
+    "stepwise_controlled"
+  ],
+  "feedback_types": [
+    "reception_ack",
+    "clarification_request",
+    "progress_checkpoint",
+    "failure_stop_report",
+    "execution_result",
+    "review_feedback",
+    "review_response",
+    "executor_switch_checkpoint"
+  ],
+  "git_operating_policy": true
+}

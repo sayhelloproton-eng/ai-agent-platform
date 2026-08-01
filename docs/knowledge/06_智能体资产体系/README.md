@@ -11,6 +11,7 @@
 | AGT-001～AGT-010 | Agent 角色、Profile、治理与首批专业智能体 |
 | SKL-001 | AI Knowledge Skill 设计 |
 | SKL-002 | Engineering Insight Distillation Skill 设计 |
+| SKL-003 | Planner Executor Handoff Skill 设计 |
 
 ## 维护规则
 

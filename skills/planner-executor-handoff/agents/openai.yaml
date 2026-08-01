@@ -1,0 +1,4 @@
+interface:
+  display_name: "Planner Executor Handoff"
+  short_description: "Control deterministic Chat-to-executor task handoffs"
+  default_prompt: "Prepare or review a deterministic handoff between the planning Chat and an execution-layer agent."

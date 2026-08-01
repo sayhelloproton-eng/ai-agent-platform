@@ -57,3 +57,9 @@ Checkpoint 保存稳定 ID、路径和 Hash，不复制所有日志。含敏感�
 - [ARC-014 健康与恢复治理架构](../04_平台架构/ARC-014-健康与恢复治理架构.md)
 - [WFL-005 多角色任务合同](WFL-005-多角色任务合同.md)
 - [WFL-008 任务暂停恢复与安全终止](WFL-008-任务暂停恢复与安全终止.md)
+
+## 10. 标准反馈与切换
+
+移交必须包含 Reception Ack、Checkpoint、Failure / Stop Report、Execution Result、Review Feedback 和 Executor Switch Checkpoint。新执行器只能从已复审的 `safe_resume_point` 继续，不得重做已通过门禁。
+
+- [SKL-003 规划者与执行器任务交接技能](../06_智能体资产体系/SKL-003-规划者与执行器任务交接技能.md)

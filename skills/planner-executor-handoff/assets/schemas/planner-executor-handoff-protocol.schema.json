@@ -1,0 +1,777 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "planner-executor-handoff-protocol.schema.json",
+  "title": "Planner Executor Handoff Protocol",
+  "$defs": {
+    "executorProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "executor_id",
+        "platform",
+        "model",
+        "execution_guidance_tier",
+        "classification_source",
+        "tools",
+        "repository_access",
+        "network_access",
+        "approval_mode",
+        "allowed_tactical_discretion",
+        "known_limits"
+      ],
+      "properties": {
+        "executor_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "platform": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "execution_guidance_tier": {
+          "enum": [
+            "compact_controlled",
+            "stepwise_controlled"
+          ]
+        },
+        "classification_source": {
+          "enum": [
+            "user_confirmed",
+            "project_default",
+            "probe_evidence"
+          ]
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "repository_access": {
+          "enum": [
+            "none",
+            "read_only",
+            "read_write"
+          ]
+        },
+        "network_access": {
+          "enum": [
+            "none",
+            "restricted",
+            "available"
+          ]
+        },
+        "approval_mode": {
+          "enum": [
+            "manual",
+            "pre_authorized_scope",
+            "runtime_policy"
+          ]
+        },
+        "allowed_tactical_discretion": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "known_limits": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "canonicalContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "task_version",
+        "title",
+        "goal",
+        "why_now",
+        "repository",
+        "source_branch",
+        "source_commit",
+        "confirmed_facts",
+        "frozen_decisions",
+        "analysis",
+        "scope",
+        "inputs",
+        "expected_outputs",
+        "acceptance_criteria",
+        "validation_plan",
+        "stop_conditions",
+        "evidence_requirements",
+        "execution_plan",
+        "git_policy",
+        "change_control"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "task_version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "goal": {
+          "type": "string",
+          "minLength": 1
+        },
+        "why_now": {
+          "type": "string",
+          "minLength": 1
+        },
+        "repository": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_branch": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "confirmed_facts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "frozen_decisions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "analysis": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "impact_analysis",
+            "cross_file_relations",
+            "selected_approach",
+            "rejected_approaches",
+            "risks"
+          ],
+          "properties": {
+            "impact_analysis": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            },
+            "cross_file_relations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "selected_approach": {
+              "type": "string",
+              "minLength": 1
+            },
+            "rejected_approaches": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "risks": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "allowed_paths",
+            "forbidden_paths",
+            "allowed_actions",
+            "forbidden_actions"
+          ],
+          "properties": {
+            "allowed_paths": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            },
+            "forbidden_paths": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "allowed_actions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            },
+            "forbidden_actions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            }
+          }
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "expected_outputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "acceptance_criteria": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "validation_plan": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "stop_conditions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "evidence_requirements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "execution_plan": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "phases",
+            "stepwise_steps"
+          ],
+          "properties": {
+            "phases": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            },
+            "stepwise_steps": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "step_id",
+                  "action",
+                  "command",
+                  "expected_result",
+                  "stop_on_failure"
+                ],
+                "properties": {
+                  "step_id": {
+                    "type": "string"
+                  },
+                  "action": {
+                    "type": "string"
+                  },
+                  "command": {
+                    "type": "string"
+                  },
+                  "expected_result": {
+                    "type": "string"
+                  },
+                  "stop_on_failure": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "change_control": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "single_source_of_truth",
+            "ambiguity_policy",
+            "executor_may_change_approach",
+            "new_authorization_required_for"
+          ],
+          "properties": {
+            "single_source_of_truth": {
+              "const": "canonical_handoff_contract"
+            },
+            "ambiguity_policy": {
+              "const": "stop_and_request_clarification"
+            },
+            "executor_may_change_approach": {
+              "const": false
+            },
+            "new_authorization_required_for": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            }
+          }
+        },
+        "git_policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "workspace_strategy",
+            "current_branch",
+            "target_branch",
+            "target_remote",
+            "allow_create_local_branch",
+            "allow_create_remote_branch",
+            "commit_allowed",
+            "commit_count",
+            "commit_message",
+            "fetch_allowed",
+            "pull_allowed",
+            "push_allowed",
+            "push_target",
+            "pr_required",
+            "pr_creation_allowed",
+            "merge_allowed",
+            "merge_strategy",
+            "rebase_allowed",
+            "cherry_pick_allowed",
+            "force_push_allowed",
+            "delete_local_branch_allowed",
+            "delete_remote_branch_allowed",
+            "remote_branches_allowed_to_delete",
+            "remove_worktree_allowed",
+            "cleanup_delivery_directory_allowed"
+          ],
+          "properties": {
+            "workspace_strategy": {
+              "enum": [
+                "current_worktree",
+                "new_worktree",
+                "existing_worktree"
+              ]
+            },
+            "current_branch": {
+              "type": "string",
+              "minLength": 1
+            },
+            "target_branch": {
+              "type": "string",
+              "minLength": 1
+            },
+            "target_remote": {
+              "type": "string",
+              "minLength": 1
+            },
+            "allow_create_local_branch": {
+              "type": "boolean"
+            },
+            "allow_create_remote_branch": {
+              "type": "boolean"
+            },
+            "commit_allowed": {
+              "type": "boolean"
+            },
+            "commit_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "commit_message": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "fetch_allowed": {
+              "type": "boolean"
+            },
+            "pull_allowed": {
+              "type": "boolean"
+            },
+            "push_allowed": {
+              "type": "boolean"
+            },
+            "push_target": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "pr_required": {
+              "type": "boolean"
+            },
+            "pr_creation_allowed": {
+              "type": "boolean"
+            },
+            "merge_allowed": {
+              "type": "boolean"
+            },
+            "merge_strategy": {
+              "enum": [
+                "none",
+                "fast_forward_only",
+                "merge_commit",
+                "squash"
+              ]
+            },
+            "rebase_allowed": {
+              "type": "boolean"
+            },
+            "cherry_pick_allowed": {
+              "type": "boolean"
+            },
+            "force_push_allowed": {
+              "type": "boolean"
+            },
+            "delete_local_branch_allowed": {
+              "type": "boolean"
+            },
+            "delete_remote_branch_allowed": {
+              "type": "boolean"
+            },
+            "remote_branches_allowed_to_delete": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "remove_worktree_allowed": {
+              "type": "boolean"
+            },
+            "cleanup_delivery_directory_allowed": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "contextPackage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "task_version",
+        "must_know_facts",
+        "frozen_decisions",
+        "relevant_files",
+        "prohibited_reinterpretations",
+        "open_questions",
+        "excluded_context"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "task_version": {
+          "type": "integer"
+        },
+        "must_know_facts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "frozen_decisions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "relevant_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "prohibited_reinterpretations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "excluded_context": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "feedback": {
+      "type": "object",
+      "required": [
+        "feedback_type",
+        "task_id",
+        "task_version",
+        "executor_id",
+        "source_commit",
+        "current_state",
+        "completed_steps",
+        "evidence",
+        "workspace_state",
+        "next_required_action"
+      ],
+      "properties": {
+        "feedback_type": {
+          "enum": [
+            "reception_ack",
+            "clarification_request",
+            "progress_checkpoint",
+            "failure_stop_report",
+            "execution_result",
+            "review_response"
+          ]
+        },
+        "task_id": {
+          "type": "string"
+        },
+        "task_version": {
+          "type": "integer"
+        },
+        "executor_id": {
+          "type": "string"
+        },
+        "source_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "current_state": {
+          "type": "string"
+        },
+        "completed_steps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "workspace_state": {
+          "type": "object",
+          "required": [
+            "branch",
+            "head",
+            "status"
+          ],
+          "properties": {
+            "branch": {
+              "type": "string"
+            },
+            "head": {
+              "type": "string"
+            },
+            "status": {
+              "enum": [
+                "clean",
+                "dirty",
+                "staged",
+                "untracked",
+                "unknown"
+              ]
+            }
+          }
+        },
+        "next_required_action": {
+          "type": "string"
+        },
+        "git_policy_acknowledged": {
+          "type": "object",
+          "required": [
+            "actual_branch",
+            "actual_head",
+            "target_branch",
+            "push_target",
+            "remote_delete_targets",
+            "matches_contract"
+          ],
+          "properties": {
+            "actual_branch": {
+              "type": "string"
+            },
+            "actual_head": {
+              "type": "string"
+            },
+            "target_branch": {
+              "type": "string"
+            },
+            "push_target": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "remote_delete_targets": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "matches_contract": {
+              "type": "boolean"
+            }
+          }
+        },
+        "git_operations": {
+          "type": "object",
+          "required": [
+            "starting_branch",
+            "starting_head",
+            "created_local_branches",
+            "created_remote_branches",
+            "commit_sha",
+            "push_target",
+            "remote_sha",
+            "merge_strategy",
+            "merge_result",
+            "deleted_remote_branches",
+            "cleanup_actions",
+            "final_branch",
+            "final_head",
+            "final_status"
+          ],
+          "properties": {
+            "starting_branch": {
+              "type": "string"
+            },
+            "starting_head": {
+              "type": "string"
+            },
+            "created_local_branches": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "created_remote_branches": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "commit_sha": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "push_target": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "remote_sha": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "merge_strategy": {
+              "type": "string"
+            },
+            "merge_result": {
+              "type": "string"
+            },
+            "deleted_remote_branches": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "cleanup_actions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "final_branch": {
+              "type": "string"
+            },
+            "final_head": {
+              "type": "string"
+            },
+            "final_status": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "executor_profile",
+    "canonical_contract",
+    "context_package"
+  ],
+  "properties": {
+    "executor_profile": {
+      "$ref": "#/$defs/executorProfile"
+    },
+    "canonical_contract": {
+      "$ref": "#/$defs/canonicalContract"
+    },
+    "context_package": {
+      "$ref": "#/$defs/contextPackage"
+    }
+  }
+}

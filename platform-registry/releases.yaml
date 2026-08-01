@@ -146,3 +146,13 @@ releases:
   merge_strategy: fast-forward-only
   source_implementation_commit: f377303025a260def940206ac264668913f6618b
   asset_implementation_commit: d2c628b5f1b201eea9f267d60ca92a03898525ba
+- release_id: PLANNER-EXECUTOR-HANDOFF-V0.3
+  type: skill-release
+  status: in_review
+  branch: knowledge-rebuild-v2
+  base_commit: 374f07b7ede3593400bf8631994fb1e91a4123bd
+  content_scope: planner-owned analysis, guidance tiers, bidirectional feedback, Git Operating Policy, review, resume, and executor switching
+  repository_review_status: pending
+  publication_status: unpublished
+  feishu_status: not_started
+  skill_version: 0.3.0

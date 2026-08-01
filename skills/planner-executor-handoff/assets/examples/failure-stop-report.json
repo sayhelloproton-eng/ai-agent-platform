@@ -1,0 +1,24 @@
+{
+  "feedback_type": "failure_stop_report",
+  "task_id": "PEH-EVAL-001",
+  "task_version": 1,
+  "executor_id": "opencode-deepseek-local",
+  "source_commit": "374f07b7ede3593400bf8631994fb1e91a4123bd",
+  "current_state": "blocked",
+  "completed_steps": [],
+  "evidence": [],
+  "workspace_state": {
+    "branch": "main",
+    "head": "374f07b7ede3593400bf8631994fb1e91a4123bd",
+    "status": "clean"
+  },
+  "next_required_action": "Planner decides whether to issue a new version.",
+  "last_successful_gate": "Contract validation",
+  "failed_step": "S01",
+  "raw_error": "HEAD does not match source_commit",
+  "interpreted_cause": "Repository drift",
+  "staged_state": "none",
+  "side_effects": [],
+  "safe_resume_point": "Restart baseline verification after a new contract version.",
+  "required_decision": "Issue a new task version or restore the expected base."
+}

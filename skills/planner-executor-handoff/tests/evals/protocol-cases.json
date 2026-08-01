@@ -1,0 +1,28 @@
+{
+  "cases": [
+    {
+      "id": "chat-owns-analysis",
+      "requirement": "Prompt includes the frozen selected approach and forbids changing it."
+    },
+    {
+      "id": "same-contract-two-tiers",
+      "requirement": "Both tiers share task ID, version, source commit, goal, scope, acceptance, and stop conditions."
+    },
+    {
+      "id": "failure-fields",
+      "requirement": "Failure report requires last successful gate, failed step, raw error, side effects, safe resume point, and required decision."
+    },
+    {
+      "id": "completion-evidence",
+      "requirement": "Execution result requires changed files, tests, diff, commit, remote SHA, artifacts, limitations, unfinished items, and workspace state."
+    },
+    {
+      "id": "git-policy-frozen",
+      "requirement": "Canonical Contract freezes current/target branch, push target, PR/merge policy, and exact deletion authorization."
+    },
+    {
+      "id": "review-does-not-create-branch",
+      "requirement": "Chat Review alone must not create or push a remote feature branch."
+    }
+  ]
+}
