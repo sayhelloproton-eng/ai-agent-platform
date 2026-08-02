@@ -49,10 +49,14 @@ Root command:
 npm run check:handoff
 ```
 
+## Context access
+
+`context/**` is semantically owned by the master/control Planner. Executors default to `read_only`. A `write_approved` handoff must name exact Context files and provide complete Planner-authored replacements; executors may only copy and validate them. Other agents only report drift, and the user confirms important changes.
+
 ## Git policy
 
 Every handoff must freeze the current branch, target branch, Push target, PR and merge policy, and cleanup permissions. Review does not imply creating a remote feature branch.
 
 ## Status
 
-Version `0.4.0` makes low-capability execution artifact-only, completes strict eight-artifact and cross-artifact validation, and adds Manifest self-verification. Chat Review `PEH-V040-REVIEW-003` accepted implementation commit `85423d29cc7a6552ada4d2b45e0b8c92dcac3375`; this update only closes the Release status and does not change the Skill implementation.
+Version `0.5.0` adds strict Context ownership and `context_access` validation while preserving v0.4.0 execution and Git policy behavior. The version is `in_review` until the generated repository Commit and returned evidence package are reviewed by Chat and the user.

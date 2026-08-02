@@ -128,6 +128,7 @@
         "frozen_artifacts",
         "execution_plan",
         "change_control",
+        "context_access",
         "git_policy"
       ],
       "properties": {
@@ -564,6 +565,43 @@
             },
             "cleanup_delivery_directory_allowed": {
               "type": "boolean"
+            }
+          }
+        },
+        "context_access": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "files",
+            "content_source",
+            "user_approval"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                "read_only",
+                "write_approved"
+              ]
+            },
+            "files": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "content_source": {
+              "enum": [
+                "none",
+                "planner_full_replacement"
+              ]
+            },
+            "user_approval": {
+              "enum": [
+                "not_required",
+                "confirmed"
+              ]
             }
           }
         }

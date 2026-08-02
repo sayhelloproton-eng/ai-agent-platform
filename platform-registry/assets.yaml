@@ -920,6 +920,17 @@ assets:
   canonical_path: docs/knowledge/05_上下文与知识系统/KNO-010-工程洞见提炼与注册表治理.md
   publication_status: unpublished
   migration_state: complete
+- asset_id: KNO-011
+  title: 上下文所有权与维护机制
+  asset_type: knowledge-document
+  status: accepted
+  evidence_level: decided
+  materialized: true
+  current_path: docs/knowledge/05_上下文与知识系统/KNO-011-上下文所有权与维护机制.md
+  target_path: null
+  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-011-上下文所有权与维护机制.md
+  publication_status: unpublished
+  migration_state: complete
 - asset_id: AGT-001
   title: Agent角色体系
   asset_type: knowledge-document

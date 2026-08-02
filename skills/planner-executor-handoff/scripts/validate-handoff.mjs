@@ -7,6 +7,7 @@ const SAFE_REF_RE = /^(?!-)(?!.*\.\.)(?!.*\s)(?!.*@\{)[^~^:?*\[\\]+$/;
 const WORKSPACE_STATUSES = ["clean", "dirty", "staged", "untracked", "unknown"];
 const GUIDANCE_TIERS = ["compact_controlled", "stepwise_controlled"];
 const EXECUTION_AUTHORITIES = ["bounded_implementation", "frozen_artifacts_only"];
+const CONTEXT_ACCESS_MODES = ["read_only", "write_approved"];
 const MERGE_STRATEGIES = ["none", "fast_forward_only", "merge_commit", "squash"];
 const FEEDBACK_TYPES = [
   "reception_ack",
@@ -145,12 +146,26 @@ function validateFrozenArtifacts(value) {
   if (!value.byte_compare_required) fail("frozen_artifacts.byte_compare_required must be true");
 }
 
+function validateContextAccess(value) {
+  exact(value, ["mode", "files", "content_source", "user_approval"], "canonical_contract.context_access");
+  oneOf(value.mode, CONTEXT_ACCESS_MODES, "context_access.mode");
+  safePaths(value.files, "context_access.files");
+  oneOf(value.content_source, ["none", "planner_full_replacement"], "context_access.content_source");
+  oneOf(value.user_approval, ["not_required", "confirmed"], "context_access.user_approval");
+  if (value.mode === "read_only") {
+    if (value.files.length !== 0 || value.content_source !== "none") fail("read_only context access must not authorize files or content");
+  } else {
+    if (value.files.length < 1) fail("write_approved context access requires exact files");
+    if (value.content_source !== "planner_full_replacement") fail("write_approved context access requires planner_full_replacement");
+    for (const file of value.files) if (!file.startsWith("context/") || file.includes("*") || file.endsWith("/")) fail("context_access.files must contain exact context/ files");
+  }
+}
 function validateContract(value) {
   const fields = [
     "task_id", "task_version", "title", "goal", "why_now", "repository", "source_branch", "source_commit",
     "confirmed_facts", "frozen_decisions", "analysis", "scope", "inputs", "expected_outputs",
     "acceptance_criteria", "validation_plan", "stop_conditions", "evidence_requirements", "delivery_mode",
-    "frozen_artifacts", "execution_plan", "change_control", "git_policy",
+    "frozen_artifacts", "execution_plan", "change_control", "context_access", "git_policy",
   ];
   exact(value, fields, "canonical_contract");
   nonEmpty(value.task_id, "canonical_contract.task_id");
@@ -195,6 +210,7 @@ function validateContract(value) {
   bool(value.change_control.executor_may_change_approach, "change_control.executor_may_change_approach");
   if (value.change_control.executor_may_change_approach) fail("executor_may_change_approach must be false");
   strings(value.change_control.new_authorization_required_for, "change_control.new_authorization_required_for", 1);
+  validateContextAccess(value.context_access);
   validateGitPolicy(value.git_policy);
 }
 

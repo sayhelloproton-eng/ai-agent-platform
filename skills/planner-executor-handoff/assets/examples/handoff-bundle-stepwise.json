@@ -147,6 +147,12 @@
         "push"
       ]
     },
+    "context_access": {
+      "mode": "read_only",
+      "files": [],
+      "content_source": "none",
+      "user_approval": "not_required"
+    },
     "git_policy": {
       "workspace_strategy": "current_worktree",
       "current_branch": "main",

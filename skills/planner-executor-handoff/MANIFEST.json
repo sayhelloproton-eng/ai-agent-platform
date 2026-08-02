@@ -1,7 +1,7 @@
 {
   "name": "planner-executor-handoff",
-  "version": "0.4.0",
-  "status": "accepted",
+  "version": "0.5.0",
+  "status": "in_review",
   "files": [
     {
       "path": "AGENTS.md",
@@ -9,15 +9,15 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "5bfe014c3c25c0820823fe34863da317b74b81458096ab797b0548973d2e0567"
+      "sha256": "b487b7c5bffa73644af588e8d6ebafbf235bcbfd4f20712d60cab824feea86b0"
     },
     {
       "path": "README.md",
-      "sha256": "aa44fe314ad88934952c89627071389ba1295f3834aa0f70644f922349e8eee1"
+      "sha256": "16af68f2b41784d2e5d8952649c0288749793a0802e32c5dd34d5c45dba1c79b"
     },
     {
       "path": "SKILL.md",
-      "sha256": "bcde3fbea9891c828917c4850e521c984abef66a6379a5781ea54e05d1ce5905"
+      "sha256": "eaefa645ad8cc35225e247ba258368e61a2ef942c9980eaf5970a74b87da94b7"
     },
     {
       "path": "agents/openai.yaml",
@@ -41,11 +41,11 @@
     },
     {
       "path": "assets/examples/handoff-bundle-compact.json",
-      "sha256": "5bdb354accaa3d41618c1bb792295c1970176353cfc3dce1c020ff1d9d8be9ef"
+      "sha256": "dd7b3dbfe668a7a944a86a25a3d565504536d6bb99b52833711ccccf58dc98f4"
     },
     {
       "path": "assets/examples/handoff-bundle-stepwise.json",
-      "sha256": "c3a796c8b1c558253dee7f98d5d5cbd7c6017ddfa59290acf33d0d80fbc548e4"
+      "sha256": "56d9196957e51e1bd616f4d6b23acbc15ebae54183fb41868fe061c3c727f8ce"
     },
     {
       "path": "assets/examples/progress-checkpoint.json",
@@ -69,7 +69,7 @@
     },
     {
       "path": "assets/schemas/planner-executor-handoff-protocol.schema.json",
-      "sha256": "8fa2e661080263017f85b0f5c0bb635260a255f1890985a920ca104f0356c9fb"
+      "sha256": "ce27f5d04fa42f2267c000a713c8c6c003cc7d73458ea9e83a99a644eacd8f8b"
     },
     {
       "path": "assets/schemas/review-feedback.schema.json",
@@ -108,12 +108,16 @@
       "sha256": "95a810abec36e6ed521389d40cd80409afbd739341629c17b506c6aa79d56a55"
     },
     {
+      "path": "references/09-context-ownership-and-access.md",
+      "sha256": "abce8ec1f4eaa41f97cccfdc3e1178dbad92e62675ff8c1d162a731116de970f"
+    },
+    {
       "path": "scripts/render-executor-prompt.mjs",
-      "sha256": "b42672dea63d0e69687a53a765c2457405c4e0b0e2ea40a55703c46e86cc66cb"
+      "sha256": "ada5fd2a6ca2dfc304a26d32f49b319495e8be7a2d80adffad08a523f164195e"
     },
     {
       "path": "scripts/validate-handoff.mjs",
-      "sha256": "80b5ffe876d4ad27596075a557aa119630dd8504a4bd952dc7c002640551489f"
+      "sha256": "06c827767ee8f0def36fcd5a9b6158e41118181f72f20aad7f113c8295ff2316"
     },
     {
       "path": "tests/evals/protocol-cases.json",
@@ -129,7 +133,7 @@
     },
     {
       "path": "tests/self-test.mjs",
-      "sha256": "7d76cdda4af55b30a1fbb8d3d73cff7917079159b6582b18a5277c4f1763c003"
+      "sha256": "68ef5b8b455bcb2ea9770373f8420f17a1466a428bc0c3f969ead61de8199e85"
     }
   ],
   "schemas": 3,
@@ -152,5 +156,10 @@
     "executor_switch_checkpoint"
   ],
   "git_operating_policy": true,
-  "manifest_self_verification": true
+  "manifest_self_verification": true,
+  "context_access": true,
+  "context_access_modes": [
+    "read_only",
+    "write_approved"
+  ]
 }

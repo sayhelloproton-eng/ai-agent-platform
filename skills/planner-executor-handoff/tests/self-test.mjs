@@ -14,7 +14,7 @@ function run(args) { const r=spawnSync(process.execPath,args,{encoding:"utf8"});
 function failRun(args) { const r=spawnSync(process.execPath,args,{encoding:"utf8"}); if(r.status===0) throw new Error(`${args.join(" ")} should fail`); }
 const load=async name=>JSON.parse(await readFile(path.join(EXAMPLES,name),"utf8"));
 const clone=value=>JSON.parse(JSON.stringify(value));
-const TMP=await mkdtemp(path.join(tmpdir(),"peh-v040-"));
+const TMP=await mkdtemp(path.join(tmpdir(),"peh-v050-"));
 async function temp(name,value){const p=path.join(TMP,name);await writeFile(p,JSON.stringify(value,null,2));return p;}
 async function mutateFeedback(name, mutator){const v=await load(name);mutator(v);failRun([VALIDATE,"feedback",await temp(`neg-${Math.random()}.json`,v)]);}
 async function mutateBundle(mutator){const v=await load("handoff-bundle-stepwise.json");mutator(v);failRun([VALIDATE,"bundle",await temp(`negb-${Math.random()}.json`,v)]);}
@@ -30,7 +30,7 @@ const compactObj=await load("handoff-bundle-compact.json"); const stepwiseObj=aw
 for(const field of ["task_id","task_version","goal","source_commit","delivery_mode"]) if(compactObj.canonical_contract[field]!==stepwiseObj.canonical_contract[field]) throw new Error(`tier contract mismatch ${field}`);
 if(stepwiseObj.executor_profile.execution_authority!=="frozen_artifacts_only") throw new Error("stepwise example must be artifact-only");
 const compactPrompt=run([RENDER,compact]); const stepPrompt=run([RENDER,stepwise]);
-for(const marker of ["Execution authority","Delivery mode","Evidence required","Git Operating Policy"]) if(!compactPrompt.includes(marker)||!stepPrompt.includes(marker)) throw new Error(`prompt missing ${marker}`);
+for(const marker of ["Execution authority","Delivery mode","Evidence required","Context access","Git Operating Policy"]) if(!compactPrompt.includes(marker)||!stepPrompt.includes(marker)) throw new Error(`prompt missing ${marker}`);
 if(!stepPrompt.includes("Execution authority: frozen_artifacts_only")||!stepPrompt.includes("Byte comparison required: true")) throw new Error("stepwise frozen delivery not rendered");
 if(compactPrompt.includes("### S01")) throw new Error("compact prompt must not render exact steps");
 if(!stepPrompt.includes("### S01")) throw new Error("stepwise prompt must render exact steps");
@@ -63,10 +63,12 @@ await mutateFeedback("executor-switch-checkpoint.json",v=>v.safe_resume_point=""
 await mutateFeedback("executor-switch-checkpoint.json",v=>v.do_not_repeat=[]);
 
 // Bundle negatives and authority gate.
-for(const field of ["git_policy","execution_plan","change_control"]) await mutateBundle(v=>v[field]={});
+for(const field of ["git_policy","context_access","execution_plan","change_control"]) await mutateBundle(v=>v[field]={});
 await mutateBundle(v=>v.executor_profile.tools="shell");
 await mutateBundle(v=>v.canonical_contract.task_version="1");
 await mutateBundle(v=>v.canonical_contract.git_policy.allow_create_remote_branch="false");
+await mutateBundle(v=>v.canonical_contract.context_access.mode="write_approved");
+await mutateBundle(v=>{v.canonical_contract.context_access={mode:"write_approved",files:["context/*.md"],content_source:"planner_full_replacement",user_approval:"confirmed"};});
 await mutateBundle(v=>v.canonical_contract.source_commit="abc");
 await mutateBundle(v=>v.canonical_contract.git_policy.current_branch="-bad");
 await mutateBundle(v=>v.canonical_contract.execution_plan.stepwise_steps[0].stop_on_failure="yes");
@@ -88,13 +90,14 @@ await crossMutate(x=>x.sw.next_execution_guidance_tier="compact_controlled");
 // Schemas parse and expose eight strict definitions.
 const protocol=JSON.parse(await readFile(path.join(ROOT,"assets","schemas","planner-executor-handoff-protocol.schema.json"),"utf8"));
 const expectedDefs=["receptionAck","clarificationRequest","progressCheckpoint","failureStopReport","executionResult","reviewFeedback","reviewResponse","executorSwitchCheckpoint"];
+if(!protocol.$defs.canonicalContract.required.includes("context_access"))throw new Error("context_access schema missing");
 for(const name of expectedDefs){const d=protocol.$defs[name];if(!d||d.additionalProperties!==false)throw new Error(`schema definition ${name} missing or not strict`);}
 if(protocol.$defs.feedback.oneOf.length!==8)throw new Error("feedback schema must contain eight oneOf branches");
 
 // Manifest file-set and hash self-verification.
 async function allFiles(dir){const out=[];for(const e of await readdir(dir,{withFileTypes:true})){const p=path.join(dir,e.name);if(e.isDirectory())out.push(...await allFiles(p));else out.push(p);}return out;}
 const manifest=JSON.parse(await readFile(path.join(ROOT,"MANIFEST.json"),"utf8"));
-if(manifest.version!=="0.4.0"||manifest.status!=="accepted")throw new Error("manifest version/status mismatch");
+if(manifest.version!=="0.5.0"||manifest.status!=="in_review")throw new Error("manifest version/status mismatch");
 const actual=(await allFiles(ROOT)).filter(p=>path.basename(p)!=="MANIFEST.json").map(p=>path.relative(ROOT,p).split(path.sep).join("/")).sort();
 const declared=manifest.files.map(x=>x.path).sort();
 if(JSON.stringify(actual)!==JSON.stringify(declared))throw new Error("manifest file set mismatch");

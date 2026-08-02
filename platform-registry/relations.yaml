@@ -469,6 +469,12 @@ relations:
 - from: KNO-010
   type: explains
   to: SKILL-ENGINEERING-INSIGHTS
+- from: KNO-011
+  type: explains
+  to: KNO-001
+- from: SKILL-PLANNER-EXECUTOR-HANDOFF
+  type: governed_by
+  to: KNO-011
 - from: ARC-017
   type: depends_on
   to: PRD-003

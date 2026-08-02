@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.0
+
+- Define `context/**` as master/control Planner-owned semantic state.
+- Add strict `context_access` to the Canonical Handoff Contract.
+- Default executors to `read_only`.
+- Permit Context writes only for exact files with Planner-provided full replacements.
+- Require other agents and executors to report Context drift instead of editing it.
+- Preserve user confirmation for important goal, architecture, phase, roadmap, and governance changes.
+- Add schema, validator, renderer, examples, negative tests, and formal knowledge alignment.
+
 ## 0.4.0
 
 - Add `execution_authority` and distinguish `bounded_implementation` from `frozen_artifacts_only`.

@@ -48,6 +48,12 @@ function renderCompact(profile, contract, context) {
     section("Selected approach", contract.analysis.selected_approach),
     section("Allowed paths", contract.scope.allowed_paths),
     section("Forbidden paths", contract.scope.forbidden_paths),
+    section("Context access", [
+      `Mode: ${contract.context_access.mode}`,
+      `Files: ${contract.context_access.files.join(", ") || "none"}`,
+      `Content source: ${contract.context_access.content_source}`,
+      `User approval: ${contract.context_access.user_approval}`,
+    ]),
     section("Git Operating Policy", [
       `Workspace strategy: ${contract.git_policy.workspace_strategy}`,
       `Current branch: ${contract.git_policy.current_branch}`,
@@ -116,6 +122,12 @@ function renderStepwise(profile, contract, context) {
     section("Forbidden paths", contract.scope.forbidden_paths),
     section("Allowed actions", contract.scope.allowed_actions),
     section("Forbidden actions", contract.scope.forbidden_actions),
+    section("Context access", [
+      `Mode: ${contract.context_access.mode}`,
+      `Files: ${contract.context_access.files.join(", ") || "none"}`,
+      `Content source: ${contract.context_access.content_source}`,
+      `User approval: ${contract.context_access.user_approval}`,
+    ]),
     section("Git Operating Policy", [
       `Workspace strategy: ${contract.git_policy.workspace_strategy}`,
       `Current branch: ${contract.git_policy.current_branch}`,

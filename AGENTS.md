@@ -1,6 +1,6 @@
 # AI Agent Platform Project Constitution
 
-> 本文件是 `ai-agent-platform` 中人类协作者、当前 ChatGPT、Codex / Work 和其他 Agent 共同遵守的最高项目规则。
+> 本文件是 `ai-agent-platform` 中 Project Owner、总控 Planner、专业 Agent、Codex / Work 和其他执行器共同遵守的最高项目规则。
 
 ## 1. 项目定位
 
@@ -21,7 +21,9 @@
 
 负责最终目标、优先级、架构方向、高风险操作、正式决策和飞书写入授权。
 
-### 当前 ChatGPT
+Project Owner 是重要 Context 变化的最终审批者和所有 Context 变化的最终 Review 人。
+
+### 总控 Planner / 当前 ChatGPT
 
 负责：
 
@@ -30,41 +32,84 @@
 - 知识综合；
 - 正式正文；
 - 复杂图规格；
-- Codex 精确任务；
-- Commit 复审。
+- Executor 精确任务；
+- Commit 复审；
+- 判断项目级共享事实是否变化；
+- 维护 `context/**` 的语义内容；
+- 为 Context 生成完整覆盖文件；
+- 在重要变化时向 Project Owner 汇报并申请确认。
 
-当前 Chat 不假装已经修改本机仓库。
+在思考者层中，只有总控 Planner 拥有 `context/**` 的语义修改权。
 
-### Codex / GPT Work
+当前 Chat 不假装已经修改本机仓库，也不把 Context 正文编写权交给 Executor。
+
+### 专业 Agent / Reviewer / Research Agent
+
+负责专业分析、Review、调研和变化识别。
+
+它们可以读取 Context，也可以报告 Context 可能过期的原因、证据和建议影响文件，但不得直接编写或修改 `context/**`。
+
+### Codex / GPT Work / OpenCode / Claude Code / Runtime Executor
 
 负责：
 
 - 读取授权范围；
 - 修改真实仓库；
 - 运行命令和测试；
-- 创建 Commit；
+- 创建获准的 Commit；
 - 返回 Diff、SHA 和证据。
 
-Codex 不得自行改变项目思想、文章边界、稳定 ID 或长期架构。
+Executor 默认只读 `context/**`。只有 Canonical Handoff Contract 明确设置 `context_access.mode: write_approved`、列出精确文件，并由总控 Planner 提供完整覆盖文件时，Executor 才能机械覆盖指定 Context 文件。
+
+Executor 不得自行总结仓库后重写 Context，不得自行改变项目思想、文章边界、稳定 ID 或长期架构。
 
 ### Custom GPT
 
-是专业角色入口，负责稳定 Instructions、角色知识、Actions 和专业交互。它不是任务数据库，不承担可靠跨会话状态。
+Custom GPT 是专业角色入口，负责稳定 Instructions、角色知识、Actions 和专业交互。它不是任务数据库，不承担可靠跨会话状态。
+
+总控 Custom GPT 必须通过自己的 Agent Profile / Instructions 知道 Context 维护职责，并在规划前读取 Git 中的最新 Context；不能把 Builder 内置 Knowledge 当作最新项目状态。
 
 ### Gateway / Runtime
 
 负责 Task Contract、身份、权限、状态、执行器连接、审批、证据和恢复。当前只实现最小安全调用链。
 
-## 3. 事实优先级
+## 3. Context 所有权
+
+核心规则：
+
+> Context 由总控 Planner 维护，Executor 只执行，其他 Agent 只报告变化，用户最终确认。
+
+Context 写入只采用完整覆盖文件：
+
+```text
+其他 Agent / Executor 发现变化
+→ 报告原因与证据
+→ 总控 Planner 判断并生成完整文件
+→ 重要变化由 Project Owner 确认
+→ Executor 按精确授权机械覆盖
+→ 测试、Commit、Push、回读
+```
+
+重要变化包括：
+
+- 项目目标或产品范围变化；
+- 核心架构或角色边界变化；
+- 阶段完成、取消或切换；
+- Roadmap 主优先级变化；
+- Git、知识、Memory、Feishu 或安全治理变化。
+
+具体规则见 `context/AGENTS.md` 和 `docs/knowledge/05_上下文与知识系统/KNO-011-上下文所有权与维护机制.md`。
+
+## 4. 事实优先级
 
 发生冲突时：
 
 ```text
 代码、测试、真实调用证据
   ↓
-当前 main 的 Context、ADR 和治理规则
+当前工作分支已验证的 Registry、Release、Migration 与 Context
   ↓
-Project Owner 与当前 Chat 已确认原则
+Project Owner 与总控 Planner 已确认原则
   ↓
 已 Review 的底稿与蓝图
   ↓
@@ -73,7 +118,7 @@ Project Owner 与当前 Chat 已确认原则
 
 旧文档不能反向约束目标设计，但其历史、问题、实验和证据必须保留。
 
-## 4. Git、飞书与 Registry
+## 5. Git、飞书与 Registry
 
 - Git 是唯一真源；
 - `docs/knowledge/` 是飞书唯一发布源；
@@ -85,7 +130,7 @@ Project Owner 与当前 Chat 已确认原则
 
 飞书写入必须由 Project Owner 明确授权。
 
-## 5. 当前与目标
+## 6. 当前与目标
 
 必须明确区分：
 
@@ -100,7 +145,7 @@ Project Owner 与当前 Chat 已确认原则
 
 不得把 MVP 描述为完整平台，不得把 Candidate / Provisional 工程洞见描述为 Accepted 标准。
 
-## 6. Scope Lock
+## 7. Scope Lock
 
 执行前必须明确：
 
@@ -109,11 +154,12 @@ Project Owner 与当前 Chat 已确认原则
 - 输入基线 SHA；
 - 预期输出；
 - 验证命令；
+- Context Access；
 - Commit 信息。
 
-不得顺手扩大范围。
+不得顺手扩大范围。未明确授权 `context/**` 时，该目录视为只读。
 
-## 7. 批次与提交
+## 8. 批次与提交
 
 一个完整、可独立 Review、可回滚的逻辑批次对应一个主 Commit。
 
@@ -131,7 +177,7 @@ Project Owner 与当前 Chat 已确认原则
 
 不采用每改一个小文件就提交，也不采用全仓一次性大爆炸提交。
 
-## 8. 文档与 Registry
+## 9. 文档与 Registry
 
 - 每个长期目录必须有有效 README；
 - 最近一级 README 必须说明目录、文件、入口和状态；
@@ -141,13 +187,13 @@ Project Owner 与当前 Chat 已确认原则
 - 关系、投影、实现状态和发布记录进入 `platform-registry/`；
 - 被替代资产必须记录 `supersedes` / `superseded_by` / `merged_into`。
 
-## 9. 复杂图
+## 10. 复杂图
 
 复杂架构、跨层关系、多角色泳道、状态机、治理闭环和生命周期必须生成正式 SVG / PNG 资产。
 
 图在正文冻结后生成。现有失败图不作为视觉基线。
 
-## 10. 安全底线
+## 11. 安全底线
 
 禁止提交：
 
@@ -158,7 +204,7 @@ Project Owner 与当前 Chat 已确认原则
 
 删除、权限、公开范围、Force Push 和历史重写必须单独授权。
 
-## 11. Definition of Done
+## 12. Definition of Done
 
 任务完成至少满足：
 
@@ -167,16 +213,20 @@ Project Owner 与当前 Chat 已确认原则
 - 验证实际运行；
 - README 与 Registry 同步；
 - 当前与目标未混淆；
+- 项目级共享事实发生变化时，已由总控 Planner判断 Context 是否需要同步；
+- Context 需要修改时，已使用 Planner 提供的完整覆盖文件；
 - Diff、Commit SHA 和限制已报告；
 - 未执行内容没有被描述为完成。
 
-## 12. 启动顺序
+## 13. 启动顺序
 
 1. 根 `README.md`；
 2. 根 `AGENTS.md`；
-3. `context/README.md`；
-4. `context/current-status.md`；
-5. 与任务直接相关的最小知识、技术方案、ADR、Skill、代码和测试；
-6. `platform-registry/` 中的相关资产与关系。
+3. `context/AGENTS.md`；
+4. `context/README.md`；
+5. `context/current-status.md`；
+6. `context/roadmap.md`；
+7. 与任务直接相关的最小知识、技术方案、ADR、Skill、代码和测试；
+8. `platform-registry/` 中的相关资产与关系。
 
 只有任务明确授权全仓审计时才允许全量扫描。

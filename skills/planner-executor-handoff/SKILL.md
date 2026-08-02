@@ -23,7 +23,7 @@ Keep planning and execution separate.
 5. Complete and freeze all implementation artifacts required by `frozen_artifacts_only` executors.
 6. Render an executor view from the same contract.
 7. Require Reception Ack before writes.
-8. Freeze and enforce the Git Operating Policy.
+8. Freeze Context Access and the Git Operating Policy.
 9. Execute with structured feedback.
 10. Review real evidence.
 11. Resume or switch only from a reviewed safe point.
@@ -74,6 +74,25 @@ A handoff is not ready for `frozen_artifacts_only` until every repository artifa
 - Executor Switch Checkpoint
 
 Bind artifacts to task ID, task version, executor ID, and source commit when applicable.
+
+## Context ownership and access
+
+Treat `context/**` as Planner-owned semantic state.
+
+- Only the master/control Planner may decide and author Context content.
+- Specialist agents, reviewers, researchers, and executors may report drift with reasons and evidence, but may not author Context.
+- The user reviews all Context changes and approves important changes to goals, architecture, phase, roadmap priority, or governance.
+- Executors default to `context_access.mode: read_only`.
+- `write_approved` requires exact Context files and `content_source: planner_full_replacement`.
+- The executor may only copy the complete Planner-provided files; it may not infer, summarize, expand, or repair Context content.
+- Context files must also be present in the normal Scope Lock.
+
+Use only:
+
+- `read_only`
+- `write_approved`
+
+See `references/09-context-ownership-and-access.md`.
 
 ## Git Operating Policy
 
@@ -129,6 +148,7 @@ Require Review Response before revision. Do not allow the executor to expand the
 - `references/06-design-basis-and-evaluation.md`
 - `references/07-related-skills.md`
 - `references/08-git-operating-policy.md`
+- `references/09-context-ownership-and-access.md`
 
 ## Stop rules
 
