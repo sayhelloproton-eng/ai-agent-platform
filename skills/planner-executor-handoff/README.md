@@ -59,4 +59,4 @@ Every handoff must freeze the current branch, target branch, Push target, PR and
 
 ## Status
 
-Version `0.5.0` adds strict Context ownership and `context_access` validation while preserving v0.4.0 execution and Git policy behavior. The version is `in_review` until the generated repository Commit and returned evidence package are reviewed by Chat and the user.
+Version `0.5.1` is `accepted`. It closes the v0.5.0 Review findings by enforcing Context Access across Scope Lock, delivery mode, Frozen Artifacts, execution authority, and forbidden paths, with conditional JSON Schema rules and adversarial tests.

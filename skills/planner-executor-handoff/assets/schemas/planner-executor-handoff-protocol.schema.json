@@ -589,7 +589,8 @@
               "items": {
                 "type": "string",
                 "minLength": 1
-              }
+              },
+              "uniqueItems": true
             },
             "content_source": {
               "enum": [
@@ -603,9 +604,92 @@
                 "confirmed"
               ]
             }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "mode": {
+                    "const": "read_only"
+                  }
+                },
+                "required": [
+                  "mode"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "files": {
+                    "maxItems": 0
+                  },
+                  "content_source": {
+                    "const": "none"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "mode": {
+                    "const": "write_approved"
+                  }
+                },
+                "required": [
+                  "mode"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "files": {
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^context/(?!.*[*?\\[\\]{}!])(?!.*\\/$).+$"
+                    }
+                  },
+                  "content_source": {
+                    "const": "planner_full_replacement"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "context_access": {
+                "properties": {
+                  "mode": {
+                    "const": "write_approved"
+                  }
+                },
+                "required": [
+                  "mode"
+                ]
+              }
+            },
+            "required": [
+              "context_access"
+            ]
+          },
+          "then": {
+            "properties": {
+              "delivery_mode": {
+                "const": "apply_frozen_artifacts"
+              },
+              "frozen_artifacts": {
+                "type": "object"
+              }
+            }
           }
         }
-      }
+      ]
     },
     "contextPackage": {
       "type": "object",

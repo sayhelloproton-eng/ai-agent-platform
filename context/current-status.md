@@ -10,7 +10,7 @@ Formal Baseline:
 Working Branch:
   Branch: knowledge-rebuild-v2
   Current HEAD: read from Git at runtime
-  Last Verified Review Source: fca48b22ff931d1ffcfceb906d8a1e6a042dd952
+  Last Verified Review Source: c4301368c9af11f2f0c40323871dcb59daa9edda
 
 Visual Asset Branch:
   Branch: knowledge-assets
@@ -66,7 +66,7 @@ Codex 已完成仓库级集中扫描、首轮内容修订、测试、Commit 与 
 - Custom GPT Actions Skill；
 - Microsoft Dev Tunnels Skill；
 - Engineering Insight Distillation Skill v0.2.0；
-- Planner Executor Handoff Skill v0.4.0 已接受；v0.5.0 已物化 Context Access 与所有权规则，状态为 `in_review`，等待本次 Commit Review。
+- Planner Executor Handoff Skill v0.5.1 已通过 Review 并标记为 `accepted`，已补齐 Context Access、Scope Lock 与冻结交付之间的机器约束。
 
 当前还包括：
 
@@ -88,7 +88,7 @@ Batch 01～Batch 10 的知识资产重构、正式视觉资产治理、Registry 
 - 318 条 Registry Relation 已登记；
 - 十张正式视觉资产 `VIS-001～VIS-010` 已标记为 `accepted`；
 - `knowledge-assets` 保存正式 SVG / PNG 源资产；
-- `planner-executor-handoff v0.4.0` 已完成并接受；v0.5.0 Context Access 更新处于 `in_review`；
+- `planner-executor-handoff v0.5.1` 已完成 Review 并标记为 `accepted`；
 - `SOL-KNO-001` 已补齐 Platform Registry 实现、治理与验证方案；
 - Project Knowledge Synthesis Skill 已进入 Roadmap，状态为 `planned / future`，未创建 Skill 目录；
 - Portfolio Release 已建立正式阶段，状态为 `planned / not_started`；

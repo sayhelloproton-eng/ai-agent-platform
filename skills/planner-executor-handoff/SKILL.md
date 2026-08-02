@@ -83,9 +83,11 @@ Treat `context/**` as Planner-owned semantic state.
 - Specialist agents, reviewers, researchers, and executors may report drift with reasons and evidence, but may not author Context.
 - The user reviews all Context changes and approves important changes to goals, architecture, phase, roadmap priority, or governance.
 - Executors default to `context_access.mode: read_only`.
-- `write_approved` requires exact Context files and `content_source: planner_full_replacement`.
+- `write_approved` requires exact Context files, `content_source: planner_full_replacement`, `delivery_mode: apply_frozen_artifacts`, non-null Frozen Artifacts, and `execution_authority: frozen_artifacts_only`.
+- Every approved Context file must be present as the same exact path in Scope Lock; broad grants such as `context/**` are forbidden.
+- `read_only` forbids Context write paths in Scope Lock. Approved files may not conflict with forbidden paths.
 - The executor may only copy the complete Planner-provided files; it may not infer, summarize, expand, or repair Context content.
-- Context files must also be present in the normal Scope Lock.
+- `user_approval` records the write-time gate. `not_required` is limited to routine synchronization under standing authorization and never removes the user's final Review role.
 
 Use only:
 

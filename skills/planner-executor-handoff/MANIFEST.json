@@ -1,7 +1,7 @@
 {
   "name": "planner-executor-handoff",
-  "version": "0.5.0",
-  "status": "in_review",
+  "version": "0.5.1",
+  "status": "accepted",
   "files": [
     {
       "path": "AGENTS.md",
@@ -9,15 +9,15 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "b487b7c5bffa73644af588e8d6ebafbf235bcbfd4f20712d60cab824feea86b0"
+      "sha256": "ac7c72ab313cf571d175624413af64c0d6cb018f0b85ee1acb03641c16c37e8a"
     },
     {
       "path": "README.md",
-      "sha256": "16af68f2b41784d2e5d8952649c0288749793a0802e32c5dd34d5c45dba1c79b"
+      "sha256": "40d4e327e4884295c499b72223e98247e6f6018042b00ad1c6569012a6bed8d5"
     },
     {
       "path": "SKILL.md",
-      "sha256": "eaefa645ad8cc35225e247ba258368e61a2ef942c9980eaf5970a74b87da94b7"
+      "sha256": "85bd451f7542d0fa51314aa9b9681a9e408a4a0e6f21bc6eea65cb8339ae150f"
     },
     {
       "path": "agents/openai.yaml",
@@ -69,7 +69,7 @@
     },
     {
       "path": "assets/schemas/planner-executor-handoff-protocol.schema.json",
-      "sha256": "ce27f5d04fa42f2267c000a713c8c6c003cc7d73458ea9e83a99a644eacd8f8b"
+      "sha256": "12ebceaa7d7376421222badbd73018e6ec9bf9ed4274d082590a016461dcde66"
     },
     {
       "path": "assets/schemas/review-feedback.schema.json",
@@ -109,7 +109,7 @@
     },
     {
       "path": "references/09-context-ownership-and-access.md",
-      "sha256": "abce8ec1f4eaa41f97cccfdc3e1178dbad92e62675ff8c1d162a731116de970f"
+      "sha256": "aed9398989ea5e0cb2fb91889d236ff8b5c10ee31cd2080cbcb76936b9118098"
     },
     {
       "path": "scripts/render-executor-prompt.mjs",
@@ -117,7 +117,7 @@
     },
     {
       "path": "scripts/validate-handoff.mjs",
-      "sha256": "06c827767ee8f0def36fcd5a9b6158e41118181f72f20aad7f113c8295ff2316"
+      "sha256": "d5685a58e95ed2fac970f044f79ff601e0bc3344b92a6f7e1403e270e5ea35d8"
     },
     {
       "path": "tests/evals/protocol-cases.json",
@@ -133,7 +133,7 @@
     },
     {
       "path": "tests/self-test.mjs",
-      "sha256": "68ef5b8b455bcb2ea9770373f8420f17a1466a428bc0c3f969ead61de8199e85"
+      "sha256": "fb186dfdb6dd5060524de94e9d4646fbf818b46a1ee2b3d173e9014b17efd2d8"
     }
   ],
   "schemas": 3,

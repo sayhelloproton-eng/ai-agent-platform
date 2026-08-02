@@ -37,9 +37,12 @@ Rules:
 
 - `write_approved` must list one or more exact `context/` files.
 - `planner_full_replacement` is the only allowed write source.
-- The same files must be allowed by Scope Lock.
+- Every approved file must appear as the same exact path in Scope Lock; broad grants such as `context/**` are forbidden.
+- `read_only` forbids every `context/**` entry in `scope.allowed_paths`.
+- `write_approved` requires `delivery_mode: apply_frozen_artifacts`, a non-null Frozen Artifact manifest, and `execution_authority: frozen_artifacts_only`.
+- Approved files must not conflict with `scope.forbidden_paths`.
 - The executor must copy complete files byte-for-byte and may not rewrite them.
-- `user_approval` is `confirmed` for important changes and may be `not_required` only for routine synchronization already covered by standing authorization.
+- `user_approval` describes the write-time approval gate: `confirmed` is required for important changes, while `not_required` is allowed only for routine synchronization already covered by standing authorization. It never removes the user's final Review role.
 
 ## Drift report
 

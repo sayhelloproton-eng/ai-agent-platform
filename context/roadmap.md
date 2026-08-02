@@ -10,7 +10,7 @@ Working Branch:
   knowledge-rebuild-v2
 
 Last Verified Review Source:
-  fca48b22ff931d1ffcfceb906d8a1e6a042dd952
+  c4301368c9af11f2f0c40323871dcb59daa9edda
 
 Current HEAD:
   read from Git at runtime
@@ -29,8 +29,7 @@ Current Status:
 - 六个正式 Skill；
 - Action Gateway → Local Runtime 窄链路 MVP；
 - 正式视觉资产与 `asset://` 发布机制；
-- `planner-executor-handoff v0.4.0` 已接受；
-- `planner-executor-handoff v0.5.0` Context Access 更新处于 `in_review`；
+- `planner-executor-handoff v0.5.1` 已通过 Review 并标记为 `accepted`；
 - Codex 仓库级集中扫描与首轮内容修订；
 - `SOL-KNO-001`、MIG-002、M-01～M-03 的控制面补齐。
 

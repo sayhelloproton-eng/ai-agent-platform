@@ -100,21 +100,35 @@ Context 写入只采用完整覆盖文件：
 
 具体规则见 `context/AGENTS.md` 和 `docs/knowledge/05_上下文与知识系统/KNO-011-上下文所有权与维护机制.md`。
 
-## 4. 事实优先级
+## 4. 事实与决策优先级
 
-发生冲突时：
+当前实现事实发生冲突时：
 
 ```text
 代码、测试、真实调用证据
   ↓
-当前工作分支已验证的 Registry、Release、Migration 与 Context
+当前工作分支已验证的 Registry、Release 与 Migration
   ↓
-Project Owner 与总控 Planner 已确认原则
+Context
   ↓
-已 Review 的底稿与蓝图
+已 Review 的底稿、蓝图与普通文档
   ↓
 旧知识文章和历史建议
 ```
+
+项目目标、优先级与治理决策发生冲突时：
+
+```text
+Project Owner 最新明确确认
+  ↓
+已接受的 ADR 与治理规则
+  ↓
+Context
+  ↓
+历史规划、底稿与普通文档
+```
+
+Project Owner 的新决定不会自动改变代码或 Context。总控 Planner 必须生成完整替换文件并按本章权限流程同步到 Git；同步完成前，执行器不得自行解释或扩写该决定。
 
 旧文档不能反向约束目标设计，但其历史、问题、实验和证据必须保留。
 

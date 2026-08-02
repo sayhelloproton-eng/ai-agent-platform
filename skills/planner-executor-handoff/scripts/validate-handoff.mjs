@@ -59,6 +59,27 @@ function safePath(value, label) {
   if (path.isAbsolute(value) || value.split(/[\\/]+/).includes("..")) fail(`${label} is not a safe repository path`);
 }
 function safePaths(value, label) { strings(value, label); value.forEach((item, index) => safePath(item, `${label}[${index}]`)); }
+function normalizeRepoPath(value) { return value.replaceAll("\\", "/").replace(/^\.\/+/, "").replace(/\/{2,}/g, "/"); }
+function isContextScopePath(value) { const normalized = normalizeRepoPath(value); return normalized === "context" || normalized.startsWith("context/"); }
+function isExactContextFile(value) {
+  const normalized = normalizeRepoPath(value);
+  return value === normalized && normalized.startsWith("context/") && !normalized.endsWith("/") && !/[*?\[\]{}!]/.test(normalized);
+}
+function scopePathCoversFile(scopePath, file) {
+  const scope = normalizeRepoPath(scopePath);
+  const target = normalizeRepoPath(file);
+  if (scope === target) return true;
+  if (scope === "context" || scope === "context/") return target.startsWith("context/");
+  let pattern = "";
+  for (let index = 0; index < scope.length; index += 1) {
+    const char = scope[index];
+    if (char === "*" && scope[index + 1] === "*") { pattern += ".*"; index += 1; }
+    else if (char === "*") pattern += "[^/]*";
+    else if (char === "?") pattern += "[^/]";
+    else pattern += char.replace(/[\^$.*+?()[\]{}|]/g, "\\$&");
+  }
+  return new RegExp(`^${pattern}$`).test(target);
+}
 function safeRefs(value, label) { strings(value, label); value.forEach((item, index) => safeRef(item, `${label}[${index}]`)); }
 function nullableString(value, label) { if (value !== null) string(value, label); }
 
@@ -146,18 +167,35 @@ function validateFrozenArtifacts(value) {
   if (!value.byte_compare_required) fail("frozen_artifacts.byte_compare_required must be true");
 }
 
-function validateContextAccess(value) {
+function validateContextAccess(value, contract) {
   exact(value, ["mode", "files", "content_source", "user_approval"], "canonical_contract.context_access");
   oneOf(value.mode, CONTEXT_ACCESS_MODES, "context_access.mode");
   safePaths(value.files, "context_access.files");
   oneOf(value.content_source, ["none", "planner_full_replacement"], "context_access.content_source");
   oneOf(value.user_approval, ["not_required", "confirmed"], "context_access.user_approval");
+
+  const normalizedFiles = value.files.map(normalizeRepoPath);
+  if (new Set(normalizedFiles).size !== normalizedFiles.length) fail("context_access.files must be unique");
+  const contextAllowedPaths = contract.scope.allowed_paths.filter(isContextScopePath);
+
   if (value.mode === "read_only") {
     if (value.files.length !== 0 || value.content_source !== "none") fail("read_only context access must not authorize files or content");
-  } else {
-    if (value.files.length < 1) fail("write_approved context access requires exact files");
-    if (value.content_source !== "planner_full_replacement") fail("write_approved context access requires planner_full_replacement");
-    for (const file of value.files) if (!file.startsWith("context/") || file.includes("*") || file.endsWith("/")) fail("context_access.files must contain exact context/ files");
+    if (contextAllowedPaths.length > 0) fail("read_only context access forbids context/** in scope.allowed_paths");
+    return;
+  }
+
+  if (value.files.length < 1) fail("write_approved context access requires exact files");
+  if (value.content_source !== "planner_full_replacement") fail("write_approved context access requires planner_full_replacement");
+  if (contract.delivery_mode !== "apply_frozen_artifacts" || contract.frozen_artifacts === null) fail("write_approved context access requires apply_frozen_artifacts with frozen_artifacts");
+
+  const approved = new Set(normalizedFiles);
+  for (const file of value.files) {
+    if (!isExactContextFile(file)) fail("context_access.files must contain exact context/ files without globs or directory grants");
+    if (!contract.scope.allowed_paths.some((allowed) => normalizeRepoPath(allowed) === normalizeRepoPath(file))) fail(`approved Context file is missing from scope.allowed_paths: ${file}`);
+    if (contract.scope.forbidden_paths.some((forbidden) => scopePathCoversFile(forbidden, file))) fail(`approved Context file conflicts with scope.forbidden_paths: ${file}`);
+  }
+  for (const allowed of contextAllowedPaths) {
+    if (!approved.has(normalizeRepoPath(allowed))) fail(`scope.allowed_paths grants unapproved Context access: ${allowed}`);
   }
 }
 function validateContract(value) {
@@ -210,7 +248,7 @@ function validateContract(value) {
   bool(value.change_control.executor_may_change_approach, "change_control.executor_may_change_approach");
   if (value.change_control.executor_may_change_approach) fail("executor_may_change_approach must be false");
   strings(value.change_control.new_authorization_required_for, "change_control.new_authorization_required_for", 1);
-  validateContextAccess(value.context_access);
+  validateContextAccess(value.context_access, value);
   validateGitPolicy(value.git_policy);
 }
 
@@ -233,6 +271,7 @@ function validateBundle(value) {
   validateContract(value.canonical_contract);
   validateContext(value.context_package, value.canonical_contract);
   if (value.executor_profile.execution_authority === "frozen_artifacts_only" && value.canonical_contract.delivery_mode !== "apply_frozen_artifacts") fail("frozen_artifacts_only executor requires apply_frozen_artifacts");
+  if (value.canonical_contract.context_access.mode === "write_approved" && value.executor_profile.execution_authority !== "frozen_artifacts_only") fail("write_approved Context access requires frozen_artifacts_only execution authority");
   secrets(value);
 }
 

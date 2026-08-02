@@ -14,10 +14,15 @@ function run(args) { const r=spawnSync(process.execPath,args,{encoding:"utf8"});
 function failRun(args) { const r=spawnSync(process.execPath,args,{encoding:"utf8"}); if(r.status===0) throw new Error(`${args.join(" ")} should fail`); }
 const load=async name=>JSON.parse(await readFile(path.join(EXAMPLES,name),"utf8"));
 const clone=value=>JSON.parse(JSON.stringify(value));
-const TMP=await mkdtemp(path.join(tmpdir(),"peh-v050-"));
+const TMP=await mkdtemp(path.join(tmpdir(),"peh-v051-"));
 async function temp(name,value){const p=path.join(TMP,name);await writeFile(p,JSON.stringify(value,null,2));return p;}
 async function mutateFeedback(name, mutator){const v=await load(name);mutator(v);failRun([VALIDATE,"feedback",await temp(`neg-${Math.random()}.json`,v)]);}
 async function mutateBundle(mutator){const v=await load("handoff-bundle-stepwise.json");mutator(v);failRun([VALIDATE,"bundle",await temp(`negb-${Math.random()}.json`,v)]);}
+
+function approveContextWrite(bundle, files=["context/current-status.md"]) {
+  bundle.canonical_contract.context_access={mode:"write_approved",files,content_source:"planner_full_replacement",user_approval:"confirmed"};
+  bundle.canonical_contract.scope.allowed_paths.push(...files);
+}
 
 const compact=path.join(EXAMPLES,"handoff-bundle-compact.json");
 const stepwise=path.join(EXAMPLES,"handoff-bundle-stepwise.json");
@@ -34,6 +39,10 @@ for(const marker of ["Execution authority","Delivery mode","Evidence required","
 if(!stepPrompt.includes("Execution authority: frozen_artifacts_only")||!stepPrompt.includes("Byte comparison required: true")) throw new Error("stepwise frozen delivery not rendered");
 if(compactPrompt.includes("### S01")) throw new Error("compact prompt must not render exact steps");
 if(!stepPrompt.includes("### S01")) throw new Error("stepwise prompt must render exact steps");
+
+const approvedWrite=clone(stepwiseObj);
+approveContextWrite(approvedWrite);
+run([VALIDATE,"bundle",await temp("approved-context-write.json",approvedWrite)]);
 
 // Strict feedback negatives.
 await mutateFeedback("clarification-request.json",v=>delete v.missing_fact);
@@ -69,6 +78,13 @@ await mutateBundle(v=>v.canonical_contract.task_version="1");
 await mutateBundle(v=>v.canonical_contract.git_policy.allow_create_remote_branch="false");
 await mutateBundle(v=>v.canonical_contract.context_access.mode="write_approved");
 await mutateBundle(v=>{v.canonical_contract.context_access={mode:"write_approved",files:["context/*.md"],content_source:"planner_full_replacement",user_approval:"confirmed"};});
+await mutateBundle(v=>v.canonical_contract.scope.allowed_paths.push("context/current-status.md"));
+await mutateBundle(v=>{approveContextWrite(v);v.canonical_contract.scope.allowed_paths=v.canonical_contract.scope.allowed_paths.filter(p=>p!=="context/current-status.md");});
+await mutateBundle(v=>{approveContextWrite(v);v.canonical_contract.scope.allowed_paths.push("context/**");});
+await mutateBundle(v=>{approveContextWrite(v);v.canonical_contract.scope.forbidden_paths.push("context/*.md");});
+await mutateBundle(v=>{approveContextWrite(v,["context/current-status.md","context/current-status.md"]);});
+await mutateBundle(v=>{approveContextWrite(v);v.canonical_contract.delivery_mode="implement_frozen_design";v.canonical_contract.frozen_artifacts=null;});
+await mutateBundle(v=>{approveContextWrite(v);v.executor_profile.execution_authority="bounded_implementation";});
 await mutateBundle(v=>v.canonical_contract.source_commit="abc");
 await mutateBundle(v=>v.canonical_contract.git_policy.current_branch="-bad");
 await mutateBundle(v=>v.canonical_contract.execution_plan.stepwise_steps[0].stop_on_failure="yes");
@@ -91,13 +107,16 @@ await crossMutate(x=>x.sw.next_execution_guidance_tier="compact_controlled");
 const protocol=JSON.parse(await readFile(path.join(ROOT,"assets","schemas","planner-executor-handoff-protocol.schema.json"),"utf8"));
 const expectedDefs=["receptionAck","clarificationRequest","progressCheckpoint","failureStopReport","executionResult","reviewFeedback","reviewResponse","executorSwitchCheckpoint"];
 if(!protocol.$defs.canonicalContract.required.includes("context_access"))throw new Error("context_access schema missing");
+const contextAccessSchema=protocol.$defs.canonicalContract.properties.context_access;
+if(contextAccessSchema.properties.files.uniqueItems!==true||!Array.isArray(contextAccessSchema.allOf)||contextAccessSchema.allOf.length!==2)throw new Error("context_access conditional schema missing");
+if(!Array.isArray(protocol.$defs.canonicalContract.allOf)||protocol.$defs.canonicalContract.allOf.length<1)throw new Error("canonical Context delivery condition missing");
 for(const name of expectedDefs){const d=protocol.$defs[name];if(!d||d.additionalProperties!==false)throw new Error(`schema definition ${name} missing or not strict`);}
 if(protocol.$defs.feedback.oneOf.length!==8)throw new Error("feedback schema must contain eight oneOf branches");
 
 // Manifest file-set and hash self-verification.
 async function allFiles(dir){const out=[];for(const e of await readdir(dir,{withFileTypes:true})){const p=path.join(dir,e.name);if(e.isDirectory())out.push(...await allFiles(p));else out.push(p);}return out;}
 const manifest=JSON.parse(await readFile(path.join(ROOT,"MANIFEST.json"),"utf8"));
-if(manifest.version!=="0.5.0"||manifest.status!=="in_review")throw new Error("manifest version/status mismatch");
+if(manifest.version!=="0.5.1"||manifest.status!=="accepted")throw new Error("manifest version/status mismatch");
 const actual=(await allFiles(ROOT)).filter(p=>path.basename(p)!=="MANIFEST.json").map(p=>path.relative(ROOT,p).split(path.sep).join("/")).sort();
 const declared=manifest.files.map(x=>x.path).sort();
 if(JSON.stringify(actual)!==JSON.stringify(declared))throw new Error("manifest file set mismatch");

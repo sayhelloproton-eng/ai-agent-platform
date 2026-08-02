@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.5.1
+
+- Close the v0.5.0 Context Access Review findings.
+- Reject Context write paths when `context_access.mode` is `read_only`.
+- Require exact Scope Lock parity for every approved Context file and reject broad `context/**` grants.
+- Reject approved Context files that conflict with forbidden paths.
+- Require `apply_frozen_artifacts`, non-null Frozen Artifacts, and `frozen_artifacts_only` authority for Context writes.
+- Add conditional JSON Schema constraints and adversarial negative tests.
+- Clarify write-time approval versus the user's final Review role.
+- Split implementation-fact priority from owner decision priority.
+- Mark the reviewed Skill version as `accepted`.
+
 ## 0.5.0
 
 - Define `context/**` as master/control Planner-owned semantic state.
