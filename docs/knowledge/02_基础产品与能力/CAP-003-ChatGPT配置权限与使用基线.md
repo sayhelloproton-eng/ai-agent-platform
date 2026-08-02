@@ -233,7 +233,7 @@ Desktop、Work 或其他本机入口可能请求：
 ## 11. 关联文档
 
 - [CAP-002 ChatGPT 产品形态与能力边界](./CAP-002-ChatGPT产品形态与能力边界.md)
-- [CTX-006 知识库阅读导航](../00_项目入口/CTX-006-知识库阅读导航.md)
+- [正式知识导航](../README.md)
 - [`AGENTS.md`](../../../AGENTS.md)
 - [`context/knowledge-strategy.md`](../../../context/knowledge-strategy.md)
 

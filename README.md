@@ -58,7 +58,8 @@ Custom GPT
 - Engineering Insight Registry；
 - Git → Feishu 单向发布机制；
 - `asset://` 正式图片引用和 Feishu 图片 Publisher；
-- AI Knowledge、Deterministic Delivery、Custom GPT Actions、Microsoft Dev Tunnels、Engineering Insight Distillation、Planner Executor Handoff 六个正式 Skill；
+- AI Knowledge、Deterministic Delivery、Custom GPT Actions、Microsoft Dev Tunnels、Engineering Insight Distillation、Planner Executor Handoff 六个已验证或已接受 Skill；
+- Project Knowledge Synthesis Skill v0.1.0 已物化并完成首个目录聚合 Pilot，当前状态为 `in_review`；
 - `planner-executor-handoff v0.5.1 / accepted`；
 - Context 所有权和维护机制。
 
@@ -79,7 +80,7 @@ Custom GPT
 Phase 2.5 — Human Content Review and Knowledge Release Closure
 ```
 
-知识资产重构、Platform Registry、六个正式 Skill、Context 治理和窄链路 MVP 已经完成。当前正在进行用户逐篇人工 Review 与 Chat 第二轮 Review，最终人工内容验收尚未完成。
+知识资产重构、Platform Registry、Context 治理和窄链路 MVP 已经完成。`00_项目入口` 已通过 Project Knowledge Synthesis 首个 Pilot 聚合为三篇正式文章；当前正在 Review `01_产品体系`，最终人工内容验收尚未完成。
 
 Feishu 最终发布、发布回读和最终整仓验收尚未开始。
 
@@ -182,6 +183,7 @@ Git 是唯一真源。Feishu 只做面向人的覆盖式投影。
 npm run check:repo
 npm run check:knowledge
 npm run check:insights
+npm run check:synthesis
 npm run verify
 ```
 

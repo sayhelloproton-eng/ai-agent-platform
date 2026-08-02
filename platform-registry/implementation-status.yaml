@@ -48,3 +48,11 @@ capabilities:
   - skills/planner-executor-handoff/tests/self-test.mjs
   - docs/knowledge/06_智能体资产体系/SKL-003-规划者与执行器任务交接技能.md
   - docs/knowledge/05_上下文与知识系统/KNO-011-上下文所有权与维护机制.md
+- id: CAP-PROJECT-KNOWLEDGE-SYNTHESIS
+  status: implemented
+  implemented_by:
+  - SKILL-PROJECT-KNOWLEDGE-SYNTHESIS
+  evidence:
+  - skills/project-knowledge-synthesis/tests/self-test.mjs
+  - skills/project-knowledge-synthesis/tests/pilots/00-project-entry/synthesis-result.json
+  - docs/knowledge/06_智能体资产体系/SKL-004-项目知识综合技能.md

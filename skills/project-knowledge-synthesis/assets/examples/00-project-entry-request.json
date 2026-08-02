@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "synthesis_id": "PKS-PILOT-00-PROJECT-ENTRY",
+  "mode": "directory_consolidation",
+  "source_scope": [
+    "docs/knowledge/00_项目入口/*.md"
+  ],
+  "truth_sources": [
+    "context/current-status.md",
+    "context/roadmap.md",
+    "platform-registry/assets.yaml",
+    "platform-registry/relations.yaml",
+    "apps/**/tests",
+    "skills/**/tests"
+  ],
+  "objectives": [
+    "reduce duplicated entry documents",
+    "preserve stable asset identities and history",
+    "keep project entry minimal",
+    "update links and registry impact"
+  ],
+  "constraints": {
+    "preserve_stable_ids": true,
+    "write_authority": "proposal_only",
+    "publication_authority": "none",
+    "sensitive_handling": "redact_and_flag"
+  }
+}

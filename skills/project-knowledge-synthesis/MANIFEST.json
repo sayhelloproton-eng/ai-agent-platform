@@ -1,0 +1,51 @@
+{
+  "name": "project-knowledge-synthesis",
+  "version": "0.1.0",
+  "lifecycle": "in_review",
+  "standard": "Agent Skills / SKILL.md bundle",
+  "description": "Synthesize multiple project sources into a governed, traceable knowledge-change proposal without direct write authority.",
+  "entrypoint": "SKILL.md",
+  "file_count": 18,
+  "files": [
+    "CHANGELOG.md",
+    "MANIFEST.json",
+    "README.md",
+    "SKILL.md",
+    "assets/README.md",
+    "assets/examples/00-project-entry-request.json",
+    "assets/schemas/synthesis-request.schema.json",
+    "assets/schemas/synthesis-result.schema.json",
+    "references/01-source-and-claim-discipline.md",
+    "references/02-overlap-conflict-and-placement.md",
+    "references/03-output-and-governance-gates.md",
+    "scripts/README.md",
+    "scripts/validate-synthesis.mjs",
+    "tests/README.md",
+    "tests/fixtures/invalid-unapproved-write.json",
+    "tests/pilots/00-project-entry/SYNTHESIS_REPORT.md",
+    "tests/pilots/00-project-entry/synthesis-result.json",
+    "tests/self-test.mjs"
+  ],
+  "capabilities": [
+    "source-scope-freeze",
+    "claim-classification",
+    "truth-reconciliation",
+    "duplicate-and-conflict-mapping",
+    "target-asset-placement",
+    "retirement-and-supersession-planning",
+    "cross-reference-impact-analysis",
+    "registry-impact-analysis",
+    "privacy-and-publication-gating",
+    "candidate-only-synthesis-result",
+    "directory-consolidation-pilot"
+  ],
+  "boundaries": [
+    "no-direct-formal-write",
+    "no-external-publication",
+    "no-context-authorship",
+    "no-lifecycle-promotion",
+    "no-unsupported-fact-invention",
+    "no-secret-or-private-material-copy",
+    "no-engineering-insight-substitution"
+  ]
+}

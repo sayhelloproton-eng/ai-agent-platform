@@ -187,7 +187,7 @@ Custom GPT
 
 ## 10. 关联文档
 
-- [CTX-007 当前实现与目标架构](../00_项目入口/CTX-007-当前实现与目标架构.md)
+- [ARC-001 平台总体架构](../04_平台架构/ARC-001-ai-agent-platform总体架构.md)
 - [PRD-003 平台产品定义](../01_产品体系/PRD-003-ai-agent-platform产品定义.md)
 - [THY-002 AI 开发范式演进](./THY-002-AI开发范式演进.md)
 - [THY-003 Agent + Skills 开发范式](./THY-003-Agent与Skills开发范式.md)

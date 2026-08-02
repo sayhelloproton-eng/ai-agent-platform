@@ -1,0 +1,201 @@
+{
+  "version": 1,
+  "synthesis_id": "PKS-PILOT-00-PROJECT-ENTRY",
+  "result_status": "synthesis_proposed",
+  "output_contract": "candidate_only",
+  "source_inventory": [
+    {
+      "path": "docs/knowledge/00_项目入口/README.md",
+      "role": "formal"
+    },
+    {
+      "path": "docs/knowledge/00_项目入口/CTX-001-项目总览.md",
+      "role": "formal"
+    },
+    {
+      "path": "docs/knowledge/00_项目入口/PRD-001-平台愿景.md",
+      "role": "formal"
+    },
+    {
+      "path": "docs/knowledge/00_项目入口/CTX-005-当前能力与演进差距.md",
+      "role": "formal"
+    },
+    {
+      "path": "docs/knowledge/00_项目入口/CTX-006-知识库阅读导航.md",
+      "role": "formal"
+    },
+    {
+      "path": "docs/knowledge/00_项目入口/CTX-007-当前实现与目标架构.md",
+      "role": "formal"
+    },
+    {
+      "path": "docs/knowledge/00_项目入口/DEC-001-架构决策演进摘要.md",
+      "role": "formal"
+    }
+  ],
+  "claim_summary": {
+    "verified_facts": 24,
+    "decisions": 18,
+    "current_status": 11,
+    "target_designs": 17,
+    "historical_statements": 15,
+    "inferences": 3,
+    "open_hypotheses": 0
+  },
+  "overlap_groups": [
+    {
+      "id": "OG-001",
+      "question": "项目为什么存在、承诺什么",
+      "sources": [
+        "CTX-001",
+        "PRD-001"
+      ],
+      "decision": "merge vision summary into CTX-001; keep detailed product definition in PRD-003"
+    },
+    {
+      "id": "OG-002",
+      "question": "当前实现、能力和目标差距",
+      "sources": [
+        "CTX-005",
+        "CTX-007"
+      ],
+      "decision": "rewrite CTX-005 as current capability and gap; delegate full target architecture to ARC-001"
+    },
+    {
+      "id": "OG-003",
+      "question": "如何阅读知识库",
+      "sources": [
+        "CTX-006",
+        "docs/knowledge/README.md",
+        "00_项目入口/README.md"
+      ],
+      "decision": "move navigation ownership to README files and retire CTX-006"
+    }
+  ],
+  "conflicts": [
+    {
+      "claim": "最终内容 Review 已完成",
+      "resolution": "stale; human Review is still in progress",
+      "evidence": [
+        "context/current-status.md"
+      ]
+    },
+    {
+      "claim": "Handoff v0.4.0",
+      "resolution": "stale; current accepted version is v0.5.1",
+      "evidence": [
+        "skills/planner-executor-handoff/MANIFEST.json"
+      ]
+    },
+    {
+      "claim": "Project Knowledge Synthesis remains future-only",
+      "resolution": "superseded by v0.1.0 materialization and this pilot",
+      "evidence": [
+        "skills/project-knowledge-synthesis/tests/pilots/00-project-entry/synthesis-result.json"
+      ]
+    }
+  ],
+  "target_assets": [
+    {
+      "asset_id": "CTX-001",
+      "action": "rewrite",
+      "path": "docs/knowledge/00_项目入口/CTX-001-项目总览.md",
+      "absorbs": [
+        "PRD-001"
+      ],
+      "purpose": "project purpose, vision, collaboration model and success criteria"
+    },
+    {
+      "asset_id": "CTX-005",
+      "action": "rewrite",
+      "path": "docs/knowledge/00_项目入口/CTX-005-当前能力与演进差距.md",
+      "absorbs": [
+        "CTX-007"
+      ],
+      "purpose": "verified current capabilities, explicit gaps and next evolution"
+    },
+    {
+      "asset_id": "DEC-001",
+      "action": "rewrite",
+      "path": "docs/knowledge/00_项目入口/DEC-001-架构决策演进摘要.md",
+      "absorbs": [],
+      "purpose": "decision history and replacement rationale"
+    },
+    {
+      "asset_id": "README-KNOWLEDGE",
+      "action": "rewrite",
+      "path": "docs/knowledge/README.md",
+      "absorbs": [
+        "CTX-006"
+      ],
+      "purpose": "knowledge-tree and role navigation"
+    },
+    {
+      "asset_id": "README-ENTRY",
+      "action": "rewrite",
+      "path": "docs/knowledge/00_项目入口/README.md",
+      "absorbs": [
+        "CTX-006"
+      ],
+      "purpose": "minimal entry-directory navigation"
+    }
+  ],
+  "retired_assets": [
+    {
+      "asset_id": "PRD-001",
+      "action": "archive",
+      "replacement_ids": [
+        "CTX-001",
+        "PRD-003"
+      ]
+    },
+    {
+      "asset_id": "CTX-006",
+      "action": "archive",
+      "replacement_ids": [
+        "CTX-001",
+        "CTX-005",
+        "DEC-001"
+      ]
+    },
+    {
+      "asset_id": "CTX-007",
+      "action": "archive",
+      "replacement_ids": [
+        "CTX-005",
+        "ARC-001"
+      ]
+    }
+  ],
+  "cross_reference_updates": [
+    "replace old CTX-005 filename",
+    "replace CTX-006 navigation links",
+    "replace CTX-007 architecture links",
+    "replace PRD-001 vision links"
+  ],
+  "registry_updates": [
+    "update CTX-005 canonical path",
+    "archive and supersede PRD-001 CTX-006 CTX-007",
+    "add SKL-004 and SKILL-PROJECT-KNOWLEDGE-SYNTHESIS",
+    "add relations and capability evidence"
+  ],
+  "sensitive_review": {
+    "secrets_found": false,
+    "private_content_found": true,
+    "action": "redacted"
+  },
+  "quality_gates": {
+    "scope": true,
+    "claim_classification": true,
+    "truth_reconciliation": true,
+    "overlap_conflict": true,
+    "asset_placement": true,
+    "traceability": true,
+    "privacy": true,
+    "governance": true
+  },
+  "human_approval": {
+    "required": true,
+    "status": "confirmed"
+  }
+}

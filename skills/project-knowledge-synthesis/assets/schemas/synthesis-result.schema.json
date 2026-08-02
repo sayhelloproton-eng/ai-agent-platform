@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Project Knowledge Synthesis Result",
+  "type": "object",
+  "required": [
+    "version",
+    "synthesis_id",
+    "result_status",
+    "output_contract",
+    "source_inventory",
+    "claim_summary",
+    "overlap_groups",
+    "conflicts",
+    "target_assets",
+    "retired_assets",
+    "cross_reference_updates",
+    "registry_updates",
+    "sensitive_review",
+    "quality_gates",
+    "human_approval"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "synthesis_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "result_status": {
+      "enum": [
+        "synthesis_proposed",
+        "needs_evidence",
+        "rejected"
+      ]
+    },
+    "output_contract": {
+      "const": "candidate_only"
+    },
+    "source_inventory": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "role"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "formal",
+              "evidence",
+              "historical",
+              "context"
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "claim_summary": {
+      "type": "object",
+      "required": [
+        "verified_facts",
+        "decisions",
+        "current_status",
+        "target_designs",
+        "historical_statements",
+        "inferences",
+        "open_hypotheses"
+      ],
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "overlap_groups": {
+      "type": "array"
+    },
+    "conflicts": {
+      "type": "array"
+    },
+    "target_assets": {
+      "type": "array"
+    },
+    "retired_assets": {
+      "type": "array"
+    },
+    "cross_reference_updates": {
+      "type": "array"
+    },
+    "registry_updates": {
+      "type": "array"
+    },
+    "sensitive_review": {
+      "type": "object",
+      "required": [
+        "secrets_found",
+        "private_content_found",
+        "action"
+      ],
+      "properties": {
+        "secrets_found": {
+          "type": "boolean"
+        },
+        "private_content_found": {
+          "type": "boolean"
+        },
+        "action": {
+          "enum": [
+            "none",
+            "redacted",
+            "blocked"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "quality_gates": {
+      "type": "object",
+      "required": [
+        "scope",
+        "claim_classification",
+        "truth_reconciliation",
+        "overlap_conflict",
+        "asset_placement",
+        "traceability",
+        "privacy",
+        "governance"
+      ],
+      "additionalProperties": {
+        "type": "boolean"
+      }
+    },
+    "human_approval": {
+      "type": "object",
+      "required": [
+        "required",
+        "status"
+      ],
+      "properties": {
+        "required": {
+          "const": true
+        },
+        "status": {
+          "enum": [
+            "pending",
+            "confirmed"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

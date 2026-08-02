@@ -48,16 +48,19 @@ assets:
   publication_status: unpublished
   migration_state: complete
 - asset_id: PRD-001
-  title: Platform Vision
+  title: Platform Vision（聚合前版本）
   asset_type: product
-  status: accepted
+  status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/00_项目入口/PRD-001-平台愿景.md
+  current_path: docs/technical/归档/历史资产/00_项目入口_聚合前版本/PRD-001-平台愿景.md
   target_path: null
-  canonical_path: docs/knowledge/00_项目入口/PRD-001-平台愿景.md
+  canonical_path: docs/technical/归档/历史资产/00_项目入口_聚合前版本/PRD-001-平台愿景.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by:
+  - CTX-001
+  - PRD-003
 - asset_id: PRD-002
   title: Portfolio Outcomes
   asset_type: product
@@ -426,38 +429,45 @@ assets:
   publication_status: unpublished
   migration_state: complete
 - asset_id: CTX-005
-  title: 当前能力地图
+  title: 当前能力与演进差距
   asset_type: knowledge-document
   status: accepted
-  evidence_level: decided
+  evidence_level: verified
   materialized: true
-  current_path: docs/knowledge/00_项目入口/CTX-005-当前能力地图.md
+  current_path: docs/knowledge/00_项目入口/CTX-005-当前能力与演进差距.md
   target_path: null
-  canonical_path: docs/knowledge/00_项目入口/CTX-005-当前能力地图.md
+  canonical_path: docs/knowledge/00_项目入口/CTX-005-当前能力与演进差距.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: CTX-006
-  title: 知识库阅读导航
+  title: 知识库阅读导航（聚合前版本）
   asset_type: knowledge-document
-  status: accepted
+  status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/00_项目入口/CTX-006-知识库阅读导航.md
+  current_path: docs/technical/归档/历史资产/00_项目入口_聚合前版本/CTX-006-知识库阅读导航.md
   target_path: null
-  canonical_path: docs/knowledge/00_项目入口/CTX-006-知识库阅读导航.md
+  canonical_path: docs/technical/归档/历史资产/00_项目入口_聚合前版本/CTX-006-知识库阅读导航.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by:
+  - CTX-001
+  - CTX-005
+  - DEC-001
 - asset_id: CTX-007
-  title: 当前实现与目标架构
+  title: 当前实现与目标架构（聚合前版本）
   asset_type: knowledge-document
-  status: accepted
+  status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/00_项目入口/CTX-007-当前实现与目标架构.md
+  current_path: docs/technical/归档/历史资产/00_项目入口_聚合前版本/CTX-007-当前实现与目标架构.md
   target_path: null
-  canonical_path: docs/knowledge/00_项目入口/CTX-007-当前实现与目标架构.md
+  canonical_path: docs/technical/归档/历史资产/00_项目入口_聚合前版本/CTX-007-当前实现与目标架构.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by:
+  - CTX-005
+  - ARC-001
 - asset_id: DEC-001
   title: 架构决策演进摘要
   asset_type: knowledge-document
@@ -1567,5 +1577,27 @@ assets:
   current_path: docs/technical/技术方案/知识系统/SOL-KNO-001-Platform-Registry实现治理与验证.md
   target_path: null
   canonical_path: docs/technical/技术方案/知识系统/SOL-KNO-001-Platform-Registry实现治理与验证.md
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: SKL-004
+  title: 项目知识综合技能
+  asset_type: skill
+  status: implemented
+  evidence_level: verified
+  materialized: true
+  current_path: docs/knowledge/06_智能体资产体系/SKL-004-项目知识综合技能.md
+  target_path: null
+  canonical_path: docs/knowledge/06_智能体资产体系/SKL-004-项目知识综合技能.md
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: SKILL-PROJECT-KNOWLEDGE-SYNTHESIS
+  title: Project Knowledge Synthesis Skill
+  asset_type: skill
+  status: implemented
+  evidence_level: verified
+  materialized: true
+  current_path: skills/project-knowledge-synthesis/
+  target_path: null
+  canonical_path: skills/project-knowledge-synthesis/
   publication_status: unpublished
   migration_state: complete

@@ -17,14 +17,17 @@ relations:
   type: implements
   to: CTX-003
 - from: PRD-001
-  type: derived_from
+  type: superseded_by
   to: CTX-001
+- from: PRD-001
+  type: superseded_by
+  to: PRD-003
 - from: PRD-002
   type: depends_on
   to: PRD-001
 - from: ARC-001
   type: implements
-  to: PRD-001
+  to: PRD-003
 - from: ARC-001
   type: decided_by
   to: ADR-002
@@ -955,3 +958,36 @@ relations:
 - from: SOL-KNO-001
   type: explains
   to: KNO-007
+- from: CTX-006
+  type: superseded_by
+  to: CTX-001
+- from: CTX-006
+  type: superseded_by
+  to: CTX-005
+- from: CTX-006
+  type: superseded_by
+  to: DEC-001
+- from: CTX-007
+  type: superseded_by
+  to: CTX-005
+- from: CTX-007
+  type: superseded_by
+  to: ARC-001
+- from: CTX-005
+  type: explains
+  to: ARC-001
+- from: SKL-004
+  type: implements
+  to: SKILL-PROJECT-KNOWLEDGE-SYNTHESIS
+- from: SKILL-PROJECT-KNOWLEDGE-SYNTHESIS
+  type: depends_on
+  to: KNO-009
+- from: SKILL-PROJECT-KNOWLEDGE-SYNTHESIS
+  type: validated_by
+  to: EXP-008
+- from: SKILL-PROJECT-KNOWLEDGE-SYNTHESIS
+  type: depends_on
+  to: SKILL-AI-KNOWLEDGE
+- from: SKILL-ENGINEERING-INSIGHTS
+  type: depends_on
+  to: SKILL-PROJECT-KNOWLEDGE-SYNTHESIS

@@ -167,10 +167,10 @@ Git 是知识真源，Knowledge Pack 是派生发布资产；外部 Knowledge Se
 - Agent Profile 尚未正式物化；
 - `knowledge-packs/` 尚未创建；
 - Custom GPT 资产化 MVP 尚未实现；
-- Project Knowledge Synthesis Skill 仍为 `planned / future`；
+- Project Knowledge Synthesis Skill v0.1.0 已物化并完成首个目录聚合 Pilot，当前为 `in_review`；
 - 外部 Knowledge Service / RAG 尚未实现。
 
-不得把这些未来资产描述为当前已完成能力。
+不得把尚未实现的资产或 Project Knowledge Synthesis 尚未具备的自动能力描述为当前已完成能力。
 
 ## Feishu Projection
 
@@ -231,6 +231,17 @@ Agent 默认采用索引优先和最小必要上下文：
 
 外部 Knowledge Service、Knowledge Pack 和 Custom GPT Knowledge 必须按角色与权限裁剪，不得把完整仓库、敏感资料或无关上下文直接暴露给所有 Agent。
 
+## Project Knowledge Synthesis Boundary
+
+`project-knowledge-synthesis` 负责把多份项目资料中的 Claim、重复、冲突、状态和目标落位整理成受治理的综合候选。它可以提出保留、重写、合并、归档、supersede、链接更新和 Registry 更新建议，但不能自行取得正式写入、发布或生命周期晋升权限。
+
+它与 Engineering Insight Distillation 的边界是：
+
+- Project Knowledge Synthesis 整理项目事实、决策、结构和资产落位；
+- Engineering Insight Distillation 从已验证工程事件中提炼可复用判断、模式和检查项。
+
+综合结果必须经过总控 Planner 语义确认和用户必要审批，再由 Executor 按冻结完整文件落库。
+
 ## Current Implementation Status
 
 ### Implemented
@@ -241,7 +252,8 @@ Agent 默认采用索引优先和最小必要上下文：
 - `docs/technical/`；
 - Platform Registry；
 - Engineering Insight Registry；
-- 六个正式 Skill；
+- 六个已验证或已接受 Skill；
+- Project Knowledge Synthesis v0.1.0 已物化并完成首个目录聚合 Pilot，当前为 `in_review`；
 - `asset://` 正式图片引用与 Feishu Publisher 支持；
 - Git → Feishu 单向投影规则；
 - 知识与 Registry 校验。
@@ -253,7 +265,7 @@ Agent 默认采用索引优先和最小必要上下文：
 - Knowledge Pack；
 - `knowledge-packs/`；
 - Custom GPT 资产化 MVP；
-- Project Knowledge Synthesis Skill；
+- Project Knowledge Synthesis 的自动 Provider、跨仓库索引、批量 Eval 与直接发布能力；
 - 外部 Knowledge Service / RAG；
 - 完整 Runtime Task Store、Checkpoint 与自动知识回写。
 

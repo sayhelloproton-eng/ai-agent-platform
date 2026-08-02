@@ -88,15 +88,15 @@ docs/knowledge/知识系统/ARC-002-智能体平台知识资产架构.md,md,ARC-
 docs/knowledge/知识系统/ARC-005-单一真源与知识投影架构.md,md,ARC-005 单一真源与知识投影架构,revise_move,docs/knowledge/05_上下文与知识系统/ARC-005-单一真源与知识投影架构.md,ARC-005,加入零预读、映射后按篇覆盖,04-knowledge-architecture
 docs/knowledge/知识系统/ARC-006-项目知识分层与Agent上下文架构.md,md,ARC-006 项目知识分层与 Agent 上下文架构,revise_move,docs/knowledge/05_上下文与知识系统/ARC-006-项目知识分层与Agent上下文架构.md,ARC-006,纳入四层上下文与 Checkpoint,04-knowledge-architecture
 docs/knowledge/知识系统/README.md,md,知识系统,replace_or_remove,,,旧栏目 README 随目标知识树替换；空栏目删除,02-entry-product
-docs/knowledge/00_项目入口/CTX-001-项目总览.md,md,CTX-001 项目总览,keep_review,docs/knowledge/00_项目入口/CTX-001-项目总览.md,CTX-001,迁移并替换完成；等待仓库级整体 Review,02-entry-and-product-documents
+docs/knowledge/00_项目入口/CTX-001-项目总览.md,md,CTX-001 项目总览,keep,docs/knowledge/00_项目入口/CTX-001-项目总览.md,CTX-001,00_项目入口人工 Review 与知识综合完成；聚合 PRD-001 的稳定入口内容,02-entry-and-product-documents
 docs/technical/归档/历史资产/CTX-003-项目总览-v1.md,md,CTX-003 项目总览 v1,archive,docs/technical/归档/历史资产/CTX-003-项目总览-v1.md,CTX-003,归档完成；有效内容由 CTX-001 承接,02-entry-and-product-documents
-docs/knowledge/00_项目入口/PRD-001-平台愿景.md,md,PRD-001 平台愿景,keep_review,docs/knowledge/00_项目入口/PRD-001-平台愿景.md,PRD-001,迁移并替换完成；等待仓库级整体 Review,02-entry-and-product-documents
+docs/technical/归档/历史资产/00_项目入口_聚合前版本/PRD-001-平台愿景.md,md,PRD-001 平台愿景（聚合前版本）,archive,docs/technical/归档/历史资产/00_项目入口_聚合前版本/PRD-001-平台愿景.md,PRD-001,入口层重复内容已由 CTX-001 与 PRD-003 承接；原文转入技术归档,02-entry-and-product-documents
 docs/technical/归档/历史资产/PRD-002-作品集成果-v1.md,md,PRD-002 作品集成果 v1,archive,docs/technical/归档/历史资产/PRD-002-作品集成果-v1.md,PRD-002,归档完成；保留既有 superseded_by 关系,02-entry-and-product-documents
 docs/knowledge/项目与产品/README.md,md,项目与产品,replace_or_remove,,,旧栏目及其目录已清理完成,02-entry-and-product-documents
-docs/knowledge/00_项目入口/CTX-005-当前能力地图.md,md,CTX-005 当前能力地图,keep_review,docs/knowledge/00_项目入口/CTX-005-当前能力地图.md,CTX-005,正文物化完成；等待仓库级整体 Review,02-entry-and-product-documents
-docs/knowledge/00_项目入口/CTX-006-知识库阅读导航.md,md,CTX-006 知识库阅读导航,keep_review,docs/knowledge/00_项目入口/CTX-006-知识库阅读导航.md,CTX-006,正文物化完成；等待仓库级整体 Review,02-entry-and-product-documents
-docs/knowledge/00_项目入口/CTX-007-当前实现与目标架构.md,md,CTX-007 当前实现与目标架构,keep_review,docs/knowledge/00_项目入口/CTX-007-当前实现与目标架构.md,CTX-007,正文物化完成；等待仓库级整体 Review,02-entry-and-product-documents
-docs/knowledge/00_项目入口/DEC-001-架构决策演进摘要.md,md,DEC-001 架构决策演进摘要,keep_review,docs/knowledge/00_项目入口/DEC-001-架构决策演进摘要.md,DEC-001,正文物化完成；等待仓库级整体 Review,02-entry-and-product-documents
+docs/knowledge/00_项目入口/CTX-005-当前能力与演进差距.md,md,CTX-005 当前能力与演进差距,keep,docs/knowledge/00_项目入口/CTX-005-当前能力与演进差距.md,CTX-005,人工 Review 与知识综合完成；吸收 CTX-007 的必要当前/目标差距摘要,02-entry-and-product-documents
+docs/technical/归档/历史资产/00_项目入口_聚合前版本/CTX-006-知识库阅读导航.md,md,CTX-006 知识库阅读导航（聚合前版本）,archive,docs/technical/归档/历史资产/00_项目入口_聚合前版本/CTX-006-知识库阅读导航.md,CTX-006,导航内容已拆入知识库根 README、目录 README 与知识治理文档；原文转入技术归档,02-entry-and-product-documents
+docs/technical/归档/历史资产/00_项目入口_聚合前版本/CTX-007-当前实现与目标架构.md,md,CTX-007 当前实现与目标架构（聚合前版本）,archive,docs/technical/归档/历史资产/00_项目入口_聚合前版本/CTX-007-当前实现与目标架构.md,CTX-007,当前能力摘要由 CTX-005 承接，完整目标架构由 ARC-001 承接；原文转入技术归档,02-entry-and-product-documents
+docs/knowledge/00_项目入口/DEC-001-架构决策演进摘要.md,md,DEC-001 架构决策演进摘要,keep,docs/knowledge/00_项目入口/DEC-001-架构决策演进摘要.md,DEC-001,人工 Review 与知识综合完成；保留为入口层独立决策演进摘要,02-entry-and-product-documents
 docs/knowledge/01_产品体系/PRD-003-ai-agent-platform产品定义.md,md,PRD-003 ai-agent-platform 产品定义,keep_review,docs/knowledge/01_产品体系/PRD-003-ai-agent-platform产品定义.md,PRD-003,正文物化完成；等待仓库级整体 Review,02-entry-and-product-documents
 docs/knowledge/01_产品体系/PRD-004-用户价值与核心场景.md,md,PRD-004 用户价值与核心场景,keep_review,docs/knowledge/01_产品体系/PRD-004-用户价值与核心场景.md,PRD-004,正文物化完成；等待仓库级整体 Review,02-entry-and-product-documents
 docs/knowledge/01_产品体系/PRD-005-能力地图与演进路线.md,md,PRD-005 能力地图与演进路线,keep_review,docs/knowledge/01_产品体系/PRD-005-能力地图与演进路线.md,PRD-005,正文物化完成；等待仓库级整体 Review,02-entry-and-product-documents

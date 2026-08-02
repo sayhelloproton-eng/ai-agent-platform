@@ -15,7 +15,8 @@ Skill 将稳定的领域能力、运行时规则、Schema、示例和测试组�
 - `deterministic-delivery/`：冻结 Contract 的校验、落库、Commit、Push 与续跑；
 - `custom-gpt-actions/`：Custom GPT Action Schema、Builder 兼容性与适配端点规则；
 - `microsoft-dev-tunnels/`：Microsoft Dev Tunnels 本机公网入口运行与安全规则；
-- `engineering-insight-distillation/`：筛选并提炼证据支持的工程事件，形成可持续演进的工程判断、模式、反模式、启发式和检查项。
+- `engineering-insight-distillation/`：筛选并提炼证据支持的工程事件，形成可持续演进的工程判断、模式、反模式、启发式和检查项；
+- `project-knowledge-synthesis/`：综合多份项目资料中的 Claim、重复、冲突和资产落位，输出受治理的知识调整候选；
 - `planner-executor-handoff/`：管理 Chat 与本地执行层之间的确定性任务合同、双向反馈、复审、续跑和执行器切换。
 
 ## Boundary

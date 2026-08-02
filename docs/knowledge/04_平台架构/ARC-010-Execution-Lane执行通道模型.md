@@ -50,4 +50,4 @@ Result 包含 status、output_refs、evidence_refs、side_effect_refs、errors �
 
 - [ARC-009 轻量 Task Control](./ARC-009-轻量Task-Control架构.md)
 - [CAP-006 Codex 产品与执行体系](../02_基础产品与能力/CAP-006-Codex产品与执行体系.md)
-- [CTX-007 当前实现与目标架构](../00_项目入口/CTX-007-当前实现与目标架构.md)
+- [ARC-001 平台总体架构](../04_平台架构/ARC-001-ai-agent-platform总体架构.md)
