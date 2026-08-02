@@ -89,6 +89,6 @@ Custom GPT
 
 ## 9. 关联资产
 
-- [CAP-005 Custom GPT 配置](../../02_基础产品与能力/CAP-005-CustomGPT-Instructions-Knowledge-Actions与发布配置.md)
+- [CAP-005 Custom GPT 配置](../../02_基础产品与能力/CAP-002-生态组件配置与能力差异/README.md)
 - [ARC-016 架构与实现映射](../../04_平台架构/ARC-016-架构能力与仓库实现映射.md)
 - [WFL-009 审批工作流](../../07_工作流与项目治理/WFL-009-审批工作流.md)

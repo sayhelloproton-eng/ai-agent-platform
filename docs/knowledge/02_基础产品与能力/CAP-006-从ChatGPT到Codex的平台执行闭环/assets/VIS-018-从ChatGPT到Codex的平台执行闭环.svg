@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xlink="http://www.w3.org/1999/xlink" baseProfile="full" height="1900" version="1.1" viewBox="0 0 3000 1900" width="3000">
+  <defs>
+    <marker id="id3" markerHeight="8" markerUnits="strokeWidth" markerWidth="8" orient="auto" refX="8" refY="4.0">
+      <path d="M0,0 L8,4.0 L0,8 z" fill="#49678F"/>
+    </marker>
+    <marker id="id4" markerHeight="8" markerUnits="strokeWidth" markerWidth="8" orient="auto" refX="8" refY="4.0">
+      <path d="M0,0 L8,4.0 L0,8 z" fill="#C83A4A"/>
+    </marker>
+  </defs>
+  <rect fill="#FFFFFF" height="1900" width="3000" x="0" y="0"/>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="44" font-weight="800" text-anchor="middle" x="1500.0" y="64">从 ChatGPT 到 Codex 的平台执行闭环</text>
+  <text fill="#60708A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="22" font-weight="500" text-anchor="middle" x="1500.0" y="102">六泳道 · 八阶段 · 主状态 / 失败状态 · 控制 / 数据 / 证据 / 知识流</text>
+  <rect fill="#EAF2FF" height="34" rx="17" ry="17" stroke="#2563EB" stroke-width="1.5" width="125" x="2845" y="24"/>
+  <text fill="#2563EB" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="17" font-weight="600" text-anchor="middle" x="2907.5" y="48">VIS-018</text>
+  <rect fill="#25324A" height="78" rx="12" ry="12" stroke="#25324A" stroke-width="0" width="310" x="24" y="135"/>
+  <text fill="#fff" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="25" font-weight="800" text-anchor="middle" x="179.0" y="169">泳道 / 阶段</text>
+  <text fill="#DCE5F4" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="15" font-weight="500" text-anchor="middle" x="179.0" y="196">任务版本贯穿全流程</text>
+  <rect fill="#EAF2FF" height="78" rx="0" ry="0" stroke="#2563EB" stroke-width="1.5" width="330.25" x="334.0" y="135"/>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="21" font-weight="800" text-anchor="middle" x="499.125" y="168">1 目标进入</text>
+  <text fill="#2563EB" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="14" font-weight="600" text-anchor="middle" x="499.125" y="194">Goal</text>
+  <rect fill="#EAF8F1" height="78" rx="0" ry="0" stroke="#16835B" stroke-width="1.5" width="330.25" x="664.25" y="135"/>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="21" font-weight="800" text-anchor="middle" x="829.375" y="168">2 上下文恢复</text>
+  <text fill="#16835B" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="14" font-weight="600" text-anchor="middle" x="829.375" y="194">Context</text>
+  <rect fill="#FFF4E9" height="78" rx="0" ry="0" stroke="#E8751A" stroke-width="1.5" width="330.25" x="994.5" y="135"/>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="21" font-weight="800" text-anchor="middle" x="1159.625" y="168">3 规划与版本</text>
+  <text fill="#E8751A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="14" font-weight="600" text-anchor="middle" x="1159.625" y="194">Plan</text>
+  <rect fill="#F3EEFF" height="78" rx="0" ry="0" stroke="#6D4AC7" stroke-width="1.5" width="330.25" x="1324.75" y="135"/>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="21" font-weight="800" text-anchor="middle" x="1489.875" y="168">4 授权与接收</text>
+  <text fill="#6D4AC7" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="14" font-weight="600" text-anchor="middle" x="1489.875" y="194">Authorize</text>
+  <rect fill="#EAF8FA" height="78" rx="0" ry="0" stroke="#0D7C86" stroke-width="1.5" width="330.25" x="1655.0" y="135"/>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="21" font-weight="800" text-anchor="middle" x="1820.125" y="168">5 真实执行</text>
+  <text fill="#0D7C86" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="14" font-weight="600" text-anchor="middle" x="1820.125" y="194">Execute</text>
+  <rect fill="#FFF0F2" height="78" rx="0" ry="0" stroke="#C83A4A" stroke-width="1.5" width="330.25" x="1985.25" y="135"/>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="21" font-weight="800" text-anchor="middle" x="2150.375" y="168">6 验证与证据</text>
+  <text fill="#C83A4A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="14" font-weight="600" text-anchor="middle" x="2150.375" y="194">Validate</text>
+  <rect fill="#EAF2FF" height="78" rx="0" ry="0" stroke="#2563EB" stroke-width="1.5" width="330.25" x="2315.5" y="135"/>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="21" font-weight="800" text-anchor="middle" x="2480.625" y="168">7 Review</text>
+  <text fill="#2563EB" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="14" font-weight="600" text-anchor="middle" x="2480.625" y="194">Review</text>
+  <rect fill="#EAF8F1" height="78" rx="0" ry="0" stroke="#16835B" stroke-width="1.5" width="330.25" x="2645.75" y="135"/>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="21" font-weight="800" text-anchor="middle" x="2810.875" y="168">8 回流与关闭</text>
+  <text fill="#16835B" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="14" font-weight="600" text-anchor="middle" x="2810.875" y="194">Close</text>
+  <rect fill="#EAF2FF" height="188" rx="0" ry="0" stroke="#2563EB" stroke-width="1.5" width="310" x="24" y="213"/>
+  <circle cx="58" cy="255" fill="#2563EB" r="20" stroke="#fff" stroke-width="2"/>
+  <text fill="#fff" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="15" font-weight="700" text-anchor="middle" x="58" y="260.25">用</text>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="19" font-weight="800" text-anchor="start" x="88" y="246">用户</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="44" y="307">目标 · 授权 · 接受</text>
+  <rect fill="#FBFCFE" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="334.0" y="213"/>
+  <rect fill="#FBFCFE" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="664.25" y="213"/>
+  <rect fill="#FBFCFE" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="994.5" y="213"/>
+  <rect fill="#FBFCFE" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="1324.75" y="213"/>
+  <rect fill="#FBFCFE" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="1655.0" y="213"/>
+  <rect fill="#FBFCFE" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="1985.25" y="213"/>
+  <rect fill="#FBFCFE" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="2315.5" y="213"/>
+  <rect fill="#FBFCFE" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="2645.75" y="213"/>
+  <rect fill="#F3EEFF" height="188" rx="0" ry="0" stroke="#6D4AC7" stroke-width="1.5" width="310" x="24" y="401"/>
+  <circle cx="58" cy="443" fill="#6D4AC7" r="20" stroke="#fff" stroke-width="2"/>
+  <text fill="#fff" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="15" font-weight="700" text-anchor="middle" x="58" y="448.25">规</text>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="19" font-weight="800" text-anchor="start" x="88" y="434">规划者（Chat / Planner）</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="44" y="495">语义判断 · 任务设计 · 复审</text>
+  <rect fill="#FFFFFF" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="334.0" y="401"/>
+  <rect fill="#FFFFFF" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="664.25" y="401"/>
+  <rect fill="#FFFFFF" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="994.5" y="401"/>
+  <rect fill="#FFFFFF" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="1324.75" y="401"/>
+  <rect fill="#FFFFFF" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="1655.0" y="401"/>
+  <rect fill="#FFFFFF" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="1985.25" y="401"/>
+  <rect fill="#FFFFFF" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="2315.5" y="401"/>
+  <rect fill="#FFFFFF" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="2645.75" y="401"/>
+  <rect fill="#EAF8F1" height="188" rx="0" ry="0" stroke="#16835B" stroke-width="1.5" width="310" x="24" y="589"/>
+  <circle cx="58" cy="631" fill="#16835B" r="20" stroke="#fff" stroke-width="2"/>
+  <text fill="#fff" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="15" font-weight="700" text-anchor="middle" x="58" y="636.25">上</text>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="19" font-weight="800" text-anchor="start" x="88" y="622">上下文与知识</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="44" y="683">事实 · 来源 · 最小上下文</text>
+  <rect fill="#FBFCFE" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="334.0" y="589"/>
+  <rect fill="#FBFCFE" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="664.25" y="589"/>
+  <rect fill="#FBFCFE" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="994.5" y="589"/>
+  <rect fill="#FBFCFE" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="1324.75" y="589"/>
+  <rect fill="#FBFCFE" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="1655.0" y="589"/>
+  <rect fill="#FBFCFE" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="1985.25" y="589"/>
+  <rect fill="#FBFCFE" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="2315.5" y="589"/>
+  <rect fill="#FBFCFE" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="2645.75" y="589"/>
+  <rect fill="#FFF4E9" height="188" rx="0" ry="0" stroke="#E8751A" stroke-width="1.5" width="310" x="24" y="777"/>
+  <circle cx="58" cy="819" fill="#E8751A" r="20" stroke="#fff" stroke-width="2"/>
+  <text fill="#fff" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="15" font-weight="700" text-anchor="middle" x="58" y="824.25">交</text>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="19" font-weight="800" text-anchor="start" x="88" y="810">交接与任务控制</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="44" y="871">版本 · 状态 · 范围 · 策略</text>
+  <rect fill="#FFFFFF" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="334.0" y="777"/>
+  <rect fill="#FFFFFF" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="664.25" y="777"/>
+  <rect fill="#FFFFFF" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="994.5" y="777"/>
+  <rect fill="#FFFFFF" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="1324.75" y="777"/>
+  <rect fill="#FFFFFF" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="1655.0" y="777"/>
+  <rect fill="#FFFFFF" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="1985.25" y="777"/>
+  <rect fill="#FFFFFF" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="2315.5" y="777"/>
+  <rect fill="#FFFFFF" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="2645.75" y="777"/>
+  <rect fill="#EAF8FA" height="188" rx="0" ry="0" stroke="#0D7C86" stroke-width="1.5" width="310" x="24" y="965"/>
+  <circle cx="58" cy="1007" fill="#0D7C86" r="20" stroke="#fff" stroke-width="2"/>
+  <text fill="#fff" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="15" font-weight="700" text-anchor="middle" x="58" y="1012.25">执</text>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="19" font-weight="800" text-anchor="start" x="88" y="998">执行器（Executor）</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="44" y="1059">Codex / Work / Runtime</text>
+  <rect fill="#FBFCFE" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="334.0" y="965"/>
+  <rect fill="#FBFCFE" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="664.25" y="965"/>
+  <rect fill="#FBFCFE" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="994.5" y="965"/>
+  <rect fill="#FBFCFE" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="1324.75" y="965"/>
+  <rect fill="#FBFCFE" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="1655.0" y="965"/>
+  <rect fill="#FBFCFE" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="1985.25" y="965"/>
+  <rect fill="#FBFCFE" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="2315.5" y="965"/>
+  <rect fill="#FBFCFE" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="2645.75" y="965"/>
+  <rect fill="#FFF0F2" height="188" rx="0" ry="0" stroke="#C83A4A" stroke-width="1.5" width="310" x="24" y="1153"/>
+  <circle cx="58" cy="1195" fill="#C83A4A" r="20" stroke="#fff" stroke-width="2"/>
+  <text fill="#fff" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="15" font-weight="700" text-anchor="middle" x="58" y="1200.25">证</text>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="19" font-weight="800" text-anchor="start" x="88" y="1186">证据与复审</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="44" y="1247">测试 · 差异 · 提交 · 日志</text>
+  <rect fill="#FFFFFF" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="334.0" y="1153"/>
+  <rect fill="#FFFFFF" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="664.25" y="1153"/>
+  <rect fill="#FFFFFF" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="994.5" y="1153"/>
+  <rect fill="#FFFFFF" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="1324.75" y="1153"/>
+  <rect fill="#FFFFFF" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="1655.0" y="1153"/>
+  <rect fill="#FFFFFF" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="1985.25" y="1153"/>
+  <rect fill="#FFFFFF" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="2315.5" y="1153"/>
+  <rect fill="#FFFFFF" height="188" rx="0" ry="0" stroke="#C9D4E6" stroke-width="1" width="330.25" x="2645.75" y="1153"/>
+  <rect fill="#EAF2FF" height="152" rx="12" ry="12" stroke="#2563EB" stroke-width="1.7" width="310.25" x="344.0" y="231"/>
+  <rect fill="#FFFFFF" height="34" rx="17" ry="17" stroke="#2563EB" stroke-width="1.5" width="68" x="354.0" y="241"/>
+  <text fill="#2563EB" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="13" font-weight="600" text-anchor="middle" x="388.0" y="265">输入</text>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="20" font-weight="800" text-anchor="middle" x="499.125" y="285">提出目标</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="358.0" y="333">期望结果</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="358.0" y="355">约束 / 环境</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="358.0" y="377">授权偏好</text>
+  <rect fill="#F3EEFF" height="152" rx="12" ry="12" stroke="#6D4AC7" stroke-width="1.7" width="310.25" x="344.0" y="419"/>
+  <rect fill="#FFFFFF" height="34" rx="17" ry="17" stroke="#6D4AC7" stroke-width="1.5" width="75" x="354.0" y="429"/>
+  <text fill="#6D4AC7" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="13" font-weight="600" text-anchor="middle" x="391.5" y="453">DRAFT</text>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="20" font-weight="800" text-anchor="middle" x="499.125" y="473">建立任务草稿</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="358.0" y="521">识别任务类型</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="358.0" y="543">标记副作用</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="358.0" y="565">列出待补信息</text>
+  <rect fill="#EAF8F1" height="152" rx="12" ry="12" stroke="#16835B" stroke-width="1.7" width="310.25" x="674.25" y="607"/>
+  <rect fill="#FFFFFF" height="34" rx="17" ry="17" stroke="#16835B" stroke-width="1.5" width="68" x="684.25" y="617"/>
+  <text fill="#16835B" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="13" font-weight="600" text-anchor="middle" x="718.25" y="641">事实</text>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="20" font-weight="800" text-anchor="middle" x="829.375" y="661">恢复最小上下文</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="688.25" y="709">会话 / Project</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="688.25" y="731">Git Context</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="688.25" y="753">Registry / 文档</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="688.25" y="775">代码 / 测试 / 来源</text>
+  <rect fill="#F3EEFF" height="152" rx="12" ry="12" stroke="#6D4AC7" stroke-width="1.7" width="310.25" x="674.25" y="419"/>
+  <rect fill="#FFFFFF" height="34" rx="17" ry="17" stroke="#6D4AC7" stroke-width="1.5" width="68" x="684.25" y="429"/>
+  <text fill="#6D4AC7" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="13" font-weight="600" text-anchor="middle" x="718.25" y="453">门禁</text>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="20" font-weight="800" text-anchor="middle" x="829.375" y="473">判断事实是否充分</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="688.25" y="521">区分事实 / 决策 / 目标 / 假设</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="688.25" y="543">不足则阻断</text>
+  <rect fill="#F3EEFF" height="152" rx="12" ry="12" stroke="#6D4AC7" stroke-width="1.7" width="310.25" x="1004.5" y="419"/>
+  <rect fill="#FFFFFF" height="34" rx="17" ry="17" stroke="#6D4AC7" stroke-width="1.5" width="105" x="1014.5" y="429"/>
+  <text fill="#6D4AC7" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="13" font-weight="600" text-anchor="middle" x="1067.0" y="453">PLANNED</text>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="20" font-weight="800" text-anchor="middle" x="1159.625" y="473">拆解并选择方案</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="1018.5" y="521">目标 / 非目标</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="1018.5" y="543">范围 / 验收</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="1018.5" y="565">风险 / 依赖</text>
+  <rect fill="#FFF4E9" height="152" rx="12" ry="12" stroke="#E8751A" stroke-width="1.7" width="310.25" x="1004.5" y="795"/>
+  <rect fill="#FFFFFF" height="34" rx="17" ry="17" stroke="#E8751A" stroke-width="1.5" width="68" x="1014.5" y="805"/>
+  <text fill="#E8751A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="13" font-weight="600" text-anchor="middle" x="1048.5" y="829">版本</text>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="20" font-weight="800" text-anchor="middle" x="1159.625" y="849">冻结 Task Version</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="1018.5" y="897">Scope</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="1018.5" y="919">Context Access</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="1018.5" y="941">Validation</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="1018.5" y="963">Git Policy</text>
+  <rect fill="#EAF2FF" height="152" rx="12" ry="12" stroke="#2563EB" stroke-width="1.7" width="310.25" x="1334.75" y="231"/>
+  <rect fill="#FFFFFF" height="34" rx="17" ry="17" stroke="#2563EB" stroke-width="1.5" width="68" x="1344.75" y="241"/>
+  <text fill="#2563EB" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="13" font-weight="600" text-anchor="middle" x="1378.75" y="265">可选</text>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="20" font-weight="800" text-anchor="middle" x="1489.875" y="285">重要变化审批</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="1348.75" y="333">写入 / 删除</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="1348.75" y="355">网络 / Secret</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="1348.75" y="377">Commit / Push / 发布</text>
+  <rect fill="#FFF4E9" height="152" rx="12" ry="12" stroke="#E8751A" stroke-width="1.7" width="310.25" x="1334.75" y="795"/>
+  <rect fill="#FFFFFF" height="34" rx="17" ry="17" stroke="#E8751A" stroke-width="1.5" width="150" x="1344.75" y="805"/>
+  <text fill="#E8751A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="13" font-weight="600" text-anchor="middle" x="1419.75" y="829">AUTHORIZED</text>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="20" font-weight="800" text-anchor="middle" x="1489.875" y="849">授权并等待接收</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="1348.75" y="897">Approval 绑定版本</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="1348.75" y="919">Executor Reception Ack</text>
+  <rect fill="#EAF8FA" height="152" rx="12" ry="12" stroke="#0D7C86" stroke-width="1.7" width="310.25" x="1334.75" y="983"/>
+  <rect fill="#FFFFFF" height="34" rx="17" ry="17" stroke="#0D7C86" stroke-width="1.5" width="68" x="1344.75" y="993"/>
+  <text fill="#0D7C86" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="13" font-weight="600" text-anchor="middle" x="1378.75" y="1017">ACK</text>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="20" font-weight="800" text-anchor="middle" x="1489.875" y="1037">接收确认</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="1348.75" y="1085">实际分支 / SHA</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="1348.75" y="1107">工作区 / 环境</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="1348.75" y="1129">理解到的边界</text>
+  <rect fill="#EAF8FA" height="152" rx="12" ry="12" stroke="#0D7C86" stroke-width="1.7" width="310.25" x="1665.0" y="983"/>
+  <rect fill="#FFFFFF" height="34" rx="17" ry="17" stroke="#0D7C86" stroke-width="1.5" width="105" x="1675.0" y="993"/>
+  <text fill="#0D7C86" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="13" font-weight="600" text-anchor="middle" x="1727.5" y="1017">RUNNING</text>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="20" font-weight="800" text-anchor="middle" x="1820.125" y="1037">在授权范围执行</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="1679.0" y="1085">Work：通用任务</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="1679.0" y="1107">Codex：仓库工程</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="1679.0" y="1129">Runtime：窄能力</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="1679.0" y="1151">API：平台流程</text>
+  <rect fill="#FFF4E9" height="152" rx="12" ry="12" stroke="#E8751A" stroke-width="1.7" width="310.25" x="1665.0" y="795"/>
+  <rect fill="#FFFFFF" height="34" rx="17" ry="17" stroke="#E8751A" stroke-width="1.5" width="68" x="1675.0" y="805"/>
+  <text fill="#E8751A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="13" font-weight="600" text-anchor="middle" x="1709.0" y="829">状态</text>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="20" font-weight="800" text-anchor="middle" x="1820.125" y="849">记录状态与副作用</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="1679.0" y="897">执行器身份</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="1679.0" y="919">动作 / 时间</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="1679.0" y="941">Checkpoint 候选</text>
+  <rect fill="#EAF8FA" height="152" rx="12" ry="12" stroke="#0D7C86" stroke-width="1.7" width="310.25" x="1995.25" y="983"/>
+  <rect fill="#FFFFFF" height="34" rx="17" ry="17" stroke="#0D7C86" stroke-width="1.5" width="150" x="2005.25" y="993"/>
+  <text fill="#0D7C86" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="13" font-weight="600" text-anchor="middle" x="2080.25" y="1017">VALIDATING</text>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="20" font-weight="800" text-anchor="middle" x="2150.375" y="1037">运行固定验证</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="2009.25" y="1085">命令 / 测试</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="2009.25" y="1107">Hash / Scope</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="2009.25" y="1129">外部 Read-back</text>
+  <rect fill="#FFF0F2" height="152" rx="12" ry="12" stroke="#C83A4A" stroke-width="1.7" width="310.25" x="1995.25" y="1171"/>
+  <rect fill="#FFFFFF" height="34" rx="17" ry="17" stroke="#C83A4A" stroke-width="1.5" width="68" x="2005.25" y="1181"/>
+  <text fill="#C83A4A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="13" font-weight="600" text-anchor="middle" x="2039.25" y="1205">证据</text>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="20" font-weight="800" text-anchor="middle" x="2150.375" y="1225">收集真实证据</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="2009.25" y="1273">Artifact Hash</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="2009.25" y="1295">Exit Code</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="2009.25" y="1317">Diff / Commit</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="2009.25" y="1339">Logs / TaskResult</text>
+  <rect fill="#F3EEFF" height="152" rx="12" ry="12" stroke="#6D4AC7" stroke-width="1.7" width="310.25" x="2325.5" y="419"/>
+  <rect fill="#FFFFFF" height="34" rx="17" ry="17" stroke="#6D4AC7" stroke-width="1.5" width="90" x="2335.5" y="429"/>
+  <text fill="#6D4AC7" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="13" font-weight="600" text-anchor="middle" x="2380.5" y="453">Review</text>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="20" font-weight="800" text-anchor="middle" x="2480.625" y="473">语义与边界复审</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="2339.5" y="521">目标达成？</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="2339.5" y="543">是否越权？</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="2339.5" y="565">证据充分？</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="2339.5" y="587">是否需续跑？</text>
+  <rect fill="#EAF2FF" height="152" rx="12" ry="12" stroke="#2563EB" stroke-width="1.7" width="310.25" x="2325.5" y="231"/>
+  <rect fill="#FFFFFF" height="34" rx="17" ry="17" stroke="#2563EB" stroke-width="1.5" width="68" x="2335.5" y="241"/>
+  <text fill="#2563EB" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="13" font-weight="600" text-anchor="middle" x="2369.5" y="265">决定</text>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="20" font-weight="800" text-anchor="middle" x="2480.625" y="285">接受 / 修订 / 终止</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="2339.5" y="333">重要结果由用户最终确认</text>
+  <rect fill="#FFF0F2" height="152" rx="12" ry="12" stroke="#C83A4A" stroke-width="1.7" width="310.25" x="2655.75" y="1171"/>
+  <rect fill="#FFFFFF" height="34" rx="17" ry="17" stroke="#C83A4A" stroke-width="1.5" width="120" x="2665.75" y="1181"/>
+  <text fill="#C83A4A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="13" font-weight="600" text-anchor="middle" x="2725.75" y="1205">ACCEPTED</text>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="20" font-weight="800" text-anchor="middle" x="2810.875" y="1225">形成接受记录</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="2669.75" y="1273">Review 结论</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="2669.75" y="1295">证据索引</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="2669.75" y="1317">最终 SHA / 状态</text>
+  <rect fill="#EAF8F1" height="152" rx="12" ry="12" stroke="#16835B" stroke-width="1.7" width="310.25" x="2655.75" y="607"/>
+  <rect fill="#FFFFFF" height="34" rx="17" ry="17" stroke="#16835B" stroke-width="1.5" width="68" x="2665.75" y="617"/>
+  <text fill="#16835B" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="13" font-weight="600" text-anchor="middle" x="2699.75" y="641">知识</text>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="20" font-weight="800" text-anchor="middle" x="2810.875" y="661">回流稳定知识</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="2669.75" y="709">Context</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="2669.75" y="731">Registry</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="2669.75" y="753">正式文档 / ADR</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="2669.75" y="775">Release / Projection</text>
+  <rect fill="#FFF4E9" height="152" rx="12" ry="12" stroke="#E8751A" stroke-width="1.7" width="310.25" x="2655.75" y="795"/>
+  <rect fill="#FFFFFF" height="34" rx="17" ry="17" stroke="#E8751A" stroke-width="1.5" width="68" x="2665.75" y="805"/>
+  <text fill="#E8751A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="13" font-weight="600" text-anchor="middle" x="2699.75" y="829">完成</text>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="20" font-weight="800" text-anchor="middle" x="2810.875" y="849">关闭任务</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="2669.75" y="897">CLOSED</text>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="16" font-weight="500" text-anchor="start" x="2669.75" y="919">保留可追踪历史</text>
+  <line marker-end="url(#id3)" stroke="#49678F" stroke-width="3" x1="646.25" x2="682.25" y1="759" y2="759"/>
+  <line marker-end="url(#id3)" stroke="#49678F" stroke-width="3" x1="976.5" x2="1012.5" y1="759" y2="759"/>
+  <line marker-end="url(#id3)" stroke="#49678F" stroke-width="3" x1="1306.75" x2="1342.75" y1="759" y2="759"/>
+  <line marker-end="url(#id3)" stroke="#49678F" stroke-width="3" x1="1637.0" x2="1673.0" y1="759" y2="759"/>
+  <line marker-end="url(#id3)" stroke="#49678F" stroke-width="3" x1="1967.25" x2="2003.25" y1="759" y2="759"/>
+  <line marker-end="url(#id3)" stroke="#49678F" stroke-width="3" x1="2297.5" x2="2333.5" y1="759" y2="759"/>
+  <line marker-end="url(#id3)" stroke="#49678F" stroke-width="3" x1="2627.75" x2="2663.75" y1="759" y2="759"/>
+  <line marker-end="url(#id3)" stroke="#6E82A6" stroke-width="2.2" x1="499.125" x2="499.125" y1="383" y2="419"/>
+  <line marker-end="url(#id3)" stroke="#6E82A6" stroke-width="2.2" x1="829.375" x2="829.375" y1="607" y2="571"/>
+  <line marker-end="url(#id3)" stroke="#6E82A6" stroke-width="2.2" x1="1159.625" x2="1159.625" y1="571" y2="795"/>
+  <line marker-end="url(#id3)" stroke="#6E82A6" stroke-width="2.2" x1="1489.875" x2="1489.875" y1="383" y2="795"/>
+  <line marker-end="url(#id3)" stroke="#6E82A6" stroke-width="2.2" x1="1489.875" x2="1489.875" y1="947" y2="983"/>
+  <line marker-end="url(#id3)" stroke="#6E82A6" stroke-width="2.2" x1="1820.125" x2="1820.125" y1="947" y2="983"/>
+  <line marker-end="url(#id3)" stroke="#6E82A6" stroke-width="2.2" x1="2150.375" x2="2150.375" y1="1135" y2="1171"/>
+  <line marker-end="url(#id3)" stroke="#6E82A6" stroke-width="2.2" x1="2480.625" x2="2480.625" y1="1171" y2="571"/>
+  <line marker-end="url(#id3)" stroke="#6E82A6" stroke-width="2.2" x1="2480.625" x2="2480.625" y1="419" y2="383"/>
+  <line marker-end="url(#id3)" stroke="#6E82A6" stroke-width="2.2" x1="2810.875" x2="2810.875" y1="383" y2="1171"/>
+  <line marker-end="url(#id3)" stroke="#6E82A6" stroke-width="2.2" x1="2810.875" x2="2810.875" y1="1171" y2="759"/>
+  <line marker-end="url(#id3)" stroke="#6E82A6" stroke-width="2.2" x1="2810.875" x2="2810.875" y1="759" y2="795"/>
+  <text fill="#111827" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="26" font-weight="800" text-anchor="start" x="24" y="1375">状态流与失败续跑</text>
+  <rect fill="#EAF2FF" height="54" rx="12" ry="12" stroke="#2563EB" stroke-width="1.6" width="282.6" x="24.0" y="1405"/>
+  <text fill="#2563EB" font-family="Noto Sans Mono CJK SC, monospace" font-size="14" font-weight="700" text-anchor="middle" x="165.3" y="1439">DRAFT</text>
+  <line marker-end="url(#id3)" stroke="#7186A8" stroke-width="2" x1="306.6" x2="320.6" y1="1432" y2="1432"/>
+  <rect fill="#EAF2FF" height="54" rx="12" ry="12" stroke="#2563EB" stroke-width="1.6" width="282.6" x="320.6" y="1405"/>
+  <text fill="#2563EB" font-family="Noto Sans Mono CJK SC, monospace" font-size="14" font-weight="700" text-anchor="middle" x="461.90000000000003" y="1439">CONTEXT_READY</text>
+  <line marker-end="url(#id3)" stroke="#7186A8" stroke-width="2" x1="603.2" x2="617.2" y1="1432" y2="1432"/>
+  <rect fill="#EAF2FF" height="54" rx="12" ry="12" stroke="#2563EB" stroke-width="1.6" width="282.6" x="617.2" y="1405"/>
+  <text fill="#2563EB" font-family="Noto Sans Mono CJK SC, monospace" font-size="14" font-weight="700" text-anchor="middle" x="758.5" y="1439">PLANNED</text>
+  <line marker-end="url(#id3)" stroke="#7186A8" stroke-width="2" x1="899.8000000000001" x2="913.8000000000001" y1="1432" y2="1432"/>
+  <rect fill="#FFF4E9" height="54" rx="12" ry="12" stroke="#E8751A" stroke-width="1.6" width="282.6" x="913.8000000000001" y="1405"/>
+  <text fill="#E8751A" font-family="Noto Sans Mono CJK SC, monospace" font-size="14" font-weight="700" text-anchor="middle" x="1055.1000000000001" y="1439">AUTHORIZED</text>
+  <line marker-end="url(#id3)" stroke="#7186A8" stroke-width="2" x1="1196.4" x2="1210.4" y1="1432" y2="1432"/>
+  <rect fill="#FFF4E9" height="54" rx="12" ry="12" stroke="#E8751A" stroke-width="1.6" width="282.6" x="1210.4" y="1405"/>
+  <text fill="#E8751A" font-family="Noto Sans Mono CJK SC, monospace" font-size="14" font-weight="700" text-anchor="middle" x="1351.7" y="1439">ACKNOWLEDGED</text>
+  <line marker-end="url(#id3)" stroke="#7186A8" stroke-width="2" x1="1493.0" x2="1507.0" y1="1432" y2="1432"/>
+  <rect fill="#EAF8FA" height="54" rx="12" ry="12" stroke="#0D7C86" stroke-width="1.6" width="282.6" x="1507.0" y="1405"/>
+  <text fill="#0D7C86" font-family="Noto Sans Mono CJK SC, monospace" font-size="14" font-weight="700" text-anchor="middle" x="1648.3" y="1439">RUNNING</text>
+  <line marker-end="url(#id3)" stroke="#7186A8" stroke-width="2" x1="1789.6" x2="1803.6000000000001" y1="1432" y2="1432"/>
+  <rect fill="#EAF8FA" height="54" rx="12" ry="12" stroke="#0D7C86" stroke-width="1.6" width="282.6" x="1803.6000000000001" y="1405"/>
+  <text fill="#0D7C86" font-family="Noto Sans Mono CJK SC, monospace" font-size="14" font-weight="700" text-anchor="middle" x="1944.9" y="1439">VALIDATING</text>
+  <line marker-end="url(#id3)" stroke="#7186A8" stroke-width="2" x1="2086.2000000000003" x2="2100.2000000000003" y1="1432" y2="1432"/>
+  <rect fill="#F3EEFF" height="54" rx="12" ry="12" stroke="#6D4AC7" stroke-width="1.6" width="282.6" x="2100.2000000000003" y="1405"/>
+  <text fill="#6D4AC7" font-family="Noto Sans Mono CJK SC, monospace" font-size="14" font-weight="700" text-anchor="middle" x="2241.5000000000005" y="1439">AWAITING_REVIEW</text>
+  <line marker-end="url(#id3)" stroke="#7186A8" stroke-width="2" x1="2382.8" x2="2396.8" y1="1432" y2="1432"/>
+  <rect fill="#EAF8F1" height="54" rx="12" ry="12" stroke="#16835B" stroke-width="1.6" width="282.6" x="2396.8" y="1405"/>
+  <text fill="#16835B" font-family="Noto Sans Mono CJK SC, monospace" font-size="14" font-weight="700" text-anchor="middle" x="2538.1000000000004" y="1439">ACCEPTED</text>
+  <line marker-end="url(#id3)" stroke="#7186A8" stroke-width="2" x1="2679.4" x2="2693.4" y1="1432" y2="1432"/>
+  <rect fill="#EAF8F1" height="54" rx="12" ry="12" stroke="#16835B" stroke-width="1.6" width="282.6" x="2693.4" y="1405"/>
+  <text fill="#16835B" font-family="Noto Sans Mono CJK SC, monospace" font-size="14" font-weight="700" text-anchor="middle" x="2834.7000000000003" y="1439">CLOSED</text>
+  <rect fill="#FFF0F2" height="118" rx="16" ry="16" stroke="#C83A4A" stroke-width="2" width="2952" x="24" y="1483"/>
+  <text fill="#C83A4A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="22" font-weight="800" text-anchor="start" x="46" y="1517">失败分支</text>
+  <rect fill="#FFFFFF" height="70" rx="10" ry="10" stroke="#C83A4A" stroke-width="1.4" width="448.3333333333333" x="190.0" y="1503"/>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="15" font-weight="700" text-anchor="middle" x="414.16666666666663" y="1531">BLOCKED / FAILED_SAFE</text>
+  <line marker-end="url(#id4)" stroke="#C83A4A" stroke-width="2" x1="638.3333333333333" x2="654.3333333333333" y1="1538" y2="1538"/>
+  <rect fill="#FFFFFF" height="70" rx="10" ry="10" stroke="#C83A4A" stroke-width="1.4" width="448.3333333333333" x="654.3333333333333" y="1503"/>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="15" font-weight="700" text-anchor="middle" x="878.4999999999999" y="1531">保留现场与原始错误</text>
+  <line marker-end="url(#id4)" stroke="#C83A4A" stroke-width="2" x1="1102.6666666666665" x2="1118.6666666666665" y1="1538" y2="1538"/>
+  <rect fill="#FFFFFF" height="70" rx="10" ry="10" stroke="#C83A4A" stroke-width="1.4" width="448.3333333333333" x="1118.6666666666665" y="1503"/>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="15" font-weight="700" text-anchor="middle" x="1342.8333333333333" y="1531">AWAITING_DECISION</text>
+  <line marker-end="url(#id4)" stroke="#C83A4A" stroke-width="2" x1="1566.9999999999998" x2="1583.0" y1="1538" y2="1538"/>
+  <rect fill="#FFFFFF" height="70" rx="10" ry="10" stroke="#C83A4A" stroke-width="1.4" width="448.3333333333333" x="1583.0" y="1503"/>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="15" font-weight="700" text-anchor="middle" x="1807.1666666666667" y="1531">同版本安全续跑</text>
+  <line marker-end="url(#id4)" stroke="#C83A4A" stroke-width="2" x1="2031.3333333333333" x2="2047.3333333333333" y1="1538" y2="1538"/>
+  <rect fill="#FFFFFF" height="70" rx="10" ry="10" stroke="#C83A4A" stroke-width="1.4" width="448.3333333333333" x="2047.3333333333333" y="1503"/>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="15" font-weight="700" text-anchor="middle" x="2271.5" y="1531">新版本重规划</text>
+  <line marker-end="url(#id4)" stroke="#C83A4A" stroke-width="2" x1="2495.6666666666665" x2="2511.6666666666665" y1="1538" y2="1538"/>
+  <rect fill="#FFFFFF" height="70" rx="10" ry="10" stroke="#C83A4A" stroke-width="1.4" width="448.3333333333333" x="2511.6666666666665" y="1503"/>
+  <text fill="#25324A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="15" font-weight="700" text-anchor="middle" x="2735.833333333333" y="1531">TERMINATED</text>
+  <rect fill="#EAF2FF" height="34" rx="17" ry="17" stroke="#2563EB" stroke-width="1.5" width="110" x="24" y="1838"/>
+  <text fill="#2563EB" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="15" font-weight="600" text-anchor="middle" x="79.0" y="1862">控制流</text>
+  <rect fill="#EAF8F1" height="34" rx="17" ry="17" stroke="#16835B" stroke-width="1.5" width="110" x="144" y="1838"/>
+  <text fill="#16835B" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="15" font-weight="600" text-anchor="middle" x="199.0" y="1862">数据流</text>
+  <rect fill="#FFF4E9" height="34" rx="17" ry="17" stroke="#E8751A" stroke-width="1.5" width="110" x="264" y="1838"/>
+  <text fill="#E8751A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="15" font-weight="600" text-anchor="middle" x="319.0" y="1862">状态流</text>
+  <rect fill="#FFF0F2" height="34" rx="17" ry="17" stroke="#C83A4A" stroke-width="1.5" width="110" x="384" y="1838"/>
+  <text fill="#C83A4A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="15" font-weight="600" text-anchor="middle" x="439.0" y="1862">证据流</text>
+  <rect fill="#F3EEFF" height="34" rx="17" ry="17" stroke="#6D4AC7" stroke-width="1.5" width="110" x="504" y="1838"/>
+  <text fill="#6D4AC7" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="15" font-weight="600" text-anchor="middle" x="559.0" y="1862">知识流</text>
+  <text fill="#60708A" font-family="Noto Sans CJK SC, Noto Sans CJK, sans-serif" font-size="17" font-weight="500" text-anchor="end" x="2976" y="1862">当前：人工控制闭环 + 两条已验证窄链；目标：平台持久化 Task、Approval、Evidence、Ledger 与 Recovery。</text>
+</svg>

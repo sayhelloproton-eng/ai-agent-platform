@@ -1,0 +1,26 @@
+{
+  "visual_asset_id": "VIS-015",
+  "title": "ChatGPT 生态体系与配置全景",
+  "version": 2,
+  "status": "accepted",
+  "target_document": "docs/knowledge/02_基础产品与能力/CAP-001-ChatGPT生态体系与配置全景/README.md",
+  "target_document_asset_id": "CAP-001",
+  "source_documents": [
+    "CAP-001",
+    "CAP-003",
+    "CAP-004",
+    "CAP-005",
+    "PRD-003"
+  ],
+  "storage_model": "document_bundle",
+  "source_svg": "docs/knowledge/02_基础产品与能力/CAP-001-ChatGPT生态体系与配置全景/assets/VIS-015-ChatGPT生态体系与配置全景.svg",
+  "preview_png": "docs/knowledge/02_基础产品与能力/CAP-001-ChatGPT生态体系与配置全景/assets/VIS-015-ChatGPT生态体系与配置全景.png",
+  "markdown_image": "./assets/VIS-015-ChatGPT生态体系与配置全景.png",
+  "semantic_mirror_heading": "AI 可读语义镜像",
+  "width": 1672,
+  "height": 941,
+  "svg_sha256": "960a11c717c935301a4a5c9745deb8c3d8ffb20c0ffd03c7d978d0fa5897ad3a",
+  "png_sha256": "fced8ff08f2f830e301cfd6c613160efd41f1579e2365f05eb77631f16ce3890",
+  "visual_style": "formal-whitepaper-card-grid-high-density",
+  "review_notes": "PNG preview regenerated in the approved OpenClaw-style high-density card layout via OpenAI image generation (`image_gen`) after document text freeze and separate visual review. Existing SVG source is older and should be refreshed in a later package; accepted PNG is the authoritative preview for this revision."
+}

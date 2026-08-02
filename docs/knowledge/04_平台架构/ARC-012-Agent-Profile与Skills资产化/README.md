@@ -63,6 +63,6 @@ Profile 经 draft、review、released、deprecated；发布前验证触发、Ski
 
 ## 9. 关联文档
 
-- [CAP-008 Agent 扩展与治理](../../02_基础产品与能力/CAP-008-Agent扩展与治理-AGENTSRulesSkillsHooksMCP与Plugins.md)
+- [CAP-008 平台核心能力模型与目标对齐](../../02_基础产品与能力/CAP-008-平台核心能力模型与目标对齐/README.md)
 - [THY-003 Agent + Skills](../../03_架构思想与理论/THY-003-Agent与Skills开发范式.md)
 - [KNO-006 Knowledge Pack 设计](../../05_上下文与知识系统/KNO-006-Knowledge-Pack设计.md)

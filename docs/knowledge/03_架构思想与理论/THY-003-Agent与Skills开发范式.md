@@ -193,7 +193,7 @@ Skill 版本不能只靠文字声明，应有：
 
 ## 11. 关联文档
 
-- [CAP-008 Agent 扩展与治理](../02_基础产品与能力/CAP-008-Agent扩展与治理-AGENTSRulesSkillsHooksMCP与Plugins.md)
+- [CAP-008 平台核心能力模型与目标对齐](../02_基础产品与能力/CAP-008-平台核心能力模型与目标对齐/README.md)
 - [THY-001 从 AI 工具到 Agent 工程平台](./THY-001-从AI工具到Agent工程平台.md)
 - [THY-006 项目方法论与工程启发](./THY-006-项目方法论与可复用工程启发.md)
 - [`skills/README.md`](../../../skills/README.md)

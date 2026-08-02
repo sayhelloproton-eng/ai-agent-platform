@@ -220,48 +220,12 @@ relations:
 - from: CAP-002
   type: derived_from
   to: PRD-001
-- from: CAP-003
-  type: depends_on
-  to: CAP-002
-- from: CAP-004
-  type: depends_on
-  to: CAP-001
-- from: CAP-004
-  type: derived_from
-  to: DEC-001
-- from: CAP-005
-  type: depends_on
-  to: CAP-004
-- from: CAP-005
-  type: explains
-  to: SKILL-CUSTOM-GPT-ACTIONS
-- from: CAP-005
-  type: validated_by
-  to: APP-GATEWAY
-- from: CAP-005
-  type: validated_by
-  to: APP-DEV-TUNNEL
 - from: CAP-006
   type: depends_on
   to: CAP-001
-- from: CAP-006
-  type: derived_from
-  to: CTX-007
 - from: CAP-006
   type: derived_from
   to: WFL-004
-- from: CAP-007
-  type: depends_on
-  to: CAP-006
-- from: CAP-007
-  type: derived_from
-  to: CTX-007
-- from: CAP-008
-  type: depends_on
-  to: CAP-006
-- from: CAP-008
-  type: depends_on
-  to: CAP-007
 - from: CAP-008
   type: derived_from
   to: PRD-007
@@ -415,12 +379,6 @@ relations:
 - from: KNO-004
   type: depends_on
   to: CAP-002
-- from: KNO-004
-  type: depends_on
-  to: CAP-004
-- from: KNO-004
-  type: depends_on
-  to: CAP-005
 - from: KNO-005
   type: derived_from
   to: WFL-001
@@ -691,9 +649,6 @@ relations:
 - from: ARC-015
   type: derived_from
   to: REF-003
-- from: CAP-005
-  type: validated_by
-  to: EXP-005
 - from: APP-GATEWAY
   type: validated_by
   to: EXP-005
@@ -1033,3 +988,78 @@ relations:
 - from: PRD-007
   type: depends_on
   to: PRD-003
+- from: CAP-003
+  type: superseded_by
+  to: CAP-001
+- from: CAP-003
+  type: superseded_by
+  to: CAP-002
+- from: CAP-004
+  type: superseded_by
+  to: CAP-001
+- from: CAP-004
+  type: superseded_by
+  to: CAP-002
+- from: CAP-005
+  type: superseded_by
+  to: CAP-001
+- from: CAP-005
+  type: superseded_by
+  to: CAP-002
+- from: CAP-007
+  type: superseded_by
+  to: CAP-002
+- from: CAP-007
+  type: superseded_by
+  to: CAP-006
+- from: CAP-001
+  type: depends_on
+  to: PRD-003
+- from: CAP-002
+  type: explains
+  to: SKILL-CUSTOM-GPT-ACTIONS
+- from: CAP-002
+  type: validated_by
+  to: APP-GATEWAY
+- from: CAP-002
+  type: validated_by
+  to: APP-DEV-TUNNEL
+- from: CAP-002
+  type: validated_by
+  to: EXP-005
+- from: CAP-006
+  type: depends_on
+  to: CAP-002
+- from: CAP-006
+  type: derived_from
+  to: CTX-005
+- from: CAP-008
+  type: depends_on
+  to: CAP-001
+- from: CAP-008
+  type: depends_on
+  to: CAP-002
+- from: CAP-008
+  type: depends_on
+  to: CAP-006
+- from: CAP-008
+  type: derived_from
+  to: PRD-003
+- from: CAP-008
+  type: derived_from
+  to: PRD-005
+- from: VIS-015
+  type: explains
+  to: CAP-001
+- from: VIS-016
+  type: explains
+  to: CAP-002
+- from: VIS-017
+  type: explains
+  to: CAP-008
+- from: VIS-018
+  type: explains
+  to: CAP-006
+- from: KNO-004
+  type: depends_on
+  to: CAP-001

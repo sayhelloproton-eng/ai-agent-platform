@@ -13,8 +13,7 @@ releases:
   branch: knowledge-rebuild-v2
   publication_status: unpublished
   feishu_status: not_started
-  notes: Knowledge content, registry migration, deterministic delivery governance, and ten formal visual assets completed
-    and accepted; final integration is merged to main by Batch 10. Feishu publication remains not started.
+  notes: Knowledge content, registry migration, deterministic delivery governance, and ten formal visual assets completed and accepted; final integration is merged to main by Batch 10. Feishu publication remains not started.
   repository_review_status: accepted
   implementation_commit: f377303025a260def940206ac264668913f6618b
   asset_implementation_commit: d2c628b5f1b201eea9f267d60ca92a03898525ba
@@ -104,8 +103,7 @@ releases:
   status: completed
   branch: knowledge-rebuild-v2
   base_commit: 1e2beb8c584ba12c5dff0fb5efb3100942394fbd
-  content_scope: full-library consistency, 15 approved path moves, 17 in-place migration audits, and legacy knowledge directory
-    closure
+  content_scope: full-library consistency, 15 approved path moves, 17 in-place migration audits, and legacy knowledge directory closure
   repository_review_status: accepted
   publication_status: unpublished
   feishu_status: not_started
@@ -115,8 +113,7 @@ releases:
   status: completed
   branch: knowledge-rebuild-v2
   base_commit: 3ef6b7a74d0626edad1179336df618e372a7588f
-  content_scope: ai-knowledge trigger narrowing, deterministic delivery skill, continuation/resume protocol, and migration
-    status closure
+  content_scope: ai-knowledge trigger narrowing, deterministic delivery skill, continuation/resume protocol, and migration status closure
   repository_review_status: accepted
   publication_status: unpublished
   feishu_status: not_started
@@ -126,8 +123,7 @@ releases:
   status: completed
   branch: knowledge-rebuild-v2
   base_commit: 80b91622198a9adc7dec787b1e4180baf6e90cce
-  content_scope: ten reviewed SVG/PNG visual assets, asset:// document integration, visual registry, and cross-branch delivery
-    validation
+  content_scope: ten reviewed SVG/PNG visual assets, asset:// document integration, visual registry, and cross-branch delivery validation
   repository_review_status: accepted
   asset_branch: knowledge-assets
   publication_status: unpublished
@@ -159,3 +155,12 @@ releases:
   feishu_status: not_started
   skill_version: 0.4.0
   implementation_commit: 85423d29cc7a6552ada4d2b45e0b8c92dcac3375
+- release_id: KNOWLEDGE-REBUILD-V2-BATCH-13
+  type: knowledge-review-and-authoring
+  status: completed
+  branch: knowledge-rebuild-v2
+  base_commit: 37e34ada2c9ad0a5ed962e4876e585bfa56b7e4b
+  content_scope: CAP-001, CAP-002, CAP-006, CAP-008, VIS-015～VIS-018, and formal diagram authoring rules
+  repository_review_status: accepted
+  publication_status: unpublished
+  feishu_status: not_started

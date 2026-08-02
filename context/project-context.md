@@ -8,6 +8,8 @@
 
 `ai-agent-platform` 是当前主产品、底层平台和仓库主体。AI 视频工作流是首个计划验证的上层产品；可信任务控制台、专业 Agent 资产工作台、项目知识治理工作台和第二垂直工作流仅处于机会方向，不是正式产品承诺。
 
+平台建立在 ChatGPT、Projects、Custom GPT、Plugins / Apps、Actions、Work、Codex 和 OpenAI API 等生态能力之上，但不把 Host 产品功能冒充为平台实现。平台核心是可信 Context、Planner–Executor Handoff、Task Control、身份与 Policy、Approval、Evidence、Recovery、Executor / Provider Adapter、Agent 资产治理和知识发布。
+
 项目与产品不同：项目承载建设历史、学习、实验、治理和 Portfolio；产品承诺为明确用户持续交付价值与体验。潜在方向只有通过问题证据、产品形态、最小纵向切片和停止条件，才升级为正式产品概念。
 
 ## 为什么创建

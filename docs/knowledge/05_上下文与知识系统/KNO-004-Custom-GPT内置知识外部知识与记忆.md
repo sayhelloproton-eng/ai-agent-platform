@@ -38,9 +38,9 @@ Memory 适合长期低风险偏好；Task State 由平台保存。Project 隔离
 
 ## 9. 关联文档
 
-- [CAP-002 ChatGPT 产品形态](../02_基础产品与能力/CAP-002-ChatGPT产品形态与能力边界.md)
-- [CAP-004 Custom GPT 边界](../02_基础产品与能力/CAP-004-CustomGPT产品能力与边界.md)
-- [CAP-005 Custom GPT 配置](../02_基础产品与能力/CAP-005-CustomGPT-Instructions-Knowledge-Actions与发布配置.md)
+- [CAP-002 ChatGPT 产品形态](../02_基础产品与能力/CAP-002-生态组件配置与能力差异/README.md)
+- [CAP-004 Custom GPT 边界](../02_基础产品与能力/CAP-002-生态组件配置与能力差异/README.md)
+- [CAP-005 Custom GPT 配置](../02_基础产品与能力/CAP-002-生态组件配置与能力差异/README.md)
 
 ## 10. 参考
 

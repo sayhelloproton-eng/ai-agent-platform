@@ -38,7 +38,7 @@ README 解释目录；Context 保存当前事实；Task Contract 定义本轮范
 
 ## 9. 关联文档
 
-- [CAP-008 Agent 扩展与治理](../02_基础产品与能力/CAP-008-Agent扩展与治理-AGENTSRulesSkillsHooksMCP与Plugins.md)
+- [CAP-008 平台核心能力模型与目标对齐](../02_基础产品与能力/CAP-008-平台核心能力模型与目标对齐/README.md)
 - [KNO-002 多级领域上下文](./KNO-002-多级领域上下文架构.md)
 - [根 AGENTS](../../../AGENTS.md)
 

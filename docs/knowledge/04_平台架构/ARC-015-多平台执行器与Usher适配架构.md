@@ -69,7 +69,7 @@ Git Agent / Skill / Tool Registry
 
 - [ARC-010 Execution Lane](./ARC-010-Execution-Lane执行通道模型/README.md)
 - [ARC-012 Agent Profile 与 Skills](./ARC-012-Agent-Profile与Skills资产化/README.md)
-- [CAP-008 Agent 扩展与治理](../02_基础产品与能力/CAP-008-Agent扩展与治理-AGENTSRulesSkillsHooksMCP与Plugins.md)
+- [CAP-008 平台核心能力模型与目标对齐](../02_基础产品与能力/CAP-008-平台核心能力模型与目标对齐/README.md)
 
 ## 10. 来源
 

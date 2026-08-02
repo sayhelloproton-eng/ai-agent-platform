@@ -23,14 +23,26 @@ When multiple sources still conflict or duplicate ownership is unresolved, route
 
 ## Workflow
 
+Formal documents use a two-stage authoring sequence. Do not design the final visual before the document's facts, terminology, information ownership and narrative are frozen.
+
+### Stage A — freeze the document text
+
 1. **Define ownership** — state the one question this document answers and what belongs elsewhere.
 2. **Select a type pattern** — architecture, product/PRD, ADR, technical design, runbook, experiment, README or portfolio. Read `references/02-document-type-patterns.md`.
 3. **Build the skeleton** — front-load scope, boundary and current/target status; use short sections with descriptive headings.
-4. **Choose dense forms** — prefer diagrams, matrices, tables, timelines, state transitions, checklists and decision records over long narrative.
-5. **Create visual semantic blocks** — every image is followed immediately by an AI-readable semantic mirror. Read `references/03-human-first-ai-lossless.md`.
-6. **Preserve evidence and uncertainty** — distinguish verified fact, accepted decision, inference, hypothesis, recommendation and non-goal.
-7. **Make it Git-first and Feishu-ready** — local relative assets, stable heading order, portable tables/code blocks, no Feishu URL in Git.
-8. **Review** — run the checklist and deterministic validator before presenting the candidate.
+4. **Choose dense textual forms** — prefer matrices, tables, timelines, state transitions, checklists and decision records over long narrative.
+5. **Normalize terminology** — on first use write `中文（English）`; keep official product names unchanged; after first use prefer Chinese.
+6. **Link current facts** — current vendor/product facts need clickable first-party Markdown links near the relevant claim and a dated source list.
+7. **Preserve evidence and uncertainty** — distinguish verified fact, accepted decision, inference, hypothesis, recommendation and non-goal.
+8. **Freeze the information map** — list the exact nodes, relationships, states, boundaries, exceptions and conclusions the later visual must contain.
+
+### Stage B — design and insert the formal visual
+
+9. **Create the formal visual from the frozen information map** — use deterministic editable vector source for architecture, process and comparison diagrams. Read `references/03-human-first-ai-lossless.md` and `references/05-formal-diagram-style.md`.
+10. **Review the visual separately** — reject rough, low-density, ambiguous or terminology-inconsistent output before inserting it into the document.
+11. **Create the semantic mirror** — every image is followed immediately by an AI-readable semantic equivalent.
+12. **Make it Git-first and Feishu-ready** — local relative assets, stable heading order, portable tables/code blocks, no Feishu URL in Git.
+13. **Review the complete bundle** — run the checklist and deterministic validator before presenting the candidate.
 
 ## Human-first, AI-lossless
 
@@ -76,4 +88,5 @@ Stop and request clarification when the document’s core question, truth source
 - claim discipline: `references/01-source-and-claim-discipline.md`;
 - document structures: `references/02-document-type-patterns.md`;
 - visual blocks: `references/03-human-first-ai-lossless.md`;
-- final review: `references/04-review-checklist.md`.
+- final review: `references/04-review-checklist.md`;
+- formal diagram style: `references/05-formal-diagram-style.md`.

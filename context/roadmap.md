@@ -10,7 +10,7 @@ Working Branch:
   knowledge-rebuild-v2
 
 Last Verified Review Source:
-  ad0bb6e687167ce198709b31e4733c5f2362e1ed
+  37e34ada2c9ad0a5ed962e4876e585bfa56b7e4b
 
 Current HEAD:
   read from Git at runtime
@@ -19,7 +19,7 @@ Current Phase:
   Phase 2.5 — Human Content Review and Knowledge Release Closure
 
 Current Review Group:
-  docs/knowledge/02_基础产品与能力/**
+  docs/knowledge/03_架构思想与理论/**
 ```
 
 当前已经完成：
@@ -34,11 +34,12 @@ Current Review Group:
 - `planner-executor-handoff v0.5.1 / accepted`；
 - `context/**` 人工 Review 与治理收口；
 - `docs/knowledge/00_项目入口/**` 聚合收口；
-- `docs/knowledge/01_产品体系/**` 产品定义、成熟度、计划产品与产品组合聚合收口。
+- `docs/knowledge/01_产品体系/**` 产品定义、成熟度、计划产品与产品组合聚合收口；
+- `docs/knowledge/02_基础产品与能力/**` ChatGPT 生态、配置、组件差异、平台核心能力与执行闭环聚合收口。
 
 当前尚未完成：
 
-- `02_基础产品与能力` 及后续知识目录的人工 Review；
+- `03_架构思想与理论` 及后续知识目录的人工 Review；
 - Project Knowledge Synthesis 的更多真实 Pilot 与接受评审；
 - 最终人工内容验收；
 - Feishu 最终发布、发布回读和最终整仓验收。
@@ -86,11 +87,12 @@ Feishu 最终知识投影尚未执行。
 
 - `context/**`；
 - `docs/knowledge/00_项目入口/**`；
-- `docs/knowledge/01_产品体系/**`。
+- `docs/knowledge/01_产品体系/**`；
+- `docs/knowledge/02_基础产品与能力/**`。
 
 ### 当前目录
 
-- `docs/knowledge/02_基础产品与能力/**`。
+- `docs/knowledge/03_架构思想与理论/**`。
 
 ### Project Knowledge Synthesis
 

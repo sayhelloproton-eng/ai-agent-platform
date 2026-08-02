@@ -66,5 +66,5 @@ Result 包含 status、output_refs、evidence_refs、side_effect_refs、errors �
 ## 9. 关联文档
 
 - [ARC-009 轻量 Task Control](../ARC-009-轻量Task-Control架构/README.md)
-- [CAP-006 Codex 产品与执行体系](../../02_基础产品与能力/CAP-006-Codex产品与执行体系.md)
+- [CAP-006 从 ChatGPT 到 Codex 的平台执行闭环](../../02_基础产品与能力/CAP-006-从ChatGPT到Codex的平台执行闭环/README.md)
 - [ARC-001 平台总体架构](../ARC-001-ai-agent-platform总体架构/README.md)

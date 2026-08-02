@@ -1,0 +1,27 @@
+{
+  "visual_asset_id": "VIS-016",
+  "title": "ChatGPT 生态组件配置与能力差异矩阵",
+  "version": 2,
+  "status": "accepted",
+  "target_document": "docs/knowledge/02_基础产品与能力/CAP-002-生态组件配置与能力差异/README.md",
+  "target_document_asset_id": "CAP-002",
+  "source_documents": [
+    "CAP-002",
+    "CAP-003",
+    "CAP-004",
+    "CAP-005",
+    "CAP-006",
+    "CAP-007"
+  ],
+  "storage_model": "document_bundle",
+  "source_svg": "docs/knowledge/02_基础产品与能力/CAP-002-生态组件配置与能力差异/assets/VIS-016-生态组件配置与能力差异矩阵.svg",
+  "preview_png": "docs/knowledge/02_基础产品与能力/CAP-002-生态组件配置与能力差异/assets/VIS-016-生态组件配置与能力差异矩阵.png",
+  "markdown_image": "./assets/VIS-016-生态组件配置与能力差异矩阵.png",
+  "semantic_mirror_heading": "AI 可读语义镜像",
+  "width": 1672,
+  "height": 941,
+  "svg_sha256": "6122e800a04381ce0df0d937ce2adfcbb3db61aa1c209c2dc67bd893a7816f73",
+  "png_sha256": "647703aa7849e9e8abf519aa5708a208a739e94ef270b35987c4955d31f01a5c",
+  "visual_style": "formal-whitepaper-card-grid-high-density",
+  "review_notes": "PNG preview regenerated in the approved OpenClaw-style high-density card layout via OpenAI image generation (`image_gen`) after document text freeze and separate visual review. Existing SVG source is older and should be refreshed in a later package; accepted PNG is the authoritative preview for this revision."
+}

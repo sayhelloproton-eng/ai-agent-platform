@@ -2,28 +2,66 @@
 
 ## 目录职责
 
-解释 ChatGPT、Custom GPT、Codex、AGENTS、Rules、Skills、Hooks、MCP 与 Plugins 的产品能力、配置和工程边界。
+本目录解释：ChatGPT 生态中有哪些产品入口和配置，功能与配置组合后能完成什么，哪些能力由生态直接提供，哪些必须成为 `ai-agent-platform` 的核心控制面，以及任务怎样从 ChatGPT 流转到 Codex / Work / Runtime 并形成可验证闭环。
+
+它不重复 `01_产品体系` 的用户价值和产品组合，也不替代 `04_平台架构` 的详细技术设计。
+
+## 推荐阅读顺序
+
+```text
+CAP-001 生态体系与配置全景
+→ CAP-002 组件差异与组合能力
+→ CAP-008 平台核心能力提炼
+→ CAP-006 任务执行闭环
+```
 
 ## 正式资产
 
-| ID | 文件 | 当前状态 |
-|---|---|---|
-| CAP-001 | `CAP-001-什么是ChatGPT-产品模型与Agent入口.md` | accepted |
-| CAP-002 | `CAP-002-ChatGPT产品形态与能力边界.md` | accepted |
-| CAP-003 | `CAP-003-ChatGPT配置权限与使用基线.md` | accepted |
-| CAP-004 | `CAP-004-CustomGPT产品能力与边界.md` | accepted |
-| CAP-005 | `CAP-005-CustomGPT-Instructions-Knowledge-Actions与发布配置.md` | accepted |
-| CAP-006 | `CAP-006-Codex产品与执行体系.md` | accepted |
-| CAP-007 | `CAP-007-Codex配置权限与执行基线.md` | accepted |
-| CAP-008 | `CAP-008-Agent扩展与治理-AGENTSRulesSkillsHooksMCP与Plugins.md` | accepted |
+| ID | Document Bundle | 核心问题 | 状态 |
+|---|---|---|---|
+| CAP-001 | [`CAP-001-ChatGPT生态体系与配置全景/`](./CAP-001-ChatGPT生态体系与配置全景/README.md) | 体系里有什么，有哪些配置？ | accepted / unpublished |
+| CAP-002 | [`CAP-002-生态组件配置与能力差异/`](./CAP-002-生态组件配置与能力差异/README.md) | 功能与配置组合后分别能做什么？ | accepted / unpublished |
+| CAP-008 | [`CAP-008-平台核心能力模型与目标对齐/`](./CAP-008-平台核心能力模型与目标对齐/README.md) | 哪些必须成为平台核心能力，是否与目标一致且可行？ | accepted / unpublished |
+| CAP-006 | [`CAP-006-从ChatGPT到Codex的平台执行闭环/`](./CAP-006-从ChatGPT到Codex的平台执行闭环/README.md) | 任务怎样按状态、权限和证据完整流转？ | accepted / unpublished |
 
-CAP-001～CAP-008 已通过真实 Commit Review；目录正文在正式发布前保持 `unpublished`。
+## 术语约定
+
+正文第一次出现专业词时采用“中文（English）”，后续优先使用中文。产品正式名称保留原名。
+
+| 中文 | 英文 / 缩写 | 本目录中的含义 |
+|---|---|---|
+| 产品入口 | Surface | 用户发起和监督工作的界面或产品形态 |
+| 执行环境 | Runtime | 文件、命令和工具真实运行的位置 |
+| 策略 | Policy | 根据身份、范围和风险决定是否允许动作 |
+| 审批 | Approval | 人或策略对高影响动作作出的继续 / 拒绝决定 |
+| 沙箱 | Sandbox | 限制本机文件、命令和网络范围的执行边界 |
+| 证据 | Evidence | 证明结果真实发生的测试、Diff、Commit、日志或回读 |
+| 任务状态 | Task State | 任务从草稿到执行、Review、接受或失败的当前阶段 |
+| 交接合同 | Handoff Contract | Planner 交给 Executor 的目标、范围、权限、验证和停止规则 |
+| 模型上下文协议 | Model Context Protocol，MCP | 向 Agent 暴露工具和资源的协议 |
+
+## 文档与图片生产顺序
+
+每篇文档严格分两阶段：
+
+```text
+知识综合与正文编写
+→ 正文事实、结构和术语冻结
+→ 单独设计正式图片
+→ 图片 Review
+→ 生成 AI 可读语义镜像
+→ 图片与正文一起进入交付包
+```
+
+禁止在正文未冻结时先生成正式架构图或流程图。
 
 ## 维护规则
 
-- 当前产品事实使用官方来源并记录核验日期；
+- 当前 OpenAI 产品事实必须提供可点击的官方链接并记录核验日期；
+- 易变事实在对应段落就近引用来源，不只在文末列名称；
 - 用户账号观察不能写成普遍事实；
-- 首次物化为 `partial`，真实 Commit Review 后再决定 `accepted`；
-- 系统元数据进入 `platform-registry/`；
-- 复杂图在正文冻结后生成；
-- Host 产品路径与本仓库 Git 真源分开。
+- “Host 有此功能”不能写成“平台已经实现”；
+- 每项平台核心能力必须连接用户问题、生态依赖、平台所有权、当前证据和下一门槛；
+- 正式图采用大画布、卡片化、强分区、栅格对齐、克制语义配色和高信息密度；
+- 每张图必须基于冻结正文生成，并紧邻 AI 可读语义镜像；
+- 文档与本地资源共同组成 Document Bundle，发布时由 Publisher 转换图片引用。

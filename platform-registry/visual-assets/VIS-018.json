@@ -1,0 +1,26 @@
+{
+  "visual_asset_id": "VIS-018",
+  "title": "从 ChatGPT 到 Codex 的平台执行闭环",
+  "version": 2,
+  "status": "accepted",
+  "target_document": "docs/knowledge/02_基础产品与能力/CAP-006-从ChatGPT到Codex的平台执行闭环/README.md",
+  "target_document_asset_id": "CAP-006",
+  "source_documents": [
+    "CAP-006",
+    "CAP-007",
+    "CAP-008",
+    "WFL-004",
+    "CTX-005"
+  ],
+  "storage_model": "document_bundle",
+  "source_svg": "docs/knowledge/02_基础产品与能力/CAP-006-从ChatGPT到Codex的平台执行闭环/assets/VIS-018-从ChatGPT到Codex的平台执行闭环.svg",
+  "preview_png": "docs/knowledge/02_基础产品与能力/CAP-006-从ChatGPT到Codex的平台执行闭环/assets/VIS-018-从ChatGPT到Codex的平台执行闭环.png",
+  "markdown_image": "./assets/VIS-018-从ChatGPT到Codex的平台执行闭环.png",
+  "semantic_mirror_heading": "AI 可读语义镜像",
+  "width": 1672,
+  "height": 941,
+  "svg_sha256": "4881752011fdc6512765d51e9a7c5614457459f21dec6c283fd2a064cd9655a5",
+  "png_sha256": "3c56a4e4ed416bc4ef120c475d3abdaf599272f1a73105c5a92fcd6f84ab5e3f",
+  "visual_style": "formal-whitepaper-card-grid-high-density",
+  "review_notes": "PNG preview regenerated in the approved OpenClaw-style high-density card layout via OpenAI image generation (`image_gen`) after document text freeze and separate visual review. Existing SVG source is older and should be refreshed in a later package; accepted PNG is the authoritative preview for this revision."
+}

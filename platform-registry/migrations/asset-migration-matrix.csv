@@ -383,14 +383,6 @@ skills/microsoft-dev-tunnels/references/official-cli-baseline.md,md,Official CLI
 skills/microsoft-dev-tunnels/references/security-and-limits.md,md,Security and Limits,keep,skills/microsoft-dev-tunnels/references/security-and-limits.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
 skills/microsoft-dev-tunnels/references/troubleshooting.md,md,Troubleshooting,keep,skills/microsoft-dev-tunnels/references/troubleshooting.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
 tsconfig.base.json,json,,keep_review,tsconfig.base.json,,保留并在相关批次复核,01-control-plane
-,md,什么是 ChatGPT：产品、模型与 Agent 入口,materialize,docs/knowledge/02_基础产品与能力/CAP-001-什么是ChatGPT-产品模型与Agent入口.md,CAP-001,基于官方产品事实、仓库实现与已接受知识综合生成正式正文,03a-chatgpt-custom-gpt
-,md,ChatGPT 产品形态与能力边界,materialize,docs/knowledge/02_基础产品与能力/CAP-002-ChatGPT产品形态与能力边界.md,CAP-002,基于官方产品事实、仓库实现与已接受知识综合生成正式正文,03a-chatgpt-custom-gpt
-,md,ChatGPT 配置、权限与使用基线,materialize,docs/knowledge/02_基础产品与能力/CAP-003-ChatGPT配置权限与使用基线.md,CAP-003,基于官方产品事实、仓库实现与已接受知识综合生成正式正文,03a-chatgpt-custom-gpt
-,md,Custom GPT 产品能力与边界,materialize,docs/knowledge/02_基础产品与能力/CAP-004-CustomGPT产品能力与边界.md,CAP-004,基于官方产品事实、仓库实现与已接受知识综合生成正式正文,03a-chatgpt-custom-gpt
-,md,Custom GPT Instructions、Knowledge、Actions 与发布配置,materialize,docs/knowledge/02_基础产品与能力/CAP-005-CustomGPT-Instructions-Knowledge-Actions与发布配置.md,CAP-005,基于官方产品事实、仓库实现与已接受知识综合生成正式正文,03a-chatgpt-custom-gpt
-,md,Codex 产品与执行体系,materialize,docs/knowledge/02_基础产品与能力/CAP-006-Codex产品与执行体系.md,CAP-006,基于官方产品事实、仓库实现、已接受知识和工程证据综合生成正式正文,03bc-codex-and-agent-theory
-,md,Codex 配置、权限与执行基线,materialize,docs/knowledge/02_基础产品与能力/CAP-007-Codex配置权限与执行基线.md,CAP-007,基于官方产品事实、仓库实现、已接受知识和工程证据综合生成正式正文,03bc-codex-and-agent-theory
-,md,Agent 扩展与治理：AGENTS、Rules、Skills、Hooks、MCP 与 Plugins,materialize,docs/knowledge/02_基础产品与能力/CAP-008-Agent扩展与治理-AGENTSRulesSkillsHooksMCP与Plugins.md,CAP-008,基于官方产品事实、仓库实现、已接受知识和工程证据综合生成正式正文,03bc-codex-and-agent-theory
 ,md,从 AI 工具到 Agent 工程平台,materialize,docs/knowledge/03_架构思想与理论/THY-001-从AI工具到Agent工程平台.md,THY-001,基于官方产品事实、仓库实现、已接受知识和工程证据综合生成正式正文,03bc-codex-and-agent-theory
 ,md,AI 开发范式演进,materialize,docs/knowledge/03_架构思想与理论/THY-002-AI开发范式演进.md,THY-002,基于官方产品事实、仓库实现、已接受知识和工程证据综合生成正式正文,03bc-codex-and-agent-theory
 ,md,Agent + Skills 开发范式,materialize,docs/knowledge/03_架构思想与理论/THY-003-Agent与Skills开发范式.md,THY-003,基于官方产品事实、仓库实现、已接受知识和工程证据综合生成正式正文,03bc-codex-and-agent-theory
@@ -510,3 +502,11 @@ docs/knowledge/01_产品体系/PRD-004-用户价值与核心场景.md,md,PRD-004
 docs/knowledge/01_产品体系/PRD-005-能力地图与演进路线.md,md,PRD-005 Product Bundle,bundle_move,docs/knowledge/01_产品体系/PRD-005-平台能力地图与产品成熟度/README.md,PRD-005,移除动态 Roadmap 所有权，保留稳定能力成熟度与证据门,12-product-system-review-and-authoring
 docs/knowledge/01_产品体系/PRD-006-AI视频工作流产品概念.md,md,PRD-006 Product Bundle,bundle_move,docs/knowledge/01_产品体系/PRD-006-AI视频工作流产品概念与验证计划/README.md,PRD-006,补齐用户、产品体验、纵向切片、证据门与停止条件,12-product-system-review-and-authoring
 docs/knowledge/01_产品体系/PRD-007-平台与上层产品边界.md,md,PRD-007 Product Bundle,rewrite_bundle,docs/knowledge/01_产品体系/PRD-007-产品组合演进与平台边界/README.md,PRD-007,扩展为当前主产品、计划产品、潜在方向、阶段门与平台边界的唯一所有者,12-product-system-review-and-authoring
+,md,ChatGPT 生态体系与配置全景,rewrite,docs/knowledge/02_基础产品与能力/CAP-001-ChatGPT生态体系与配置全景/README.md,CAP-001,聚合 CAP-001/003/004/005 的稳定事实，并用官方 2026-08-03 产品资料校准,02-capability-system
+,md,ChatGPT 生态组件配置与能力差异,rewrite,docs/knowledge/02_基础产品与能力/CAP-002-生态组件配置与能力差异/README.md,CAP-002,聚合组件差异、配置、权限与选型，避免把 Host 功能写成平台实现,02-capability-system
+,md,从 ChatGPT 到 Codex 的平台执行闭环,rewrite,docs/knowledge/02_基础产品与能力/CAP-006-从ChatGPT到Codex的平台执行闭环/README.md,CAP-006,聚合 Codex 产品、权限与执行基线，建立控制流、数据流、证据流和失败门,02-capability-system
+,md,平台核心能力模型与目标对齐,rewrite,docs/knowledge/02_基础产品与能力/CAP-008-平台核心能力模型与目标对齐/README.md,CAP-008,从生态原生能力中提炼平台必须拥有的跨产品控制面,02-capability-system
+,md,ChatGPT 配置、权限与使用基线（聚合前版本）,archive,docs/technical/归档/历史资产/02_基础产品与能力_聚合前版本/CAP-003-ChatGPT配置权限与使用基线.md,CAP-003,由 CAP-001 与 CAP-002 承接,02-capability-system
+,md,Custom GPT 产品能力与边界（聚合前版本）,archive,docs/technical/归档/历史资产/02_基础产品与能力_聚合前版本/CAP-004-CustomGPT产品能力与边界.md,CAP-004,由 CAP-001 与 CAP-002 承接,02-capability-system
+,md,Custom GPT Instructions、Knowledge、Actions 与发布配置（聚合前版本）,archive,docs/technical/归档/历史资产/02_基础产品与能力_聚合前版本/CAP-005-CustomGPT-Instructions-Knowledge-Actions与发布配置.md,CAP-005,由 CAP-001 与 CAP-002 承接,02-capability-system
+,md,Codex 配置、权限与执行基线（聚合前版本）,archive,docs/technical/归档/历史资产/02_基础产品与能力_聚合前版本/CAP-007-Codex配置权限与执行基线.md,CAP-007,由 CAP-002 与 CAP-006 承接,02-capability-system

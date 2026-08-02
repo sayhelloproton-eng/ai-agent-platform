@@ -10,7 +10,7 @@ Formal Baseline:
 Working Branch:
   Branch: knowledge-rebuild-v2
   Current HEAD: read from Git at runtime
-  Last Verified Review Source: ad0bb6e687167ce198709b31e4733c5f2362e1ed
+  Last Verified Review Source: 37e34ada2c9ad0a5ed962e4876e585bfa56b7e4b
 
 Phase:
   2.5 — Human Content Review and Governance Refinement
@@ -69,11 +69,11 @@ Document-ID-title/
 - Feishu URL、Media Token 与 Block ID 不回写 Git；
 - Git 和 Feishu 要求语义等价，不要求物理语法相同。
 
-首批 10 个正式视觉资产已迁回对应文档包，用于验证 Document Bundle 和 Human-first、AI-lossless 规则。
+当前 18 个正式视觉资产与对应文档共置；其中基础产品与能力新增 4 张精致卡片化正式图，用于表达生态配置、组件差异、核心能力提炼和执行闭环。
 
 ## Current Review State
 
-- `00_项目入口` 与 `01_产品体系` 已经综合收敛并完成落库；
+- `00_项目入口`、`01_产品体系` 与 `02_基础产品与能力` 已经综合收敛并完成落库；
 - 当前主线继续逐目录正式内容人工 Review；
 - Skill 组合治理、Document Bundle、Human-first / AI-lossless 与 Publisher 本地图片转换规则已完成落库；
 - Feishu 最终覆盖发布、发布回读和整仓验收尚未开始；
@@ -81,7 +81,7 @@ Document-ID-title/
 
 ## Next Actions
 
-1. 继续 `docs/knowledge/02_基础产品与能力/` 人工 Review；
+1. 继续 `docs/knowledge/03_架构思想与理论/` 人工 Review；
 2. 按目录生成冻结完整文件，由 Executor 机械落库；
 3. 全部正文 Review 后执行 Registry / 链接 / 文档包 / 图片语义镜像总验收；
 4. 独立授权 Git → Feishu 覆盖发布并回读；

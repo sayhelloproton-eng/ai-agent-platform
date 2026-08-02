@@ -1,5 +1,5 @@
 version: 1
-baseline_commit: ad0bb6e687167ce198709b31e4733c5f2362e1ed
+baseline_commit: 37e34ada2c9ad0a5ed962e4876e585bfa56b7e4b
 capabilities:
 - id: CAP-RUNTIME-STATUS
   status: verified
@@ -23,19 +23,27 @@ capabilities:
 - id: CAP-TASK-CONTROL
   status: designing
   implemented_by: []
-  evidence: []
+  evidence:
+  - docs/knowledge/02_基础产品与能力/CAP-008-平台核心能力模型与目标对齐/README.md
+  - docs/knowledge/02_基础产品与能力/CAP-006-从ChatGPT到Codex的平台执行闭环/README.md
 - id: CAP-APPROVAL
   status: candidate
   implemented_by: []
-  evidence: []
+  evidence:
+  - docs/knowledge/02_基础产品与能力/CAP-008-平台核心能力模型与目标对齐/README.md
+  - docs/knowledge/02_基础产品与能力/CAP-006-从ChatGPT到Codex的平台执行闭环/README.md
 - id: CAP-EVIDENCE
   status: candidate
   implemented_by: []
-  evidence: []
+  evidence:
+  - docs/knowledge/02_基础产品与能力/CAP-008-平台核心能力模型与目标对齐/README.md
+  - docs/knowledge/02_基础产品与能力/CAP-006-从ChatGPT到Codex的平台执行闭环/README.md
 - id: CAP-HEALTH-RECOVERY
   status: candidate
   implemented_by: []
-  evidence: []
+  evidence:
+  - docs/knowledge/02_基础产品与能力/CAP-008-平台核心能力模型与目标对齐/README.md
+  - docs/knowledge/02_基础产品与能力/CAP-006-从ChatGPT到Codex的平台执行闭环/README.md
 - id: CAP-AI-VIDEO-WORKFLOW
   status: idea
   implemented_by: []
@@ -77,3 +85,5 @@ capabilities:
   - skills/engineering-document-authoring/tests/self-test.mjs
   - docs/knowledge/06_智能体资产体系/SKL-005-工程文档编写技能.md
   - docs/adr/ADR-003-document-bundles-human-first-ai-lossless.md
+  - skills/engineering-document-authoring/references/05-formal-diagram-style.md
+  - docs/knowledge/02_基础产品与能力/CAP-001-ChatGPT生态体系与配置全景/README.md
