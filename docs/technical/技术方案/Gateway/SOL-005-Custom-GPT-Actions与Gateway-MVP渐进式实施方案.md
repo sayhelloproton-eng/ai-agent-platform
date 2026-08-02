@@ -1,7 +1,7 @@
 # SOL-005: Custom GPT Actions 与 Gateway MVP 渐进式实施方案
 
 > **状态：Superseded（历史方案）**
-> 本文记录早期 Cloudflare Tunnel 路线。2026-07-30 起，Project Owner 已将当前 MVP 公网入口切换为 `Custom GPT → Microsoft Dev Tunnel → Action Gateway → Local Runtime`；当前命令与状态以 `apps/dev-tunnel/`、`context/current-status.md` 和 `skills/microsoft-dev-tunnels/` 为准。
+> 本文记录早期 Cloudflare Tunnel 路线。2026-07-30 起，Project Owner 已将当前 MVP 公网入口切换为 `Custom GPT → Microsoft Dev Tunnel → Action Gateway → Local Runtime`；当前命令与状态以 `apps/dev-tunnel/` 和 `context/current-status.md` 为准。
 
 ## 一、任务目标
 
@@ -224,7 +224,7 @@ ai-agent-platform
 4. 创建根 TypeScript 配置；
 5. 创建统一 Node 版本约束；
 6. 添加根级检查脚本；
-7. 验证不会影响现有 `skills/ai-knowledge`。
+7. 验证不会影响现有 `skills/project-knowledge-governance`。
 
 技术原则：
 

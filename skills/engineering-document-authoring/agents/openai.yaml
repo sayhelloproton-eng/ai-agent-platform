@@ -1,0 +1,4 @@
+interface:
+  display_name: "Engineering Document Authoring"
+  short_description: "Write Human-first, AI-lossless engineering documents"
+  default_prompt: "Use $engineering-document-authoring to turn approved facts and decisions into a complete, visually structured, AI-lossless engineering document."

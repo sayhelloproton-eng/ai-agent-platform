@@ -172,7 +172,7 @@ Codex 的可靠性来自工程边界，而不是模型承诺：
 - [CAP-001 什么是 ChatGPT](./CAP-001-什么是ChatGPT-产品模型与Agent入口.md)
 - [CAP-007 Codex 配置、权限与执行基线](./CAP-007-Codex配置权限与执行基线.md)
 - [CAP-008 Agent 扩展与治理](./CAP-008-Agent扩展与治理-AGENTSRulesSkillsHooksMCP与Plugins.md)
-- [ARC-001 平台总体架构](../04_平台架构/ARC-001-ai-agent-platform总体架构.md)
+- [ARC-001 平台总体架构](../04_平台架构/ARC-001-ai-agent-platform总体架构/README.md)
 - [WFL-004 多模型 Agent 执行治理与 Token 预算](../07_工作流与项目治理/WFL-004-多模型Agent执行治理与Token预算.md)
 
 ## 11. 产品事实核验基线

@@ -553,7 +553,7 @@ Cloudflare Edge 是独立 Workspace，没有修改：
 - `packages/contracts`；
 - `packages/auth`；
 - `packages/policy`；
-- `skills/ai-knowledge`。
+- `skills/project-knowledge-governance`。
 
 ---
 

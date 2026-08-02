@@ -17,7 +17,8 @@ const requiredDirectories = [
   "context",
   "docs",
   "skills",
-  "skills/ai-knowledge",
+  "skills/project-knowledge-governance",
+  "skills/engineering-document-authoring",
 ];
 const protectedSecretFiles = [".env", ".env.local", ".env.production"];
 const failures = [];

@@ -2,7 +2,7 @@
 
 ## 1. 目的
 
-本协议定义 Project Owner、ChatGPT、执行层 Agent 和 AI Knowledge Skill 在项目任务中的详细职责，以及读取、计划、修改、验证和报告流程。
+本协议定义 Project Owner、ChatGPT、执行层 Agent 和 Project Knowledge Governance Skill 在项目任务中的详细职责，以及读取、计划、修改、验证和报告流程。
 
 它细化根项目宪法，不改变项目愿景、阶段顺序或正式事实边界。
 
@@ -45,7 +45,7 @@ ChatGPT 不把方案自动视为本地实现，也不替代实际测试证据。
 
 Codex、GPT Work、OpenCode / DeepSeek 及其他执行器不得自行改变项目愿景、阶段顺序、总体架构、冻结方案或已接受决策。执行器必须按 `planner-executor-handoff` 返回 Reception Ack、Checkpoint、Failure / Stop Report、Execution Result 和 Review Response。
 
-### AI Knowledge Skill
+### Project Knowledge Governance Skill
 
 负责：
 

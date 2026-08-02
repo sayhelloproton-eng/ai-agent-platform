@@ -57,9 +57,10 @@ Custom GPT
 - Platform Registry；
 - Engineering Insight Registry；
 - Git → Feishu 单向发布机制；
-- `asset://` 正式图片引用和 Feishu 图片 Publisher；
-- AI Knowledge、Deterministic Delivery、Custom GPT Actions、Microsoft Dev Tunnels、Engineering Insight Distillation、Planner Executor Handoff 六个已验证或已接受 Skill；
-- Project Knowledge Synthesis Skill v0.1.0 已物化并完成首个目录聚合 Pilot，当前状态为 `in_review`；
+- 文档正文与 SVG / PNG 资源同目录、同分支、同 Commit 管理；
+- Human-first、AI-lossless 视觉语义块和本地相对图片 Publisher；
+- 六个边界清晰的活跃 Skill：Planner Executor Handoff、Project Knowledge Synthesis、Engineering Document Authoring、Project Knowledge Governance、Engineering Insight Distillation、Custom GPT Actions；
+- Deterministic Delivery 已并入 Handoff；Microsoft Dev Tunnels 已回归应用 Runbook；
 - `planner-executor-handoff v0.5.1 / accepted`；
 - Context 所有权和维护机制。
 
@@ -69,7 +70,7 @@ Custom GPT
 
 - Task / Result / Error Contracts；
 - Skill、Knowledge、Registry 和仓库级校验；
-- 测试、Scope Lock、确定性交付、单 Commit 与远端回读；
+- 测试、Scope Lock、Handoff 冻结 Artifact 模式、单 Commit 与远端回读；
 - 正式知识、代码、测试、决策和证据的可追踪关系。
 
 ## 当前阶段
@@ -175,13 +176,15 @@ Git 是唯一真源。Feishu 只做面向人的覆盖式投影。
 5. [`docs/knowledge/README.md`](docs/knowledge/README.md)：正式知识导航；
 6. [`docs/technical/README.md`](docs/technical/README.md)：工程执行资料；
 7. [`platform-registry/README.md`](platform-registry/README.md)：资产关系、状态与 Feishu 映射；
-8. [`skills/README.md`](skills/README.md)：可执行 Skill。
+8. [`skills/README.md`](skills/README.md)：六个活跃 Skill 与退役映射。
 
 ## 验证
 
 ```bash
 npm run check:repo
+npm run check:skills
 npm run check:knowledge
+npm run check:authoring
 npm run check:insights
 npm run check:synthesis
 npm run verify

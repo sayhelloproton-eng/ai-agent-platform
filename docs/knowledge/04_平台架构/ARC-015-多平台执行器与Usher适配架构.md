@@ -67,8 +67,8 @@ Git Agent / Skill / Tool Registry
 
 ## 9. 关联资产
 
-- [ARC-010 Execution Lane](./ARC-010-Execution-Lane执行通道模型.md)
-- [ARC-012 Agent Profile 与 Skills](./ARC-012-Agent-Profile与Skills资产化.md)
+- [ARC-010 Execution Lane](./ARC-010-Execution-Lane执行通道模型/README.md)
+- [ARC-012 Agent Profile 与 Skills](./ARC-012-Agent-Profile与Skills资产化/README.md)
 - [CAP-008 Agent 扩展与治理](../02_基础产品与能力/CAP-008-Agent扩展与治理-AGENTSRulesSkillsHooksMCP与Plugins.md)
 
 ## 10. 来源

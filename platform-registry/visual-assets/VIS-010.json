@@ -3,20 +3,21 @@
   "title": "知识生命周期与单向投影",
   "version": 1,
   "status": "accepted",
-  "target_document": "docs/knowledge/05_上下文与知识系统/KNO-005-项目知识生命周期.md",
+  "target_document": "docs/knowledge/05_上下文与知识系统/KNO-005-项目知识生命周期/README.md",
   "target_document_asset_id": "KNO-005",
   "source_documents": [
     "KNO-005",
     "WFL-001",
     "ARC-005"
   ],
-  "source_branch": "knowledge-assets",
-  "source_svg": "images/05_上下文与知识系统/KNO-005-项目知识生命周期/VIS-010-知识生命周期与单向投影.svg",
-  "preview_png": "images/05_上下文与知识系统/KNO-005-项目知识生命周期/VIS-010-知识生命周期与单向投影.png",
-  "asset_uri": "asset://05_上下文与知识系统/KNO-005-项目知识生命周期/VIS-010-知识生命周期与单向投影.png",
+  "source_svg": "docs/knowledge/05_上下文与知识系统/KNO-005-项目知识生命周期/assets/VIS-010-知识生命周期与单向投影.svg",
+  "preview_png": "docs/knowledge/05_上下文与知识系统/KNO-005-项目知识生命周期/assets/VIS-010-知识生命周期与单向投影.png",
   "width": 1800,
   "height": 1100,
   "svg_sha256": "68de0bf0b961b3ed3d7bebce0f2f8f71310d38ba5610bc8400180d4c3f3b7531",
   "png_sha256": "eacfc9f90f78303274e6190231cd73437b7effa55749cd5efafa4f0359d6392a",
-  "review_notes": "Git 是唯一正式修改入口；Feishu、Custom GPT Knowledge 与 HTML 都是可重建投影。"
+  "review_notes": "Git 是唯一正式修改入口；Feishu、Custom GPT Knowledge 与 HTML 都是可重建投影。",
+  "storage_model": "document_bundle",
+  "markdown_image": "./assets/VIS-010-知识生命周期与单向投影.png",
+  "semantic_mirror_heading": "AI 可读语义镜像"
 }

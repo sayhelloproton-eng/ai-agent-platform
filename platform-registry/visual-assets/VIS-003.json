@@ -3,18 +3,19 @@
   "title": "DDD Bounded Context 蓝图",
   "version": 1,
   "status": "accepted",
-  "target_document": "docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图.md",
+  "target_document": "docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图/README.md",
   "target_document_asset_id": "ARC-008",
   "source_documents": [
     "ARC-008"
   ],
-  "source_branch": "knowledge-assets",
-  "source_svg": "images/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图/VIS-003-DDD领域蓝图.svg",
-  "preview_png": "images/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图/VIS-003-DDD领域蓝图.png",
-  "asset_uri": "asset://04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图/VIS-003-DDD领域蓝图.png",
+  "source_svg": "docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图/assets/VIS-003-DDD领域蓝图.svg",
+  "preview_png": "docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图/assets/VIS-003-DDD领域蓝图.png",
   "width": 1800,
   "height": 1100,
   "svg_sha256": "12c5aafd60d5074e95043e85721c1665eec150608f0344e8c15386fe94dbaec1",
   "png_sha256": "69ff1632783e4806f000b77486756afaaab026dc98dd461ab63b96a9c97dd1cf",
-  "review_notes": "Context 表示规则与状态所有权，不表示当前已经拆成独立服务。"
+  "review_notes": "Context 表示规则与状态所有权，不表示当前已经拆成独立服务。",
+  "storage_model": "document_bundle",
+  "markdown_image": "./assets/VIS-003-DDD领域蓝图.png",
+  "semantic_mirror_heading": "AI 可读语义镜像"
 }

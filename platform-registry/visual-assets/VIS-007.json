@@ -3,18 +3,19 @@
   "title": "审批、证据与副作用账本",
   "version": 1,
   "status": "accepted",
-  "target_document": "docs/knowledge/04_平台架构/ARC-013-审批证据与副作用账本.md",
+  "target_document": "docs/knowledge/04_平台架构/ARC-013-审批证据与副作用账本/README.md",
   "target_document_asset_id": "ARC-013",
   "source_documents": [
     "ARC-013"
   ],
-  "source_branch": "knowledge-assets",
-  "source_svg": "images/04_平台架构/ARC-013-审批证据与副作用账本/VIS-007-审批证据与副作用账本.svg",
-  "preview_png": "images/04_平台架构/ARC-013-审批证据与副作用账本/VIS-007-审批证据与副作用账本.png",
-  "asset_uri": "asset://04_平台架构/ARC-013-审批证据与副作用账本/VIS-007-审批证据与副作用账本.png",
+  "source_svg": "docs/knowledge/04_平台架构/ARC-013-审批证据与副作用账本/assets/VIS-007-审批证据与副作用账本.svg",
+  "preview_png": "docs/knowledge/04_平台架构/ARC-013-审批证据与副作用账本/assets/VIS-007-审批证据与副作用账本.png",
   "width": 1800,
   "height": 1100,
   "svg_sha256": "9f9c742db8350d4877c2d67ff01ce6384b14d89332b8b99588cf9ad6957504b2",
   "png_sha256": "0ccee45ed68a35a50bc28629d36886f317d6b49055a5568f2a47bed524702e4b",
-  "review_notes": "高风险动作必须同时保留授权、执行副作用和完成证据。"
+  "review_notes": "高风险动作必须同时保留授权、执行副作用和完成证据。",
+  "storage_model": "document_bundle",
+  "markdown_image": "./assets/VIS-007-审批证据与副作用账本.png",
+  "semantic_mirror_heading": "AI 可读语义镜像"
 }

@@ -44,9 +44,9 @@ Git `skills/` 保存运行时真源；知识正文解释设计；Registry 关联
 
 - [THY-003 Agent + Skills 开发范式](../03_架构思想与理论/THY-003-Agent与Skills开发范式.md)
 - [CAP-008 Agent 扩展与治理：AGENTS、Rules、Skills、Hooks、MCP 与 Plugins](../02_基础产品与能力/CAP-008-Agent扩展与治理-AGENTSRulesSkillsHooksMCP与Plugins.md)
-- [ARC-012 Agent-Profile与Skills资产化](../04_平台架构/ARC-012-Agent-Profile与Skills资产化.md)
+- [ARC-012 Agent-Profile与Skills资产化](../04_平台架构/ARC-012-Agent-Profile与Skills资产化/README.md)
 - [KNO-010 工程洞见提炼与注册表治理](../05_上下文与知识系统/KNO-010-工程洞见提炼与注册表治理.md)
-- [SKL-001 AI Knowledge Skill](SKL-001-AI知识技能.md)
+- [SKL-001 项目知识治理技能](SKL-001-项目知识治理技能.md)
 - [SKL-002 Engineering Insight Distillation Skill](SKL-002-工程洞见提炼技能.md)
 - [SKL-003 规划者与执行器任务交接技能](SKL-003-规划者与执行器任务交接技能.md)
 - [AGT-007 Agent评估测试与发布](AGT-007-Agent评估测试与发布.md)

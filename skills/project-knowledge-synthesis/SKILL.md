@@ -110,7 +110,8 @@ Return `needs_evidence` or stop when:
 
 ## Relationship to Other Skills
 
-- `ai-knowledge` governs formal knowledge lifecycle and Feishu projection;
+- `project-knowledge-governance` governs formal knowledge lifecycle, Registry integrity and Feishu projection;
 - `engineering-insight-distillation` extracts reusable engineering lessons from verified events;
 - `planner-executor-handoff` carries approved frozen artifacts to the Executor;
-- `deterministic-delivery` applies the frozen package exactly.
+- `engineering-document-authoring` turns approved synthesis into complete formal documents;
+- `planner-executor-handoff` applies approved artifacts through `implement_from_spec` or `apply_frozen_artifacts`.

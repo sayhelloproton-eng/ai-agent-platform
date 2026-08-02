@@ -39,5 +39,5 @@ Git 不保存运行中 Lease、Approval 等待、心跳、外部副作用、临�
 ## 9. 关联文档
 
 - [ARC-007 多任务并行架构](./ARC-007-多窗口多角色多任务并行架构.md)
-- [ARC-010 Execution Lane](./ARC-010-Execution-Lane执行通道模型.md)
+- [ARC-010 Execution Lane](./ARC-010-Execution-Lane执行通道模型/README.md)
 - [THY-006 项目方法论](../03_架构思想与理论/THY-006-项目方法论与可复用工程启发.md)

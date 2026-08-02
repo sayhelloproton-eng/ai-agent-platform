@@ -201,11 +201,21 @@ Project Owner 的新决定不会自动改变代码或 Context。总控 Planner �
 - 关系、投影、实现状态和发布记录进入 `platform-registry/`；
 - 被替代资产必须记录 `supersedes` / `superseded_by` / `merged_into`。
 
-## 10. 复杂图
+## 10. 文档包与复杂图
 
-复杂架构、跨层关系、多角色泳道、状态机、治理闭环和生命周期必须生成正式 SVG / PNG 资产。
+资源型正式文档采用 Document Bundle：
 
-图在正文冻结后生成。现有失败图不作为视觉基线。
+```text
+Document-ID-title/
+├── README.md
+└── assets/
+```
+
+正文、图片、图表和附件必须位于同一工作分支、同一 Commit 和准确文档目录。Git 使用 `./assets/...` 本地相对引用；不得把正式资源放在独立图片分支，也不得把 Feishu 媒体链接回写 Git。
+
+复杂架构、跨层关系、多角色泳道、状态机、治理闭环和生命周期必须生成正式 SVG / PNG 资产。每个图片下方必须立即提供 `### AI 可读语义镜像`，以表格、节点关系、ASCII 架构、文本流程、状态转换或结构化叙述保存全部决策语义。
+
+图片与语义镜像是一个原子 Review 单元，必须同步更新。核心原则是：**Human-first, AI-lossless**。
 
 ## 11. 安全底线
 

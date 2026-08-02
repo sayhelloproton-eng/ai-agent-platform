@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-import { createHash } from "node:crypto";
-import { mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -113,14 +112,13 @@ if(!Array.isArray(protocol.$defs.canonicalContract.allOf)||protocol.$defs.canoni
 for(const name of expectedDefs){const d=protocol.$defs[name];if(!d||d.additionalProperties!==false)throw new Error(`schema definition ${name} missing or not strict`);}
 if(protocol.$defs.feedback.oneOf.length!==8)throw new Error("feedback schema must contain eight oneOf branches");
 
-// Manifest file-set and hash self-verification.
-async function allFiles(dir){const out=[];for(const e of await readdir(dir,{withFileTypes:true})){const p=path.join(dir,e.name);if(e.isDirectory())out.push(...await allFiles(p));else out.push(p);}return out;}
-const manifest=JSON.parse(await readFile(path.join(ROOT,"MANIFEST.json"),"utf8"));
-if(manifest.version!=="0.5.1"||manifest.status!=="accepted")throw new Error("manifest version/status mismatch");
-const actual=(await allFiles(ROOT)).filter(p=>path.basename(p)!=="MANIFEST.json").map(p=>path.relative(ROOT,p).split(path.sep).join("/")).sort();
-const declared=manifest.files.map(x=>x.path).sort();
-if(JSON.stringify(actual)!==JSON.stringify(declared))throw new Error("manifest file set mismatch");
-for(const item of manifest.files){const digest=createHash("sha256").update(await readFile(path.join(ROOT,item.path))).digest("hex");if(digest!==item.sha256)throw new Error(`manifest hash mismatch ${item.path}`);}
+// Frozen delivery mode inherited from deterministic-delivery.
+const frozenValidate=path.join(ROOT,"scripts","validate-frozen-delivery.mjs");
+run([frozenValidate,path.join(EXAMPLES,"frozen-delivery.json")]);
+run([frozenValidate,path.join(EXAMPLES,"frozen-delivery-continuation.json")]);
+failRun([frozenValidate,path.join(ROOT,"tests","fixtures","invalid-frozen-overlap.json")]);
+const handoffSkill=await readFile(path.join(ROOT,"SKILL.md"),"utf8");
+for(const marker of ["implement_from_spec","apply_frozen_artifacts","--no-renames","/usr/bin/cmp"]) if(!handoffSkill.includes(marker)) throw new Error(`SKILL.md missing ${marker}`);
 
 await rm(TMP,{recursive:true,force:true});
 console.log("planner-executor-handoff self-test passed");

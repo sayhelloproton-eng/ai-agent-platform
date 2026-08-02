@@ -16,7 +16,7 @@
   ],
   "scripts": {
     "check:repo": "node scripts/repo-check.mjs",
-    "check:knowledge": "node skills/ai-knowledge/tests/self-test.mjs",
+    "check:knowledge": "node skills/project-knowledge-governance/tests/self-test.mjs && node skills/project-knowledge-governance/scripts/validate-document-bundles.mjs docs/knowledge",
     "check:contracts": "npm run verify --workspace @ai-agent-platform/contracts",
     "check:auth": "npm run verify --workspace @ai-agent-platform/auth",
     "check:policy": "npm run verify --workspace @ai-agent-platform/policy",
@@ -37,13 +37,14 @@
     "dev-tunnel:openapi": "npm run openapi --workspace @ai-agent-platform/dev-tunnel",
     "mvp:runtime-status": "npm run dev-tunnel:verify",
     "check:local-stack": "npm run local:build && node --test scripts/local-stack-test.mjs",
-    "verify": "npm run check:repo && npm run check:knowledge && npm run check:delivery && npm run check:handoff && npm run check:visuals && npm run check:insights && npm run check:synthesis && npm run check:registry && npm run check:contracts && npm run check:auth && npm run check:policy && npm run check:gateway && npm run check:runtime && npm run check:dev-tunnel && npm run check:local-chain && npm run check:local-stack",
+    "verify": "npm run check:repo && npm run check:skills && npm run check:knowledge && npm run check:authoring && npm run check:handoff && npm run check:visuals && npm run check:insights && npm run check:synthesis && npm run check:registry && npm run check:contracts && npm run check:auth && npm run check:policy && npm run check:gateway && npm run check:runtime && npm run check:dev-tunnel && npm run check:local-chain && npm run check:local-stack",
     "check:insights": "node skills/engineering-insight-distillation/scripts/eval.mjs validate-registry platform-registry/registries/engineering-insights",
     "check:registry": "node scripts/platform-registry-check.mjs",
-    "check:delivery": "node skills/deterministic-delivery/tests/self-test.mjs",
     "check:visuals": "node scripts/visual-asset-check.mjs",
     "check:handoff": "node skills/planner-executor-handoff/tests/self-test.mjs",
-    "check:synthesis": "node skills/project-knowledge-synthesis/tests/self-test.mjs"
+    "check:synthesis": "node skills/project-knowledge-synthesis/tests/self-test.mjs",
+    "check:authoring": "node skills/engineering-document-authoring/tests/self-test.mjs",
+    "check:skills": "node scripts/skill-portfolio-check.mjs"
   },
   "devDependencies": {
     "@types/node": "^20.19.43",

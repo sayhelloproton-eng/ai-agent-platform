@@ -148,7 +148,7 @@ Custom GPT
 - [CAP-002 ChatGPT 产品形态与能力边界](./CAP-002-ChatGPT产品形态与能力边界.md)
 - [CAP-004 Custom GPT 产品能力与边界](./CAP-004-CustomGPT产品能力与边界.md)
 - [CTX-001 项目总览](../00_项目入口/CTX-001-项目总览.md)
-- [ARC-001 平台总体架构](../04_平台架构/ARC-001-ai-agent-platform总体架构.md)
+- [ARC-001 平台总体架构](../04_平台架构/ARC-001-ai-agent-platform总体架构/README.md)
 
 ## 9. 产品事实核验基线
 

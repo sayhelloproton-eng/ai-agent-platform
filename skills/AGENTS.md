@@ -1,113 +1,75 @@
 # Skill Engineering Rules
 
-> 作用范围：`skills/**`。本文件细化根项目宪法，不得推翻根 `AGENTS.md`。
+> 作用范围：`skills/**`。本文件细化根项目宪法，不得降低其安全、Git 或 Review 要求。
 
-## 1. Skill 定位
+## 1. 独立 Skill 的成立条件
 
-Skill 是可复用的 Agent 能力资产，不是脚本集合。
+只有同时满足以下条件的能力才进入 `skills/`：
 
-每个 Skill 应说明：
+- 会在多个任务中重复出现；
+- 需要 Agent 进行稳定判断或执行一套稳定工作流；
+- 输入、输出、非目标和停止条件可清楚定义；
+- 与相邻能力存在可验证的边界；
+- 能通过真实案例、Fixture 或确定性脚本验证。
 
-- Purpose；
-- Problem；
-- Target Agent / User；
-- Capability Boundary；
-- Inputs；
-- Outputs；
-- Workflow；
-- Provider；
-- Error Handling；
-- Security；
-- Examples；
-- Tests；
-- Limitations；
-- Future Evolution。
+工具安装说明、单个应用运行命令、一次性迁移和历史报告不是 Skill，应进入应用 README、Runbook、技术文档或归档。
 
-Skill 不替 Project Owner 做最终决策，也不得把未经验证的内容写成项目事实。
+## 2. Skill Creator 结构
 
-## 2. README.md 与 SKILL.md
+每个活跃 Skill 必须提供：
 
-### README.md
+```text
+skill-name/
+├── SKILL.md                 # 必需；运行时入口
+├── agents/openai.yaml       # 推荐；人类可见元数据
+├── references/              # 按需读取的详细规则
+├── scripts/                 # 只放重复且需要确定性的代码
+├── assets/                  # 输出模板、Schema、Fixture 等可复用资产
+└── tests/                   # 触发、边界和结果验证
+```
 
-面向人类开发者，解释：
+`SKILL.md` YAML Frontmatter 只允许 `name` 与 `description`。`description` 必须同时说明正向触发和主要负向触发，因为它承担路由职责。
 
-- 设计与边界；
-- 安装和配置；
-- 使用方式；
-- 示例和测试；
-- 维护与演进；
-- 相关 Architecture、ADR 和工程资产。
+默认不创建 Skill 内部 `README.md`、`CHANGELOG.md`、`MANIFEST.json`、Quick Start 或重复索引。人类总索引由 `skills/README.md` 承担；设计历史由 Git、Registry、正式知识和技术文档承担。
 
-### SKILL.md
+## 3. 渐进披露
 
-面向 Agent Runtime，描述：
+- `SKILL.md` 只保留核心不变量、决策树、主流程和停止规则；
+- 详细领域知识进入 `references/`，仅在对应任务需要时读取；
+- 可重复的机械工作进入 `scripts/`；
+- 模板、Schema 和示例进入 `assets/`；
+- 不把完整 Pilot 报告、历史基线输出或大段项目知识塞进 Skill 内核。
 
-- 触发条件；
-- 能力和非目标；
-- 输入输出；
-- 执行流程；
-- 工具依赖；
-- 安全、确认和停止规则。
+上下文窗口是共享资源。Skill 不得通过重复文档扩大默认加载量。
 
-README 与 SKILL 不得完全重复，也不得互相替代。详细设计应进入正式文档，运行时规则保持最小且可执行。
+## 4. 边界与路由
 
-## 3. Provider 解耦
+每个 Skill 必须明确：
 
-Skill 领域能力不得直接绑定：
+- 它回答的唯一核心问题；
+- 哪些任务应该触发；
+- 哪些相邻任务必须移交；
+- 是否拥有语义决定权、写入权、发布权；
+- 冲突时哪个 Skill 主导。
 
-- 飞书或其他单一知识平台；
-- CLI；
-- 单一模型；
-- 单一 SDK；
-- 单一存储。
+路径或关键词不能单独决定触发。例如目标文件位于 `docs/knowledge/`，不代表必须触发知识治理；已有冻结 Artifact 时由 `planner-executor-handoff` 的 `apply_frozen_artifacts` 模式主导。
 
-上层依赖 Capability、Port、Contract 或稳定接口。Provider / Adapter 负责具体鉴权、分页、重试、格式转换和底层错误。
+## 5. 写入与证据
 
-Provider 私有 Token、CLI 输出结构或 SDK 类型不得泄漏到领域模型。
+- Skill 默认只提供方法或候选结果，不自动获得仓库写入、生命周期晋升、外部发布或 Git 权限；
+- Context 语义仍由总控 Planner 维护；
+- Executor 只能在 Canonical Handoff Contract 授权范围内执行；
+- 所有成功结论必须对应真实测试、回读、Commit 或外部证据；
+- 失败必须保留原始错误、影响范围和安全停止点。
 
-## 4. Schema、Example 与测试
+## 6. 修改验收
 
-新增或修改 Skill 能力时必须同步检查：
+修改 Skill 时至少检查：
 
-- 输入输出 Schema；
-- Example；
-- 测试与 Fixtures；
-- README；
-- SKILL.md；
-- Provider 契约和错误表达；
-- 相关设计资产和版本记录。
-
-必须报告真实执行的验证命令和结果。未运行的测试不得声称通过；失败或环境缺失必须明确标记。
-
-## 5. 安全与写入
-
-- 默认只读、最小权限和最小上下文；
-- 写入必须遵守预览、确认、幂等和回读验收；
-- 删除、权限、公开分享、批量移动和历史重写不得自动执行；
-- 不在代码、Fixture、Example 或文档中提交真实凭据和租户私有标识；
-- 不把第三方完整正文或个人隐私作为测试数据；
-- Provider 失败不得伪装为能力成功。
-
-## 6. Skill 专属 AGENTS.md
-
-只有当某个 Skill 具有明显特殊的安全边界、验证命令、Provider 规则或目录约束时，才在其自身目录增加 `AGENTS.md`。
-
-专属规则：
-
-- 只能细化本文件和根宪法；
-- 不得降低安全或验证标准；
-- 必须说明作用范围和特殊原因；
-- 不得复制整份上层规则。
-
-本阶段不创建 `skills/ai-knowledge/AGENTS.md`；是否需要在后续 Skill 重构中决定。
-
-## 7. 修改与验收
-
-修改 Skill 前：
-
-1. 明确能力边界和允许文件；
-2. 阅读相关 README、SKILL、Schema、测试、Architecture 和 ADR；
-3. 先计划 Contract / Schema、Provider 或安全边界变化；
-4. 进行小批次、可 Review 的修改；
-5. 运行相关最小测试；
-6. 报告 Git diff、验证证据、限制和未完成项。
+1. `description` 的触发精度；
+2. 与相邻 Skill 的职责是否重复；
+3. SKILL 正文是否可继续压缩并下沉到 References；
+4. Agents 元数据是否仍与正文一致；
+5. 脚本、Schema、Fixture 和测试是否覆盖新增边界；
+6. `skills/README.md`、Registry、Context 和正式 Skill 文档是否同步；
+7. 被替代 Skill 是否有明确 `superseded_by`，且不再参与自动路由。

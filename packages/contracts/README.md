@@ -95,7 +95,7 @@ Contract v1 只允许：
 
 ## Skill Boundary
 
-`skills/ai-knowledge` 不属于 npm workspace，不依赖本包，也未因本包创建而迁移。Contracts 只服务平台运行时协议。
+`skills/project-knowledge-governance` 不属于 npm workspace，也不依赖本包。Contracts 只服务平台运行时协议。
 
 ## Related Docs
 

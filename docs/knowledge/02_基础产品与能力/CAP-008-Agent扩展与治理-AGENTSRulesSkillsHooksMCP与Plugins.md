@@ -184,9 +184,9 @@ Plugin 是可安装分发单元，可以包含：
 
 ## 11. 本项目当前实例
 
-- `skills/ai-knowledge/`：知识治理和飞书投影方法；
+- `skills/project-knowledge-governance/`：知识落位、Registry、文档包和飞书投影治理；
 - `skills/custom-gpt-actions/`：Action Schema、认证和真实路径验证；
-- `skills/microsoft-dev-tunnels/`：开发期 Tunnel 管理；
+- `apps/dev-tunnel/`：开发期 Tunnel 应用与 Runbook；
 - `skills/engineering-insight-distillation/`：工程洞见提炼与 Evals；
 - 根 `AGENTS.md`：项目宪法；
 - Custom GPT Action：`runtime.status`；
@@ -198,7 +198,7 @@ Plugin 是可安装分发单元，可以包含：
 
 ```text
 AGENTS
-→ AI Knowledge Skill
+→ Project Knowledge Governance Skill
 → lark-cli / Publisher Tool
 → Git Registry
 → 人工写入批准

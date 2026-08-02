@@ -1,5 +1,5 @@
 version: 1
-baseline_commit: bd31893ddb9bb2efeb3cb38f67f1add66735cd79
+baseline_commit: 7db863f383dd5def32ca30ec0020bcb787e94d12
 capabilities:
 - id: CAP-RUNTIME-STATUS
   status: verified
@@ -48,6 +48,8 @@ capabilities:
   - skills/planner-executor-handoff/tests/self-test.mjs
   - docs/knowledge/06_智能体资产体系/SKL-003-规划者与执行器任务交接技能.md
   - docs/knowledge/05_上下文与知识系统/KNO-011-上下文所有权与维护机制.md
+  - skills/planner-executor-handoff/references/10-frozen-artifact-delivery.md
+  - skills/planner-executor-handoff/scripts/validate-frozen-delivery.mjs
 - id: CAP-PROJECT-KNOWLEDGE-SYNTHESIS
   status: implemented
   implemented_by:
@@ -56,3 +58,20 @@ capabilities:
   - skills/project-knowledge-synthesis/tests/self-test.mjs
   - skills/project-knowledge-synthesis/tests/pilots/00-project-entry/synthesis-result.json
   - docs/knowledge/06_智能体资产体系/SKL-004-项目知识综合技能.md
+- id: CAP-PROJECT-KNOWLEDGE-GOVERNANCE
+  status: implemented
+  implemented_by:
+  - SKILL-PROJECT-KNOWLEDGE-GOVERNANCE
+  evidence:
+  - skills/project-knowledge-governance/tests/self-test.mjs
+  - scripts/visual-asset-check.mjs
+  - docs/knowledge/06_智能体资产体系/SKL-001-项目知识治理技能.md
+  - docs/adr/ADR-003-document-bundles-human-first-ai-lossless.md
+- id: CAP-ENGINEERING-DOCUMENT-AUTHORING
+  status: implemented
+  implemented_by:
+  - SKILL-ENGINEERING-DOCUMENT-AUTHORING
+  evidence:
+  - skills/engineering-document-authoring/tests/self-test.mjs
+  - docs/knowledge/06_智能体资产体系/SKL-005-工程文档编写技能.md
+  - docs/adr/ADR-003-document-bundles-human-first-ai-lossless.md

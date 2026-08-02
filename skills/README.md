@@ -1,50 +1,27 @@
 # Skills
 
-## What
+`skills/` 保存经过边界治理、可重复使用并可验证的 Agent 能力。数量不是目标；精确触发、渐进披露和职责不重叠才是目标。
 
-`skills/` 保存可复用的 Agent 能力工程资产。
+## 活跃 Skill
 
-## Why
+| Skill | 唯一核心问题 | 状态 |
+|---|---|---|
+| [`planner-executor-handoff`](planner-executor-handoff/SKILL.md) | Planner 如何把普通实施或冻结 Artifact 安全交给 Executor，并接收证据、复审和续跑？ | accepted |
+| [`project-knowledge-synthesis`](project-knowledge-synthesis/SKILL.md) | 多源项目材料中哪些是事实、重复、冲突，目标知识结构应该是什么？ | in_review |
+| [`engineering-document-authoring`](engineering-document-authoring/SKILL.md) | 已确认内容如何写成 Human-first、AI-lossless 的正式工程文档？ | in_review |
+| [`project-knowledge-governance`](project-knowledge-governance/SKILL.md) | 正式项目知识如何落位、登记、校验、检索和单向发布？ | in_review |
+| [`engineering-insight-distillation`](engineering-insight-distillation/SKILL.md) | 有证据的工程事件能否提炼为有边界、可执行的复用洞见？ | verified / explicit trigger |
+| [`custom-gpt-actions`](custom-gpt-actions/SKILL.md) | Custom GPT Action 如何保持 Builder 兼容和服务端安全边界？ | verified |
 
-Skill 将稳定的领域能力、运行时规则、Schema、示例和测试组织为可独立验证和演进的单元。
+## 已退出独立 Skill
 
-## Contains
+- `deterministic-delivery`：能力并入 `planner-executor-handoff` 的 `apply_frozen_artifacts` 模式；
+- `ai-knowledge`：被职责更窄的 `project-knowledge-governance` 取代；
+- `microsoft-dev-tunnels`：降级为 [`apps/dev-tunnel`](../apps/dev-tunnel/README.md) 的应用 Runbook，不再作为通用 Agent Skill。
 
-- [`AGENTS.md`](AGENTS.md)：所有 Skill 共同遵守的工程规则；
-- `ai-knowledge/`：知识语义、生命周期与 Feishu Projection；
-- `deterministic-delivery/`：冻结 Contract 的校验、落库、Commit、Push 与续跑；
-- `custom-gpt-actions/`：Custom GPT Action Schema、Builder 兼容性与适配端点规则；
-- `microsoft-dev-tunnels/`：Microsoft Dev Tunnels 本机公网入口运行与安全规则；
-- `engineering-insight-distillation/`：筛选并提炼证据支持的工程事件，形成可持续演进的工程判断、模式、反模式、启发式和检查项；
-- `project-knowledge-synthesis/`：综合多份项目资料中的 Claim、重复、冲突和资产落位，输出受治理的知识调整候选；
-- `planner-executor-handoff/`：管理 Chat 与本地执行层之间的确定性任务合同、双向反馈、复审、续跑和执行器切换。
+## 共同规则
 
-## Boundary
-
-本目录允许 Skill 实现、最小运行说明、契约、示例和测试。
-
-完整架构思想、ADR 和跨 Skill 治理应放入 `docs/`；真实凭据、运行缓存和与 Skill 无关的业务代码不得进入本目录。
-
-## Structure
-
-每个长期 Skill 至少应提供：
-
-- `README.md`：面向人类开发者；
-- `SKILL.md`：面向 Agent Runtime；
-- Schema、Example 和 Test；
-- 必要的 Provider / Adapter 或 References。
-
-## Usage
-
-修改任何 Skill 前，先读取根 `AGENTS.md`、本目录 [`AGENTS.md`](AGENTS.md) 和目标 Skill 自身说明。
-
-## Maintenance
-
-能力、输入输出、安全边界或 Provider 行为变化时，同步更新 README、SKILL、Schema、Example 和测试。
-
-## Related Docs
-
-- [项目宪法](../AGENTS.md)
-- [Agent 工作协议](../docs/technical/治理规则/GOV-001-Agent工作协议.md)
-- [Git / Feishu 治理](../docs/technical/治理规则/git-feishu-governance.md)
-- [文档规范](../docs/technical/治理规则/GOV-002-文档与知识治理规则.md)
+- 修改前读取根 [`AGENTS.md`](../AGENTS.md) 与 [`skills/AGENTS.md`](AGENTS.md)；
+- `SKILL.md` 只保留运行时必要规则，详细内容按需进入 `references/`；
+- 正式设计、知识和项目事实仍进入 `docs/`、`context/` 与 Platform Registry；
+- Skill 不因生成候选结果而自动获得写入、Commit、Push 或外部发布权限。

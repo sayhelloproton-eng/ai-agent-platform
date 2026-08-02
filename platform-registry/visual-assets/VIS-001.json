@@ -3,20 +3,21 @@
   "title": "平台六层总体架构",
   "version": 1,
   "status": "accepted",
-  "target_document": "docs/knowledge/04_平台架构/ARC-001-ai-agent-platform总体架构.md",
+  "target_document": "docs/knowledge/04_平台架构/ARC-001-ai-agent-platform总体架构/README.md",
   "target_document_asset_id": "ARC-001",
   "source_documents": [
     "CTX-001",
     "ARC-008",
     "ARC-016"
   ],
-  "source_branch": "knowledge-assets",
-  "source_svg": "images/04_平台架构/ARC-001-ai-agent-platform总体架构/VIS-001-平台六层总体架构.svg",
-  "preview_png": "images/04_平台架构/ARC-001-ai-agent-platform总体架构/VIS-001-平台六层总体架构.png",
-  "asset_uri": "asset://04_平台架构/ARC-001-ai-agent-platform总体架构/VIS-001-平台六层总体架构.png",
+  "source_svg": "docs/knowledge/04_平台架构/ARC-001-ai-agent-platform总体架构/assets/VIS-001-平台六层总体架构.svg",
+  "preview_png": "docs/knowledge/04_平台架构/ARC-001-ai-agent-platform总体架构/assets/VIS-001-平台六层总体架构.png",
   "width": 1800,
   "height": 1100,
   "svg_sha256": "522f572a8c43718bdb8b782d3ca40dfc4d093d43353ee79f39aa52b5ccba15e2",
   "png_sha256": "d929e39e60abc8acd742c330fbb20f17a9ab13374b8cf0afde02d5a1f9770026",
-  "review_notes": "该图描述长期目标分层；右侧“当前边界”明确区分已验证实现与目标设计。"
+  "review_notes": "该图描述长期目标分层；右侧“当前边界”明确区分已验证实现与目标设计。",
+  "storage_model": "document_bundle",
+  "markdown_image": "./assets/VIS-001-平台六层总体架构.png",
+  "semantic_mirror_heading": "AI 可读语义镜像"
 }

@@ -39,8 +39,8 @@ Task Control 根据任务类型、风险、能力和验收方式选择角色。�
 ## 9. 关联文档
 
 - [THY-003 Agent + Skills 开发范式](../03_架构思想与理论/THY-003-Agent与Skills开发范式.md)
-- [ARC-008 ai-agent-platform-DDD领域蓝图](../04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图.md)
-- [ARC-012 Agent-Profile与Skills资产化](../04_平台架构/ARC-012-Agent-Profile与Skills资产化.md)
-- [ARC-013 审批证据与副作用账本](../04_平台架构/ARC-013-审批证据与副作用账本.md)
+- [ARC-008 ai-agent-platform-DDD领域蓝图](../04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图/README.md)
+- [ARC-012 Agent-Profile与Skills资产化](../04_平台架构/ARC-012-Agent-Profile与Skills资产化/README.md)
+- [ARC-013 审批证据与副作用账本](../04_平台架构/ARC-013-审批证据与副作用账本/README.md)
 - [AGT-002 Agent-Profile设计规范](AGT-002-Agent-Profile设计规范.md)
 - [AGT-006 多Agent协作角色模型](AGT-006-多Agent协作角色模型.md)

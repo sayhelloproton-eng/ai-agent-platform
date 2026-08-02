@@ -33,7 +33,7 @@
 
 | 能力域 | 当前 | 下一步 |
 | --- | --- | --- |
-| Context & Knowledge | Git 真源、Context、四层文档、AI Knowledge Skill、Platform Registry | 生成索引、自动影响分析、Agent Profile 与 Knowledge Pack |
+| Context & Knowledge | Git 真源、Context、四层文档、Project Knowledge Governance、Platform Registry | 生成索引、自动影响分析、Agent Profile 与 Knowledge Pack |
 | Contracts & Security | Task/Result/Error、Auth、双层 Policy | 动态身份、Scope、expected\_version |
 | Gateway & Runtime | 安全窄链路、两个 Capability、限流/并发 | Task State、队列/重试边界、执行适配 |
 | Agent Assets | Custom GPT + Actions Skill | Agent Profile、评估、Release |

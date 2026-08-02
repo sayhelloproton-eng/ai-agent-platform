@@ -1,157 +1,115 @@
 ---
 name: planner-executor-handoff
-description: Prepare, validate, render, execute, review, resume, and evolve deterministic handoffs between a planning/review Chat and local execution agents. Use when Chat delegates repository, terminal, browser, or tool work to Codex, GPT Work, OpenCode/DeepSeek, or another executor; when an executor must acknowledge, request clarification, checkpoint, stop, report results, respond to review, resume, or switch; or when recurring handoff failures should become protocol tests and revisions.
+description: Prepare, validate, execute, review, resume, and switch controlled handoffs between a planning/review Chat and local executors. Use for repository, terminal, browser, or tool delegation; for bounded implementation from an approved specification; or for byte-identical application of frozen ZIP/Overlay artifacts. Also use for Reception Ack, clarification, checkpoints, failure reports, review responses, Git authorization, and continuation. Do not use to discover goals, choose architecture, author unresolved content, or replace domain-specific semantic review.
 ---
+
 # Planner Executor Handoff
 
 ## Core invariant
 
-Keep planning and execution separate.
+The Planner owns meaning and authorization. The Executor owns bounded observation, execution, validation, and factual feedback.
 
-- Treat the current Chat as the brain, planner, decision maker, contract author, and reviewer.
-- Treat Codex, GPT Work, OpenCode/DeepSeek, Runtime, and future models as execution-layer agents.
-- Complete deterministic analysis before delegation. Recover missing facts with repository reads, Actions, files, tools, or explicit user confirmation.
-- Do not delegate goal discovery, architecture decisions, impact analysis, scope selection, or acceptance design to the executor.
-- Allow the executor to observe, execute, validate, and report only within the frozen contract.
+- The current Chat is the brain, contract author, reviewer, and change-control authority.
+- Codex, GPT Work, OpenCode/DeepSeek, Runtime, scripts, and future models are execution-layer agents.
+- Do not delegate goal discovery, architecture, approach selection, impact analysis, scope design, acceptance design, Context semantics, or unresolved prose.
+- Every task has one Canonical Handoff Contract; prompts, ZIP task books, Context Packages, and resume instructions derive from it.
 
-## Workflow
+## Delivery modes
 
-1. Recover facts.
-2. Freeze one Canonical Handoff Contract.
-3. Build a minimal Context Package.
-4. Choose `compact_controlled` or `stepwise_controlled` and freeze `execution_authority`.
-5. Complete and freeze all implementation artifacts required by `frozen_artifacts_only` executors.
-6. Render an executor view from the same contract.
-7. Require Reception Ack before writes.
-8. Freeze Context Access and the Git Operating Policy.
-9. Execute with structured feedback.
-10. Review real evidence.
-11. Resume or switch only from a reviewed safe point.
-12. Evolve rules only from incidents and evaluations.
+### `implement_from_spec`
 
-## Execution guidance tiers
+Use when the design, scope, constraints, acceptance, and Git policy are frozen, but the Executor must still implement within those boundaries.
 
-### `compact_controlled`
+- `execution_authority: bounded_implementation`;
+- tactical command choices are allowed;
+- architecture, dependencies, external behavior, scope, and acceptance may not change;
+- unexpected design choices require clarification.
 
-Provide complete deterministic analysis, selected approach, cross-file relations, scope, validation, evidence, and stop conditions.
+### `apply_frozen_artifacts`
 
-Omit repeated history, tutorials, and unnecessary command-by-command narration.
+Use when the Planner has already authored the complete final files or ZIP Overlay.
 
-Permit only tactical discretion: equivalent commands, necessary read-only checks, and local command-error diagnosis. Do not permit changes to goal, architecture, approach, dependencies, scope, or acceptance.
+- `execution_authority: frozen_artifacts_only`;
+- the Executor may validate, copy, delete exact paths, compare bytes, run fixed checks, create the authorized Commit, Push, and report;
+- use `/usr/bin/cmp` for byte identity and Git `--no-renames` when computing deterministic Scope;
+- no rewriting, repair, formatting, semantic merge, Schema redesign, or “optimization” is allowed;
+- the existence of knowledge or Context paths does not transfer control to a domain Skill.
 
-### `stepwise_controlled`
+Read [`references/10-frozen-artifact-delivery.md`](references/10-frozen-artifact-delivery.md) and validate the frozen contract with `scripts/validate-frozen-delivery.mjs`.
 
-Provide the same complete analysis plus exact paths, fixed step order, concrete commands, expected results, multi-layer checks, checkpoints, stop conditions, safe resume points, and a fixed report format.
+## Main workflow
 
-For a low-capability executor, set `execution_authority: frozen_artifacts_only`. Chat must finish the code, schemas, tests, documents, overlay, manifest, and hashes before handoff. The executor may only validate, copy byte-identical artifacts, run fixed commands, commit, push, and report. Do not give a weak executor a development specification and ask it to implement or repair the solution.
+1. Recover current repository, environment, remote, and task facts.
+2. Freeze goal, selected approach, Scope Lock, acceptance, stop rules, Context Access, and Git Operating Policy.
+3. Select `compact_controlled` or `stepwise_controlled` guidance and one delivery mode.
+4. For frozen delivery, finish and independently verify every Artifact before delegation.
+5. Render the executor view from the same contract.
+6. Require Reception Ack before writes.
+7. Execute with structured checkpoints and immediate stop on contract mismatch.
+8. Review real Diff, tests, Commit, remote SHA, side effects, and workspace state.
+9. Resume or switch only from a reviewed safe point.
 
-## Execution authority
+## Guidance tiers
 
-Use one of two authority modes:
+- `compact_controlled`: complete deterministic analysis with concise execution guidance; suitable for an Executor that reliably respects boundaries.
+- `stepwise_controlled`: the same analysis plus exact order, commands, expected results, checkpoints, stop conditions, and report format.
 
-- `bounded_implementation`: the executor may implement the already-frozen design inside exact scope. Chat still owns analysis, architecture, approach, acceptance, and review.
-- `frozen_artifacts_only`: the executor may not author or edit task content. Chat must provide a complete overlay, manifest, hashes, delete list, fixed commands, and expected results.
+Guidance detail never expands execution authority.
 
-Current project default:
+## Context ownership
 
-- Codex normally uses `compact_controlled` with `bounded_implementation` or `frozen_artifacts_only`, depending on task readiness.
-- OpenCode/DeepSeek uses `stepwise_controlled` with `frozen_artifacts_only`.
+`context/**` is Planner-owned semantic state.
 
-A handoff is not ready for `frozen_artifacts_only` until every repository artifact is final and independently tested by Chat. If the task still requires coding choices, schema design, test design, prose drafting, or cross-file reasoning, Chat must complete that work before delegation.
+- Default: `context_access.mode: read_only`.
+- `write_approved` requires exact files, `content_source: planner_full_replacement`, user authorization, matching Scope Lock, `delivery_mode: apply_frozen_artifacts`, and `frozen_artifacts_only`.
+- Specialist agents report drift and evidence; they do not author Context.
+- Broad grants such as `context/**` are forbidden.
 
-## Canonical artifacts
-
-- Executor Profile
-- Canonical Handoff Contract
-- Context Package
-- Reception Ack
-- Clarification Request
-- Progress Checkpoint
-- Failure / Stop Report
-- Execution Result
-- Review Feedback
-- Review Response
-- Executor Switch Checkpoint
-
-Bind artifacts to task ID, task version, executor ID, and source commit when applicable.
-
-## Context ownership and access
-
-Treat `context/**` as Planner-owned semantic state.
-
-- Only the master/control Planner may decide and author Context content.
-- Specialist agents, reviewers, researchers, and executors may report drift with reasons and evidence, but may not author Context.
-- The user reviews all Context changes and approves important changes to goals, architecture, phase, roadmap priority, or governance.
-- Executors default to `context_access.mode: read_only`.
-- `write_approved` requires exact Context files, `content_source: planner_full_replacement`, `delivery_mode: apply_frozen_artifacts`, non-null Frozen Artifacts, and `execution_authority: frozen_artifacts_only`.
-- Every approved Context file must be present as the same exact path in Scope Lock; broad grants such as `context/**` are forbidden.
-- `read_only` forbids Context write paths in Scope Lock. Approved files may not conflict with forbidden paths.
-- The executor may only copy the complete Planner-provided files; it may not infer, summarize, expand, or repair Context content.
-- `user_approval` records the write-time gate. `not_required` is limited to routine synchronization under standing authorization and never removes the user's final Review role.
-
-Use only:
-
-- `read_only`
-- `write_approved`
-
-See `references/09-context-ownership-and-access.md`.
+Read [`references/09-context-ownership-and-access.md`](references/09-context-ownership-and-access.md).
 
 ## Git Operating Policy
 
-Treat every Git action as a Chat-owned decision.
+Every contract explicitly states current/target branch, remote, allowed branch creation, Commit count/message, Fetch/Pull/Push/PR/Merge/Rebase/Cherry-pick/Squash/Force Push permissions, cleanup permissions, and exact deletion targets.
 
-The Canonical Handoff Contract must state:
+Chat Review is not a reason to create or Push a feature branch. A remote write requires an explicit push target and remote-head check.
 
-- current and target branch;
-- target remote;
-- whether local or remote branch creation is allowed;
-- whether commit, fetch, pull, push, PR, merge, rebase, cherry-pick, squash, or force-push is allowed;
-- exact push target and commit count/message when authorized;
-- merge strategy when authorized;
-- whether local branch, remote branch, Worktree, or delivery-directory cleanup is allowed;
-- exact remote branches allowed to be deleted.
+Read [`references/08-git-operating-policy.md`](references/08-git-operating-policy.md).
 
-Do not create a feature branch merely because Chat Review is required.
+## Feedback artifacts
 
-When the user asks to install or migrate into the current repository branch, continue on that branch unless Chat explicitly freezes another target.
+Use structured:
 
-Require Reception Ack to confirm the actual branch and Git policy before writes. Require Execution Result to report all created, pushed, merged, deleted, and cleaned Git resources.
+- Reception Ack;
+- Clarification Request;
+- Progress Checkpoint;
+- Failure / Stop Report;
+- Execution Result;
+- Review Feedback and Review Response;
+- Executor Switch Checkpoint.
 
-## Feedback contract
+A failure report includes the last successful gate, raw error, side effects, workspace/index state, safe resume point, and required decision. A completion report includes exact files, tests and exit codes, Diff, Commit and remote SHA, artifacts, limitations, unfinished items, and final workspace state.
 
-Require the execution layer to report facts and state, not make planning decisions.
+## Routing boundaries
 
-Every executor feedback artifact must identify current state, completed steps, evidence, workspace state, and next required action.
+- `project-knowledge-synthesis` decides what project knowledge should remain, merge, conflict, or retire.
+- `engineering-document-authoring` writes approved formal documents.
+- `project-knowledge-governance` supplies read-only knowledge placement, Registry, integrity, and publication constraints.
+- `engineering-insight-distillation` is invoked explicitly for reusable lessons.
+- Provider-specific Skills govern their own external contracts.
 
-Failure reports must include the last successful gate, failed step, raw error, side effects, safe resume point, and required decision.
-
-Completion reports must include changed and deleted files, tests and exit codes, diff stat, commit and remote SHA, artifacts, limitations, unfinished items, and workspace state.
-
-## Review and change control
-
-Return Review Feedback with the reviewed commit, findings, required changes, unchanged scope, resume point, and new authorization.
-
-Require Review Response before revision. Do not allow the executor to expand the task from review comments.
-
-## Skill routing
-
-- Use `deterministic-delivery` for frozen ZIP, overlay, Git scope, staging, commit, push, and deterministic continuation.
-- Use `ai-knowledge` for knowledge semantics, lifecycle, Registry meaning, and Feishu projection.
-- Use `engineering-insight-distillation` to decide whether an incident should become a durable engineering rule.
-- Use provider-specific skills for their own tools and APIs.
-
-## Read references progressively
-
-- `references/01-role-boundaries.md`
-- `references/02-guidance-tiers.md`
-- `references/03-contract-context-feedback.md`
-- `references/04-review-resume-switch.md`
-- `references/05-casebook.md`
-- `references/06-design-basis-and-evaluation.md`
-- `references/07-related-skills.md`
-- `references/08-git-operating-policy.md`
-- `references/09-context-ownership-and-access.md`
+In `apply_frozen_artifacts`, domain Skills are constraint references only and may not reinterpret the package.
 
 ## Stop rules
 
-Stop and return a structured artifact when the source commit, current or target branch, remote head, workspace, staged state, Git authorization, scope, artifact versions, side effects, or completion evidence do not match the contract.
+Stop when source or remote SHA, branch, workspace/index, package hash, Manifest, Scope, Context Access, Git policy, Artifact identity, validation evidence, or side effects differ from the contract. Report facts; do not adapt the contract silently.
+
+## Progressive references
+
+Read only what the task needs:
+
+- role and guidance: `references/01-role-boundaries.md`, `02-guidance-tiers.md`;
+- contract and feedback: `03-contract-context-feedback.md`, `04-review-resume-switch.md`;
+- cases and evaluation: `05-casebook.md`, `06-design-basis-and-evaluation.md`;
+- routing and Git: `07-related-skills.md`, `08-git-operating-policy.md`;
+- Context: `09-context-ownership-and-access.md`;
+- frozen ZIP/Overlay: `10-frozen-artifact-delivery.md`.

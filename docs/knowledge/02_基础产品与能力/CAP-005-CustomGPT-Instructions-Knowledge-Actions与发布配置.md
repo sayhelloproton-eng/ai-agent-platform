@@ -252,7 +252,7 @@ Publisher
 
 - [CAP-004 Custom GPT 产品能力与边界](./CAP-004-CustomGPT产品能力与边界.md)
 - [CTX-005 当前能力与演进差距](../00_项目入口/CTX-005-当前能力与演进差距.md)
-- [ARC-001 平台总体架构](../04_平台架构/ARC-001-ai-agent-platform总体架构.md)
+- [ARC-001 平台总体架构](../04_平台架构/ARC-001-ai-agent-platform总体架构/README.md)
 - [DEC-001 架构决策演进摘要](../00_项目入口/DEC-001-架构决策演进摘要.md)
 
 ## 14. 产品事实核验基线

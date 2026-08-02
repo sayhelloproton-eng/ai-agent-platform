@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "execution_mode": "apply_frozen_artifacts",
+  "base_commit": "0123456789abcdef0123456789abcdef01234567",
+  "branch": "knowledge-rebuild-v2",
+  "knowledge_content_frozen": true,
+  "archive": "delivery.zip",
+  "overlay_paths": [
+    "README.md",
+    "context/current-status.md"
+  ],
+  "delete_paths": [],
+  "empty_directories": [],
+  "validation_commands": [
+    "npm run verify",
+    "git diff --check"
+  ],
+  "commit_message": "docs: apply frozen delivery",
+  "push_remote": "origin",
+  "push_branch": "knowledge-rebuild-v2",
+  "stop_on_failure": true,
+  "skill_policy": {
+    "project_knowledge_governance": "contract_reference_only",
+    "planner_executor_handoff": "full"
+  }
+}

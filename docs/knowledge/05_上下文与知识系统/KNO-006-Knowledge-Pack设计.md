@@ -38,6 +38,6 @@
 
 ## 9. 关联文档
 
-- [ARC-012 Agent Profile 与 Skills](../04_平台架构/ARC-012-Agent-Profile与Skills资产化.md)
+- [ARC-012 Agent Profile 与 Skills](../04_平台架构/ARC-012-Agent-Profile与Skills资产化/README.md)
 - [KNO-004 内置知识与记忆](./KNO-004-Custom-GPT内置知识外部知识与记忆.md)
-- [KNO-005 项目知识生命周期](./KNO-005-项目知识生命周期.md)
+- [KNO-005 项目知识生命周期](./KNO-005-项目知识生命周期/README.md)

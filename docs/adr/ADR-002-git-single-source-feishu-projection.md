@@ -111,7 +111,7 @@ Feishu Native 可以长期存在，但不是项目正式事实。一旦内容影
 - ADR-001 标记为 Superseded；
 - 飞书投影页面必须记录 Git Path、Commit、Hash 和同步状态；
 - Feishu Native 放入独立逻辑区，形成正式结论时创建 Git Change Proposal；
-- AI Knowledge Skill 的上层能力保持 Provider-neutral。
+- 知识治理 Skill 的上层能力保持 Provider-neutral；该能力当前由 Project Knowledge Governance 承担。
 
 ## Validation
 

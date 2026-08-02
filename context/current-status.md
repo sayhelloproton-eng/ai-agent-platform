@@ -10,155 +10,83 @@ Formal Baseline:
 Working Branch:
   Branch: knowledge-rebuild-v2
   Current HEAD: read from Git at runtime
-  Last Verified Review Source: 16a847a7a9df1021a562ac049405fba9d36066a6
-
-Visual Asset Branch:
-  Branch: knowledge-assets
+  Last Verified Review Source: 7db863f383dd5def32ca30ec0020bcb787e94d12
 
 Phase:
-  2.5 — Human Content Review In Progress
+  2.5 — Human Content Review and Governance Refinement
 ```
 
-`main` 保存 Batch 10 合并后的正式基线；`knowledge-rebuild-v2` 承载 Batch 10 后的控制面收口、内容修订与当前人工 Review；`knowledge-assets` 保存正式 SVG / PNG 视觉源资产。
-
-Codex 已完成仓库级集中扫描、首轮内容修订、测试、Commit 与 Push，但这不等于最终人工内容验收。当前由用户逐篇人工 Review，Chat 进行第二轮 Review；每完成一个目录或逻辑组，由总控 Planner 生成冻结完整文件，Executor 只负责确定性落库。
+`main` 保存已合并正式基线；`knowledge-rebuild-v2` 承载控制面收口、正式内容 Review、Skill 治理和最终发布准备。视觉资产不再使用独立分支，正文和资源在当前工作分支以 Document Bundle 共同管理。
 
 ## Verified Implementation
 
-### Applications and Packages
-
-- `apps/action-gateway/`：Gateway 认证、Policy、Task 转发和 `/v1/runtime/status`；
-- `apps/local-runtime/`：Task 校验、Runtime Policy、Capability 执行和 TaskResult；
-- `apps/dev-tunnel/`：Microsoft Dev Tunnels 开发期公网入口、OpenAPI 和验证脚本；
-- `packages/contracts/`：Task / Result / Error Contract v1；
-- `packages/auth/`：Bearer、API Key 校验和安全比较；
-- `packages/policy/`：Capability 默认拒绝与 Allowlist。
-
-当前安全 Capability：
-
-- `gateway.ping`；
-- `runtime.status`。
-
-`system.info.safe` 只存在于 Contract 白名单，当前没有默认实现，并被 Policy 拒绝。
-
-### Security and Reliability
-
-- 外部与内部 API Key 分离；
-- Gateway 与 Runtime 双层 Policy；
-- Loopback-only；
-- Timeout、请求与响应大小限制；
-- Rate Limit；
-- Gateway 最大 2 个在途 Task；
-- Runtime 最大 1 个执行 Task；
-- 无队列快速失败；
-- TaskResult `taskId` 对应校验；
-- 安全错误映射与响应脱敏。
-
-### Skills and Knowledge Governance
-
-当前已有六个已验证或已接受 Skill：
-
-- AI Knowledge Skill；
-- Deterministic Delivery Skill；
-- Custom GPT Actions Skill；
-- Microsoft Dev Tunnels Skill；
-- Engineering Insight Distillation Skill v0.2.0；
-- Planner Executor Handoff Skill v0.5.1 / `accepted`。
-
-新增：
-
-- Project Knowledge Synthesis Skill v0.1.0 已物化，状态为 `in_review`；
-- 首个 governed Pilot 已用于聚合 `docs/knowledge/00_项目入口/`；
-- Skill 只输出综合候选、冲突报告、目标资产建议和 Registry / 链接影响，不直接取得正式写入权。
-
-当前还包括：
-
-- Platform Registry；
-- Engineering Insight Registry；
-- 五条初始工程洞见，其中四条 `provisional`、一条 `candidate`；
-- Git 作为唯一知识真源；
-- Feishu 作为单向发布投影。
-
-## Knowledge Rebuild Status
-
-Batch 01～Batch 10 的知识资产重构、正式视觉资产治理、Registry 迁移和 `main` 集成已经完成。
-
-当前已确认：
-
-- `MIG-KNOWLEDGE-V2` 已完成；
-- Platform Registry 已登记正式资产和关系；
-- 十张正式视觉资产 `VIS-001～VIS-010` 已标记为 `accepted`；
-- `knowledge-assets` 保存正式 SVG / PNG 源资产；
-- `planner-executor-handoff v0.5.1` 已完成 Review 并标记为 `accepted`；
-- `project-knowledge-synthesis v0.1.0` 已完成首个真实目录聚合 Pilot，仍处于 `in_review`；
-- `00_项目入口` 从六篇正式文章收敛为 `CTX-001`、`CTX-005`、`DEC-001` 三篇，旧 `PRD-001`、`CTX-006`、`CTX-007` 转入技术归档并保留 superseded 关系；
-- Portfolio Release 状态为 `planned / not_started`；
-- Feishu 最终发布尚未开始。
-
-## Human Content Review Status
-
-当前 Review 模式：
-
-1. 用户逐篇或逐目录人工 Review；
-2. Chat / 总控 Planner 进行语义复审和知识综合；
-3. Project Knowledge Synthesis 产生去重、冲突、落位和退役建议；
-4. 总控 Planner 生成冻结完整文件；
-5. Executor 按 Manifest 完整覆盖、验证、单 Commit 和 Push；
-6. 全部人工 Review 完成前，不执行 Feishu 发布。
-
-已完成：
+### Runtime chain
 
 ```text
-context/**
-docs/knowledge/00_项目入口/**
+Custom GPT
+→ Microsoft Dev Tunnels
+→ Action Gateway
+→ Local Runtime
+→ gateway.ping / runtime.status
 ```
 
-当前 Review 组：
+已验证 Contracts、Auth、Policy、双层 Key、双层 Capability Policy、Loopback、Rate/Concurrency/Timeout/Size 限制、Builder Action 与真实自然语言调用。动态 Task Store、Approval、Evidence、Execution Lane、多执行器与自动恢复仍未实现。
+
+### Knowledge and Skill governance
+
+活跃 Skill 收敛为六个：
+
+1. `planner-executor-handoff`：普通实施与冻结 Artifact 两种交接模式；
+2. `project-knowledge-synthesis`：多源事实、重复、冲突和目标资产结构；
+3. `engineering-document-authoring`：Human-first、AI-lossless 正式工程文档；
+4. `project-knowledge-governance`：落位、Registry、生命周期、完整性与 Feishu 投影；
+5. `engineering-insight-distillation`：显式触发的工程洞见提炼；
+6. `custom-gpt-actions`：Builder 兼容 Action 和服务端适配边界。
+
+治理变化：
+
+- `deterministic-delivery` 已并入 `planner-executor-handoff` 的 `apply_frozen_artifacts` 模式；
+- `ai-knowledge` 已由职责更窄的 `project-knowledge-governance` 取代；
+- Microsoft Dev Tunnels 已降级为 `apps/dev-tunnel/` Runbook；
+- Project Knowledge Synthesis v0.1.0 仍为 `in_review`；
+- Engineering Document Authoring 与 Project Knowledge Governance 首版为 `in_review`；
+- Skill 采用 Skill Creator 的最小入口、渐进披露、精确触发和可验证资源结构。
+
+### Document and projection model
+
+正式资源型文档采用：
 
 ```text
-docs/knowledge/01_产品体系/**
+Document-ID-title/
+├── README.md
+└── assets/
 ```
 
-## Not Implemented
+- 正文和资源同分支、同 Commit、同生命周期；
+- Git 使用本地相对资源路径；
+- 每个图片立即跟随 AI 可读语义镜像；
+- Feishu Publisher 在投影时上传本地图片并插入媒体块；
+- Feishu URL、Media Token 与 Block ID 不回写 Git；
+- Git 和 Feishu 要求语义等价，不要求物理语法相同。
 
-- 动态 Task Control；
-- Execution / Result 持久化；
-- Executor Adapter 与 Execution Lane；
-- Approval、Evidence、Side-effect Ledger；
-- Health & Recovery；
-- 多执行器自动调度；
-- 平台自有 MCP Server、MCP Adapter 与统一 MCP 治理；
-- AI 视频工作流；
-- 生产级公网服务；
-- 完整 Agent Profile 与 Knowledge Pack 资产体系；
-- Custom GPT 资产化 MVP；
-- Project Knowledge Synthesis 的自动 Provider、跨仓库索引、批量 Eval 和直接发布能力；
-- Portfolio Release；
-- 新知识树的 Feishu 最终发布。
+首批 10 个正式视觉资产已迁回对应文档包，用于验证 Document Bundle 和 Human-first、AI-lossless 规则。
 
-宿主产品已经提供的 MCP、Memory 或其他能力，不等于 ai-agent-platform 已完成对应平台实现。
+## Current Review State
 
-## Current Restrictions
+- `00_项目入口` 已经综合收敛并完成落库；
+- 当前主线仍是逐目录正式内容人工 Review；
+- Skill 组合治理、Document Bundle、Human-first / AI-lossless 与 Publisher 本地图片转换规则已完成落库；
+- Feishu 最终覆盖发布、发布回读和整仓验收尚未开始；
+- 本次治理不执行 Feishu 写入。
 
-- 不把当前窄链路 MVP 描述为完整 Agent 平台；
-- 不把 Dev Tunnels 描述为生产方案；
-- 不把 `provisional` / `candidate` 洞见描述为 `accepted`；
-- 不把 Project Knowledge Synthesis v0.1.0 描述为已接受或自动写入系统；
-- 不把 Codex 集中扫描与首轮修订描述为最终人工内容验收；
-- 在用户逐篇人工 Review 和 Chat 第二轮 Review 全部完成前，不执行 Feishu 发布；
-- 人工 Review 完成后，Feishu 发布仍需独立授权；
-- Feishu 发布前不读取旧正文、不比较、不合并；
-- 不创建根级 `products/`；
-- 不提前创建未来空壳资产。
+## Next Actions
 
-## Next Steps
+1. 继续 `docs/knowledge/01_产品体系/` 人工 Review；
+2. 按目录生成冻结完整文件，由 Executor 机械落库；
+3. 全部正文 Review 后执行 Registry / 链接 / 文档包 / 图片语义镜像总验收；
+4. 独立授权 Git → Feishu 覆盖发布并回读；
+5. 最终整仓验收后再评估 fast-forward only 接入 `main`。
 
-```text
-→ Review docs/knowledge/01_产品体系/**
-→ 继续按目录执行人工 Review + Project Knowledge Synthesis
-→ 由总控 Planner 生成冻结完整文件包
-→ Executor 完成确定性落库
-→ 全部知识 Review 完成后执行 Git / Registry 总验收
-→ 独立授权 Feishu 单向覆盖发布
-→ 发布回读与最终整仓验收
-```
+## Non-claims
+
+宿主产品已有的 MCP、Memory、Projects 或视觉能力，不等于平台已经实现对应 Runtime、RAG、Task Store 或 Agent 自动调度。Skill 物化也不等于相关业务能力已进入生产。

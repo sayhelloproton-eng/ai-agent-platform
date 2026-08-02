@@ -1,0 +1,6 @@
+#!/usr/bin/env node
+import {spawnSync} from "node:child_process";import fs from "node:fs";import path from "node:path";import {fileURLToPath} from "node:url";
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");const tmp=path.join(root,"tests/.tmp");fs.rmSync(tmp,{recursive:true,force:true});fs.mkdirSync(tmp,{recursive:true});
+function run(args){const r=spawnSync(process.execPath,args,{cwd:root,encoding:"utf8"});if(r.status!==0)throw new Error(`${args.join(" ")} failed
+${r.stderr}`);return r.stdout;}
+const index="tests/.tmp/index.json";run(["scripts/build_index.mjs","--tree","tests/fixtures/sample-tree.json","--pages","tests/fixtures/pages","--out",index]);const result=JSON.parse(run(["scripts/query_index.mjs","--index",index,"--query","Gateway Adapter ADR","--top","3"]));if(!result.candidates.some(x=>x.node_token==="gateway"))throw new Error("Gateway not retrieved");const skill=fs.readFileSync(path.join(root,"SKILL.md"),"utf8");for(const marker of ["Document Bundle","AI 可读语义镜像","project-knowledge-synthesis","engineering-document-authoring","apply_frozen_artifacts"])if(!skill.includes(marker))throw new Error(`missing ${marker}`);fs.rmSync(tmp,{recursive:true,force:true});console.log(JSON.stringify({ok:true,index:true,retrieval:true,boundaries:true},null,2));

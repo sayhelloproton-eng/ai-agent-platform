@@ -33,7 +33,7 @@ Custom GPT
 - Control Boundary：Gateway 认证、Policy、Task 构造和 Runtime 转发；
 - Execution Boundary：Runtime 二次认证、二次 Policy、Capability 执行和 TaskResult；
 - Shared Contracts：contracts、auth、policy；
-- Knowledge and Skills：Git 文档、六个已验证或已接受 Skill、Project Knowledge Synthesis v0.1.0（in_review）与 Engineering Insight Registry；
+- Knowledge and Skills：Git 文档、六个边界治理后的活跃 Skill、Document Bundle / Human-first AI-lossless 模型与 Engineering Insight Registry；
 - Evidence：测试、验收记录、Commit 和真实调用结果。
 
 ## 目标架构
@@ -76,7 +76,7 @@ Custom GPT
 - Engineering Insight Registry；
 - Agent Profile；
 - Knowledge Pack；
-- Feishu Projection；
+- Document Bundle、Visual Semantic Block 与 Feishu Projection；
 - Release 与变更影响。
 
 ## 当前差距

@@ -1,4 +1,4 @@
-version: 4
+version: 5
 project: ai-agent-platform
 canonical_source: git
 assets:
@@ -79,9 +79,9 @@ assets:
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/04_平台架构/ARC-001-ai-agent-platform总体架构.md
+  current_path: docs/knowledge/04_平台架构/ARC-001-ai-agent-platform总体架构/README.md
   target_path: null
-  canonical_path: docs/knowledge/04_平台架构/ARC-001-ai-agent-platform总体架构.md
+  canonical_path: docs/knowledge/04_平台架构/ARC-001-ai-agent-platform总体架构/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: ARC-003
@@ -110,14 +110,14 @@ assets:
   publication_status: unpublished
   migration_state: complete
 - asset_id: SKL-001
-  title: AI Knowledge Skill
+  title: 项目知识治理技能
   asset_type: skill
   status: implemented
   evidence_level: verified
   materialized: true
-  current_path: docs/knowledge/06_智能体资产体系/SKL-001-AI知识技能.md
+  current_path: docs/knowledge/06_智能体资产体系/SKL-001-项目知识治理技能.md
   target_path: null
-  canonical_path: docs/knowledge/06_智能体资产体系/SKL-001-AI知识技能.md
+  canonical_path: docs/knowledge/06_智能体资产体系/SKL-001-项目知识治理技能.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: WFL-001
@@ -705,9 +705,9 @@ assets:
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图.md
+  current_path: docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图/README.md
   target_path: null
-  canonical_path: docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图.md
+  canonical_path: docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: ARC-009
@@ -716,9 +716,9 @@ assets:
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/04_平台架构/ARC-009-轻量Task-Control架构.md
+  current_path: docs/knowledge/04_平台架构/ARC-009-轻量Task-Control架构/README.md
   target_path: null
-  canonical_path: docs/knowledge/04_平台架构/ARC-009-轻量Task-Control架构.md
+  canonical_path: docs/knowledge/04_平台架构/ARC-009-轻量Task-Control架构/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: ARC-010
@@ -727,9 +727,9 @@ assets:
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/04_平台架构/ARC-010-Execution-Lane执行通道模型.md
+  current_path: docs/knowledge/04_平台架构/ARC-010-Execution-Lane执行通道模型/README.md
   target_path: null
-  canonical_path: docs/knowledge/04_平台架构/ARC-010-Execution-Lane执行通道模型.md
+  canonical_path: docs/knowledge/04_平台架构/ARC-010-Execution-Lane执行通道模型/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: ARC-011
@@ -749,9 +749,9 @@ assets:
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/04_平台架构/ARC-012-Agent-Profile与Skills资产化.md
+  current_path: docs/knowledge/04_平台架构/ARC-012-Agent-Profile与Skills资产化/README.md
   target_path: null
-  canonical_path: docs/knowledge/04_平台架构/ARC-012-Agent-Profile与Skills资产化.md
+  canonical_path: docs/knowledge/04_平台架构/ARC-012-Agent-Profile与Skills资产化/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: ARC-013
@@ -760,9 +760,9 @@ assets:
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/04_平台架构/ARC-013-审批证据与副作用账本.md
+  current_path: docs/knowledge/04_平台架构/ARC-013-审批证据与副作用账本/README.md
   target_path: null
-  canonical_path: docs/knowledge/04_平台架构/ARC-013-审批证据与副作用账本.md
+  canonical_path: docs/knowledge/04_平台架构/ARC-013-审批证据与副作用账本/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: ARC-014
@@ -771,9 +771,9 @@ assets:
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/04_平台架构/ARC-014-健康与恢复治理架构.md
+  current_path: docs/knowledge/04_平台架构/ARC-014-健康与恢复治理架构/README.md
   target_path: null
-  canonical_path: docs/knowledge/04_平台架构/ARC-014-健康与恢复治理架构.md
+  canonical_path: docs/knowledge/04_平台架构/ARC-014-健康与恢复治理架构/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: ARC-015
@@ -804,9 +804,9 @@ assets:
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/04_平台架构/ARC-017-产品孵化与需求治理体系.md
+  current_path: docs/knowledge/04_平台架构/ARC-017-产品孵化与需求治理体系/README.md
   target_path: null
-  canonical_path: docs/knowledge/04_平台架构/ARC-017-产品孵化与需求治理体系.md
+  canonical_path: docs/knowledge/04_平台架构/ARC-017-产品孵化与需求治理体系/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: ARC-018
@@ -870,9 +870,9 @@ assets:
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/05_上下文与知识系统/KNO-005-项目知识生命周期.md
+  current_path: docs/knowledge/05_上下文与知识系统/KNO-005-项目知识生命周期/README.md
   target_path: null
-  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-005-项目知识生命周期.md
+  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-005-项目知识生命周期/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: KNO-006
@@ -1145,9 +1145,9 @@ assets:
   status: accepted
   evidence_level: observed
   materialized: true
-  current_path: docs/knowledge/08_实验与复盘/EXP-005-Custom-GPT-Actions链路实验.md
+  current_path: docs/knowledge/08_实验与复盘/EXP-005-Custom-GPT-Actions链路实验/README.md
   target_path: null
-  canonical_path: docs/knowledge/08_实验与复盘/EXP-005-Custom-GPT-Actions链路实验.md
+  canonical_path: docs/knowledge/08_实验与复盘/EXP-005-Custom-GPT-Actions链路实验/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: EXP-006
@@ -1360,16 +1360,17 @@ assets:
   publication_status: unpublished
   migration_state: complete
 - asset_id: SKILL-AI-KNOWLEDGE
-  title: AI Knowledge Skill
+  title: AI Knowledge Skill（已被项目知识治理取代）
   asset_type: skill
-  status: verified
+  status: superseded
   evidence_level: verified
-  materialized: true
-  current_path: skills/ai-knowledge/
-  target_path: null
-  canonical_path: skills/ai-knowledge/
+  materialized: false
+  current_path: null
+  target_path: skills/project-knowledge-governance/
+  canonical_path: null
   publication_status: unpublished
   migration_state: complete
+  superseded_by: SKILL-PROJECT-KNOWLEDGE-GOVERNANCE
 - asset_id: SKILL-CUSTOM-GPT-ACTIONS
   title: Custom GPT Actions Skill
   asset_type: skill
@@ -1382,16 +1383,17 @@ assets:
   publication_status: unpublished
   migration_state: complete
 - asset_id: SKILL-DEV-TUNNELS
-  title: Microsoft Dev Tunnels Skill
+  title: Microsoft Dev Tunnels Skill（已降级为应用 Runbook）
   asset_type: skill
-  status: verified
+  status: superseded
   evidence_level: verified
-  materialized: true
-  current_path: skills/microsoft-dev-tunnels/
-  target_path: null
-  canonical_path: skills/microsoft-dev-tunnels/
+  materialized: false
+  current_path: null
+  target_path: apps/dev-tunnel/
+  canonical_path: null
   publication_status: unpublished
   migration_state: complete
+  superseded_by: APP-DEV-TUNNEL
 - asset_id: SKILL-ENGINEERING-INSIGHTS
   title: Engineering Insight Distillation Skill
   asset_type: skill
@@ -1415,16 +1417,17 @@ assets:
   publication_status: unpublished
   migration_state: complete
 - asset_id: SKILL-DETERMINISTIC-DELIVERY
-  title: Deterministic Delivery Skill
+  title: Deterministic Delivery Skill（已并入 Handoff）
   asset_type: skill
-  status: verified
+  status: superseded
   evidence_level: verified
-  materialized: true
-  current_path: skills/deterministic-delivery/
-  target_path: null
-  canonical_path: skills/deterministic-delivery/
+  materialized: false
+  current_path: null
+  target_path: skills/planner-executor-handoff/
+  canonical_path: null
   publication_status: unpublished
   migration_state: complete
+  superseded_by: SKILL-PLANNER-EXECUTOR-HANDOFF
 - asset_id: VIS-001
   title: 平台六层总体架构
   asset_type: visual
@@ -1547,7 +1550,7 @@ assets:
   publication_status: unpublished
   migration_state: complete
 - asset_id: SKILL-PLANNER-EXECUTOR-HANDOFF
-  title: Planner Executor Handoff Skill
+  title: Planner Executor Handoff Skill（含冻结 Artifact 交付）
   asset_type: skill
   status: accepted
   evidence_level: verified
@@ -1599,5 +1602,60 @@ assets:
   current_path: skills/project-knowledge-synthesis/
   target_path: null
   canonical_path: skills/project-knowledge-synthesis/
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: SKILL-PROJECT-KNOWLEDGE-GOVERNANCE
+  title: Project Knowledge Governance Skill
+  asset_type: skill
+  status: implemented
+  evidence_level: verified
+  materialized: true
+  current_path: skills/project-knowledge-governance/
+  target_path: null
+  canonical_path: skills/project-knowledge-governance/
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: SKL-005
+  title: 工程文档编写技能
+  asset_type: skill
+  status: implemented
+  evidence_level: verified
+  materialized: true
+  current_path: docs/knowledge/06_智能体资产体系/SKL-005-工程文档编写技能.md
+  target_path: null
+  canonical_path: docs/knowledge/06_智能体资产体系/SKL-005-工程文档编写技能.md
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: SKILL-ENGINEERING-DOCUMENT-AUTHORING
+  title: Engineering Document Authoring Skill
+  asset_type: skill
+  status: implemented
+  evidence_level: verified
+  materialized: true
+  current_path: skills/engineering-document-authoring/
+  target_path: null
+  canonical_path: skills/engineering-document-authoring/
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: ADR-003
+  title: 文档包与 Human-first、AI-lossless
+  asset_type: adr
+  status: accepted
+  evidence_level: decided
+  materialized: true
+  current_path: docs/adr/ADR-003-document-bundles-human-first-ai-lossless.md
+  target_path: null
+  canonical_path: docs/adr/ADR-003-document-bundles-human-first-ai-lossless.md
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: GOV-002
+  title: 文档与知识治理规则
+  asset_type: governance
+  status: accepted
+  evidence_level: decided
+  materialized: true
+  current_path: docs/technical/治理规则/GOV-002-文档与知识治理规则.md
+  target_path: null
+  canonical_path: docs/technical/治理规则/GOV-002-文档与知识治理规则.md
   publication_status: unpublished
   migration_state: complete

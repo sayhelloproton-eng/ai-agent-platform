@@ -27,3 +27,14 @@ npm run dev-tunnel:openapi
 ```
 
 Microsoft Dev Tunnels 仍是 Public Preview，无生产 SLA；持久 Tunnel 的开发期稳定 URL 也不等于永久域名所有权。连续 30 天无活动可能删除资源，维护由显式 `refresh` 命令完成，本应用不会自动安装后台保活任务。
+
+
+## Runbooks
+
+- [MVP Runbook](docs/mvp-runbook.md)
+- [Security and limits](docs/security-and-limits.md)
+- [Official CLI baseline](docs/official-cli-baseline.md)
+- [Custom GPT Actions integration](docs/custom-gpt-actions.md)
+- [Troubleshooting](docs/troubleshooting.md)
+
+Microsoft Dev Tunnels is an application/provider runbook, not an independent Agent Skill.

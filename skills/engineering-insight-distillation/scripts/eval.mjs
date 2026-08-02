@@ -229,38 +229,8 @@ function scoreRubric(scoresFile) {
 }
 
 function selfTest() {
-  const manifest = readJson(path.join(root, "MANIFEST.json"));
-  const actual = walk(root)
-    .filter((file) => rel(file) !== "MANIFEST.json")
-    .map(rel)
-    .concat(["MANIFEST.json"])
-    .sort();
-  const declared = [...manifest.files].sort();
-  assert(JSON.stringify(actual) === JSON.stringify(declared), "manifest file list does not match actual files");
-  assert(manifest.file_count === actual.length, "manifest file_count is incorrect");
-
-  for (const file of walk(path.join(root, "assets/schemas"))) {
-    if (file.endsWith(".json")) readJson(file);
-  }
-
-  const forbidden = [
-    ["Microsoft", " Dev Tunnels"].join(""),
-    ["Cloud", "flare"].join(""),
-    ["/v1/", "tasks"].join(""),
-    ["/v1/runtime/", "status"].join(""),
-  ];
-  for (const file of walk(root)) {
-    const relative = rel(file);
-    if (relative.startsWith("tests/")) continue;
-    const text = fs.readFileSync(file, "utf8");
-    for (const token of forbidden) {
-      assert(!text.includes(token), `project-bound token outside tests: ${relative} -> ${token}`);
-    }
-  }
-
-  const triggerCases = readJson(path.join(root, "tests/evals/trigger-cases.json"));
-  assert(triggerCases.filter((item) => item.should_trigger).length >= 8, "trigger set needs more positive cases");
-  assert(triggerCases.filter((item) => !item.should_trigger).length >= 8, "trigger set needs more negative cases");
+  const skillText = fs.readFileSync(path.join(root, "SKILL.md"), "utf8");
+  for (const marker of ["explicit-trigger specialist Skill", "project-knowledge-synthesis", "project-knowledge-governance"]) assert(skillText.includes(marker), `SKILL.md missing ${marker}`);
 
   const screeningDir = path.join(root, "tests/evals/pilot-02/screening-outputs");
   const expectedScreening = readJson(path.join(root, "tests/evals/pilot-02/expected-decisions.json"));

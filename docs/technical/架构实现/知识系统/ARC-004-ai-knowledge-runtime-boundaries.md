@@ -7,13 +7,15 @@ canonical_path: docs/technical/架构实现/知识系统/ARC-004-ai-knowledge-ru
 related_assets: [ARC-002, SKL-001, ADR-002, SOL-002]
 ---
 
-# ARC-004 AI Knowledge Runtime Boundaries
+# ARC-004 Project Knowledge Governance Runtime Boundaries
+
+> `ai-knowledge` 保留在文件名中仅用于稳定路径和历史追踪；当前活跃 Skill 为 `project-knowledge-governance`。
 
 ## Layers
 
 ```text
 Agent Intent
-  → AI Knowledge Skill
+  → Project Knowledge Governance Skill
   → Knowledge Port
   → Git / Feishu / Local / Web Adapter
   → External System

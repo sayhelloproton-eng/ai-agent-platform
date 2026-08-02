@@ -1,12 +1,9 @@
-version: 4
+version: 5
 project: ai-agent-platform
-
 source_of_truth:
   type: git
-
 knowledge_source:
   path: docs/knowledge/
-
 registry:
   root: platform-registry/
   asset_index: platform-registry/assets.yaml
@@ -15,7 +12,6 @@ registry:
   implementation_status: platform-registry/implementation-status.yaml
   release_index: platform-registry/releases.yaml
   engineering_insights: platform-registry/registries/engineering-insights/
-
 projection:
   target: feishu
   mode: overwrite
@@ -27,19 +23,18 @@ projection:
   require_write_preview: true
   require_human_confirmation: true
   require_api_verification: true
-
 publisher:
-  image_source: knowledge-assets
-  image_reference_scheme: asset
+  image_source: document_bundle
+  image_reference_scheme: relative_local
   upload_images: true
-
+  semantic_mirror_required: true
+  write_projection_tokens_back_to_git: false
 retrieval:
   strategy: index_first
   default_full_documents_limit: 3
   allow_implicit_full_repository_scan: false
   allow_implicit_full_feishu_scan: false
   private_context_requires_task_need: true
-
 paths:
   docs_root: docs
   context_root: context
@@ -54,12 +49,10 @@ paths:
   current_state: context/current-status.md
   roadmap: context/roadmap.md
   knowledge_strategy: context/knowledge-strategy.md
-
 runtime_evidence:
   store_full_agent_logs_in_docs: false
   store_full_traces_in_docs: false
   store_reproducible_config_and_summary: true
-
 security:
   auto_delete: false
   auto_move: false
@@ -67,3 +60,10 @@ security:
   auto_public_share: false
   auto_force_push: false
   private_context_is_secret_vault: false
+document_bundles:
+  resource_bearing_document_entry: README.md
+  asset_directory: assets
+  co_locate_assets: true
+  same_branch_and_commit: true
+  human_first: true
+  ai_lossless: true

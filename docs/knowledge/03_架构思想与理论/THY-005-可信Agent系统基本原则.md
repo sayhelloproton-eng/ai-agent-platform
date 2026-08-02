@@ -193,7 +193,7 @@ Agent 会读取网页、仓库、Skill、Plugin 和 MCP 返回值。这些内容
 - [THY-004 DDD 与 Agent 系统边界建模](./THY-004-DDD与Agent系统边界建模.md)
 - [THY-006 项目方法论与工程启发](./THY-006-项目方法论与可复用工程启发.md)
 - [INS-001 工程洞见方法与实践](../05_上下文与知识系统/INS-001-工程洞见方法与实践.md)
-- [ARC-001 平台总体架构](../04_平台架构/ARC-001-ai-agent-platform总体架构.md)
+- [ARC-001 平台总体架构](../04_平台架构/ARC-001-ai-agent-platform总体架构/README.md)
 
 ## 10. 参考
 

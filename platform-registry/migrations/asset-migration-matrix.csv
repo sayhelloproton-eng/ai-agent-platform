@@ -79,7 +79,7 @@ docs/knowledge/工程经验/INS-001-工程洞见方法与实践.md,md,INS-001 �
 docs/knowledge/技术方案/README.md,md,技术方案,replace_or_remove,,,旧栏目 README 随目标知识树替换；空栏目删除,02-entry-product
 docs/knowledge/技术方案/SOL-004-跨平台文档可移植性与发布适配.md,md,SOL-004 跨平台文档可移植性与发布适配,split_move,docs/technical/技术方案/知识系统/SOL-004-跨平台文档可移植性与发布适配.md,SOL-004,技术实现移入 technical；知识结论并入 ARC-005/WFL-001,04-knowledge-architecture
 docs/knowledge/架构与领域/README.md,md,架构与领域,replace_or_remove,,,旧栏目 README 随目标知识树替换；空栏目删除,02-entry-product
-docs/knowledge/架构与领域/平台架构/ARC-001-平台目标架构.md,md,ARC-001 平台目标架构,replace_move,docs/knowledge/04_平台架构/ARC-001-ai-agent-platform总体架构.md,ARC-001,基于当前实现与目标三平面重写,04-knowledge-architecture
+docs/knowledge/架构与领域/平台架构/ARC-001-平台目标架构.md,md,ARC-001 平台目标架构,replace_move,docs/knowledge/04_平台架构/ARC-001-ai-agent-platform总体架构/README.md,ARC-001,基于当前实现与目标三平面重写,04-knowledge-architecture
 docs/knowledge/架构与领域/平台架构/ARC-003-六个月交付架构.md,md,ARC-003 六个月交付架构,merge_archive,docs/technical/归档/历史资产/ARC-003-六个月交付架构-v1.md,ARC-003,并入 PRD-005 与 DEC-001，保留历史 ID,03-foundation-theory
 docs/knowledge/架构与领域/平台架构/README.md,md,平台架构,replace_or_remove,,,旧栏目 README 随目标知识树替换；空栏目删除,02-entry-product
 docs/knowledge/架构与领域/领域模型/DOM-001-核心领域模型.md,md,DOM-001 核心领域模型,revise_move,docs/knowledge/04_平台架构/DOM-001-核心领域模型.md,DOM-001,保留 ID，基于最新系统对象重构,04-knowledge-architecture
@@ -398,25 +398,25 @@ tsconfig.base.json,json,,keep_review,tsconfig.base.json,,保留并在相关批�
 ,md,可信 Agent 系统基本原则,materialize,docs/knowledge/03_架构思想与理论/THY-005-可信Agent系统基本原则.md,THY-005,基于官方产品事实、仓库实现、已接受知识和工程证据综合生成正式正文,03bc-codex-and-agent-theory
 ,md,项目方法论与可复用工程启发,materialize,docs/knowledge/03_架构思想与理论/THY-006-项目方法论与可复用工程启发.md,THY-006,基于官方产品事实、仓库实现、已接受知识和工程证据综合生成正式正文,03bc-codex-and-agent-theory
 ,md,多窗口多角色多任务并行架构,materialize,docs/knowledge/04_平台架构/ARC-007-多窗口多角色多任务并行架构.md,ARC-007,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
-,md,ai-agent-platform-DDD领域蓝图,materialize,docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图.md,ARC-008,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
-,md,轻量Task-Control架构,materialize,docs/knowledge/04_平台架构/ARC-009-轻量Task-Control架构.md,ARC-009,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
-,md,Execution-Lane执行通道模型,materialize,docs/knowledge/04_平台架构/ARC-010-Execution-Lane执行通道模型.md,ARC-010,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
+,md,ai-agent-platform-DDD领域蓝图,materialize,docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图/README.md,ARC-008,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
+,md,轻量Task-Control架构,materialize,docs/knowledge/04_平台架构/ARC-009-轻量Task-Control架构/README.md,ARC-009,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
+,md,Execution-Lane执行通道模型,materialize,docs/knowledge/04_平台架构/ARC-010-Execution-Lane执行通道模型/README.md,ARC-010,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
 ,md,Git-Branch-Worktree与任务隔离,materialize,docs/knowledge/04_平台架构/ARC-011-Git-Branch-Worktree与任务隔离.md,ARC-011,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
-,md,Agent-Profile与Skills资产化,materialize,docs/knowledge/04_平台架构/ARC-012-Agent-Profile与Skills资产化.md,ARC-012,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
-,md,审批证据与副作用账本,materialize,docs/knowledge/04_平台架构/ARC-013-审批证据与副作用账本.md,ARC-013,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
-,md,健康与恢复治理架构,materialize,docs/knowledge/04_平台架构/ARC-014-健康与恢复治理架构.md,ARC-014,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
+,md,Agent-Profile与Skills资产化,materialize,docs/knowledge/04_平台架构/ARC-012-Agent-Profile与Skills资产化/README.md,ARC-012,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
+,md,审批证据与副作用账本,materialize,docs/knowledge/04_平台架构/ARC-013-审批证据与副作用账本/README.md,ARC-013,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
+,md,健康与恢复治理架构,materialize,docs/knowledge/04_平台架构/ARC-014-健康与恢复治理架构/README.md,ARC-014,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
 ,md,架构能力与仓库实现映射,materialize,docs/knowledge/04_平台架构/ARC-016-架构能力与仓库实现映射.md,ARC-016,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
 ,md,AGENTS上下文契约与跨平台治理,materialize,docs/knowledge/05_上下文与知识系统/KNO-001-AGENTS上下文契约与跨平台治理.md,KNO-001,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
 ,md,多级领域上下文架构,materialize,docs/knowledge/05_上下文与知识系统/KNO-002-多级领域上下文架构.md,KNO-002,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
 ,md,上下文Token与证据治理,materialize,docs/knowledge/05_上下文与知识系统/KNO-003-上下文Token与证据治理.md,KNO-003,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
 ,md,Custom-GPT内置知识外部知识与记忆,materialize,docs/knowledge/05_上下文与知识系统/KNO-004-Custom-GPT内置知识外部知识与记忆.md,KNO-004,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
-,md,项目知识生命周期,materialize,docs/knowledge/05_上下文与知识系统/KNO-005-项目知识生命周期.md,KNO-005,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
+,md,项目知识生命周期,materialize,docs/knowledge/05_上下文与知识系统/KNO-005-项目知识生命周期/README.md,KNO-005,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
 ,md,Knowledge-Pack设计,materialize,docs/knowledge/05_上下文与知识系统/KNO-006-Knowledge-Pack设计.md,KNO-006,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
 ,md,平台资产关联模型,materialize,docs/knowledge/05_上下文与知识系统/KNO-007-平台资产关联模型.md,KNO-007,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
 ,md,知识与资产变更影响分析,materialize,docs/knowledge/05_上下文与知识系统/KNO-008-知识与资产变更影响分析.md,KNO-008,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
 ,md,项目会话知识综合与仓库沉淀,materialize,docs/knowledge/05_上下文与知识系统/KNO-009-项目会话知识综合与仓库沉淀.md,KNO-009,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
 ,md,工程洞见提炼与注册表治理,materialize,docs/knowledge/05_上下文与知识系统/KNO-010-工程洞见提炼与注册表治理.md,KNO-010,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
-,md,产品孵化与需求治理体系,materialize,docs/knowledge/04_平台架构/ARC-017-产品孵化与需求治理体系.md,ARC-017,基于已接受架构、知识系统、项目实践与治理规则综合生成正式正文,05-agent-assets-and-workflow-governance
+,md,产品孵化与需求治理体系,materialize,docs/knowledge/04_平台架构/ARC-017-产品孵化与需求治理体系/README.md,ARC-017,基于已接受架构、知识系统、项目实践与治理规则综合生成正式正文,05-agent-assets-and-workflow-governance
 ,md,项目治理与汇报架构,materialize,docs/knowledge/04_平台架构/ARC-018-项目治理与汇报架构.md,ARC-018,基于已接受架构、知识系统、项目实践与治理规则综合生成正式正文,05-agent-assets-and-workflow-governance
 ,md,Agent角色体系,materialize,docs/knowledge/06_智能体资产体系/AGT-001-Agent角色体系.md,AGT-001,基于已接受架构、知识系统、项目实践与治理规则综合生成正式正文,05-agent-assets-and-workflow-governance
 ,md,Agent-Profile设计规范,materialize,docs/knowledge/06_智能体资产体系/AGT-002-Agent-Profile设计规范.md,AGT-002,基于已接受架构、知识系统、项目实践与治理规则综合生成正式正文,05-agent-assets-and-workflow-governance
@@ -437,7 +437,7 @@ tsconfig.base.json,json,,keep_review,tsconfig.base.json,,保留并在相关批�
 ,md,新产品孵化与资产生成工作流,materialize,docs/knowledge/07_工作流与项目治理/WFL-011-新产品孵化与资产生成工作流.md,WFL-011,基于已接受架构、知识系统、项目实践与治理规则综合生成正式正文,05-agent-assets-and-workflow-governance
 ,md,项目状态汇总与阶段汇报,materialize,docs/knowledge/07_工作流与项目治理/WFL-012-项目状态汇总与阶段汇报.md,WFL-012,基于已接受架构、知识系统、项目实践与治理规则综合生成正式正文,05-agent-assets-and-workflow-governance
 ,md,多平台执行器与Usher适配架构,materialize,docs/knowledge/04_平台架构/ARC-015-多平台执行器与Usher适配架构.md,ARC-015,基于真实实验、已接受架构、代码证据和来源索引生成正式正文,06-experiments-portfolio-references-and-path-closure
-,md,Custom-GPT-Actions链路实验,materialize,docs/knowledge/08_实验与复盘/EXP-005-Custom-GPT-Actions链路实验.md,EXP-005,基于真实实验、已接受架构、代码证据和来源索引生成正式正文,06-experiments-portfolio-references-and-path-closure
+,md,Custom-GPT-Actions链路实验,materialize,docs/knowledge/08_实验与复盘/EXP-005-Custom-GPT-Actions链路实验/README.md,EXP-005,基于真实实验、已接受架构、代码证据和来源索引生成正式正文,06-experiments-portfolio-references-and-path-closure
 ,md,Gateway-Local-Runtime与Dev-Tunnels实验,materialize,docs/knowledge/08_实验与复盘/EXP-006-Gateway-Local-Runtime与Dev-Tunnels实验.md,EXP-006,基于真实实验、已接受架构、代码证据和来源索引生成正式正文,06-experiments-portfolio-references-and-path-closure
 ,md,Cloudflare路线替代复盘,materialize,docs/knowledge/08_实验与复盘/EXP-007-Cloudflare路线替代复盘.md,EXP-007,基于真实实验、已接受架构、代码证据和来源索引生成正式正文,06-experiments-portfolio-references-and-path-closure
 ,md,长上下文与知识综合复盘,materialize,docs/knowledge/08_实验与复盘/EXP-008-长上下文与知识综合复盘.md,EXP-008,基于真实实验、已接受架构、代码证据和来源索引生成正式正文,06-experiments-portfolio-references-and-path-closure
@@ -457,7 +457,7 @@ docs/knowledge/工作流/WFL-001-知识生命周期.md,md,Knowledge Lifecycle,mo
 docs/knowledge/工作流/WFL-002-ChatGPT任务到Codex与Git.md,md,ChatGPT Task Codex Git,move,docs/knowledge/07_工作流与项目治理/WFL-002-ChatGPT任务到Codex与Git.md,WFL-002,完成目标知识树路径收口并保持稳定资产 ID,06-experiments-portfolio-references-and-path-closure
 docs/knowledge/工作流/WFL-003-AI视频工作流.md,md,AI Video Workflow,move,docs/knowledge/07_工作流与项目治理/WFL-003-AI视频工作流.md,WFL-003,完成目标知识树路径收口并保持稳定资产 ID,06-experiments-portfolio-references-and-path-closure
 docs/knowledge/工作流/WFL-004-多模型Agent执行治理与Token预算.md,md,Multi-Model Agent Execution Governance and Token Budget,move,docs/knowledge/07_工作流与项目治理/WFL-004-多模型Agent执行治理与Token预算.md,WFL-004,完成目标知识树路径收口并保持稳定资产 ID,06-experiments-portfolio-references-and-path-closure
-docs/knowledge/04_平台架构/ARC-001-ai-agent-platform总体架构.md,md,Platform Target Architecture,move,,ARC-001,执行 Registry 已批准目标路径并完成全库路径收口,07-full-library-consistency-and-registry-closure
+docs/knowledge/04_平台架构/ARC-001-ai-agent-platform总体架构/README.md,md,Platform Target Architecture,move,,ARC-001,执行 Registry 已批准目标路径并完成全库路径收口,07-full-library-consistency-and-registry-closure
 docs/technical/归档/历史资产/ARC-003-六个月交付架构-v1.md,md,Six-Month Delivery Architecture,move,,ARC-003,执行 Registry 已批准目标路径并完成全库路径收口,07-full-library-consistency-and-registry-closure
 docs/knowledge/04_平台架构/DOM-001-核心领域模型.md,md,Core Domain Model,move,,DOM-001,执行 Registry 已批准目标路径并完成全库路径收口,07-full-library-consistency-and-registry-closure
 docs/knowledge/05_上下文与知识系统/ARC-002-智能体平台知识资产架构.md,md,Knowledge Asset Architecture,move,,ARC-002,执行 Registry 已批准目标路径并完成全库路径收口,07-full-library-consistency-and-registry-closure
@@ -489,3 +489,19 @@ skills/custom-gpt-actions/,path,Custom GPT Actions Skill,audit_complete,skills/c
 skills/microsoft-dev-tunnels/,path,Microsoft Dev Tunnels Skill,audit_complete,skills/microsoft-dev-tunnels/,SKILL-DEV-TUNNELS,当前路径已是最终路径，无需移动；完成迁移状态审计,07-full-library-consistency-and-registry-closure
 skills/engineering-insight-distillation/,path,Engineering Insight Distillation Skill,audit_complete,skills/engineering-insight-distillation/,SKILL-ENGINEERING-INSIGHTS,当前路径已是最终路径，无需移动；完成迁移状态审计,07-full-library-consistency-and-registry-closure
 platform-registry/registries/engineering-insights/,path,Engineering Insight Registry,audit_complete,platform-registry/registries/engineering-insights/,REG-ENGINEERING-INSIGHTS,当前路径已是最终路径，无需移动；完成迁移状态审计,07-full-library-consistency-and-registry-closure
+skills/ai-knowledge/,path,AI Knowledge Skill,supersede_move,skills/project-knowledge-governance/,SKILL-AI-KNOWLEDGE,收缩为项目知识治理；移出内容综合、正文编写与冻结交付职责,11-skill-portfolio-and-document-bundles
+skills/deterministic-delivery/,path,Deterministic Delivery Skill,merge_supersede,skills/planner-executor-handoff/,SKILL-DETERMINISTIC-DELIVERY,确定性交付并入 Planner Executor Handoff 的 apply_frozen_artifacts 模式,11-skill-portfolio-and-document-bundles
+skills/microsoft-dev-tunnels/,path,Microsoft Dev Tunnels Skill,demote_move,apps/dev-tunnel/docs/,SKILL-DEV-TUNNELS,工具操作降级为应用 Runbook，不再作为独立 Agent Skill,11-skill-portfolio-and-document-bundles
+,path,Engineering Document Authoring Skill,materialize,skills/engineering-document-authoring/,SKILL-ENGINEERING-DOCUMENT-AUTHORING,新增正式工程文档编写能力，承接 Human-first 与 AI-lossless 表达,11-skill-portfolio-and-document-bundles
+,md,工程文档编写技能,materialize,docs/knowledge/06_智能体资产体系/SKL-005-工程文档编写技能.md,SKL-005,记录新 Skill 的正式知识说明与边界,11-skill-portfolio-and-document-bundles
+,md,文档包与 Human-first、AI-lossless,materialize,docs/adr/ADR-003-document-bundles-human-first-ai-lossless.md,ADR-003,接受文档资源共置、相对路径、语义镜像与投影转换决策,11-skill-portfolio-and-document-bundles
+docs/knowledge/04_平台架构/ARC-001-ai-agent-platform总体架构.md,md,ARC-001 Document Bundle,bundle_move,docs/knowledge/04_平台架构/ARC-001-ai-agent-platform总体架构/README.md,ARC-001,正文与专属视觉资源共置；图片下方补齐 AI 可读语义镜像,11-skill-portfolio-and-document-bundles
+docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图.md,md,ARC-008 Document Bundle,bundle_move,docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图/README.md,ARC-008,正文与专属视觉资源共置；图片下方补齐 AI 可读语义镜像,11-skill-portfolio-and-document-bundles
+docs/knowledge/04_平台架构/ARC-009-轻量Task-Control架构.md,md,ARC-009 Document Bundle,bundle_move,docs/knowledge/04_平台架构/ARC-009-轻量Task-Control架构/README.md,ARC-009,正文与专属视觉资源共置；图片下方补齐 AI 可读语义镜像,11-skill-portfolio-and-document-bundles
+docs/knowledge/04_平台架构/ARC-010-Execution-Lane执行通道模型.md,md,ARC-010 Document Bundle,bundle_move,docs/knowledge/04_平台架构/ARC-010-Execution-Lane执行通道模型/README.md,ARC-010,正文与专属视觉资源共置；图片下方补齐 AI 可读语义镜像,11-skill-portfolio-and-document-bundles
+docs/knowledge/04_平台架构/ARC-012-Agent-Profile与Skills资产化.md,md,ARC-012 Document Bundle,bundle_move,docs/knowledge/04_平台架构/ARC-012-Agent-Profile与Skills资产化/README.md,ARC-012,正文与专属视觉资源共置；图片下方补齐 AI 可读语义镜像,11-skill-portfolio-and-document-bundles
+docs/knowledge/04_平台架构/ARC-013-审批证据与副作用账本.md,md,ARC-013 Document Bundle,bundle_move,docs/knowledge/04_平台架构/ARC-013-审批证据与副作用账本/README.md,ARC-013,正文与专属视觉资源共置；图片下方补齐 AI 可读语义镜像,11-skill-portfolio-and-document-bundles
+docs/knowledge/04_平台架构/ARC-014-健康与恢复治理架构.md,md,ARC-014 Document Bundle,bundle_move,docs/knowledge/04_平台架构/ARC-014-健康与恢复治理架构/README.md,ARC-014,正文与专属视觉资源共置；图片下方补齐 AI 可读语义镜像,11-skill-portfolio-and-document-bundles
+docs/knowledge/04_平台架构/ARC-017-产品孵化与需求治理体系.md,md,ARC-017 Document Bundle,bundle_move,docs/knowledge/04_平台架构/ARC-017-产品孵化与需求治理体系/README.md,ARC-017,正文与专属视觉资源共置；图片下方补齐 AI 可读语义镜像,11-skill-portfolio-and-document-bundles
+docs/knowledge/05_上下文与知识系统/KNO-005-项目知识生命周期.md,md,KNO-005 Document Bundle,bundle_move,docs/knowledge/05_上下文与知识系统/KNO-005-项目知识生命周期/README.md,KNO-005,正文与专属视觉资源共置；图片下方补齐 AI 可读语义镜像,11-skill-portfolio-and-document-bundles
+docs/knowledge/08_实验与复盘/EXP-005-Custom-GPT-Actions链路实验.md,md,EXP-005 Document Bundle,bundle_move,docs/knowledge/08_实验与复盘/EXP-005-Custom-GPT-Actions链路实验/README.md,EXP-005,正文与专属视觉资源共置；图片下方补齐 AI 可读语义镜像,11-skill-portfolio-and-document-bundles

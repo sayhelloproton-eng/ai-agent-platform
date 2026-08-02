@@ -10,7 +10,7 @@ Working Branch:
   knowledge-rebuild-v2
 
 Last Verified Review Source:
-  16a847a7a9df1021a562ac049405fba9d36066a6
+  7db863f383dd5def32ca30ec0020bcb787e94d12
 
 Current HEAD:
   read from Git at runtime
@@ -26,10 +26,11 @@ Current Review Group:
 
 - Batch 01～10 的知识资产重构与 `main` 集成；
 - Git 唯一真源与 Platform Registry；
-- 六个已验证或已接受 Skill；
+- 六个边界治理后的活跃 Skill；
 - Project Knowledge Synthesis v0.1.0 物化及首个目录聚合 Pilot，状态 `in_review`；
+- Skill Portfolio 收敛方案、Document Bundle 与 Human-first、AI-lossless 原则已确认；
 - Action Gateway → Local Runtime 窄链路 MVP；
-- 正式视觉资产与 `asset://` 发布机制；
+- 正式视觉资产与文档资源共置、相对路径和 Feishu 媒体转换机制；
 - `planner-executor-handoff v0.5.1 / accepted`；
 - `context/**` 人工 Review 与治理收口；
 - `docs/knowledge/00_项目入口/**` 聚合收口。
@@ -49,7 +50,7 @@ Current Review Group:
 
 状态：**Completed**
 
-已完成 Git 唯一真源、Context、正式知识与技术文档边界、Platform Registry、Engineering Insight Registry、知识发布机制、`asset://` 和 Feishu 图片 Publisher。
+已完成 Git 唯一真源、Context、正式知识与技术文档边界、Platform Registry、Engineering Insight Registry、Document Bundle、Human-first / AI-lossless 视觉语义块和 Feishu 图片 Publisher 规则。
 
 Feishu 最终知识投影尚未执行。
 
@@ -59,7 +60,7 @@ Feishu 最终知识投影尚未执行。
 
 状态：**MVP Verified / Platform Incomplete**
 
-已实现 Contracts、Auth、Policy、Action Gateway、Local Runtime、Microsoft Dev Tunnels、Custom GPT `runtime.status`、确定性交付、工程洞见提炼和 Planner / Executor Handoff。
+已实现 Contracts、Auth、Policy、Action Gateway、Local Runtime、Microsoft Dev Tunnels、Custom GPT `runtime.status`、工程洞见提炼和 Planner / Executor Handoff；冻结 Artifact 的确定性交付已并入 Handoff。
 
 尚未实现动态 Task Store、Execution / Result 持久化、Executor Adapter、Approval、Evidence、Side-effect Ledger、Health & Recovery、多执行器调度和完整自动闭环。
 
@@ -76,7 +77,7 @@ Feishu 最终知识投影尚未执行。
 → 总控 Planner 语义复审
 → Project Knowledge Synthesis 去重、冲突与落位
 → Planner 生成冻结完整文件
-→ Executor 确定性落库
+→ Executor 通过 Handoff 的冻结 Artifact 模式落库
 → Git / Registry 校验
 ```
 
@@ -103,6 +104,23 @@ Feishu 最终知识投影尚未执行。
 6. 发布回读与失败修正；
 7. 最终整仓验收；
 8. 再评估 fast-forward only 接入 `main`。
+
+---
+
+## Phase 2.5B — Skill Portfolio and Document Model Governance
+
+状态：**Completed**
+
+- 活跃 Skill 收敛为六个并按 Skill Creator 治理；
+- Deterministic Delivery 并入 Planner Executor Handoff；
+- AI Knowledge 收缩为 Project Knowledge Governance；
+- 新增 Engineering Document Authoring；
+- Microsoft Dev Tunnels 回归应用 Runbook；
+- 正式资源型文档迁移为 Document Bundle；
+- 落实 Human-first、AI-lossless 视觉语义镜像；
+- Publisher 从本地相对图片生成 Feishu 媒体投影。
+
+完成结果：Skill、Context、Registry、10 个视觉文档包、校验和 Publisher 规则已经一致；本批不包含 Feishu 实际写入。
 
 ---
 
@@ -141,6 +159,7 @@ Feishu 最终知识投影尚未执行。
 - Agent Profile / Knowledge Pack Publisher；
 - 外部 Knowledge Service / RAG；
 - Project Knowledge Synthesis 自动 Provider、跨仓库索引和批量 Eval；
+- Engineering Document Authoring 与 Project Knowledge Governance 的后续 Pilot 和 accepted 评审；
 - 生产级公网入口。
 
 这些能力只有在出现真实调用方、测试和发布目标后继续物化。

@@ -3,20 +3,21 @@
   "title": "Agent Profile、Skill 与 Knowledge Pack",
   "version": 1,
   "status": "accepted",
-  "target_document": "docs/knowledge/04_平台架构/ARC-012-Agent-Profile与Skills资产化.md",
+  "target_document": "docs/knowledge/04_平台架构/ARC-012-Agent-Profile与Skills资产化/README.md",
   "target_document_asset_id": "ARC-012",
   "source_documents": [
     "ARC-012",
     "AGT-002",
     "KNO-006"
   ],
-  "source_branch": "knowledge-assets",
-  "source_svg": "images/04_平台架构/ARC-012-Agent-Profile与Skills资产化/VIS-006-Agent-Profile-Skill-Knowledge-Pack.svg",
-  "preview_png": "images/04_平台架构/ARC-012-Agent-Profile与Skills资产化/VIS-006-Agent-Profile-Skill-Knowledge-Pack.png",
-  "asset_uri": "asset://04_平台架构/ARC-012-Agent-Profile与Skills资产化/VIS-006-Agent-Profile-Skill-Knowledge-Pack.png",
+  "source_svg": "docs/knowledge/04_平台架构/ARC-012-Agent-Profile与Skills资产化/assets/VIS-006-Agent-Profile-Skill-Knowledge-Pack.svg",
+  "preview_png": "docs/knowledge/04_平台架构/ARC-012-Agent-Profile与Skills资产化/assets/VIS-006-Agent-Profile-Skill-Knowledge-Pack.png",
   "width": 1800,
   "height": 1100,
   "svg_sha256": "baaf20ac7cd6f2819d9b0b71099a4ce00b3422ce4e4f608cabcce2fb4f0d1dc3",
   "png_sha256": "f8d7094db7b2f3b56b3f1b4a3de8584949ccc4d81385dca2e28760a7abf25507",
-  "review_notes": "Git 中的 Profile、Skill、Knowledge Pack、Tool Contract 与 Policy 组合后派生到不同 Host。"
+  "review_notes": "Git 中的 Profile、Skill、Knowledge Pack、Tool Contract 与 Policy 组合后派生到不同 Host。",
+  "storage_model": "document_bundle",
+  "markdown_image": "./assets/VIS-006-Agent-Profile-Skill-Knowledge-Pack.png",
+  "semantic_mirror_heading": "AI 可读语义镜像"
 }

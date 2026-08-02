@@ -1,10 +1,10 @@
 # Related Skills and Boundaries
 
-## deterministic-delivery
+## apply_frozen_artifacts
 
 Owns frozen ZIP, manifest, overlay, Git scope, staging, tests, commit, push, and deterministic continuation.
 
-## ai-knowledge
+## project-knowledge-governance
 
 Owns knowledge semantics, lifecycle, Registry meaning, asset placement, and Feishu projection.
 

@@ -45,4 +45,4 @@ npm run check:policy
 
 - [项目宪法](../AGENTS.md)
 - [Gateway 技术方案](../docs/technical/技术方案/Gateway/README.md)
-- [AI Knowledge Skill](../skills/ai-knowledge/README.md)
+- [Project Knowledge Governance Skill](../skills/project-knowledge-governance/SKILL.md)

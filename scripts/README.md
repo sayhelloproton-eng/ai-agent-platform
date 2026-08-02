@@ -39,4 +39,4 @@ npm run verify
 
 ## Visual Asset Check
 
-- `visual-asset-check.mjs`：验证 `VIS-*` Manifest、正文 `asset://` 引用、尺寸和 Hash；设置 `KNOWLEDGE_ASSETS_ROOT` 时同时检查 `knowledge-assets` 工作树中的 SVG / PNG。
+- `visual-asset-check.mjs`：验证 `VIS-*` Manifest、Document Bundle 共置路径、正文相对图片、AI 可读语义镜像、SVG 安全、PNG 尺寸和 Hash。

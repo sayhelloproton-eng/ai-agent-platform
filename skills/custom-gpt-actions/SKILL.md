@@ -1,6 +1,6 @@
 ---
 name: custom-gpt-actions
-description: Design, validate, and troubleshoot Builder-compatible Custom GPT Action OpenAPI schemas and narrow server-side adapter endpoints. Use when Codex modifies a Custom GPT Action schema, resolves GPT Builder validation errors, prevents the model from generating internal platform contracts, or verifies an Action through local validation, Builder parsing, and Preview calls.
+description: Design, validate, and troubleshoot Builder-compatible Custom GPT Action OpenAPI schemas and narrow server-side adapter endpoints. Use when modifying an Action schema, resolving GPT Builder validation errors, preventing the model from generating internal platform contracts, or verifying an Action through local validation, Builder parsing, and Preview calls. Do not use for general Custom GPT persona, Knowledge, Agent Profile, Runtime orchestration, public ingress, or unrelated OpenAPI services.
 ---
 
 # Custom GPT Actions

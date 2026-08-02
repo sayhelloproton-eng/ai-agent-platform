@@ -3,19 +3,20 @@
   "title": "健康、恢复与终止快照",
   "version": 1,
   "status": "accepted",
-  "target_document": "docs/knowledge/04_平台架构/ARC-014-健康与恢复治理架构.md",
+  "target_document": "docs/knowledge/04_平台架构/ARC-014-健康与恢复治理架构/README.md",
   "target_document_asset_id": "ARC-014",
   "source_documents": [
     "ARC-014",
     "EXP-009"
   ],
-  "source_branch": "knowledge-assets",
-  "source_svg": "images/04_平台架构/ARC-014-健康与恢复治理架构/VIS-008-健康恢复与终止快照.svg",
-  "preview_png": "images/04_平台架构/ARC-014-健康与恢复治理架构/VIS-008-健康恢复与终止快照.png",
-  "asset_uri": "asset://04_平台架构/ARC-014-健康与恢复治理架构/VIS-008-健康恢复与终止快照.png",
+  "source_svg": "docs/knowledge/04_平台架构/ARC-014-健康与恢复治理架构/assets/VIS-008-健康恢复与终止快照.svg",
+  "preview_png": "docs/knowledge/04_平台架构/ARC-014-健康与恢复治理架构/assets/VIS-008-健康恢复与终止快照.png",
   "width": 1800,
   "height": 1100,
   "svg_sha256": "266062fbb95f3ca3161536c711b64d42b597c6e3dad8c8fe08b9447f366b9334",
   "png_sha256": "6f7e0f841095b2915954e4314d3a9864bc058dc7a94177650b57778784778863",
-  "review_notes": "恢复受幂等、次数、时间和资源预算限制；无法安全恢复时保存 Snapshot 并移交。"
+  "review_notes": "恢复受幂等、次数、时间和资源预算限制；无法安全恢复时保存 Snapshot 并移交。",
+  "storage_model": "document_bundle",
+  "markdown_image": "./assets/VIS-008-健康恢复与终止快照.png",
+  "semantic_mirror_heading": "AI 可读语义镜像"
 }

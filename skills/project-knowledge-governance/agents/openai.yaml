@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Knowledge Governance"
+  short_description: "Govern Git-first knowledge assets and Feishu projection"
+  default_prompt: "Use $project-knowledge-governance to validate project knowledge placement, Registry state, document-bundle integrity, lifecycle, or one-way Feishu publication constraints."

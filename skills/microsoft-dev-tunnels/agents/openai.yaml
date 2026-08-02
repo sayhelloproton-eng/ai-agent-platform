@@ -1,4 +1,0 @@
-interface:
-  display_name: "Microsoft Dev Tunnels"
-  short_description: "Run and verify the Microsoft Dev Tunnels MVP safely"
-  default_prompt: "Use $microsoft-dev-tunnels to set up and verify the persistent Dev Tunnel MVP."

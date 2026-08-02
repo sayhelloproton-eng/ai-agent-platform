@@ -278,7 +278,7 @@ Secret
 | 路线图状态 | `context/roadmap.md` | 产品文档解释路线原因，不复制实时状态 |
 | Git / 飞书权威关系 | ADR + ARC-005 | README 只做简短引用 |
 | 正式知识路径 | `knowledge.config.yaml` | AGENTS 和 Skill 引用配置 |
-| 发布规则 | `skills/ai-knowledge/**` | SOL-004 解释原因，不重复实现细节 |
+| 发布规则 | `skills/project-knowledge-governance/**` | SOL-004 解释原因，不重复实现细节 |
 | 项目长期叙事 | `docs/knowledge/**` | Context 只提供摘要 |
 | 私人信息 | `.private-context/**` | 正式知识不得复制 |
 
@@ -321,7 +321,7 @@ knowledge.config.yaml
 ARC-005
 SOL-004
 SKL-001
-skills/ai-knowledge/**
+skills/project-knowledge-governance/**
 相关测试
 ```
 

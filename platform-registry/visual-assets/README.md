@@ -1,12 +1,26 @@
 # Visual Asset Registry
 
-本目录保存正式视觉资产的稳定 ID、来源文档、`knowledge-assets` 分支路径、`asset://` 引用、尺寸和 SHA-256。SVG / PNG 二进制文件不放在知识正文分支，而由 `knowledge-assets` 分支作为图片源资产仓库保存。
+本目录保存正式视觉资产的稳定 ID、目标 Document Bundle、来源、尺寸、Hash、事实边界和投影所需元数据。SVG / PNG 文件与目标文档共置，不在 Registry 目录重复存储。
 
-规则：
+## 当前存储模型
 
-- `VIS-*` 是稳定视觉资产 ID；
-- SVG 是可编辑源，PNG 是 Markdown / Feishu 预览；
-- Markdown 只使用 `asset://` 引用；
-- 每张图必须绑定目标正文和来源资产；
-- 图片改变时必须同步更新本目录 Hash、正文引用、Registry 关系与 Release；
-- 图片不能把目标设计冒充为当前实现。
+- `storage_model: document_bundle`；
+- `target_document` 指向文档目录中的 `README.md`；
+- `source_svg` 与 `preview_png` 必须位于同一文档目录的 `assets/`；
+- `markdown_image` 必须是 `./assets/...`；
+- `semantic_mirror_heading` 固定为 `AI 可读语义镜像`；
+- 图片、正文镜像和 Manifest 必须同步 Review。
+
+## 发布模型
+
+Git 文档包是唯一真源。Feishu Publisher 读取本地相对图片、上传媒体并在相同位置插入 image block；Feishu Token、URL 和 Block ID 不写回 Git。
+
+## 校验
+
+运行：
+
+```bash
+npm run check:visuals
+```
+
+校验覆盖路径共置、正文嵌入、语义镜像、SVG 安全、PNG 尺寸和 SHA-256。

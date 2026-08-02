@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Knowledge Synthesis"
+  short_description: "Reconcile project facts, overlap, conflict, and target assets"
+  default_prompt: "Use $project-knowledge-synthesis to synthesize the named project sources into a traceable, candidate-only knowledge restructuring proposal."

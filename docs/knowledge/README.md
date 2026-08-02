@@ -51,7 +51,7 @@
 | 当前真实做到什么 | `context/current-status.md`、`00_项目入口/CTX-005-当前能力与演进差距.md` |
 | 为什么采用当前路线 | `00_项目入口/DEC-001-架构决策演进摘要.md`、`docs/adr/` |
 | 产品如何定义 | `01_产品体系/` |
-| 当前与目标架构如何区分 | `04_平台架构/ARC-001-ai-agent-platform总体架构.md` |
+| 当前与目标架构如何区分 | `04_平台架构/ARC-001-ai-agent-platform总体架构/README.md` |
 | 某个机制怎样实现 | `docs/technical/`、代码和测试 |
 | Agent 怎样执行任务 | 根/目录 `AGENTS.md`、对应 Skill |
 | 是否可用于求职展示 | `09_作品集/`，并回查代码、实验和 Commit |
@@ -81,4 +81,7 @@
 - 正式写入必须经过总控 Planner 语义确认和必要的用户 Review；
 - Feishu 只接受 Git → Feishu 的逐篇覆盖投影；
 - 不读取 Feishu 旧正文做合并或反向同步；
-- 复杂图使用正式 SVG / PNG 资产，正文引用 `asset://`。
+- 资源型文章使用 `文档目录/README.md + assets/`；
+- 复杂图使用同目录正式 SVG / PNG，并通过 `./assets/...` 引用；
+- 每张图片下方立即提供 `### AI 可读语义镜像`，确保 Human-first、AI-lossless；
+- Publisher 在 Feishu 投影时上传本地图片，Feishu 媒体链接不回写 Git。
