@@ -10,7 +10,7 @@ Formal Baseline:
 Working Branch:
   Branch: knowledge-rebuild-v2
   Current HEAD: read from Git at runtime
-  Last Verified Review Source: c4301368c9af11f2f0c40323871dcb59daa9edda
+  Last Verified Review Source: 16a847a7a9df1021a562ac049405fba9d36066a6
 
 Visual Asset Branch:
   Branch: knowledge-assets
@@ -117,10 +117,10 @@ Codex 在 `fca48b22...` 中完成的集中扫描与首轮修订，只作为当�
 当前 Review 组：
 
 ```text
-context/**
+docs/knowledge/**
 ```
 
-详细逐篇进度由本轮人工 Review 清单维护，本文件只保存当前阶段和总体状态，不展开全部文件级记录。
+`context/**` 已完成本轮人工 Review 与治理收口。详细逐篇进度由本轮人工 Review 清单维护，本文件只保存当前阶段和总体状态，不展开全部文件级记录。
 
 ## Not Implemented
 

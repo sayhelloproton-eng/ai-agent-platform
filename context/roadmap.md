@@ -10,7 +10,7 @@ Working Branch:
   knowledge-rebuild-v2
 
 Last Verified Review Source:
-  c4301368c9af11f2f0c40323871dcb59daa9edda
+  16a847a7a9df1021a562ac049405fba9d36066a6
 
 Current HEAD:
   read from Git at runtime
@@ -93,7 +93,7 @@ Current Status:
 - Timeout；
 - 安全错误映射；
 - Engineering Insight Distillation；
-- Planner / Executor Handoff v0.4.0。
+- Planner / Executor Handoff v0.5.1。
 
 ### 尚未实现
 
