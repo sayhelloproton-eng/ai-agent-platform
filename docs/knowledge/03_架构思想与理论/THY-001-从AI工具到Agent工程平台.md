@@ -188,7 +188,7 @@ Custom GPT
 ## 10. 关联文档
 
 - [ARC-001 平台总体架构](../04_平台架构/ARC-001-ai-agent-platform总体架构/README.md)
-- [PRD-003 平台产品定义](../01_产品体系/PRD-003-ai-agent-platform产品定义.md)
+- [PRD-003 产品定义与用户价值](../01_产品体系/PRD-003-ai-agent-platform产品定义与用户价值/README.md)
 - [THY-002 AI 开发范式演进](./THY-002-AI开发范式演进.md)
 - [THY-003 Agent + Skills 开发范式](./THY-003-Agent与Skills开发范式.md)
 - [THY-005 可信 Agent 系统基本原则](./THY-005-可信Agent系统基本原则.md)

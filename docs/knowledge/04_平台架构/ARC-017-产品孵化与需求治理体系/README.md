@@ -73,9 +73,9 @@ idea
 
 ## 9. 关联文档
 
-- [PRD-003 ai-agent-platform产品定义](../../01_产品体系/PRD-003-ai-agent-platform产品定义.md)
-- [PRD-004 用户价值与核心场景](../../01_产品体系/PRD-004-用户价值与核心场景.md)
-- [PRD-007 平台与上层产品边界](../../01_产品体系/PRD-007-平台与上层产品边界.md)
+- [PRD-003 ai-agent-platform 产品定义与用户价值](../../01_产品体系/PRD-003-ai-agent-platform产品定义与用户价值/README.md)
+- [PRD-003 ai-agent-platform 产品定义与用户价值](../../01_产品体系/PRD-003-ai-agent-platform产品定义与用户价值/README.md)
+- [PRD-007 产品组合、演进阶段与平台边界](../../01_产品体系/PRD-007-产品组合演进与平台边界/README.md)
 - [ARC-008 ai-agent-platform-DDD领域蓝图](../ARC-008-ai-agent-platform-DDD领域蓝图/README.md)
 - [AGT-009 需求与产品孵化智能体](../../06_智能体资产体系/AGT-009-需求与产品孵化智能体.md)
 - [WFL-011 新产品孵化与资产生成工作流](../../07_工作流与项目治理/WFL-011-新产品孵化与资产生成工作流.md)

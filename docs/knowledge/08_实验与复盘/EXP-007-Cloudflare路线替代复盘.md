@@ -55,4 +55,4 @@ Cloudflare 文档和历史实现保留为 Superseded 审计证据，但不再作
 
 - [DEC-001 架构决策演进](../00_项目入口/DEC-001-架构决策演进摘要.md)
 - [EXP-006 Gateway / Runtime / Tunnel](./EXP-006-Gateway-Local-Runtime与Dev-Tunnels实验.md)
-- [PRD-005 能力路线](../01_产品体系/PRD-005-能力地图与演进路线.md)
+- [PRD-005 平台能力与产品成熟度](../01_产品体系/PRD-005-平台能力地图与产品成熟度/README.md)

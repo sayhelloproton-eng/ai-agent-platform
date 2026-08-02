@@ -1,5 +1,5 @@
 version: 1
-baseline_commit: 7db863f383dd5def32ca30ec0020bcb787e94d12
+baseline_commit: ad0bb6e687167ce198709b31e4733c5f2362e1ed
 capabilities:
 - id: CAP-RUNTIME-STATUS
   status: verified
@@ -39,7 +39,9 @@ capabilities:
 - id: CAP-AI-VIDEO-WORKFLOW
   status: idea
   implemented_by: []
-  evidence: []
+  evidence:
+  - docs/knowledge/01_产品体系/PRD-006-AI视频工作流产品概念与验证计划/README.md
+  - docs/knowledge/01_产品体系/PRD-007-产品组合演进与平台边界/README.md
 - id: CAP-PLANNER-EXECUTOR-HANDOFF
   status: verified
   implemented_by:

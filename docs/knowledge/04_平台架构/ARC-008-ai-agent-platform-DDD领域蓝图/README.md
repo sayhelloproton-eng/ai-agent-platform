@@ -64,5 +64,5 @@ Context 通过 Command、Event、Query、Port 和 Registry Reference 交流，�
 ## 9. 关联文档
 
 - [THY-004 DDD 与 Agent 系统边界建模](../../03_架构思想与理论/THY-004-DDD与Agent系统边界建模.md)
-- [PRD-007 平台与上层产品边界](../../01_产品体系/PRD-007-平台与上层产品边界.md)
+- [PRD-007 产品组合、演进阶段与平台边界](../../01_产品体系/PRD-007-产品组合演进与平台边界/README.md)
 - [ARC-001 历史平台目标架构](../ARC-001-ai-agent-platform总体架构/README.md)

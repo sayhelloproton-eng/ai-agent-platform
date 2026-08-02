@@ -10,7 +10,7 @@ Formal Baseline:
 Working Branch:
   Branch: knowledge-rebuild-v2
   Current HEAD: read from Git at runtime
-  Last Verified Review Source: 7db863f383dd5def32ca30ec0020bcb787e94d12
+  Last Verified Review Source: ad0bb6e687167ce198709b31e4733c5f2362e1ed
 
 Phase:
   2.5 — Human Content Review and Governance Refinement
@@ -73,15 +73,15 @@ Document-ID-title/
 
 ## Current Review State
 
-- `00_项目入口` 已经综合收敛并完成落库；
-- 当前主线仍是逐目录正式内容人工 Review；
+- `00_项目入口` 与 `01_产品体系` 已经综合收敛并完成落库；
+- 当前主线继续逐目录正式内容人工 Review；
 - Skill 组合治理、Document Bundle、Human-first / AI-lossless 与 Publisher 本地图片转换规则已完成落库；
 - Feishu 最终覆盖发布、发布回读和整仓验收尚未开始；
 - 本次治理不执行 Feishu 写入。
 
 ## Next Actions
 
-1. 继续 `docs/knowledge/01_产品体系/` 人工 Review；
+1. 继续 `docs/knowledge/02_基础产品与能力/` 人工 Review；
 2. 按目录生成冻结完整文件，由 Executor 机械落库；
 3. 全部正文 Review 后执行 Registry / 链接 / 文档包 / 图片语义镜像总验收；
 4. 独立授权 Git → Feishu 覆盖发布并回读；

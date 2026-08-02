@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "visual_asset_count": 10,
+  "visual_asset_count": 14,
   "assets": [
     {
       "visual_asset_id": "VIS-001",
@@ -219,6 +219,97 @@
       "png_sha256": "eacfc9f90f78303274e6190231cd73437b7effa55749cd5efafa4f0359d6392a",
       "review_notes": "Git 是唯一正式修改入口；Feishu、Custom GPT Knowledge 与 HTML 都是可重建投影。",
       "markdown_image": "./assets/VIS-010-知识生命周期与单向投影.png",
+      "storage_model": "document_bundle",
+      "semantic_mirror_heading": "AI 可读语义镜像"
+    },
+    {
+      "visual_asset_id": "VIS-011",
+      "title": "平台产品形态与价值闭环",
+      "version": 1,
+      "status": "accepted",
+      "target_document": "docs/knowledge/01_产品体系/PRD-003-ai-agent-platform产品定义与用户价值/README.md",
+      "target_document_asset_id": "PRD-003",
+      "source_documents": [
+        "PRD-003",
+        "PRD-004",
+        "CTX-001"
+      ],
+      "source_svg": "docs/knowledge/01_产品体系/PRD-003-ai-agent-platform产品定义与用户价值/assets/VIS-011-平台产品形态与价值闭环.svg",
+      "preview_png": "docs/knowledge/01_产品体系/PRD-003-ai-agent-platform产品定义与用户价值/assets/VIS-011-平台产品形态与价值闭环.png",
+      "width": 1800,
+      "height": 1100,
+      "svg_sha256": "348157a6b50414de7540735f3784ba55723535c23bdfc97f839e681a8e211029",
+      "png_sha256": "00e8d15ef277ff747fdf0ed51058cd90af77b2560a102489ee9094e420b555c3",
+      "review_notes": "产品体系人工 Review 后生成；视觉图与 AI 可读语义镜像共同表达产品定义、成熟度或组合边界。",
+      "markdown_image": "./assets/VIS-011-平台产品形态与价值闭环.png",
+      "storage_model": "document_bundle",
+      "semantic_mirror_heading": "AI 可读语义镜像"
+    },
+    {
+      "visual_asset_id": "VIS-012",
+      "title": "平台能力成熟度阶梯",
+      "version": 1,
+      "status": "accepted",
+      "target_document": "docs/knowledge/01_产品体系/PRD-005-平台能力地图与产品成熟度/README.md",
+      "target_document_asset_id": "PRD-005",
+      "source_documents": [
+        "PRD-005",
+        "CTX-005"
+      ],
+      "source_svg": "docs/knowledge/01_产品体系/PRD-005-平台能力地图与产品成熟度/assets/VIS-012-平台能力成熟度阶梯.svg",
+      "preview_png": "docs/knowledge/01_产品体系/PRD-005-平台能力地图与产品成熟度/assets/VIS-012-平台能力成熟度阶梯.png",
+      "width": 1800,
+      "height": 1100,
+      "svg_sha256": "8dec373adf3fee452ee62ffc95363bdf5f06af1de4ca0a27b845eca7c4ef6902",
+      "png_sha256": "a052dce7cd086f87fcdbb715c71316c7036dfdd12f5bcb8a18c208fdcc94b8c0",
+      "review_notes": "产品体系人工 Review 后生成；视觉图与 AI 可读语义镜像共同表达产品定义、成熟度或组合边界。",
+      "markdown_image": "./assets/VIS-012-平台能力成熟度阶梯.png",
+      "storage_model": "document_bundle",
+      "semantic_mirror_heading": "AI 可读语义镜像"
+    },
+    {
+      "visual_asset_id": "VIS-013",
+      "title": "AI视频工作流产品体验与验证切片",
+      "version": 1,
+      "status": "accepted",
+      "target_document": "docs/knowledge/01_产品体系/PRD-006-AI视频工作流产品概念与验证计划/README.md",
+      "target_document_asset_id": "PRD-006",
+      "source_documents": [
+        "PRD-006",
+        "PRD-007"
+      ],
+      "source_svg": "docs/knowledge/01_产品体系/PRD-006-AI视频工作流产品概念与验证计划/assets/VIS-013-AI视频工作流产品体验与验证切片.svg",
+      "preview_png": "docs/knowledge/01_产品体系/PRD-006-AI视频工作流产品概念与验证计划/assets/VIS-013-AI视频工作流产品体验与验证切片.png",
+      "width": 1800,
+      "height": 1100,
+      "svg_sha256": "e646a7b4554ea90aff60015311dcfe7932850a428e5e04dcc977861b17aed33e",
+      "png_sha256": "501f0bdca372dbba27950c332f10352b2eef073b7899216827d3d9323ee9ab6f",
+      "review_notes": "产品体系人工 Review 后生成；视觉图与 AI 可读语义镜像共同表达产品定义、成熟度或组合边界。",
+      "markdown_image": "./assets/VIS-013-AI视频工作流产品体验与验证切片.png",
+      "storage_model": "document_bundle",
+      "semantic_mirror_heading": "AI 可读语义镜像"
+    },
+    {
+      "visual_asset_id": "VIS-014",
+      "title": "产品组合演进与平台边界",
+      "version": 1,
+      "status": "accepted",
+      "target_document": "docs/knowledge/01_产品体系/PRD-007-产品组合演进与平台边界/README.md",
+      "target_document_asset_id": "PRD-007",
+      "source_documents": [
+        "PRD-003",
+        "PRD-006",
+        "PRD-007",
+        "ARC-017"
+      ],
+      "source_svg": "docs/knowledge/01_产品体系/PRD-007-产品组合演进与平台边界/assets/VIS-014-产品组合演进与平台边界.svg",
+      "preview_png": "docs/knowledge/01_产品体系/PRD-007-产品组合演进与平台边界/assets/VIS-014-产品组合演进与平台边界.png",
+      "width": 1800,
+      "height": 1100,
+      "svg_sha256": "c649f350b3fc3c5579b1d1c9577b87d244d99b20e4adb762976b6e332feea78c",
+      "png_sha256": "72194fa38ee6f9e174e079add3fc426bfa99753e19f1e3b5f4b36a99cb576a26",
+      "review_notes": "产品体系人工 Review 后生成；视觉图与 AI 可读语义镜像共同表达产品定义、成熟度或组合边界。",
+      "markdown_image": "./assets/VIS-014-产品组合演进与平台边界.png",
       "storage_model": "document_bundle",
       "semantic_mirror_heading": "AI 可读语义镜像"
     }

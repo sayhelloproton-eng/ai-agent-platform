@@ -217,7 +217,7 @@ Provider 变化应限制在 Adapter，不穿透领域模型。
 
 - [THY-001 从 AI 工具到 Agent 工程平台](./THY-001-从AI工具到Agent工程平台.md)
 - [THY-005 可信 Agent 系统基本原则](./THY-005-可信Agent系统基本原则.md)
-- [PRD-007 平台与上层产品边界](../01_产品体系/PRD-007-平台与上层产品边界.md)
+- [PRD-007 产品组合、演进阶段与平台边界](../01_产品体系/PRD-007-产品组合演进与平台边界/README.md)
 - [ARC-001 平台目标架构](../04_平台架构/ARC-001-ai-agent-platform总体架构/README.md)
 
 ## 13. 结论

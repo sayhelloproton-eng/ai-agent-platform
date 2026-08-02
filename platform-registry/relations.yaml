@@ -199,9 +199,6 @@ relations:
 - from: PRD-003
   type: derived_from
   to: PRD-001
-- from: PRD-004
-  type: depends_on
-  to: PRD-003
 - from: PRD-005
   type: depends_on
   to: PRD-003
@@ -481,9 +478,6 @@ relations:
 - from: ARC-017
   type: depends_on
   to: PRD-003
-- from: ARC-017
-  type: depends_on
-  to: PRD-004
 - from: ARC-017
   type: depends_on
   to: PRD-007
@@ -1021,3 +1015,21 @@ relations:
 - from: APP-DEV-TUNNEL
   type: explains
   to: SKILL-CUSTOM-GPT-ACTIONS
+- from: PRD-004
+  type: superseded_by
+  to: PRD-003
+- from: VIS-011
+  type: explains
+  to: PRD-003
+- from: VIS-012
+  type: explains
+  to: PRD-005
+- from: VIS-013
+  type: explains
+  to: PRD-006
+- from: VIS-014
+  type: explains
+  to: PRD-007
+- from: PRD-007
+  type: depends_on
+  to: PRD-003

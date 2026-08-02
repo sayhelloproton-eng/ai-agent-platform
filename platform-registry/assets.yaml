@@ -480,58 +480,59 @@ assets:
   publication_status: unpublished
   migration_state: complete
 - asset_id: PRD-003
-  title: ai-agent-platform产品定义
+  title: ai-agent-platform产品定义与用户价值
   asset_type: product
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/01_产品体系/PRD-003-ai-agent-platform产品定义.md
+  current_path: docs/knowledge/01_产品体系/PRD-003-ai-agent-platform产品定义与用户价值/README.md
   target_path: null
-  canonical_path: docs/knowledge/01_产品体系/PRD-003-ai-agent-platform产品定义.md
+  canonical_path: docs/knowledge/01_产品体系/PRD-003-ai-agent-platform产品定义与用户价值/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: PRD-004
   title: 用户价值与核心场景
   asset_type: product
-  status: accepted
+  status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/01_产品体系/PRD-004-用户价值与核心场景.md
+  current_path: docs/technical/归档/历史资产/01_产品体系_聚合前版本/PRD-004-用户价值与核心场景.md
   target_path: null
-  canonical_path: docs/knowledge/01_产品体系/PRD-004-用户价值与核心场景.md
+  canonical_path: docs/technical/归档/历史资产/01_产品体系_聚合前版本/PRD-004-用户价值与核心场景.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by: PRD-003
 - asset_id: PRD-005
-  title: 能力地图与演进路线
+  title: 平台能力地图与产品成熟度
   asset_type: product
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/01_产品体系/PRD-005-能力地图与演进路线.md
+  current_path: docs/knowledge/01_产品体系/PRD-005-平台能力地图与产品成熟度/README.md
   target_path: null
-  canonical_path: docs/knowledge/01_产品体系/PRD-005-能力地图与演进路线.md
+  canonical_path: docs/knowledge/01_产品体系/PRD-005-平台能力地图与产品成熟度/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: PRD-006
-  title: AI视频工作流产品概念
+  title: AI视频工作流产品概念与验证计划
   asset_type: product
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/01_产品体系/PRD-006-AI视频工作流产品概念.md
+  current_path: docs/knowledge/01_产品体系/PRD-006-AI视频工作流产品概念与验证计划/README.md
   target_path: null
-  canonical_path: docs/knowledge/01_产品体系/PRD-006-AI视频工作流产品概念.md
+  canonical_path: docs/knowledge/01_产品体系/PRD-006-AI视频工作流产品概念与验证计划/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: PRD-007
-  title: 平台与上层产品边界
+  title: 产品组合、演进阶段与平台边界
   asset_type: product
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/01_产品体系/PRD-007-平台与上层产品边界.md
+  current_path: docs/knowledge/01_产品体系/PRD-007-产品组合演进与平台边界/README.md
   target_path: null
-  canonical_path: docs/knowledge/01_产品体系/PRD-007-平台与上层产品边界.md
+  canonical_path: docs/knowledge/01_产品体系/PRD-007-产品组合演进与平台边界/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: CAP-001
@@ -1657,5 +1658,49 @@ assets:
   current_path: docs/technical/治理规则/GOV-002-文档与知识治理规则.md
   target_path: null
   canonical_path: docs/technical/治理规则/GOV-002-文档与知识治理规则.md
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: VIS-011
+  title: 平台产品形态与价值闭环
+  asset_type: visual
+  status: accepted
+  evidence_level: verified
+  materialized: true
+  current_path: platform-registry/visual-assets/VIS-011.json
+  target_path: null
+  canonical_path: platform-registry/visual-assets/VIS-011.json
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: VIS-012
+  title: 平台能力成熟度阶梯
+  asset_type: visual
+  status: accepted
+  evidence_level: verified
+  materialized: true
+  current_path: platform-registry/visual-assets/VIS-012.json
+  target_path: null
+  canonical_path: platform-registry/visual-assets/VIS-012.json
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: VIS-013
+  title: AI视频工作流产品体验与验证切片
+  asset_type: visual
+  status: accepted
+  evidence_level: verified
+  materialized: true
+  current_path: platform-registry/visual-assets/VIS-013.json
+  target_path: null
+  canonical_path: platform-registry/visual-assets/VIS-013.json
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: VIS-014
+  title: 产品组合演进与平台边界
+  asset_type: visual
+  status: accepted
+  evidence_level: verified
+  materialized: true
+  current_path: platform-registry/visual-assets/VIS-014.json
+  target_path: null
+  canonical_path: platform-registry/visual-assets/VIS-014.json
   publication_status: unpublished
   migration_state: complete

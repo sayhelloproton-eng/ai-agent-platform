@@ -10,7 +10,7 @@ Working Branch:
   knowledge-rebuild-v2
 
 Last Verified Review Source:
-  7db863f383dd5def32ca30ec0020bcb787e94d12
+  ad0bb6e687167ce198709b31e4733c5f2362e1ed
 
 Current HEAD:
   read from Git at runtime
@@ -19,7 +19,7 @@ Current Phase:
   Phase 2.5 — Human Content Review and Knowledge Release Closure
 
 Current Review Group:
-  docs/knowledge/01_产品体系/**
+  docs/knowledge/02_基础产品与能力/**
 ```
 
 当前已经完成：
@@ -33,11 +33,12 @@ Current Review Group:
 - 正式视觉资产与文档资源共置、相对路径和 Feishu 媒体转换机制；
 - `planner-executor-handoff v0.5.1 / accepted`；
 - `context/**` 人工 Review 与治理收口；
-- `docs/knowledge/00_项目入口/**` 聚合收口。
+- `docs/knowledge/00_项目入口/**` 聚合收口；
+- `docs/knowledge/01_产品体系/**` 产品定义、成熟度、计划产品与产品组合聚合收口。
 
 当前尚未完成：
 
-- `01_产品体系` 及后续知识目录的人工 Review；
+- `02_基础产品与能力` 及后续知识目录的人工 Review；
 - Project Knowledge Synthesis 的更多真实 Pilot 与接受评审；
 - 最终人工内容验收；
 - Feishu 最终发布、发布回读和最终整仓验收。
@@ -84,11 +85,12 @@ Feishu 最终知识投影尚未执行。
 ### 已完成目录
 
 - `context/**`；
-- `docs/knowledge/00_项目入口/**`。
+- `docs/knowledge/00_项目入口/**`；
+- `docs/knowledge/01_产品体系/**`。
 
 ### 当前目录
 
-- `docs/knowledge/01_产品体系/**`。
+- `docs/knowledge/02_基础产品与能力/**`。
 
 ### Project Knowledge Synthesis
 
