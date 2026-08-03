@@ -1,4 +1,4 @@
-version: 2
+version: 3
 project: ai-agent-platform
 provider: feishu
 direction: git_to_feishu
@@ -10,26 +10,84 @@ source_root: docs/knowledge/
 structure: one_to_one
 navigation_mode: governed_tree
 document_entry: README.md
-directory_readmes_published: false
-image_source: document_bundle
-homepage:
-  source_asset_id: CTX-001
-  source_path: docs/knowledge/00_项目与产品/CTX-001-智能体工程探索录/README.md
+directory_readmes_published_as_group_body: true
+canonical_child_sort: stable_asset_id
+space_name: 智能体工程探索
+standalone_entries:
+- asset_id: CTX-001
   title: 智能体工程探索录
-  preserve_existing_root_node: true
-  projected_parent: root
+  source_path: docs/knowledge/00_项目与产品/CTX-001-智能体工程探索录/README.md
+  level: 1
+  parent: space_root
+  role: standalone_entry
+  preserve_existing_node: true
   exclude_from_navigation_groups: true
 navigation_groups:
 - group_id: project-and-product
   title: 项目与产品
-  order: 0
   source_root: docs/knowledge/00_项目与产品/
-  excluded_assets:
-  - CTX-001
-  asset_prefix_order:
-  - CTX
-  - DEC
-  - PRD
+  level: 1
+  parent: space_root
+  excluded_assets: [CTX-001]
+- group_id: foundational-products-and-capabilities
+  title: 基础产品与能力
+  source_root: docs/knowledge/02_基础产品与能力/
+  level: 1
+  parent: space_root
+- group_id: agent-engineering-architecture-methodology
+  title: Agent工程架构思想与方法论
+  source_root: docs/knowledge/03_Agent工程架构思想与方法论/
+  level: 1
+  parent: space_root
+- group_id: platform-architecture
+  title: 平台架构
+  source_root: docs/knowledge/04_平台架构/
+  level: 1
+  parent: space_root
+- group_id: context-and-knowledge-system
+  title: 上下文与知识系统
+  source_root: docs/knowledge/05_上下文与知识系统/
+  level: 1
+  parent: space_root
+- group_id: agent-asset-system
+  title: 智能体资产体系
+  source_root: docs/knowledge/06_智能体资产体系/
+  level: 1
+  parent: space_root
+- group_id: workflow-and-project-governance
+  title: 工作流与项目治理
+  source_root: docs/knowledge/07_工作流与项目治理/
+  level: 1
+  parent: space_root
+- group_id: experiments-and-retrospectives
+  title: 实验与复盘
+  source_root: docs/knowledge/08_实验与复盘/
+  level: 1
+  parent: space_root
+- group_id: portfolio
+  title: 作品集
+  source_root: docs/knowledge/09_作品集/
+  level: 1
+  parent: space_root
+- group_id: terminology-and-sources
+  title: 术语与来源
+  source_root: docs/knowledge/10_术语与来源/
+  level: 1
+  parent: space_root
+mapping_workflow:
+- compile_desired_mapping
+- read_existing_tree
+- build_mapping_diff
+- generate_operation_plan
+- preview
+- apply
+- readback
+private_state_root: .local-state/feishu/<SOURCE_SHA>/
+required_private_artifacts:
+- desired-projection.json
+- existing-tree.json
+- mapping-diff.json
+- operation-plan.json
 require_write_preview: true
 require_human_confirmation: true
 require_readback_verification: true

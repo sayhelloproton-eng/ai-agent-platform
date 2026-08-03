@@ -1,28 +1,38 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Feishu Projection",
+  "title": "Feishu Desired Projection Policy",
   "type": "object",
   "required": [
-    "asset_id",
-    "git_path",
-    "node_id",
-    "mode"
+    "version", "project", "provider", "direction", "mode", "space_name",
+    "standalone_entries", "navigation_groups", "mapping_workflow",
+    "required_private_artifacts", "mappings"
   ],
   "properties": {
-    "asset_id": {
-      "type": "string"
+    "version": { "const": 3 },
+    "project": { "const": "ai-agent-platform" },
+    "provider": { "const": "feishu" },
+    "direction": { "const": "git_to_feishu" },
+    "mode": { "const": "overwrite" },
+    "space_name": { "const": "智能体工程探索" },
+    "standalone_entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["asset_id", "title", "source_path", "level", "parent", "role", "preserve_existing_node", "exclude_from_navigation_groups"]
+      }
     },
-    "git_path": {
-      "type": "string"
+    "navigation_groups": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "required": ["group_id", "title", "source_root", "level", "parent"]
+      }
     },
-    "node_id": {
-      "type": "string"
-    },
-    "mode": {
-      "const": "overwrite"
-    },
-    "source_commit": {
-      "type": "string"
-    }
-  }
+    "mapping_workflow": { "type": "array", "minItems": 7, "maxItems": 7 },
+    "required_private_artifacts": { "type": "array", "minItems": 4, "maxItems": 4 },
+    "mappings": { "type": "array", "maxItems": 0 }
+  },
+  "additionalProperties": true
 }

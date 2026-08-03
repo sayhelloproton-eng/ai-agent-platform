@@ -70,6 +70,8 @@ Do not silently scan all Git or all Feishu. Current task state must not be infer
 
 - source is always the reviewed Git document bundle;
 - publish by overwrite, never merge or reverse sync;
+- treat the Feishu Space root as the navigation container: standalone entries and navigation groups are level-1 siblings, never implicit children of a homepage;
+- compile the public Desired Projection before reading the private Existing Tree, then build a Mapping Diff and an explicit operation plan before any delete, create or reuse action;
 - local images are uploaded during projection and replaced by Feishu media/image blocks at the same location;
 - Feishu media tokens, URLs and Block IDs never write back into Git;
 - the AI-readable semantic mirror remains ordinary text;

@@ -1,0 +1,17 @@
+{
+  "code": 0,
+  "data": {
+    "nodes": [
+      {
+        "title": "脱敏根页",
+        "node_token": "wikcnREDACTED001",
+        "obj_token": "docxREDACTED001",
+        "obj_type": "docx",
+        "parent_node_token": "wikcnREDACTEDPARENT",
+        "space_id": "spcREDACTED001",
+        "has_child": false,
+        "obj_edit_time": "0"
+      }
+    ]
+  }
+}

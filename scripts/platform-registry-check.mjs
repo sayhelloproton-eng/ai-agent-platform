@@ -486,24 +486,68 @@ async function main() {
     "require_human_confirmation: true",
     "require_readback_verification: true",
     "navigation_mode: governed_tree",
-    "source_asset_id: CTX-001",
+    "space_name: 智能体工程探索",
+    "asset_id: CTX-001",
     "title: 智能体工程探索录",
+    "role: standalone_entry",
+    "preserve_existing_node: true",
+    "exclude_from_navigation_groups: true",
     "group_id: project-and-product",
     "title: 项目与产品",
+    "private_state_root: .local-state/feishu/<SOURCE_SHA>/",
+    "mappings: []",
   ]) {
     if (!projection.includes(required)) fail(`projection policy missing ${required}`);
   }
-  const mappings = parseRecords(projection, "asset_id");
-  for (const mapping of mappings) {
-    const asset = assetsById.get(mapping.asset_id);
-    if (!asset) {
-      fail(`projection references unknown asset ${mapping.asset_id}`);
-      continue;
-    }
-    if (!asset.materialized || asset.publication_status !== "published") {
-      fail(`projection asset ${mapping.asset_id} is not materialized and published`);
-    }
-    if (!mapping.node_id) fail(`projection asset ${mapping.asset_id} missing node_id`);
+  const expectedProjectionGroups = [
+    ["项目与产品", "docs/knowledge/00_项目与产品/"],
+    ["基础产品与能力", "docs/knowledge/02_基础产品与能力/"],
+    ["Agent工程架构思想与方法论", "docs/knowledge/03_Agent工程架构思想与方法论/"],
+    ["平台架构", "docs/knowledge/04_平台架构/"],
+    ["上下文与知识系统", "docs/knowledge/05_上下文与知识系统/"],
+    ["智能体资产体系", "docs/knowledge/06_智能体资产体系/"],
+    ["工作流与项目治理", "docs/knowledge/07_工作流与项目治理/"],
+    ["实验与复盘", "docs/knowledge/08_实验与复盘/"],
+    ["作品集", "docs/knowledge/09_作品集/"],
+    ["术语与来源", "docs/knowledge/10_术语与来源/"],
+  ];
+  let previousGroupOffset = -1;
+  for (const [title, sourceRoot] of expectedProjectionGroups) {
+    const marker = `  title: ${title}\n  source_root: ${sourceRoot}\n  level: 1\n  parent: space_root`;
+    const offset = projection.indexOf(marker);
+    if (offset < 0) fail(`projection navigation group invalid: ${title}`);
+    if (offset >= 0 && offset <= previousGroupOffset) fail(`projection navigation group order invalid: ${title}`);
+    previousGroupOffset = offset;
+  }
+  for (const workflowStep of [
+    "compile_desired_mapping",
+    "read_existing_tree",
+    "build_mapping_diff",
+    "generate_operation_plan",
+    "preview",
+    "apply",
+    "readback",
+  ]) {
+    if (!projection.includes(`- ${workflowStep}`)) fail(`projection mapping workflow missing ${workflowStep}`);
+  }
+  for (const privateArtifact of [
+    "desired-projection.json",
+    "existing-tree.json",
+    "mapping-diff.json",
+    "operation-plan.json",
+  ]) {
+    if (!projection.includes(`- ${privateArtifact}`)) fail(`projection private artifact missing ${privateArtifact}`);
+  }
+  if (/\b(?:node_token|obj_token|node_id|https?:\/\/)/.test(projection)) {
+    fail("projection policy must not contain private Feishu tokens, node IDs or URLs");
+  }
+  const projectionSchema = JSON.parse(
+    await read("platform-registry/schemas/projection.schema.json"),
+  );
+  if (projectionSchema.properties?.version?.const !== 3 ||
+      projectionSchema.properties?.mappings?.maxItems !== 0 ||
+      projectionSchema.properties?.space_name?.const !== "智能体工程探索") {
+    fail("projection schema does not enforce the mapping-first desired projection boundary");
   }
 
   const migrationText = await read(
