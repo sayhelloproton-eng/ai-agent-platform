@@ -2,6 +2,8 @@
 
 > 结论：安全恢复不是重新执行整个任务，而是在固定 Task Version、Git SHA、Scope、Evidence 和副作用状态后，只修正已确认根因，并从明确执行点幂等续跑。
 
+本实验提供 **observed evidence**，证明快照、Handoff 和人工续跑机制在真实任务中具有恢复价值；它不证明平台已经实现自动健康检测、自动恢复预算或持久 Task Runtime。
+
 ## 1. 实验定位
 
 本文记录两个真实恢复场景：
@@ -52,6 +54,8 @@ v3 恢复前执行：
 
 ## 4. 被验证的恢复原则
 
+以下结论来自已发生并被记录的人工恢复场景，而不是完整 Runtime 的自动化验证：
+
 - 停止边界可以保护未提交工作区；
 - Checkpoint 必须包含 SHA、范围、已完成门禁和副作用状态；
 - 恢复授权只覆盖已确认根因；
@@ -94,6 +98,8 @@ integrity_hash
 - Lease 撤销服务；
 - 通用 Recovery Service；
 - 自动 Side-effect Ledger。
+
+因此，自动健康检测、自动恢复预算、持久 Task Runtime 和通用 Recovery Service 仍是目标机制，不得从本实验的人工观察推导为已实现能力。
 
 ## 8. 对平台的影响
 

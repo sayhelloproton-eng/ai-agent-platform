@@ -1244,7 +1244,7 @@ assets:
   title: 任务中断、健康恢复与快照续跑实验
   asset_type: experiment
   status: accepted
-  evidence_level: hypothesis
+  evidence_level: observed
   materialized: true
   current_path: docs/knowledge/08_实验与复盘/EXP-009-健康恢复与任务快照实验/README.md
   target_path:
@@ -1936,6 +1936,61 @@ assets:
   current_path: platform-registry/visual-assets/VIS-029.json
   target_path:
   canonical_path: platform-registry/visual-assets/VIS-029.json
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: VIS-030
+  title: 上下文与知识系统总体架构
+  asset_type: visual
+  status: accepted
+  evidence_level: verified
+  materialized: true
+  current_path: platform-registry/visual-assets/VIS-030.json
+  target_path:
+  canonical_path: platform-registry/visual-assets/VIS-030.json
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: VIS-031
+  title: 多消费者上下文编译与策略架构
+  asset_type: visual
+  status: accepted
+  evidence_level: verified
+  materialized: true
+  current_path: platform-registry/visual-assets/VIS-031.json
+  target_path:
+  canonical_path: platform-registry/visual-assets/VIS-031.json
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: VIS-032
+  title: 上下文运行流转与恢复机制
+  asset_type: visual
+  status: accepted
+  evidence_level: verified
+  materialized: true
+  current_path: platform-registry/visual-assets/VIS-032.json
+  target_path:
+  canonical_path: platform-registry/visual-assets/VIS-032.json
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: VIS-033
+  title: 知识分发、Knowledge Pack 与多渠道投影
+  asset_type: visual
+  status: accepted
+  evidence_level: verified
+  materialized: true
+  current_path: platform-registry/visual-assets/VIS-033.json
+  target_path:
+  canonical_path: platform-registry/visual-assets/VIS-033.json
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: VIS-034
+  title: 记忆、反馈与知识自迭代机制
+  asset_type: visual
+  status: accepted
+  evidence_level: verified
+  materialized: true
+  current_path: platform-registry/visual-assets/VIS-034.json
+  target_path:
+  canonical_path: platform-registry/visual-assets/VIS-034.json
   publication_status: unpublished
   migration_state: complete
 - asset_id: VIS-035

@@ -6,4 +6,13 @@ mode: overwrite
 pre_read_content: false
 semantic_diff: false
 reverse_write: false
+source_root: docs/knowledge/
+structure: one_to_one
+document_entry: README.md
+image_source: document_bundle
+require_write_preview: true
+require_human_confirmation: true
+require_readback_verification: true
+publication_status: not_started
+mapping_status: not_initialized
 mappings: []

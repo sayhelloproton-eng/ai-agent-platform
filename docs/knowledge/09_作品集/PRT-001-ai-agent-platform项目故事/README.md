@@ -66,7 +66,7 @@ Planner、Executor、Reviewer 和 Approver 的责任被分开，冻结 Artifact 
 - Platform Registry；
 - Document Bundle 和视觉语义镜像；
 - 六个活跃 Skill；
-- `AGT-001/002/003/005/007/008` 六篇智能体资产 Canonical 文档与 `VIS-035` 总体架构图；
+- `AGT-001/002/003/005/007/008` 六篇智能体资产 Canonical 文档与 `VIS-035` 总体架构图，形成并接受了智能体资产模型；相关运行资产尚未物化；
 - Planner–Executor Handoff；
 - 冻结 ZIP、Manifest、Hash、Scope、单 Commit 和远端回读。
 
@@ -88,25 +88,35 @@ Planner、Executor、Reviewer 和 Approver 的责任被分开，冻结 Artifact 
 
 ## 5. 当前事实边界
 
-已经验证：
+### 已实现并测试
 
-- 智能体资产体系的角色、Profile、知识装配、Skill / Capability / Tool / Permission / Policy、评估发布和专业目录边界；
-- 知识治理和 Registry；
-- Document Bundle 与视觉资产规则；
-- 六个活跃 Skill；
+- Contracts、Auth、Policy、Gateway、Runtime 与仓库验证；
+- 知识治理、Registry、Document Bundle 与六个活跃 Skill。
+
+### 真实链路已验证
+
 - Custom GPT Actions 最小可信链路；
 - Gateway / Runtime / Dev Tunnels；
 - 冻结交付、完整校验和安全续跑。
 
-尚未实现：
+### 正式设计已接受
 
-- 正式 `agents/` 目录、Role / Agent Profile Schema 和 released 专业 Agent；
+- Role、Agent Profile、Knowledge Pack、Skill / Capability / Tool / Permission / Policy、Eval、Host Release 与 Catalog 的智能体资产模型；
+- 正式设计已接受，但 `agents/**`、`knowledge-packs/**`、released 专业 Agent 和完整 Agent Runtime 尚未物化。
+
+### 计划中
+
+- 正式 `agents/**`、Role / Agent Profile Schema 和 released 专业 Agent；
+- 正式 `knowledge-packs/**`；
+- 完整 Agent Runtime；
 - 动态 Task Store 和持久 Execution；
 - Approval / Evidence / Side-effect Ledger；
 - 自动多执行器调度；
 - Knowledge Pack / Agent Profile 自动 Publisher；
 - AI 视频业务 Demo；
 - 生产公网和正式 Portfolio Release。
+
+这些未物化项不影响项目已经形成正式资产模型和清晰实现路线，但不得被描述为已验证运行能力。
 
 ## 6. 适合展示的能力
 

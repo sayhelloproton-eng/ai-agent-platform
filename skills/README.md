@@ -7,11 +7,13 @@
 | Skill | 唯一核心问题 | 状态 |
 |---|---|---|
 | [`planner-executor-handoff`](planner-executor-handoff/SKILL.md) | Planner 如何把普通实施或冻结 Artifact 安全交给 Executor，并接收证据、复审和续跑？ | accepted |
-| [`project-knowledge-synthesis`](project-knowledge-synthesis/SKILL.md) | 多源项目材料中哪些是事实、重复、冲突，目标知识结构应该是什么？ | in_review |
-| [`engineering-document-authoring`](engineering-document-authoring/SKILL.md) | 已确认内容如何写成 Human-first、AI-lossless 的正式工程文档？ | in_review |
-| [`project-knowledge-governance`](project-knowledge-governance/SKILL.md) | 正式项目知识如何落位、登记、校验、检索和单向发布？ | in_review |
+| [`project-knowledge-synthesis`](project-knowledge-synthesis/SKILL.md) | 多源项目材料中哪些是事实、重复、冲突，目标知识结构应该是什么？ | implemented / verified evidence |
+| [`engineering-document-authoring`](engineering-document-authoring/SKILL.md) | 已确认内容如何写成 Human-first、AI-lossless 的正式工程文档？ | implemented / verified evidence |
+| [`project-knowledge-governance`](project-knowledge-governance/SKILL.md) | 正式项目知识如何落位、登记、校验、检索和单向发布？ | implemented / verified evidence |
 | [`engineering-insight-distillation`](engineering-insight-distillation/SKILL.md) | 有证据的工程事件能否提炼为有边界、可执行的复用洞见？ | verified / explicit trigger |
 | [`custom-gpt-actions`](custom-gpt-actions/SKILL.md) | Custom GPT Action 如何保持 Builder 兼容和服务端安全边界？ | verified |
+
+这里的状态表示 Skill 资产的实现与验证状态，不表示所有后续 Pilot、产品化和外部发布均已完成。
 
 ## 已退出独立 Skill
 

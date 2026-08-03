@@ -3,50 +3,22 @@
 ## Current Position
 
 ```text
-Formal Baseline:
-  main@374f07b7ede3593400bf8631994fb1e91a4123bd
-
 Working Branch:
-  knowledge-rebuild-v2
-
-Last Verified Review Source:
-  93da9612e237f94cc6044d85ac7a2f0d7c37b203
+  main
 
 Current HEAD:
   read from Git at runtime
 
 Current Phase:
-  Phase 2.5 — Human Content Review and Knowledge Release Closure
+  Phase 2.5 — Knowledge Review Closure and Feishu Publication Preparation
 
-Current Review Group:
-  docs/knowledge/08_实验与复盘/**
+Current Work:
+  Control-plane closure, Git verification and publication preparation
 ```
 
-当前已经完成：
+`docs/knowledge/00～10` 已完成本轮 Canonical 内容 Review 和落库。当前不再按章节继续扩写，主线已经切换为状态、映射、证据和发布控制面的最终收口。
 
-- Batch 01～10 的知识资产重构与 `main` 集成；
-- Git 唯一真源与 Platform Registry；
-- 六个边界治理后的活跃 Skill；
-- Project Knowledge Synthesis v0.1.0 物化及首个目录聚合 Pilot，状态 `in_review`；
-- Skill Portfolio 收敛方案、Document Bundle 与 Human-first、AI-lossless 原则已确认；
-- Action Gateway → Local Runtime 窄链路 MVP；
-- 正式视觉资产与文档资源共置、相对路径和 Feishu 媒体转换机制；
-- `planner-executor-handoff v0.5.1 / accepted`；
-- `context/**` 人工 Review 与治理收口；
-- `docs/knowledge/00_项目入口/**` 聚合收口；
-- `docs/knowledge/01_产品体系/**` 产品定义、成熟度、计划产品与产品组合聚合收口；
-- `docs/knowledge/02_基础产品与能力/**` ChatGPT 生态、配置、组件差异、平台核心能力与执行闭环聚合收口。
-- `docs/knowledge/03_Agent工程架构思想与方法论/**` 平台化责任、复杂度演进、Skills、DDD 边界建模、可信系统与项目方法论完成收口；
-- `docs/knowledge/04_平台架构/**` 纠偏收敛为 ARC-001 总体架构与执行路径、ARC-016 能力依赖与分阶段 MVP；DDD、运行、部署、信任、证据、并行和正式占位已串联，旧观点和旧视觉资产完成可追溯归档。
-
-当前尚未完成：
-
-- `06_智能体资产体系` 及后续知识目录的人工 Review；
-- Project Knowledge Synthesis 的更多真实 Pilot 与接受评审；
-- 最终人工内容验收；
-- Feishu 最终发布、发布回读和最终整仓验收。
-
-详细 Release 和 Migration 历史见 Platform Registry、迁移计划与 Git Commit。
+准确 Commit、远端状态和仓库洁净度必须从 Git 实时读取，不在 Roadmap 中长期硬编码。
 
 ---
 
@@ -54,9 +26,21 @@ Current Review Group:
 
 状态：**Completed**
 
-已完成 Git 唯一真源、Context、正式知识与技术文档边界、Platform Registry、Engineering Insight Registry、Document Bundle、Human-first / AI-lossless 视觉语义块和 Feishu 图片 Publisher 规则。
+已经形成：
 
-Feishu 最终知识投影尚未执行。
+* Git 唯一真源；
+* Context 治理；
+* 正式知识与技术资料边界；
+* Platform Registry；
+* Engineering Insight Registry；
+* Document Bundle；
+* Human-first、AI-lossless 视觉资产；
+* Git → Feishu 单向覆盖原则；
+* Feishu 本地图片上传与语义镜像规则；
+* 六个活跃 Skill；
+* Planner–Executor 冻结 Artifact 交付。
+
+Feishu 实际全量投影尚未执行。
 
 ---
 
@@ -64,113 +48,161 @@ Feishu 最终知识投影尚未执行。
 
 状态：**MVP Verified / Platform Incomplete**
 
-已实现 Contracts、Auth、Policy、Action Gateway、Local Runtime、Microsoft Dev Tunnels、Custom GPT `runtime.status`、工程洞见提炼和 Planner / Executor Handoff；冻结 Artifact 的确定性交付已并入 Handoff。
-
-尚未实现动态 Task Store、Execution / Result 持久化、Executor Adapter、Approval、Evidence、Side-effect Ledger、Health & Recovery、多执行器调度和完整自动闭环。
-
----
-
-## Phase 2.5 — Human Content Review and Knowledge Release Closure
-
-状态：**In Progress**
-
-### Review 方法
+已经验证：
 
 ```text
-用户 Review
-→ 总控 Planner 语义复审
-→ Project Knowledge Synthesis 去重、冲突与落位
-→ Planner 生成冻结完整文件
-→ Executor 通过 Handoff 的冻结 Artifact 模式落库
-→ Git / Registry 校验
+Custom GPT
+→ Dev Tunnels
+→ Action Gateway
+→ Local Runtime
+→ gateway.ping / runtime.status
 ```
 
-### 已完成目录
+已有 Contracts、Auth、Policy、Gateway、Runtime、开发期 Tunnel、Custom GPT Action 和人工 Planner–Executor Git 闭环。
 
-- `context/**`；
-- `docs/knowledge/00_项目入口/**`；
-- `docs/knowledge/01_产品体系/**`；
-- `docs/knowledge/02_基础产品与能力/**`；
-- `docs/knowledge/03_Agent工程架构思想与方法论/**`；
-- `docs/knowledge/04_平台架构/**`;
-- `docs/knowledge/05_上下文与知识系统/**`；
-- `docs/knowledge/06_智能体资产体系/**`；
-- `docs/knowledge/07_工作流与项目治理/**`。
+尚未实现：
 
-### 当前目录
-
-- `docs/knowledge/08_实验与复盘/**`。
-
-### Project Knowledge Synthesis
-
-`project-knowledge-synthesis v0.1.0` 已物化并完成 `00_项目入口` 首个 governed Pilot，当前状态为 `in_review`。当前只支持结构化输入、离线 Contract 校验、综合候选和人工审批后的冻结交付，不具备自动写入或发布权限。
-
-### 本阶段完成门槛
-
-1. 所有正式知识目录完成人工 Review 与必要聚合；
-2. 所有确认修改项通过冻结文件包落库；
-3. 全量 Git、Knowledge、Registry 和 Skill 校验通过；
-4. 最终人工内容验收；
-5. 独立授权 Feishu 单向覆盖发布；
-6. 发布回读与失败修正；
-7. 最终整仓验收；
-8. 再评估 fast-forward only 接入 `main`。
+* 动态 Task Store；
+* Execution / Result 持久化；
+* Approval；
+* Evidence；
+* Side-effect Ledger；
+* Safe Continuation；
+* 自动 Health Recovery；
+* 多角色 Handoff Runtime；
+* 多任务依赖和并行 Lane；
+* 多执行器 Capability Routing。
 
 ---
 
-## Phase 2.5B — Skill Portfolio and Document Model Governance
+## Phase 2.5 — Knowledge Review Closure and Publication Preparation
 
-状态：**Completed**
+状态：**Canonical Content Completed / Publication Pending**
 
-- 活跃 Skill 收敛为六个并按 Skill Creator 治理；
-- Deterministic Delivery 并入 Planner Executor Handoff；
-- AI Knowledge 收缩为 Project Knowledge Governance；
-- 新增 Engineering Document Authoring；
-- Microsoft Dev Tunnels 回归应用 Runbook；
-- 正式资源型文档迁移为 Document Bundle；
-- 落实 Human-first、AI-lossless 视觉语义镜像；
-- Publisher 从本地相对图片生成 Feishu 媒体投影。
+### 已完成内容范围
 
-完成结果：Skill、Context、Registry、10 个视觉文档包、校验和 Publisher 规则已经一致；本批不包含 Feishu 实际写入。
+* `context/**` 治理模型；
+* `docs/knowledge/00_项目入口/**`；
+* `docs/knowledge/01_产品体系/**`；
+* `docs/knowledge/02_基础产品与能力/**`；
+* `docs/knowledge/03_Agent工程架构思想与方法论/**`；
+* `docs/knowledge/04_平台架构/**`；
+* `docs/knowledge/05_上下文与知识系统/**`；
+* `docs/knowledge/06_智能体资产体系/**`；
+* `docs/knowledge/07_工作流与项目治理/**`；
+* `docs/knowledge/08_实验与复盘/**`；
+* `docs/knowledge/09_作品集/**`；
+* `docs/knowledge/10_术语与来源/**`。
+
+### 当前 Closure
+
+当前必须完成：
+
+1. 根 README 与 Current Context 同步；
+2. Registry、Relations、Migration、Release 和 Implementation Status 闭环；
+3. Visual Registry、主 Assets 与 Relations 三方一致；
+4. 旧 ARC ID 的当前入口修复；
+5. Skill、Experiment 和 Portfolio 证据口径收紧；
+6. Node 20 全量验证；
+7. Git Commit、Push 和远端回读；
+8. 总控 Chat 基于固定 Commit 最终复审。
+
+### 发布门槛
+
+进入 Feishu Preview 前必须满足：
+
+* Worktree、Index、Untracked 干净；
+* 本地与远端 SHA 一致；
+* `git diff --check` 通过；
+* `npm run check:repo` 通过；
+* `npm run verify` 通过；
+* Registry、Visual、Document Bundle 全部通过；
+* 当前知识入口不再指向历史资产；
+* Projection Policy 明确；
+* 所有资产仍保持 `unpublished`；
+* 未伪造 Feishu `node_id`。
+
+Feishu Preview、实际覆盖和 Readback 必须使用独立授权。
 
 ---
 
-## Phase 2 Next — Task Control and Trusted Execution
+## Phase 3 — Minimal Trusted Agent Slice
+
+状态：**Next after Publication Closure**
+
+推荐的首个纵向切片：
+
+```text
+Minimal Agent Profile
+→ Task Contract 引用稳定 Agent / Role ID
+→ Gateway / Runtime 解析
+→ Scope / Policy
+→ Evidence
+→ 人工 Approval
+→ Result / Checkpoint
+```
+
+该切片用于同时验证：
+
+* `05_上下文与知识系统`；
+* `06_智能体资产体系`；
+* `07_工作流与项目治理`；
+* Gateway / Runtime；
+* Evidence / Approval。
+
+在该切片出现真实消费者前，不批量创建 Agent Profile、Knowledge Pack 或空目录。
+
+---
+
+## Phase 4 — Product Workflow
 
 状态：**Planned**
 
-目标包括动态 Task State、Task / Execution / Result Store、Executor Adapter、Execution Lane、Approval、Evidence、Side-effect Ledger、Health Event、Snapshot、Retry / Recovery、多执行器适配、资源与成本治理，以及平台自有 MCP Server / Adapter / Governance。
+完成可信任务闭环后，再推进 AI 视频工作流的最小纵向产品切片。
 
-是否使用当前分支、独立 Branch、Worktree、Push、PR 或 Merge，必须由逐任务 Git Operating Policy 明确授权。
-
----
-
-## Phase 3 — AI Video Workflow
-
-状态：**Planned / Not Started**
-
-用真实业务验证故事理解、角色场景、分镜、提示词、多模型 Adapter、一致性、质量评估、重试审批、成本和结果归档。
-
-当前不新增根级 `products/`；真实产品进入设计或开发后，再按资产类型建立子目录。
+不得提前把仓库改造成根级多产品总仓。
 
 ---
 
-## Phase 4 — Portfolio Release
+## Phase 5 — Portfolio Release
 
-状态：**Planned / Not Started**
+状态：**In Preparation**
 
-正式 Portfolio Release 依赖可运行 Demo、真实业务工作流、代码与测试证据、治理与恢复边界、知识投影展示和敏感信息检查。
+作品集必须连接：
+
+* 真实代码；
+* 自动测试；
+* 调用证据；
+* 实验；
+* 架构决策；
+* Registry；
+* Git Commit；
+* Feishu 投影；
+* Readback；
+* 当前限制和未来路线。
+
+对外表述统一使用：
+
+* 已实现并测试；
+* 真实链路已验证；
+* 正式设计已接受；
+* 计划中；
+* 历史归档。
+
+不得把“正式设计已接受”写成“运行能力已验证”。
 
 ---
 
-## Deferred and Placeholder Candidates
+## Deferred
 
-- Custom GPT Assetization MVP；
-- `agents/` 与 `knowledge-packs/`；
-- Agent Profile / Knowledge Pack Publisher；
-- 外部 Knowledge Service / RAG；
-- Project Knowledge Synthesis 自动 Provider、跨仓库索引和批量 Eval；
-- Engineering Document Authoring 与 Project Knowledge Governance 的后续 Pilot 和 accepted 评审；
-- 生产级公网入口。
-
-这些能力只有在出现真实调用方、测试和发布目标后继续物化。
+* 批量 Agent Profile；
+* 正式 `agents/**`；
+* 正式 `knowledge-packs/**`；
+* Agent Profile / Knowledge Pack Publisher；
+* Agent Eval Release；
+* 外部 Knowledge Service / RAG；
+* 自动 Memory 晋升；
+* 完整多执行器调度；
+* 生产级公网入口；
+* 通用 Agent SaaS；
+* 根级 `products/`。

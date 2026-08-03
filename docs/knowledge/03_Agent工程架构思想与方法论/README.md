@@ -18,7 +18,7 @@
 | 本栏目：方法论 | `04_平台架构`：具体设计 |
 |---|---|
 | 解释为什么需要边界 | 给出 `ai-agent-platform` 的实际边界 |
-| 给出划分限界上下文的方法 | 给出 ARC-008 领域蓝图 |
+| 给出划分限界上下文的方法 | 当前总体架构由 ARC-001 承接，能力依赖与阶段路线由 ARC-016 承接 |
 | 解释聚合、不变量、领域事件 | 给出 Task Control、Execution Lane 等实际模型 |
 | 解释端口与适配器 | 给出 Codex、Runtime、Git、Feishu 等适配关系 |
 | 给出可信系统原则 | 给出 Approval、Evidence、Recovery 等目标架构 |
@@ -50,7 +50,7 @@
 本轮综合使用：
 
 - 当前 `THY-001～THY-006` 正文；
-- `DOM-001`、`ARC-001`、`ARC-008～ARC-014` 等平台架构资产；
+- `DOM-001`、`ARC-008～ARC-014` 等历史设计输入，以及当前 Canonical `ARC-001`、`ARC-016` 与 `07_工作流与项目治理` 的 WFL 资产；
 - Contracts、Auth、Policy、Action Gateway、Local Runtime 与六个正式 Skill 的代码和测试；
 - 2026-07-24 的 v1.0～v1.2 历史架构底稿，用于恢复 `DDD First / API First / Adapter Pattern`、Task / Agent / Capability / Workflow / Result 等初始设计意图；
 - Eric Evans 的 DDD Reference、Alistair Cockburn 的 Hexagonal Architecture、OpenAI 的 Agent 工程指南等外部原始来源。

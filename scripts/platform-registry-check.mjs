@@ -213,6 +213,7 @@ async function main() {
     "platform-registry/assets.yaml",
     "platform-registry/relations.yaml",
     "platform-registry/relation-types.yaml",
+    "platform-registry/visual-assets/index.json",
     "platform-registry/projections.yaml",
     "platform-registry/implementation-status.yaml",
     "platform-registry/releases.yaml",
@@ -375,6 +376,58 @@ async function main() {
     }
   }
 
+  const visualIndex = JSON.parse(
+    await read("platform-registry/visual-assets/index.json"),
+  );
+  const visualEntries = Array.isArray(visualIndex.assets)
+    ? visualIndex.assets
+    : [];
+  if (visualIndex.visual_asset_count !== visualEntries.length) {
+    fail(
+      `visual index count mismatch: declared ${visualIndex.visual_asset_count}, actual ${visualEntries.length}`,
+    );
+  }
+  for (const visualEntry of visualEntries) {
+    const visualId = visualEntry.visual_asset_id;
+    const mainAsset = assetsById.get(visualId);
+    const expectedManifestPath = `platform-registry/visual-assets/${visualId}.json`;
+    if (!mainAsset) {
+      fail(`visual ${visualId} missing from main asset registry`);
+      continue;
+    }
+    if (mainAsset.asset_type !== "visual") {
+      fail(`visual ${visualId} main asset type must be visual`);
+    }
+    if (mainAsset.materialized !== true) {
+      fail(`visual ${visualId} main asset must be materialized`);
+    }
+    if (mainAsset.canonical_path !== expectedManifestPath) {
+      fail(
+        `visual ${visualId} canonical_path must be ${expectedManifestPath}`,
+      );
+    }
+    if (!(await pathExists(expectedManifestPath))) {
+      fail(`visual ${visualId} manifest does not exist: ${expectedManifestPath}`);
+      continue;
+    }
+    const manifest = JSON.parse(await read(expectedManifestPath));
+    const targetId = manifest.target_document_asset_id;
+    if (!targetId || !assetsById.has(targetId)) {
+      fail(`visual ${visualId} has invalid target_document_asset_id ${targetId ?? "<missing>"}`);
+      continue;
+    }
+    const hasDirectRelation = relations.some((relation) => {
+      const targets = asArray(relation.to);
+      return (
+        (relation.from === visualId && targets.includes(targetId)) ||
+        (relation.from === targetId && targets.includes(visualId))
+      );
+    });
+    if (!hasDirectRelation) {
+      fail(`visual ${visualId} missing direct relation with ${targetId}`);
+    }
+  }
+
   const capabilities = parseRecords(
     await read("platform-registry/implementation-status.yaml"),
     "id",
@@ -421,6 +474,11 @@ async function main() {
     "pre_read_content: false",
     "semantic_diff: false",
     "reverse_write: false",
+    "source_root: docs/knowledge/",
+    "structure: one_to_one",
+    "require_write_preview: true",
+    "require_human_confirmation: true",
+    "require_readback_verification: true",
   ]) {
     if (!projection.includes(required)) fail(`projection policy missing ${required}`);
   }

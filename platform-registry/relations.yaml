@@ -1345,3 +1345,18 @@ relations:
 - from: REF-003
   type: superseded_by
   to: REF-002
+- from: VIS-030
+  type: explains
+  to: ARC-002
+- from: VIS-031
+  type: explains
+  to: ARC-006
+- from: VIS-032
+  type: explains
+  to: KNO-011
+- from: VIS-033
+  type: explains
+  to: KNO-006
+- from: VIS-034
+  type: explains
+  to: KNO-009

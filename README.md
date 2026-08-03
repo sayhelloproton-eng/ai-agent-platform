@@ -78,12 +78,14 @@ Custom GPT
 当前处于：
 
 ```text
-Phase 2.5 — Human Content Review and Knowledge Release Closure
+Phase 2.5 — Knowledge Review Closure and Feishu Publication Preparation
 ```
 
-知识资产重构、Platform Registry、Context 治理和窄链路 MVP 已经完成。`00_项目入口` 已通过 Project Knowledge Synthesis 首个 Pilot 聚合为三篇正式文章；当前正在 Review `01_产品体系`，最终人工内容验收尚未完成。
+`docs/knowledge/00～10` 已完成本轮 Canonical 内容 Review、聚合与落库。当前工作不再是继续扩写章节，而是同步 Context、Registry、Relations、Migration、Release、Navigation、Evidence 与 Projection 前置状态，形成可回读的正式 Git 基线。
 
-Feishu 最终发布、发布回读和最终整仓验收尚未开始。
+内容完成不等于 Agent Runtime 完成。Agent Profile、Knowledge Pack、Task Store、Approval、Evidence 等目标能力仍未实现。
+
+Git → Feishu 规则和 Publisher 逻辑已经存在，但 Feishu 最终覆盖发布尚未执行。实际 Projection Mapping、图片上传、发布回读和 publication status 必须在 Git Closure 完成后获得独立授权。
 
 精确状态与当前工作见：
 

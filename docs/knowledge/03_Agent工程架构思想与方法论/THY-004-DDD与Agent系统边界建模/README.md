@@ -176,7 +176,7 @@ Context 表示模型与状态所有权，不等于微服务。
 | Product Domain | Story、Character、Scene 等业务模型 | 不被平台通用 Task 模型替代 |
 | Infrastructure Integration | Provider、Adapter、Credential、Transport | 属于集成责任边界，不一定是业务子域，也不拥有业务规则 |
 
-这只是方法示例；`ai-agent-platform` 的正式上下文蓝图归 [ARC-008](../../../technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/README.md)。
+这只是方法示例。`ARC-008` 是[历史 DDD 蓝图输入](../../../technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/README.md)；当前总体架构由 [ARC-001](../../04_平台架构/ARC-001-ai-agent-platform总体架构/README.md) 承接，能力依赖与阶段路线由 [ARC-016](../../04_平台架构/ARC-016-能力依赖多任务并行与分阶段MVP路线图/README.md) 承接，具体 Workflow 规则由 `07_工作流与项目治理` 的 WFL Canonical 文档承接。
 
 ## 5. 上下文映射
 
@@ -470,12 +470,12 @@ Provider 变化应停留在 Adapter。Domain 不应出现 `codexSessionId`、`fe
 - `apps/local-runtime`：本地 Capability 执行；
 - Git Knowledge / Registry：知识资产和关系控制面。
 
-### 接受设计
+### 历史设计输入与当前承接
 
-- [DOM-001 核心领域模型](../../../technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/README.md)
-- [ARC-008 DDD 领域蓝图](../../../technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/README.md)
-- [ARC-009 轻量 Task Control](../../04_平台架构/ARC-001-ai-agent-platform总体架构/README.md)
-- [ARC-010 Execution Lane](../../04_平台架构/ARC-001-ai-agent-platform总体架构/README.md)
+- [DOM-001 与 ARC-008～ARC-010 历史设计输入](../../../technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/README.md)
+- [ARC-001 当前总体架构](../../04_平台架构/ARC-001-ai-agent-platform总体架构/README.md)
+- [ARC-016 当前能力依赖与阶段路线](../../04_平台架构/ARC-016-能力依赖多任务并行与分阶段MVP路线图/README.md)
+- [WFL-001 当前工作流与项目治理总体模型](../../07_工作流与项目治理/WFL-001-工作流与项目治理总体模型/README.md)
 
 ### 未实现
 
