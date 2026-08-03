@@ -2,28 +2,61 @@
 
 ## 目录职责
 
-维护知识资产架构、单一真源与投影、AGENTS、上下文分层、Context 所有权、Token 与证据、Custom GPT Knowledge、Knowledge Pack、Registry、影响分析、会话综合和工程洞见。
+本目录描述 `ai-agent-platform` 如何把长期可信知识、项目 Context、Task State、Role、Runtime、Evidence、Memory 和 Session，按不同消费者与任务阶段编译为可执行 Context Package，并在任务生命周期中受控流转、恢复、分发和迭代。
 
-## 正式资产
+本目录不是单一“知识库”说明，也不把 Feishu、Custom GPT Knowledge、RAG、Memory 或 Task Store 混为一类。
 
-| ID | 主题 |
-|---|---|
-| ARC-002 | 智能体平台知识资产架构 |
-| ARC-005 | 单一真源与知识投影架构 |
-| ARC-006 | 项目知识分层与 Agent 上下文架构 |
-| KNO-001～KNO-010 | 上下文、知识、Registry、影响分析与综合治理 |
-| KNO-011 | Context 所有权、Planner 维护权、Executor 完整覆盖与用户 Review 机制 |
-| INS-001 | 工程洞见方法与实践 |
+## Canonical 阅读顺序
 
-跨平台发布工程方案 `SOL-004` 已迁入 `docs/technical/技术方案/知识系统/`，不属于飞书知识正文。
+| 顺序 | ID | 主题 | 核心问题 |
+|---:|---|---|---|
+| 1 | ARC-002 | [上下文与知识系统总体架构](./ARC-002-上下文与知识系统总体架构/README.md) | 五领域怎样组成并与平台其他领域协作？ |
+| 2 | ARC-005 | [知识资产治理、单一真源与生命周期](./ARC-005-知识资产治理单一真源与生命周期架构/README.md) | 平台怎样维护可信、可追溯、可演进的知识？ |
+| 3 | ARC-006 | [多消费者上下文编译与策略](./ARC-006-多消费者上下文编译与策略架构/README.md) | 不同消费者怎样获得最小充分 Context Package？ |
+| 4 | KNO-011 | [上下文运行、流转与恢复](./KNO-011-上下文运行流转与恢复机制/README.md) | Context 怎样绑定、版本化、流转、失效和恢复？ |
+| 5 | KNO-006 | [知识分发、Knowledge Pack 与多渠道投影](./KNO-006-知识分发Knowledge-Pack与多渠道投影/README.md) | Git 知识怎样派生为 Feishu、GPT Knowledge、Pack 和 RAG？ |
+| 6 | KNO-009 | [记忆、反馈与知识自迭代](./KNO-009-记忆反馈与知识自迭代机制/README.md) | 经历和反馈怎样在防污染门禁下转化为可复用能力？ |
 
-## 维护规则
+## 五个领域
 
-- Git 是唯一真源；
-- Knowledge Pack、Feishu 和 Host 配置是派生发布；
-- Memory、Context、Knowledge 和 Task State 分概念；
-- `context/**` 由总控 Planner 维护语义，其他 Agent 只报告，Executor 只按完整覆盖文件执行；
-- 重要 Context 变化由用户最终确认；
-- Private Context 进入 Public Git 前必须最小化和 Review；
-- 机器状态只在 Platform Registry 维护；
-- 本目录内容在正式发布前保持 `unpublished`。
+```text
+Knowledge Asset Governance
+→ Context Compilation & Policy
+→ Context Runtime & Continuity
+
+Knowledge Distribution & Projection
+Memory, Feedback & Learning
+```
+
+前三个领域构成可信知识、上下文编译和运行连续性的核心；后两个领域负责多渠道交付和受控自迭代。
+
+## 外部协作领域
+
+本目录通过 Contract 使用但不重新拥有：
+
+- User & Interaction；
+- Task Governance；
+- Agent & Role；
+- Execution Orchestration；
+- Evidence & Approval。
+
+## 核心边界
+
+```text
+DDD Bounded Context ≠ Runtime Context
+Knowledge Base ≠ Context Package
+Git Knowledge ≠ Feishu Projection
+Git Knowledge ≠ Custom GPT Knowledge
+Knowledge Pack ≠ Source of Truth
+Memory ≠ Task State
+Session ≠ Task
+Evidence ≠ Knowledge
+AGENTS ≠ Task Prompt
+Context Builder ≠ Knowledge Store
+```
+
+## 当前实现边界
+
+当前已具备 Git 唯一真源、项目 Context、正式知识与 Registry、六个活跃 Skill、人工 Planner–Executor Handoff、冻结 Artifact、Document Bundle 和 Feishu 单向投影规则。
+
+通用 Context Builder、Context Runtime、持久 Task Store、Knowledge Pack Publisher、Agent Profile Publisher、外部 Knowledge Service / RAG 和自动 Memory 晋升仍属于目标设计。

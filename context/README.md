@@ -11,7 +11,7 @@
 - Executor 只有收到完整覆盖文件和精确 `write_approved` 授权时才能机械落盘；
 - 重要目标、架构、阶段、Roadmap 和治理变化由用户最终确认。
 
-详细规则先读 `AGENTS.md`，正式机制见 `docs/knowledge/05_上下文与知识系统/KNO-011-上下文所有权与维护机制.md`。
+详细规则先读 `AGENTS.md`，正式机制见 `docs/knowledge/05_上下文与知识系统/KNO-011-上下文运行流转与恢复机制/README.md`。
 
 ## 阅读顺序
 

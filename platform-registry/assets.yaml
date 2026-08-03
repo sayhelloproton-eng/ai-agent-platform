@@ -155,14 +155,14 @@ assets:
   publication_status: unpublished
   migration_state: complete
 - asset_id: ARC-002
-  title: Knowledge Asset Architecture
+  title: Context and Knowledge System Architecture
   asset_type: architecture
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/05_上下文与知识系统/ARC-002-智能体平台知识资产架构.md
+  current_path: docs/knowledge/05_上下文与知识系统/ARC-002-上下文与知识系统总体架构/README.md
   target_path:
-  canonical_path: docs/knowledge/05_上下文与知识系统/ARC-002-智能体平台知识资产架构.md
+  canonical_path: docs/knowledge/05_上下文与知识系统/ARC-002-上下文与知识系统总体架构/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: ARC-004
@@ -353,25 +353,25 @@ assets:
   publication_status: unpublished
   migration_state: complete
 - asset_id: ARC-005
-  title: Single Source and Knowledge Projection Architecture
+  title: Knowledge Asset Governance, Single Source of Truth and Lifecycle Architecture
   asset_type: architecture
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/05_上下文与知识系统/ARC-005-单一真源与知识投影架构.md
+  current_path: docs/knowledge/05_上下文与知识系统/ARC-005-知识资产治理单一真源与生命周期架构/README.md
   target_path:
-  canonical_path: docs/knowledge/05_上下文与知识系统/ARC-005-单一真源与知识投影架构.md
+  canonical_path: docs/knowledge/05_上下文与知识系统/ARC-005-知识资产治理单一真源与生命周期架构/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: ARC-006
-  title: Project Knowledge Layering and Agent Context Architecture
+  title: Multi-consumer Context Compilation and Policy Architecture
   asset_type: architecture
-  status: proposed
+  status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/05_上下文与知识系统/ARC-006-项目知识分层与Agent上下文架构.md
+  current_path: docs/knowledge/05_上下文与知识系统/ARC-006-多消费者上下文编译与策略架构/README.md
   target_path:
-  canonical_path: docs/knowledge/05_上下文与知识系统/ARC-006-项目知识分层与Agent上下文架构.md
+  canonical_path: docs/knowledge/05_上下文与知识系统/ARC-006-多消费者上下文编译与策略架构/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: SOL-004
@@ -421,14 +421,15 @@ assets:
 - asset_id: INS-001
   title: Engineering Insight Method and Practice
   asset_type: insight
-  status: accepted
+  status: superseded
   evidence_level: observed
   materialized: true
-  current_path: docs/knowledge/05_上下文与知识系统/INS-001-工程洞见方法与实践.md
+  current_path: docs/technical/归档/历史资产/05_上下文与知识系统_整合前观点与候选/legacy-assets/INS-001-工程洞见方法与实践.md
   target_path:
-  canonical_path: docs/knowledge/05_上下文与知识系统/INS-001-工程洞见方法与实践.md
+  canonical_path: docs/technical/归档/历史资产/05_上下文与知识系统_整合前观点与候选/legacy-assets/INS-001-工程洞见方法与实践.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by: KNO-009
 - asset_id: CTX-005
   title: 当前能力与演进差距
   asset_type: knowledge-document
@@ -854,122 +855,136 @@ assets:
 - asset_id: KNO-001
   title: AGENTS上下文契约与跨平台治理
   asset_type: knowledge-document
-  status: accepted
+  status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/05_上下文与知识系统/KNO-001-AGENTS上下文契约与跨平台治理.md
+  current_path: docs/technical/归档/历史资产/05_上下文与知识系统_整合前观点与候选/legacy-assets/KNO-001-AGENTS上下文契约与跨平台治理.md
   target_path:
-  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-001-AGENTS上下文契约与跨平台治理.md
+  canonical_path: docs/technical/归档/历史资产/05_上下文与知识系统_整合前观点与候选/legacy-assets/KNO-001-AGENTS上下文契约与跨平台治理.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by: ARC-006
 - asset_id: KNO-002
   title: 多级领域上下文架构
   asset_type: knowledge-document
-  status: accepted
+  status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/05_上下文与知识系统/KNO-002-多级领域上下文架构.md
+  current_path: docs/technical/归档/历史资产/05_上下文与知识系统_整合前观点与候选/legacy-assets/KNO-002-多级领域上下文架构.md
   target_path:
-  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-002-多级领域上下文架构.md
+  canonical_path: docs/technical/归档/历史资产/05_上下文与知识系统_整合前观点与候选/legacy-assets/KNO-002-多级领域上下文架构.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by:
+  - ARC-006
+  - KNO-011
 - asset_id: KNO-003
   title: 上下文Token与证据治理
   asset_type: knowledge-document
-  status: accepted
+  status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/05_上下文与知识系统/KNO-003-上下文Token与证据治理.md
+  current_path: docs/technical/归档/历史资产/05_上下文与知识系统_整合前观点与候选/legacy-assets/KNO-003-上下文Token与证据治理.md
   target_path:
-  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-003-上下文Token与证据治理.md
+  canonical_path: docs/technical/归档/历史资产/05_上下文与知识系统_整合前观点与候选/legacy-assets/KNO-003-上下文Token与证据治理.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by:
+  - ARC-006
+  - KNO-011
 - asset_id: KNO-004
   title: Custom-GPT内置知识外部知识与记忆
   asset_type: knowledge-document
-  status: accepted
+  status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/05_上下文与知识系统/KNO-004-Custom-GPT内置知识外部知识与记忆.md
+  current_path: docs/technical/归档/历史资产/05_上下文与知识系统_整合前观点与候选/legacy-assets/KNO-004-Custom-GPT内置知识外部知识与记忆.md
   target_path:
-  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-004-Custom-GPT内置知识外部知识与记忆.md
+  canonical_path: docs/technical/归档/历史资产/05_上下文与知识系统_整合前观点与候选/legacy-assets/KNO-004-Custom-GPT内置知识外部知识与记忆.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by:
+  - KNO-006
+  - KNO-009
 - asset_id: KNO-005
   title: 项目知识生命周期
   asset_type: knowledge-document
-  status: accepted
+  status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/05_上下文与知识系统/KNO-005-项目知识生命周期/README.md
+  current_path: docs/technical/归档/历史资产/05_上下文与知识系统_整合前观点与候选/legacy-assets/KNO-005-项目知识生命周期.md
   target_path:
-  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-005-项目知识生命周期/README.md
+  canonical_path: docs/technical/归档/历史资产/05_上下文与知识系统_整合前观点与候选/legacy-assets/KNO-005-项目知识生命周期.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by: ARC-005
 - asset_id: KNO-006
-  title: Knowledge-Pack设计
+  title: 知识分发、Knowledge Pack 与多渠道投影
   asset_type: knowledge-document
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/05_上下文与知识系统/KNO-006-Knowledge-Pack设计.md
+  current_path: docs/knowledge/05_上下文与知识系统/KNO-006-知识分发Knowledge-Pack与多渠道投影/README.md
   target_path:
-  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-006-Knowledge-Pack设计.md
+  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-006-知识分发Knowledge-Pack与多渠道投影/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: KNO-007
   title: 平台资产关联模型
   asset_type: knowledge-document
-  status: accepted
+  status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/05_上下文与知识系统/KNO-007-平台资产关联模型.md
+  current_path: docs/technical/归档/历史资产/05_上下文与知识系统_整合前观点与候选/legacy-assets/KNO-007-平台资产关联模型.md
   target_path:
-  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-007-平台资产关联模型.md
+  canonical_path: docs/technical/归档/历史资产/05_上下文与知识系统_整合前观点与候选/legacy-assets/KNO-007-平台资产关联模型.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by: ARC-005
 - asset_id: KNO-008
   title: 知识与资产变更影响分析
   asset_type: knowledge-document
-  status: accepted
+  status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/05_上下文与知识系统/KNO-008-知识与资产变更影响分析.md
+  current_path: docs/technical/归档/历史资产/05_上下文与知识系统_整合前观点与候选/legacy-assets/KNO-008-知识与资产变更影响分析.md
   target_path:
-  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-008-知识与资产变更影响分析.md
+  canonical_path: docs/technical/归档/历史资产/05_上下文与知识系统_整合前观点与候选/legacy-assets/KNO-008-知识与资产变更影响分析.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by: ARC-005
 - asset_id: KNO-009
-  title: 项目会话知识综合与仓库沉淀
+  title: 记忆、反馈与知识自迭代机制
   asset_type: knowledge-document
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/05_上下文与知识系统/KNO-009-项目会话知识综合与仓库沉淀.md
+  current_path: docs/knowledge/05_上下文与知识系统/KNO-009-记忆反馈与知识自迭代机制/README.md
   target_path:
-  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-009-项目会话知识综合与仓库沉淀.md
+  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-009-记忆反馈与知识自迭代机制/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: KNO-010
   title: 工程洞见提炼与注册表治理
   asset_type: knowledge-document
-  status: accepted
+  status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/05_上下文与知识系统/KNO-010-工程洞见提炼与注册表治理.md
+  current_path: docs/technical/归档/历史资产/05_上下文与知识系统_整合前观点与候选/legacy-assets/KNO-010-工程洞见提炼与注册表治理.md
   target_path:
-  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-010-工程洞见提炼与注册表治理.md
+  canonical_path: docs/technical/归档/历史资产/05_上下文与知识系统_整合前观点与候选/legacy-assets/KNO-010-工程洞见提炼与注册表治理.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by: KNO-009
 - asset_id: KNO-011
-  title: 上下文所有权与维护机制
+  title: 上下文运行、流转与恢复机制
   asset_type: knowledge-document
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/05_上下文与知识系统/KNO-011-上下文所有权与维护机制.md
+  current_path: docs/knowledge/05_上下文与知识系统/KNO-011-上下文运行流转与恢复机制/README.md
   target_path:
-  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-011-上下文所有权与维护机制.md
+  canonical_path: docs/knowledge/05_上下文与知识系统/KNO-011-上下文运行流转与恢复机制/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: AGT-001

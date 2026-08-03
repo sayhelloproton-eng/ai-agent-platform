@@ -1,0 +1,22 @@
+{
+  "visual_asset_id": "VIS-032",
+  "title": "上下文运行流转与恢复机制",
+  "version": 1,
+  "status": "accepted",
+  "target_document": "docs/knowledge/05_上下文与知识系统/KNO-011-上下文运行流转与恢复机制/README.md",
+  "target_document_asset_id": "KNO-011",
+  "source_documents": [
+    "KNO-011",
+    "ARC-001"
+  ],
+  "source_svg": "docs/knowledge/05_上下文与知识系统/KNO-011-上下文运行流转与恢复机制/assets/VIS-032-上下文运行流转与恢复机制.svg",
+  "preview_png": "docs/knowledge/05_上下文与知识系统/KNO-011-上下文运行流转与恢复机制/assets/VIS-032-上下文运行流转与恢复机制.png",
+  "width": 1448,
+  "height": 1086,
+  "svg_sha256": "afe8e59fdf0629d8bfb98d66f780cb9e106938b6475678177041f806518bef21",
+  "png_sha256": "5c87898a0f3b5fff501b082cabd037f9bd917e3220caf11a7a865e94d15a0e5a",
+  "review_notes": "正文、术语与信息图谱经用户确认；PNG 为正式人类阅读资产，SVG 为同目录封装源，语义镜像紧邻图片。",
+  "storage_model": "document_bundle",
+  "markdown_image": "./assets/VIS-032-上下文运行流转与恢复机制.png",
+  "semantic_mirror_heading": "AI 可读语义镜像"
+}

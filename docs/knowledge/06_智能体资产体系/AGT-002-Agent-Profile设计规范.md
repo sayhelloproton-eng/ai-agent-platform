@@ -60,8 +60,8 @@ Publisher 从固定 Git Commit 生成 Custom GPT、Codex、Plugin 或 Runtime �
 ## 9. 关联文档
 
 - [ARC-012 Agent-Profile与Skills资产化](../../technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/README.md)
-- [KNO-006 Knowledge-Pack设计](../05_上下文与知识系统/KNO-006-Knowledge-Pack设计.md)
-- [KNO-007 平台资产关联模型](../05_上下文与知识系统/KNO-007-平台资产关联模型.md)
+- [KNO-006 Knowledge-Pack设计](../05_上下文与知识系统/KNO-006-知识分发Knowledge-Pack与多渠道投影/README.md)
+- [KNO-007 平台资产关联模型](../05_上下文与知识系统/ARC-005-知识资产治理单一真源与生命周期架构/README.md)
 - [AGT-001 Agent角色体系](AGT-001-Agent角色体系.md)
 - [AGT-003 Agent知识记忆与行为模型](AGT-003-Agent知识记忆与行为模型.md)
 - [AGT-007 Agent评估测试与发布](AGT-007-Agent评估测试与发布.md)

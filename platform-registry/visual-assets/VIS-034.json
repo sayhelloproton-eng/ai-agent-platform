@@ -1,0 +1,22 @@
+{
+  "visual_asset_id": "VIS-034",
+  "title": "记忆、反馈与知识自迭代机制",
+  "version": 1,
+  "status": "accepted",
+  "target_document": "docs/knowledge/05_上下文与知识系统/KNO-009-记忆反馈与知识自迭代机制/README.md",
+  "target_document_asset_id": "KNO-009",
+  "source_documents": [
+    "KNO-009",
+    "ARC-001"
+  ],
+  "source_svg": "docs/knowledge/05_上下文与知识系统/KNO-009-记忆反馈与知识自迭代机制/assets/VIS-034-记忆、反馈与知识自迭代机制.svg",
+  "preview_png": "docs/knowledge/05_上下文与知识系统/KNO-009-记忆反馈与知识自迭代机制/assets/VIS-034-记忆、反馈与知识自迭代机制.png",
+  "width": 1448,
+  "height": 1086,
+  "svg_sha256": "5f6670f30e3e3350f453b7e942f01f8110e2fe1276f0e7e4cce9c0dc632ee53a",
+  "png_sha256": "e64f63523230193aea7309bb6df9e1140e2c13dfddb6ed8b0928143a3460410f",
+  "review_notes": "正文、术语与信息图谱经用户确认；PNG 为正式人类阅读资产，SVG 为同目录封装源，语义镜像紧邻图片。",
+  "storage_model": "document_bundle",
+  "markdown_image": "./assets/VIS-034-记忆、反馈与知识自迭代机制.png",
+  "semantic_mirror_heading": "AI 可读语义镜像"
+}

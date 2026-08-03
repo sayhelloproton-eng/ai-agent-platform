@@ -10,7 +10,7 @@ Working Branch:
   knowledge-rebuild-v2
 
 Last Verified Review Source:
-  9ea5f397c4e2d4db5ade60e5b30bfc8fd8610cf5
+  da818cad26a87afc0a4dc8cee3f251c2d1ca4bb8
 
 Current HEAD:
   read from Git at runtime
@@ -19,7 +19,7 @@ Current Phase:
   Phase 2.5 — Human Content Review and Knowledge Release Closure
 
 Current Review Group:
-  docs/knowledge/05_上下文与知识系统/**
+  docs/knowledge/06_智能体资产体系/**
 ```
 
 当前已经完成：
@@ -41,7 +41,7 @@ Current Review Group:
 
 当前尚未完成：
 
-- `05_上下文与知识系统` 及后续知识目录的人工 Review；
+- `06_智能体资产体系` 及后续知识目录的人工 Review；
 - Project Knowledge Synthesis 的更多真实 Pilot 与接受评审；
 - 最终人工内容验收；
 - Feishu 最终发布、发布回读和最终整仓验收。
@@ -92,11 +92,12 @@ Feishu 最终知识投影尚未执行。
 - `docs/knowledge/01_产品体系/**`；
 - `docs/knowledge/02_基础产品与能力/**`；
 - `docs/knowledge/03_Agent工程架构思想与方法论/**`；
-- `docs/knowledge/04_平台架构/**`。
+- `docs/knowledge/04_平台架构/**`;
+- `docs/knowledge/05_上下文与知识系统/**`。
 
 ### 当前目录
 
-- `docs/knowledge/05_上下文与知识系统/**`。
+- `docs/knowledge/06_智能体资产体系/**`。
 
 ### Project Knowledge Synthesis
 

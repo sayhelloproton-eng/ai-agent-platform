@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "visual_asset_count": 29,
+  "visual_asset_count": 34,
   "assets": [
     {
       "visual_asset_id": "VIS-001",
@@ -201,25 +201,25 @@
     },
     {
       "visual_asset_id": "VIS-010",
-      "title": "知识生命周期与单向投影",
-      "version": 1,
+      "title": "知识资产治理单一真源与生命周期架构",
+      "version": 2,
       "status": "accepted",
-      "target_document": "docs/knowledge/05_上下文与知识系统/KNO-005-项目知识生命周期/README.md",
-      "target_document_asset_id": "KNO-005",
+      "target_document": "docs/knowledge/05_上下文与知识系统/ARC-005-知识资产治理单一真源与生命周期架构/README.md",
+      "target_document_asset_id": "ARC-005",
       "source_documents": [
-        "KNO-005",
-        "WFL-001",
-        "ARC-005"
+        "ARC-005",
+        "ARC-002",
+        "KNO-006"
       ],
-      "source_svg": "docs/knowledge/05_上下文与知识系统/KNO-005-项目知识生命周期/assets/VIS-010-知识生命周期与单向投影.svg",
-      "preview_png": "docs/knowledge/05_上下文与知识系统/KNO-005-项目知识生命周期/assets/VIS-010-知识生命周期与单向投影.png",
-      "width": 1800,
-      "height": 1100,
-      "svg_sha256": "68de0bf0b961b3ed3d7bebce0f2f8f71310d38ba5610bc8400180d4c3f3b7531",
-      "png_sha256": "eacfc9f90f78303274e6190231cd73437b7effa55749cd5efafa4f0359d6392a",
-      "review_notes": "Git 是唯一正式修改入口；Feishu、Custom GPT Knowledge 与 HTML 都是可重建投影。",
-      "markdown_image": "./assets/VIS-010-知识生命周期与单向投影.png",
+      "source_svg": "docs/knowledge/05_上下文与知识系统/ARC-005-知识资产治理单一真源与生命周期架构/assets/VIS-010-知识资产治理单一真源与生命周期架构.svg",
+      "preview_png": "docs/knowledge/05_上下文与知识系统/ARC-005-知识资产治理单一真源与生命周期架构/assets/VIS-010-知识资产治理单一真源与生命周期架构.png",
+      "width": 1448,
+      "height": 1086,
+      "svg_sha256": "5c7df6bbf52b6b2aee46e5b0ff0528cf2e83f7cd014daecd4b23adae7cc800fc",
+      "png_sha256": "30462591454a9f5e8044eb724fe8212234aac36209494caa36cbae41b59bc526",
+      "review_notes": "正文、术语与信息图谱经用户确认；PNG 为正式人类阅读资产，SVG 为同目录封装源，语义镜像紧邻图片。",
       "storage_model": "document_bundle",
+      "markdown_image": "./assets/VIS-010-知识资产治理单一真源与生命周期架构.png",
       "semantic_mirror_heading": "AI 可读语义镜像"
     },
     {
@@ -687,6 +687,116 @@
       "review_notes": "用户确认沿用此前的能力依赖、多任务并行与分阶段 MVP 路线图 PNG。PNG 为本轮人工 Review 权威资产；SVG 仅保留为可编辑参考，后续如需对齐须单独 Review。",
       "storage_model": "document_bundle",
       "markdown_image": "./assets/VIS-029-能力依赖多任务并行与分阶段MVP路线图.png",
+      "semantic_mirror_heading": "AI 可读语义镜像"
+    },
+    {
+      "visual_asset_id": "VIS-030",
+      "title": "上下文与知识系统总体架构",
+      "version": 1,
+      "status": "accepted",
+      "target_document": "docs/knowledge/05_上下文与知识系统/ARC-002-上下文与知识系统总体架构/README.md",
+      "target_document_asset_id": "ARC-002",
+      "source_documents": [
+        "ARC-002",
+        "ARC-001"
+      ],
+      "source_svg": "docs/knowledge/05_上下文与知识系统/ARC-002-上下文与知识系统总体架构/assets/VIS-030-上下文与知识系统总体架构.svg",
+      "preview_png": "docs/knowledge/05_上下文与知识系统/ARC-002-上下文与知识系统总体架构/assets/VIS-030-上下文与知识系统总体架构.png",
+      "width": 1536,
+      "height": 1024,
+      "svg_sha256": "493dace3b9c0bd68792a9d42fc403530402702f6f9dd303e7af1cbf1b198b671",
+      "png_sha256": "6df87bb70e06adebbe88d268b2bad27cbfd18ac1e48af8339de06f24467a9891",
+      "review_notes": "正文、术语与信息图谱经用户确认；PNG 为正式人类阅读资产，SVG 为同目录封装源，语义镜像紧邻图片。",
+      "storage_model": "document_bundle",
+      "markdown_image": "./assets/VIS-030-上下文与知识系统总体架构.png",
+      "semantic_mirror_heading": "AI 可读语义镜像"
+    },
+    {
+      "visual_asset_id": "VIS-031",
+      "title": "多消费者上下文编译与策略架构",
+      "version": 1,
+      "status": "accepted",
+      "target_document": "docs/knowledge/05_上下文与知识系统/ARC-006-多消费者上下文编译与策略架构/README.md",
+      "target_document_asset_id": "ARC-006",
+      "source_documents": [
+        "ARC-006",
+        "ARC-001"
+      ],
+      "source_svg": "docs/knowledge/05_上下文与知识系统/ARC-006-多消费者上下文编译与策略架构/assets/VIS-031-多消费者上下文编译与策略架构.svg",
+      "preview_png": "docs/knowledge/05_上下文与知识系统/ARC-006-多消费者上下文编译与策略架构/assets/VIS-031-多消费者上下文编译与策略架构.png",
+      "width": 1448,
+      "height": 1086,
+      "svg_sha256": "cb1a1d97d67d247928856c2e272704ec13bfa568528b646b2c6889d267864c61",
+      "png_sha256": "dc7b4537ddf86b30f0535a5a92e6f7c98cbaaf0d62dc09e3f59de6ab3ad33646",
+      "review_notes": "正文、术语与信息图谱经用户确认；PNG 为正式人类阅读资产，SVG 为同目录封装源，语义镜像紧邻图片。",
+      "storage_model": "document_bundle",
+      "markdown_image": "./assets/VIS-031-多消费者上下文编译与策略架构.png",
+      "semantic_mirror_heading": "AI 可读语义镜像"
+    },
+    {
+      "visual_asset_id": "VIS-032",
+      "title": "上下文运行流转与恢复机制",
+      "version": 1,
+      "status": "accepted",
+      "target_document": "docs/knowledge/05_上下文与知识系统/KNO-011-上下文运行流转与恢复机制/README.md",
+      "target_document_asset_id": "KNO-011",
+      "source_documents": [
+        "KNO-011",
+        "ARC-001"
+      ],
+      "source_svg": "docs/knowledge/05_上下文与知识系统/KNO-011-上下文运行流转与恢复机制/assets/VIS-032-上下文运行流转与恢复机制.svg",
+      "preview_png": "docs/knowledge/05_上下文与知识系统/KNO-011-上下文运行流转与恢复机制/assets/VIS-032-上下文运行流转与恢复机制.png",
+      "width": 1448,
+      "height": 1086,
+      "svg_sha256": "afe8e59fdf0629d8bfb98d66f780cb9e106938b6475678177041f806518bef21",
+      "png_sha256": "5c87898a0f3b5fff501b082cabd037f9bd917e3220caf11a7a865e94d15a0e5a",
+      "review_notes": "正文、术语与信息图谱经用户确认；PNG 为正式人类阅读资产，SVG 为同目录封装源，语义镜像紧邻图片。",
+      "storage_model": "document_bundle",
+      "markdown_image": "./assets/VIS-032-上下文运行流转与恢复机制.png",
+      "semantic_mirror_heading": "AI 可读语义镜像"
+    },
+    {
+      "visual_asset_id": "VIS-033",
+      "title": "知识分发、Knowledge Pack 与多渠道投影",
+      "version": 1,
+      "status": "accepted",
+      "target_document": "docs/knowledge/05_上下文与知识系统/KNO-006-知识分发Knowledge-Pack与多渠道投影/README.md",
+      "target_document_asset_id": "KNO-006",
+      "source_documents": [
+        "KNO-006",
+        "ARC-001"
+      ],
+      "source_svg": "docs/knowledge/05_上下文与知识系统/KNO-006-知识分发Knowledge-Pack与多渠道投影/assets/VIS-033-知识分发、Knowledge Pack 与多渠道投影.svg",
+      "preview_png": "docs/knowledge/05_上下文与知识系统/KNO-006-知识分发Knowledge-Pack与多渠道投影/assets/VIS-033-知识分发、Knowledge Pack 与多渠道投影.png",
+      "width": 1448,
+      "height": 1086,
+      "svg_sha256": "6b381505945c3248c1052c778e25ad179771450def79e74ee5a262603a02fad2",
+      "png_sha256": "5b14ee6cb0d2478f2ddb9e5c6c66072d39dd0f0afd8c56ecb566da37253de6de",
+      "review_notes": "正文、术语与信息图谱经用户确认；PNG 为正式人类阅读资产，SVG 为同目录封装源，语义镜像紧邻图片。",
+      "storage_model": "document_bundle",
+      "markdown_image": "./assets/VIS-033-知识分发、Knowledge Pack 与多渠道投影.png",
+      "semantic_mirror_heading": "AI 可读语义镜像"
+    },
+    {
+      "visual_asset_id": "VIS-034",
+      "title": "记忆、反馈与知识自迭代机制",
+      "version": 1,
+      "status": "accepted",
+      "target_document": "docs/knowledge/05_上下文与知识系统/KNO-009-记忆反馈与知识自迭代机制/README.md",
+      "target_document_asset_id": "KNO-009",
+      "source_documents": [
+        "KNO-009",
+        "ARC-001"
+      ],
+      "source_svg": "docs/knowledge/05_上下文与知识系统/KNO-009-记忆反馈与知识自迭代机制/assets/VIS-034-记忆、反馈与知识自迭代机制.svg",
+      "preview_png": "docs/knowledge/05_上下文与知识系统/KNO-009-记忆反馈与知识自迭代机制/assets/VIS-034-记忆、反馈与知识自迭代机制.png",
+      "width": 1448,
+      "height": 1086,
+      "svg_sha256": "5f6670f30e3e3350f453b7e942f01f8110e2fe1276f0e7e4cce9c0dc632ee53a",
+      "png_sha256": "e64f63523230193aea7309bb6df9e1140e2c13dfddb6ed8b0928143a3460410f",
+      "review_notes": "正文、术语与信息图谱经用户确认；PNG 为正式人类阅读资产，SVG 为同目录封装源，语义镜像紧邻图片。",
+      "storage_model": "document_bundle",
+      "markdown_image": "./assets/VIS-034-记忆、反馈与知识自迭代机制.png",
       "semantic_mirror_heading": "AI 可读语义镜像"
     }
   ],

@@ -43,9 +43,9 @@ Agent 必须在任务开始验证版本，在压缩或移交后保留目标、�
 
 ## 9. 关联文档
 
-- [KNO-002 多级领域上下文架构](../05_上下文与知识系统/KNO-002-多级领域上下文架构.md)
-- [KNO-003 上下文Token与证据治理](../05_上下文与知识系统/KNO-003-上下文Token与证据治理.md)
-- [KNO-004 Custom-GPT内置知识外部知识与记忆](../05_上下文与知识系统/KNO-004-Custom-GPT内置知识外部知识与记忆.md)
-- [KNO-006 Knowledge-Pack设计](../05_上下文与知识系统/KNO-006-Knowledge-Pack设计.md)
+- [KNO-002 多级领域上下文架构](../05_上下文与知识系统/ARC-006-多消费者上下文编译与策略架构/README.md)
+- [KNO-003 上下文Token与证据治理](../05_上下文与知识系统/ARC-006-多消费者上下文编译与策略架构/README.md)
+- [KNO-004 Custom-GPT内置知识外部知识与记忆](../05_上下文与知识系统/KNO-006-知识分发Knowledge-Pack与多渠道投影/README.md)
+- [KNO-006 Knowledge-Pack设计](../05_上下文与知识系统/KNO-006-知识分发Knowledge-Pack与多渠道投影/README.md)
 - [AGT-002 Agent-Profile设计规范](AGT-002-Agent-Profile设计规范.md)
 - [AGT-004 Agent工具权限与审批边界](AGT-004-Agent工具权限与审批边界.md)

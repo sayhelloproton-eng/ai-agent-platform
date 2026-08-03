@@ -65,7 +65,7 @@ capabilities:
   evidence:
   - skills/planner-executor-handoff/tests/self-test.mjs
   - docs/knowledge/06_智能体资产体系/SKL-003-规划者与执行器任务交接技能.md
-  - docs/knowledge/05_上下文与知识系统/KNO-011-上下文所有权与维护机制.md
+  - docs/knowledge/05_上下文与知识系统/KNO-011-上下文运行流转与恢复机制/README.md
   - skills/planner-executor-handoff/references/10-frozen-artifact-delivery.md
   - skills/planner-executor-handoff/scripts/validate-frozen-delivery.mjs
 - id: CAP-PROJECT-KNOWLEDGE-SYNTHESIS

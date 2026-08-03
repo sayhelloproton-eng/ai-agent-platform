@@ -513,3 +513,6 @@ docs/knowledge/01_产品体系/PRD-007-平台与上层产品边界.md,md,PRD-007
 docs/knowledge/04_平台架构/,directory,04 平台架构两文档收敛,consolidate,docs/knowledge/04_平台架构/,,正式架构收敛为 ARC-001 与 ARC-016，其他有效观点与旧图转入技术归档,15-platform-architecture-review
 docs/knowledge/04_平台架构/ARC-016-能力依赖多任务并行与分阶段MVP路线图/README.md,md,ARC-016 能力依赖、多任务并行与分阶段 MVP 路线图,bundle_move,docs/knowledge/04_平台架构/ARC-016-能力依赖多任务并行与分阶段MVP路线图/README.md,ARC-016,保留稳定 ID，重写为分阶段 MVP 与依赖路线并共置正式视觉资产,15-platform-architecture-review
 docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/README.md,md,04 平台架构整合前观点与后续处理候选,archive_materialize,docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/README.md,,保存未进入两篇正式文档的有效观点与旧视觉资产,15-platform-architecture-review
+docs/knowledge/05_上下文与知识系统/,directory,05 上下文与知识系统六文档收敛,consolidate,docs/knowledge/05_上下文与知识系统/,,收敛为 ARC-002/005/006 与 KNO-006/009/011；补齐六张正式视觉资产,16-context-and-knowledge-system-review
+docs/knowledge/05_上下文与知识系统/KNO-005-项目知识生命周期/README.md,md,KNO-005 项目知识生命周期,archive_supersede,docs/technical/归档/历史资产/05_上下文与知识系统_整合前观点与候选/legacy-assets/KNO-005-项目知识生命周期.md,KNO-005,生命周期与 VIS-010 由 ARC-005 承接，旧文和旧图保留历史追溯,16-context-and-knowledge-system-review
+,md,Context and Knowledge System Canonical Bundle,materialize,docs/knowledge/05_上下文与知识系统/ARC-002-上下文与知识系统总体架构/README.md,ARC-002,五领域、外部协作、多消费者和双循环总览,16-context-and-knowledge-system-review

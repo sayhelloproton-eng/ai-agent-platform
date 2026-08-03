@@ -98,7 +98,7 @@ Context 写入只采用完整覆盖文件：
 - Roadmap 主优先级变化；
 - Git、知识、Memory、Feishu 或安全治理变化。
 
-具体规则见 `context/AGENTS.md` 和 `docs/knowledge/05_上下文与知识系统/KNO-011-上下文所有权与维护机制.md`。
+具体规则见 `context/AGENTS.md` 和 `docs/knowledge/05_上下文与知识系统/KNO-011-上下文运行流转与恢复机制/README.md`。
 
 ## 4. 事实与决策优先级
 

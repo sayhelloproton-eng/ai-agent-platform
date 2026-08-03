@@ -1,0 +1,22 @@
+{
+  "visual_asset_id": "VIS-033",
+  "title": "知识分发、Knowledge Pack 与多渠道投影",
+  "version": 1,
+  "status": "accepted",
+  "target_document": "docs/knowledge/05_上下文与知识系统/KNO-006-知识分发Knowledge-Pack与多渠道投影/README.md",
+  "target_document_asset_id": "KNO-006",
+  "source_documents": [
+    "KNO-006",
+    "ARC-001"
+  ],
+  "source_svg": "docs/knowledge/05_上下文与知识系统/KNO-006-知识分发Knowledge-Pack与多渠道投影/assets/VIS-033-知识分发、Knowledge Pack 与多渠道投影.svg",
+  "preview_png": "docs/knowledge/05_上下文与知识系统/KNO-006-知识分发Knowledge-Pack与多渠道投影/assets/VIS-033-知识分发、Knowledge Pack 与多渠道投影.png",
+  "width": 1448,
+  "height": 1086,
+  "svg_sha256": "6b381505945c3248c1052c778e25ad179771450def79e74ee5a262603a02fad2",
+  "png_sha256": "5b14ee6cb0d2478f2ddb9e5c6c66072d39dd0f0afd8c56ecb566da37253de6de",
+  "review_notes": "正文、术语与信息图谱经用户确认；PNG 为正式人类阅读资产，SVG 为同目录封装源，语义镜像紧邻图片。",
+  "storage_model": "document_bundle",
+  "markdown_image": "./assets/VIS-033-知识分发、Knowledge Pack 与多渠道投影.png",
+  "semantic_mirror_heading": "AI 可读语义镜像"
+}

@@ -368,7 +368,7 @@ candidate
 
 ## 18. 仓库证据入口
 
-- [INS-001 工程洞见方法与实践](../../05_上下文与知识系统/INS-001-工程洞见方法与实践.md)
+- [INS-001 工程洞见方法与实践](../../05_上下文与知识系统/KNO-009-记忆反馈与知识自迭代机制/README.md)
 - [`planner-executor-handoff`](../../../../skills/planner-executor-handoff/SKILL.md)
 - [`project-knowledge-synthesis`](../../../../skills/project-knowledge-synthesis/SKILL.md)
 - [`engineering-document-authoring`](../../../../skills/engineering-document-authoring/SKILL.md)

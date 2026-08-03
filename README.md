@@ -130,7 +130,7 @@ Executor
 
 - [`AGENTS.md`](AGENTS.md)
 - [`context/AGENTS.md`](context/AGENTS.md)
-- [`docs/knowledge/05_上下文与知识系统/KNO-011-上下文所有权与维护机制.md`](docs/knowledge/05_上下文与知识系统/KNO-011-上下文所有权与维护机制.md)
+- [`docs/knowledge/05_上下文与知识系统/KNO-011-上下文运行流转与恢复机制/README.md`](docs/knowledge/05_上下文与知识系统/KNO-011-上下文运行流转与恢复机制/README.md)
 
 ## Git 与飞书
 

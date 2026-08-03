@@ -96,8 +96,8 @@ npm run verify
 ## 16. 相关文档
 
 - [Platform Registry README](../../../../platform-registry/README.md)
-- [ARC-002 智能体平台知识资产架构](../../../knowledge/05_上下文与知识系统/ARC-002-智能体平台知识资产架构.md)
-- [KNO-007 平台资产关联模型](../../../knowledge/05_上下文与知识系统/KNO-007-平台资产关联模型.md)
+- [ARC-002 智能体平台知识资产架构](../../../knowledge/05_上下文与知识系统/ARC-002-上下文与知识系统总体架构/README.md)
+- [KNO-007 平台资产关联模型](../../../knowledge/05_上下文与知识系统/ARC-005-知识资产治理单一真源与生命周期架构/README.md)
 - [ARC-016 能力依赖、多任务并行与分阶段 MVP 路线图](../../../knowledge/04_平台架构/ARC-016-能力依赖多任务并行与分阶段MVP路线图/README.md)
 - [GOV-002 文档与知识治理规则](../../治理规则/GOV-002-文档与知识治理规则.md)
 

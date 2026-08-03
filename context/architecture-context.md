@@ -77,6 +77,18 @@ MVP-0 窄链路与人工闭环
 - Git 是代码和正式知识真源，Feishu 是可重建投影；
 - 当前、目标、阶段和历史候选必须分开。
 
+## 上下文与知识系统领域
+
+`05_上下文与知识系统` 将 ARC-001 的 Context & Knowledge 边界细化为：
+
+- Knowledge Asset Governance；
+- Context Compilation & Policy；
+- Context Runtime & Continuity；
+- Knowledge Distribution & Projection；
+- Memory, Feedback & Learning。
+
+前三者构成可信知识、最小充分 Context Package 与可恢复运行的核心；后两者负责 Feishu、Custom GPT Knowledge、Knowledge Pack、RAG 等派生分发，以及 Experience → Feedback → Insight → Review → Knowledge 的受控自迭代。User、Task、Agent、Execution 与 Evidence 仍由外部协作领域拥有事实，本系统只通过 Contract 获取视图。
+
 ## 当前差距
 
 Browser Loop、Local CLI、持久 Task Store、Role Assignment、Context Builder、Approval / Evidence Store、Safe Continuation、Lane Registry、Codex Adapter、多任务并行和多执行器路由尚未形成完整代码闭环。
