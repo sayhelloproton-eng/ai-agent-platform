@@ -641,9 +641,9 @@ assets:
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/03_架构思想与理论/THY-001-从AI工具到Agent工程平台.md
+  current_path: docs/knowledge/03_Agent工程架构思想与方法论/THY-001-从AI工具到Agent工程平台/README.md
   target_path:
-  canonical_path: docs/knowledge/03_架构思想与理论/THY-001-从AI工具到Agent工程平台.md
+  canonical_path: docs/knowledge/03_Agent工程架构思想与方法论/THY-001-从AI工具到Agent工程平台/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: THY-002
@@ -652,9 +652,9 @@ assets:
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/03_架构思想与理论/THY-002-AI开发范式演进.md
+  current_path: docs/knowledge/03_Agent工程架构思想与方法论/THY-002-AI开发范式演进/README.md
   target_path:
-  canonical_path: docs/knowledge/03_架构思想与理论/THY-002-AI开发范式演进.md
+  canonical_path: docs/knowledge/03_Agent工程架构思想与方法论/THY-002-AI开发范式演进/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: THY-003
@@ -663,9 +663,9 @@ assets:
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/03_架构思想与理论/THY-003-Agent与Skills开发范式.md
+  current_path: docs/knowledge/03_Agent工程架构思想与方法论/THY-003-Agent与Skills开发范式/README.md
   target_path:
-  canonical_path: docs/knowledge/03_架构思想与理论/THY-003-Agent与Skills开发范式.md
+  canonical_path: docs/knowledge/03_Agent工程架构思想与方法论/THY-003-Agent与Skills开发范式/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: THY-004
@@ -674,9 +674,9 @@ assets:
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/03_架构思想与理论/THY-004-DDD与Agent系统边界建模.md
+  current_path: docs/knowledge/03_Agent工程架构思想与方法论/THY-004-DDD与Agent系统边界建模/README.md
   target_path:
-  canonical_path: docs/knowledge/03_架构思想与理论/THY-004-DDD与Agent系统边界建模.md
+  canonical_path: docs/knowledge/03_Agent工程架构思想与方法论/THY-004-DDD与Agent系统边界建模/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: THY-005
@@ -685,9 +685,9 @@ assets:
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/03_架构思想与理论/THY-005-可信Agent系统基本原则.md
+  current_path: docs/knowledge/03_Agent工程架构思想与方法论/THY-005-可信Agent系统基本原则/README.md
   target_path:
-  canonical_path: docs/knowledge/03_架构思想与理论/THY-005-可信Agent系统基本原则.md
+  canonical_path: docs/knowledge/03_Agent工程架构思想与方法论/THY-005-可信Agent系统基本原则/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: THY-006
@@ -696,9 +696,9 @@ assets:
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/03_架构思想与理论/THY-006-项目方法论与可复用工程启发.md
+  current_path: docs/knowledge/03_Agent工程架构思想与方法论/THY-006-项目方法论与可复用工程启发/README.md
   target_path:
-  canonical_path: docs/knowledge/03_架构思想与理论/THY-006-项目方法论与可复用工程启发.md
+  canonical_path: docs/knowledge/03_Agent工程架构思想与方法论/THY-006-项目方法论与可复用工程启发/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: ARC-007
@@ -1758,5 +1758,113 @@ assets:
   current_path: platform-registry/visual-assets/VIS-018.json
   target_path:
   canonical_path: platform-registry/visual-assets/VIS-018.json
+  publication_status: unpublished
+  migration_state: complete
+
+- asset_id: VIS-019
+  title: 从 AI 工具到 Agent 工程平台的责任边界
+  asset_type: visual
+  status: accepted
+  evidence_level: decided
+  materialized: true
+  current_path: platform-registry/visual-assets/VIS-019.json
+  target_path:
+  canonical_path: platform-registry/visual-assets/VIS-019.json
+  publication_status: unpublished
+  migration_state: complete
+
+- asset_id: VIS-020
+  title: AI 开发范式与工程责任演进
+  asset_type: visual
+  status: accepted
+  evidence_level: decided
+  materialized: true
+  current_path: platform-registry/visual-assets/VIS-020.json
+  target_path:
+  canonical_path: platform-registry/visual-assets/VIS-020.json
+  publication_status: unpublished
+  migration_state: complete
+
+- asset_id: VIS-021
+  title: Agent、Skill、Tool、Script 与 Workflow 的责任边界
+  asset_type: visual
+  status: accepted
+  evidence_level: decided
+  materialized: true
+  current_path: platform-registry/visual-assets/VIS-021.json
+  target_path:
+  canonical_path: platform-registry/visual-assets/VIS-021.json
+  publication_status: unpublished
+  migration_state: complete
+
+- asset_id: VIS-022
+  title: Agent 系统统一语言与概念边界
+  asset_type: visual
+  status: accepted
+  evidence_level: decided
+  materialized: true
+  current_path: platform-registry/visual-assets/VIS-022.json
+  target_path:
+  canonical_path: platform-registry/visual-assets/VIS-022.json
+  publication_status: unpublished
+  migration_state: complete
+
+- asset_id: VIS-023
+  title: 限界上下文推导与上下文映射
+  asset_type: visual
+  status: accepted
+  evidence_level: decided
+  materialized: true
+  current_path: platform-registry/visual-assets/VIS-023.json
+  target_path:
+  canonical_path: platform-registry/visual-assets/VIS-023.json
+  publication_status: unpublished
+  migration_state: complete
+
+- asset_id: VIS-024
+  title: Task Aggregate 状态、不变量与领域事件
+  asset_type: visual
+  status: accepted
+  evidence_level: decided
+  materialized: true
+  current_path: platform-registry/visual-assets/VIS-024.json
+  target_path:
+  canonical_path: platform-registry/visual-assets/VIS-024.json
+  publication_status: unpublished
+  migration_state: complete
+
+- asset_id: VIS-025
+  title: Domain、Port、Adapter 与 Provider 边界模型
+  asset_type: visual
+  status: accepted
+  evidence_level: decided
+  materialized: true
+  current_path: platform-registry/visual-assets/VIS-025.json
+  target_path:
+  canonical_path: platform-registry/visual-assets/VIS-025.json
+  publication_status: unpublished
+  migration_state: complete
+
+- asset_id: VIS-026
+  title: 可信 Agent 系统信任链
+  asset_type: visual
+  status: accepted
+  evidence_level: decided
+  materialized: true
+  current_path: platform-registry/visual-assets/VIS-026.json
+  target_path:
+  canonical_path: platform-registry/visual-assets/VIS-026.json
+  publication_status: unpublished
+  migration_state: complete
+
+- asset_id: VIS-027
+  title: 从真实事件到可复用工程方法
+  asset_type: visual
+  status: accepted
+  evidence_level: decided
+  materialized: true
+  current_path: platform-registry/visual-assets/VIS-027.json
+  target_path:
+  canonical_path: platform-registry/visual-assets/VIS-027.json
   publication_status: unpublished
   migration_state: complete

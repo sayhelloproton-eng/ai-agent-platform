@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3000" height="1688" viewBox="0 0 3000 1688">
+<defs><filter id="shadow" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#64748B" flood-opacity="0.12"/></filter><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#475569"/></marker></defs>
+<rect x="0" y="0" width="3000" height="1688" rx="0" fill="#FFFFFF" stroke="none" stroke-width="1"/>
+<text x="150" y="92" font-family="Noto Sans CJK SC" font-size="48" font-weight="700" fill="#111827" text-anchor="start">VIS-023｜DDD 战略设计：限界上下文推导与上下文映射</text>
+<text x="150" y="140" font-family="Noto Sans CJK SC" font-size="24" font-weight="400" fill="#526079" text-anchor="start">边界由语言、规则、生命周期、权限和责任推导，不由 Agent 名称、目录或微服务数量决定</text>
+<line x1="150" y1="166" x2="2850" y2="166" stroke="#D5DFEC" stroke-width="2"/>
+<circle cx="136" cy="233" r="26" fill="#1F63C6" stroke="none" stroke-width="1"/>
+<text x="136" y="242" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#fff" text-anchor="middle">1</text>
+<text x="182" y="242" font-family="Noto Sans CJK SC" font-size="28" font-weight="700" fill="#1F63C6" text-anchor="start">边界推导依据</text>
+<rect x="120" y="270" width="620" height="135" rx="14" fill="#EAF3FF" stroke="#B9D4FA" stroke-width="2"/>
+<text x="142" y="308" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#1F63C6" text-anchor="start">语言</text>
+<text x="144" y="345" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="start">• 同一术语是否含义不同？</text>
+<rect x="120" y="435" width="620" height="135" rx="14" fill="#F4EEFF" stroke="#D7C2F5" stroke-width="2"/>
+<text x="142" y="473" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#6C35C9" text-anchor="start">不变量</text>
+<text x="144" y="510" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="start">• 哪些规则必须同步成立？</text>
+<rect x="120" y="600" width="620" height="135" rx="14" fill="#ECF8F2" stroke="#B8DFC9" stroke-width="2"/>
+<text x="142" y="638" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#16835A" text-anchor="start">生命周期</text>
+<text x="144" y="675" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="start">• 对象何时创建、结束、归档？</text>
+<rect x="120" y="765" width="620" height="135" rx="14" fill="#FFF6E7" stroke="#F2C98C" stroke-width="2"/>
+<text x="142" y="803" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#C96A00" text-anchor="start">权限</text>
+<text x="144" y="840" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="start">• 谁能读、写、批准？</text>
+<rect x="120" y="930" width="620" height="135" rx="14" fill="#FFF0F2" stroke="#F2B4BB" stroke-width="2"/>
+<text x="142" y="968" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#C63D4A" text-anchor="start">变化频率</text>
+<text x="144" y="1005" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="start">• 模型是否以不同节奏演进？</text>
+<rect x="120" y="1095" width="620" height="135" rx="14" fill="#EAF8FA" stroke="#B7E0E4" stroke-width="2"/>
+<text x="142" y="1133" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#087B8A" text-anchor="start">组织责任</text>
+<text x="144" y="1170" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="start">• 谁对结果负责？</text>
+<circle cx="846" cy="233" r="26" fill="#6C35C9" stroke="none" stroke-width="1"/>
+<text x="846" y="242" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#fff" text-anchor="middle">2</text>
+<text x="892" y="242" font-family="Noto Sans CJK SC" font-size="28" font-weight="700" fill="#6C35C9" text-anchor="start">Agent 平台候选 Context Map</text>
+<rect x="1200" y="590" width="650" height="270" rx="30" fill="#F4EEFF" stroke="#D7C2F5" stroke-width="3" filter="url(#shadow)"/>
+<text x="1525" y="665" font-family="Noto Sans CJK SC" font-size="34" font-weight="700" fill="#6C35C9" text-anchor="middle">Platform Governance</text>
+<text x="1525" y="710" font-family="Noto Sans CJK SC" font-size="23" font-weight="400" fill="#111827" text-anchor="middle">Identity · Policy · Registry · Audit</text>
+<text x="1525" y="760" font-family="Noto Sans CJK SC" font-size="20" font-weight="400" fill="#526079" text-anchor="middle">提供共享治理，不拥有所有业务状态</text>
+<rect x="850" y="320" width="560" height="190" rx="14" fill="#EAF3FF" stroke="#B9D4FA" stroke-width="2" filter="url(#shadow)"/>
+<text x="872" y="358" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#1F63C6" text-anchor="start">Task Control</text>
+<text x="874" y="395" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="start">• Task · Version · State · Approval · </text>
+<text x="874" y="422" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="start">Recovery</text>
+<line x1="1130.0" y1="415.0" x2="1525" y2="725" stroke="#CBD5E1" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1630" y="320" width="560" height="190" rx="14" fill="#F4EEFF" stroke="#D7C2F5" stroke-width="2" filter="url(#shadow)"/>
+<text x="1652" y="358" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#6C35C9" text-anchor="start">Agent Governance</text>
+<text x="1654" y="395" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="start">• Agent Profile · Skill · Capability </text>
+<text x="1654" y="422" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="start">Grant · Eval</text>
+<line x1="1910.0" y1="415.0" x2="1525" y2="725" stroke="#CBD5E1" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="2140" y="620" width="560" height="190" rx="14" fill="#FFF6E7" stroke="#F2C98C" stroke-width="2" filter="url(#shadow)"/>
+<text x="2162" y="658" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#C96A00" text-anchor="start">Execution</text>
+<text x="2164" y="695" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="start">• Lane · Lease · Executor · Execution ·</text>
+<text x="2164" y="722" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="start"> Result</text>
+<line x1="2420.0" y1="715.0" x2="1525" y2="725" stroke="#CBD5E1" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1630" y="930" width="560" height="190" rx="14" fill="#ECF8F2" stroke="#B8DFC9" stroke-width="2" filter="url(#shadow)"/>
+<text x="1652" y="968" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#16835A" text-anchor="start">Knowledge Asset</text>
+<text x="1654" y="1005" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="start">• Context · Asset · Registry · </text>
+<text x="1654" y="1032" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="start">Lifecycle</text>
+<line x1="1910.0" y1="1025.0" x2="1525" y2="725" stroke="#CBD5E1" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="850" y="930" width="560" height="190" rx="14" fill="#EAF8FA" stroke="#B7E0E4" stroke-width="2" filter="url(#shadow)"/>
+<text x="872" y="968" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#087B8A" text-anchor="start">Publishing</text>
+<text x="874" y="1005" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="start">• Projection · Publish Job · Readback</text>
+<line x1="1130.0" y1="1025.0" x2="1525" y2="725" stroke="#CBD5E1" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="640" y="620" width="440" height="190" rx="14" fill="#FFF0F2" stroke="#F2B4BB" stroke-width="2" filter="url(#shadow)"/>
+<text x="662" y="658" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#C63D4A" text-anchor="start">Product Domain</text>
+<text x="664" y="695" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="start">• 业务语言与质量规则</text>
+<line x1="860.0" y1="715.0" x2="1525" y2="725" stroke="#CBD5E1" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="2220" y="1040" width="560" height="190" rx="14" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="2" filter="url(#shadow)"/>
+<text x="2242" y="1078" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#475569" text-anchor="start">Infrastructure Integration</text>
+<text x="2244" y="1115" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="start">• Provider · Adapter · Credential · </text>
+<text x="2244" y="1142" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="start">Transport</text>
+<line x1="2500.0" y1="1135.0" x2="1525" y2="725" stroke="#CBD5E1" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="2240" y="250" width="620" height="320" rx="15" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="2"/>
+<text x="2550" y="295" font-family="Noto Sans CJK SC" font-size="26" font-weight="700" fill="#111827" text-anchor="middle">Context 关系</text>
+<text x="2280" y="345" font-family="Noto Sans CJK SC" font-size="19" font-weight="400" fill="#111827" text-anchor="start">• Published Language：稳定公开契约</text>
+<text x="2280" y="399" font-family="Noto Sans CJK SC" font-size="19" font-weight="400" fill="#111827" text-anchor="start">• Customer / Supplier：需求协商</text>
+<text x="2280" y="453" font-family="Noto Sans CJK SC" font-size="19" font-weight="400" fill="#111827" text-anchor="start">• Anti-corruption Layer：隔离外部模型</text>
+<text x="2280" y="507" font-family="Noto Sans CJK SC" font-size="19" font-weight="400" fill="#111827" text-anchor="start">• Separate Ways：不值得集成</text>
+<rect x="790" y="1270" width="2070" height="270" rx="18" fill="#FFF9E5" stroke="#EED79D" stroke-width="2"/>
+<text x="1825" y="1314" font-family="Noto Sans CJK SC" font-size="28" font-weight="700" fill="#9A6A00" text-anchor="middle">战略设计门禁</text>
+<rect x="850" y="1350" width="610" height="52" rx="10" fill="#fff" stroke="#EED79D" stroke-width="1"/>
+<text x="1155" y="1384" font-family="Noto Sans CJK SC" font-size="19" font-weight="600" fill="#111827" text-anchor="middle">Context ≠ 微服务</text>
+<rect x="1510" y="1350" width="610" height="52" rx="10" fill="#fff" stroke="#EED79D" stroke-width="1"/>
+<text x="1815" y="1384" font-family="Noto Sans CJK SC" font-size="19" font-weight="600" fill="#111827" text-anchor="middle">边界内模型必须一致</text>
+<rect x="2170" y="1350" width="610" height="52" rx="10" fill="#fff" stroke="#EED79D" stroke-width="1"/>
+<text x="2475" y="1384" font-family="Noto Sans CJK SC" font-size="19" font-weight="600" fill="#111827" text-anchor="middle">Context 之间不共享内部对象</text>
+<rect x="850" y="1422" width="610" height="52" rx="10" fill="#fff" stroke="#EED79D" stroke-width="1"/>
+<text x="1155" y="1456" font-family="Noto Sans CJK SC" font-size="19" font-weight="600" fill="#111827" text-anchor="middle">先模块化单体验证，再按部署压力拆分</text>
+<rect x="1510" y="1422" width="610" height="52" rx="10" fill="#fff" stroke="#EED79D" stroke-width="1"/>
+<text x="1815" y="1456" font-family="Noto Sans CJK SC" font-size="19" font-weight="600" fill="#111827" text-anchor="middle">正式平台蓝图归 ARC-008</text>
+</svg>

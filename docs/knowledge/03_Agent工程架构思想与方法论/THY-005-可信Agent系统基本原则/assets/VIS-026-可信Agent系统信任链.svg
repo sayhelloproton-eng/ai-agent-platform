@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3000" height="1688" viewBox="0 0 3000 1688">
+<defs><filter id="shadow" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#64748B" flood-opacity="0.12"/></filter><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#475569"/></marker></defs>
+<rect x="0" y="0" width="3000" height="1688" rx="0" fill="#FFFFFF" stroke="none" stroke-width="1"/>
+<text x="150" y="92" font-family="Noto Sans CJK SC" font-size="48" font-weight="700" fill="#111827" text-anchor="start">VIS-026｜可信 Agent 系统信任链</text>
+<text x="150" y="140" font-family="Noto Sans CJK SC" font-size="24" font-weight="400" fill="#526079" text-anchor="start">可信不是永不出错，而是每个关键阶段都有输入、门禁、证据、失败状态和恢复策略</text>
+<line x1="150" y1="166" x2="2850" y2="166" stroke="#D5DFEC" stroke-width="2"/>
+<rect x="90.0" y="245" width="336.75" height="300" rx="17" fill="#EAF3FF" stroke="#B9D4FA" stroke-width="2" filter="url(#shadow)"/>
+<circle cx="132.0" cy="289" r="26" fill="#1F63C6" stroke="none" stroke-width="1"/>
+<text x="132.0" y="298" font-family="Noto Sans CJK SC" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">1</text>
+<text x="258.375" y="350" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#1F63C6" text-anchor="middle">意图可信</text>
+<text x="258.375" y="410" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="middle">Intent Adapter</text>
+<text x="258.375" y="448" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="middle">Schema / Idempotency</text>
+<text x="258.375" y="513" font-family="Noto Sans CJK SC" font-size="16" font-weight="400" fill="#526079" text-anchor="middle">失败 → 停止 / 降级</text>
+<line x1="426.75" y1="395" x2="440.75" y2="395" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="444.75" y="245" width="336.75" height="300" rx="17" fill="#F4EEFF" stroke="#D7C2F5" stroke-width="2" filter="url(#shadow)"/>
+<circle cx="486.75" cy="289" r="26" fill="#6C35C9" stroke="none" stroke-width="1"/>
+<text x="486.75" y="298" font-family="Noto Sans CJK SC" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">2</text>
+<text x="613.125" y="350" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#6C35C9" text-anchor="middle">身份可信</text>
+<text x="613.125" y="410" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="middle">Authentication</text>
+<text x="613.125" y="448" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="middle">主体不可伪造</text>
+<text x="613.125" y="513" font-family="Noto Sans CJK SC" font-size="16" font-weight="400" fill="#526079" text-anchor="middle">失败 → 停止 / 降级</text>
+<line x1="781.5" y1="395" x2="795.5" y2="395" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="799.5" y="245" width="336.75" height="300" rx="17" fill="#FFF6E7" stroke="#F2C98C" stroke-width="2" filter="url(#shadow)"/>
+<circle cx="841.5" cy="289" r="26" fill="#C96A00" stroke="none" stroke-width="1"/>
+<text x="841.5" y="298" font-family="Noto Sans CJK SC" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">3</text>
+<text x="967.875" y="350" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#C96A00" text-anchor="middle">权限与审批</text>
+<text x="967.875" y="410" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="middle">Capability / Policy</text>
+<text x="967.875" y="448" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="middle">Version-bound Approval</text>
+<text x="967.875" y="513" font-family="Noto Sans CJK SC" font-size="16" font-weight="400" fill="#526079" text-anchor="middle">失败 → 停止 / 降级</text>
+<line x1="1136.25" y1="395" x2="1150.25" y2="395" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="1154.25" y="245" width="336.75" height="300" rx="17" fill="#EAF8FA" stroke="#B7E0E4" stroke-width="2" filter="url(#shadow)"/>
+<circle cx="1196.25" cy="289" r="26" fill="#087B8A" stroke="none" stroke-width="1"/>
+<text x="1196.25" y="298" font-family="Noto Sans CJK SC" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">4</text>
+<text x="1322.625" y="350" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#087B8A" text-anchor="middle">Task 状态可信</text>
+<text x="1322.625" y="410" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="middle">Expected Version</text>
+<text x="1322.625" y="448" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="middle">显式状态机</text>
+<text x="1322.625" y="513" font-family="Noto Sans CJK SC" font-size="16" font-weight="400" fill="#526079" text-anchor="middle">失败 → 停止 / 降级</text>
+<line x1="1491.0" y1="395" x2="1505.0" y2="395" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="1509.0" y="245" width="336.75" height="300" rx="17" fill="#FFF0F2" stroke="#F2B4BB" stroke-width="2" filter="url(#shadow)"/>
+<circle cx="1551.0" cy="289" r="26" fill="#C63D4A" stroke="none" stroke-width="1"/>
+<text x="1551.0" y="298" font-family="Noto Sans CJK SC" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">5</text>
+<text x="1677.375" y="350" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#C63D4A" text-anchor="middle">执行受控</text>
+<text x="1677.375" y="410" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="middle">Sandbox / Allowlist</text>
+<text x="1677.375" y="448" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="middle">Timeout / Lease</text>
+<text x="1677.375" y="513" font-family="Noto Sans CJK SC" font-size="16" font-weight="400" fill="#526079" text-anchor="middle">失败 → 停止 / 降级</text>
+<line x1="1845.75" y1="395" x2="1859.75" y2="395" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="1863.75" y="245" width="336.75" height="300" rx="17" fill="#ECF8F2" stroke="#B8DFC9" stroke-width="2" filter="url(#shadow)"/>
+<circle cx="1905.75" cy="289" r="26" fill="#16835A" stroke="none" stroke-width="1"/>
+<text x="1905.75" y="298" font-family="Noto Sans CJK SC" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">6</text>
+<text x="2032.125" y="350" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#16835A" text-anchor="middle">结果可验证</text>
+<text x="2032.125" y="410" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="middle">Result + Evidence</text>
+<text x="2032.125" y="448" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="middle">Acceptance</text>
+<text x="2032.125" y="513" font-family="Noto Sans CJK SC" font-size="16" font-weight="400" fill="#526079" text-anchor="middle">失败 → 停止 / 降级</text>
+<line x1="2200.5" y1="395" x2="2214.5" y2="395" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="2218.5" y="245" width="336.75" height="300" rx="17" fill="#FFF9E5" stroke="#EED79D" stroke-width="2" filter="url(#shadow)"/>
+<circle cx="2260.5" cy="289" r="26" fill="#9A6A00" stroke="none" stroke-width="1"/>
+<text x="2260.5" y="298" font-family="Noto Sans CJK SC" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">7</text>
+<text x="2386.875" y="350" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#9A6A00" text-anchor="middle">副作用可追踪</text>
+<text x="2386.875" y="410" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="middle">Ledger / Hash</text>
+<text x="2386.875" y="448" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="middle">幂等与可逆性</text>
+<text x="2386.875" y="513" font-family="Noto Sans CJK SC" font-size="16" font-weight="400" fill="#526079" text-anchor="middle">失败 → 停止 / 降级</text>
+<line x1="2555.25" y1="395" x2="2569.25" y2="395" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="2573.25" y="245" width="336.75" height="300" rx="17" fill="#EAF3FF" stroke="#B9D4FA" stroke-width="2" filter="url(#shadow)"/>
+<circle cx="2615.25" cy="289" r="26" fill="#1F63C6" stroke="none" stroke-width="1"/>
+<text x="2615.25" y="298" font-family="Noto Sans CJK SC" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">8</text>
+<text x="2741.625" y="350" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#1F63C6" text-anchor="middle">失败可恢复</text>
+<text x="2741.625" y="410" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="middle">Snapshot</text>
+<text x="2741.625" y="448" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="middle">Safe Continuation</text>
+<text x="2741.625" y="513" font-family="Noto Sans CJK SC" font-size="16" font-weight="400" fill="#526079" text-anchor="middle">失败 → 停止 / 降级</text>
+<circle cx="126" cy="628" r="26" fill="#C63D4A" stroke="none" stroke-width="1"/>
+<text x="126" y="637" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#fff" text-anchor="middle">A</text>
+<text x="172" y="637" font-family="Noto Sans CJK SC" font-size="28" font-weight="700" fill="#C63D4A" text-anchor="start">风险分级与人工介入</text>
+<rect x="120" y="675" width="640" height="190" rx="14" fill="#EAF3FF" stroke="#B9D4FA" stroke-width="2"/>
+<text x="142" y="713" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#1F63C6" text-anchor="start">L0 只读低风险</text>
+<text x="144" y="750" font-family="Noto Sans CJK SC" font-size="19" font-weight="400" fill="#111827" text-anchor="start">• 自动执行 + 记录</text>
+<rect x="820" y="675" width="640" height="190" rx="14" fill="#ECF8F2" stroke="#B8DFC9" stroke-width="2"/>
+<text x="842" y="713" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#16835A" text-anchor="start">L1 可逆低风险</text>
+<text x="844" y="750" font-family="Noto Sans CJK SC" font-size="19" font-weight="400" fill="#111827" text-anchor="start">• 自动执行 + Review</text>
+<rect x="1520" y="675" width="640" height="190" rx="14" fill="#FFF6E7" stroke="#F2C98C" stroke-width="2"/>
+<text x="1542" y="713" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#C96A00" text-anchor="start">L2 中风险写入</text>
+<text x="1544" y="750" font-family="Noto Sans CJK SC" font-size="19" font-weight="400" fill="#111827" text-anchor="start">• Scope + Policy + Approval + Evidence</text>
+<rect x="2220" y="675" width="640" height="190" rx="14" fill="#FFF0F2" stroke="#F2B4BB" stroke-width="2"/>
+<text x="2242" y="713" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#C63D4A" text-anchor="start">L3 高风险不可逆</text>
+<text x="2244" y="750" font-family="Noto Sans CJK SC" font-size="19" font-weight="400" fill="#111827" text-anchor="start">• 强制人工批准 + 双重验证</text>
+<circle cx="126" cy="958" r="26" fill="#6C35C9" stroke="none" stroke-width="1"/>
+<text x="126" y="967" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#fff" text-anchor="middle">B</text>
+<text x="172" y="967" font-family="Noto Sans CJK SC" font-size="28" font-weight="700" fill="#6C35C9" text-anchor="start">分层防御与证据链</text>
+<rect x="110" y="1005" width="430" height="70" rx="12" fill="#EAF3FF" stroke="#B9D4FA" stroke-width="1.5"/>
+<text x="325" y="1050" font-family="Noto Sans CJK SC" font-size="18" font-weight="600" fill="#1F63C6" text-anchor="middle">Network</text>
+<line x1="540" y1="1040" x2="578" y2="1040" stroke="#CBD5E1" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="585" y="1005" width="430" height="70" rx="12" fill="#F4EEFF" stroke="#D7C2F5" stroke-width="1.5"/>
+<text x="800" y="1050" font-family="Noto Sans CJK SC" font-size="18" font-weight="600" fill="#6C35C9" text-anchor="middle">Authentication</text>
+<line x1="1015" y1="1040" x2="1053" y2="1040" stroke="#CBD5E1" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1060" y="1005" width="430" height="70" rx="12" fill="#FFF6E7" stroke="#F2C98C" stroke-width="1.5"/>
+<text x="1275" y="1050" font-family="Noto Sans CJK SC" font-size="18" font-weight="600" fill="#C96A00" text-anchor="middle">Capability Allowlist</text>
+<line x1="1490" y1="1040" x2="1528" y2="1040" stroke="#CBD5E1" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1535" y="1005" width="430" height="70" rx="12" fill="#EAF8FA" stroke="#B7E0E4" stroke-width="1.5"/>
+<text x="1750" y="1050" font-family="Noto Sans CJK SC" font-size="18" font-weight="600" fill="#087B8A" text-anchor="middle">Runtime Policy</text>
+<line x1="1965" y1="1040" x2="2003" y2="1040" stroke="#CBD5E1" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="2010" y="1005" width="430" height="70" rx="12" fill="#ECF8F2" stroke="#B8DFC9" stroke-width="1.5"/>
+<text x="2225" y="1050" font-family="Noto Sans CJK SC" font-size="18" font-weight="600" fill="#16835A" text-anchor="middle">Input Validation</text>
+<line x1="2440" y1="1040" x2="2478" y2="1040" stroke="#CBD5E1" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="2485" y="1005" width="430" height="70" rx="12" fill="#FFF0F2" stroke="#F2B4BB" stroke-width="1.5"/>
+<text x="2700" y="1050" font-family="Noto Sans CJK SC" font-size="18" font-weight="600" fill="#C63D4A" text-anchor="middle">Approval</text>
+<line x1="2915" y1="1040" x2="2953" y2="1040" stroke="#CBD5E1" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="110" y="1130" width="430" height="70" rx="12" fill="#EAF3FF" stroke="#B9D4FA" stroke-width="1.5"/>
+<text x="325" y="1175" font-family="Noto Sans CJK SC" font-size="18" font-weight="600" fill="#1F63C6" text-anchor="middle">Sandbox / Tool Safeguard</text>
+<line x1="540" y1="1165" x2="578" y2="1165" stroke="#CBD5E1" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="585" y="1130" width="430" height="70" rx="12" fill="#F4EEFF" stroke="#D7C2F5" stroke-width="1.5"/>
+<text x="800" y="1175" font-family="Noto Sans CJK SC" font-size="18" font-weight="600" fill="#6C35C9" text-anchor="middle">Output Validation</text>
+<line x1="1015" y1="1165" x2="1053" y2="1165" stroke="#CBD5E1" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1060" y="1130" width="430" height="70" rx="12" fill="#FFF6E7" stroke="#F2C98C" stroke-width="1.5"/>
+<text x="1275" y="1175" font-family="Noto Sans CJK SC" font-size="18" font-weight="600" fill="#C96A00" text-anchor="middle">Evidence</text>
+<line x1="1490" y1="1165" x2="1528" y2="1165" stroke="#CBD5E1" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1535" y="1130" width="430" height="70" rx="12" fill="#EAF8FA" stroke="#B7E0E4" stroke-width="1.5"/>
+<text x="1750" y="1175" font-family="Noto Sans CJK SC" font-size="18" font-weight="600" fill="#087B8A" text-anchor="middle">Ledger</text>
+<line x1="1965" y1="1165" x2="2003" y2="1165" stroke="#CBD5E1" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="2010" y="1130" width="430" height="70" rx="12" fill="#ECF8F2" stroke="#B8DFC9" stroke-width="1.5"/>
+<text x="2225" y="1175" font-family="Noto Sans CJK SC" font-size="18" font-weight="600" fill="#16835A" text-anchor="middle">Health / Recovery</text>
+<rect x="110" y="1288" width="1340" height="220" rx="16" fill="#ECF8F2" stroke="#B8DFC9" stroke-width="2"/>
+<text x="780" y="1332" font-family="Noto Sans CJK SC" font-size="28" font-weight="700" fill="#16835A" text-anchor="middle">当前已验证</text>
+<text x="780" y="1377" font-family="Noto Sans CJK SC" font-size="20" font-weight="400" fill="#111827" text-anchor="middle">双层 Key / Policy · 默认拒绝 · Loopback · Rate / Timeout / Size</text>
+<text x="780" y="1414" font-family="Noto Sans CJK SC" font-size="20" font-weight="400" fill="#111827" text-anchor="middle">真实 Custom GPT 路径 · Git / Test / Commit / Readback 证据</text>
+<text x="780" y="1451" font-family="Noto Sans CJK SC" font-size="20" font-weight="400" fill="#111827" text-anchor="middle">冻结交付与 Stop Rules</text>
+<rect x="1550" y="1288" width="1340" height="220" rx="16" fill="#FFF6E7" stroke="#F2C98C" stroke-width="2"/>
+<text x="2220" y="1332" font-family="Noto Sans CJK SC" font-size="28" font-weight="700" fill="#C96A00" text-anchor="middle">目标设计 / 未实现</text>
+<text x="2220" y="1377" font-family="Noto Sans CJK SC" font-size="20" font-weight="400" fill="#111827" text-anchor="middle">持久 Task · 结构化 Approval · Evidence Registry · Side-effect Ledger</text>
+<text x="2220" y="1414" font-family="Noto Sans CJK SC" font-size="20" font-weight="400" fill="#111827" text-anchor="middle">Health Event · Snapshot / Recovery · Execution Lane Lease</text>
+<text x="2220" y="1451" font-family="Noto Sans CJK SC" font-size="20" font-weight="400" fill="#111827" text-anchor="middle">多执行器调度与生产边缘治理</text>
+</svg>

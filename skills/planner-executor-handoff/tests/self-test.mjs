@@ -118,7 +118,7 @@ run([frozenValidate,path.join(EXAMPLES,"frozen-delivery.json")]);
 run([frozenValidate,path.join(EXAMPLES,"frozen-delivery-continuation.json")]);
 failRun([frozenValidate,path.join(ROOT,"tests","fixtures","invalid-frozen-overlap.json")]);
 const handoffSkill=await readFile(path.join(ROOT,"SKILL.md"),"utf8");
-for(const marker of ["implement_from_spec","apply_frozen_artifacts","--no-renames","/usr/bin/cmp"]) if(!handoffSkill.includes(marker)) throw new Error(`SKILL.md missing ${marker}`);
+for(const marker of ["implement_from_spec","apply_frozen_artifacts","--no-renames","/usr/bin/cmp","Large document-and-visual delivery choreography","article review bundle"]) if(!handoffSkill.includes(marker)) throw new Error(`SKILL.md missing ${marker}`);
 
 await rm(TMP,{recursive:true,force:true});
 console.log("planner-executor-handoff self-test passed");

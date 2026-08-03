@@ -1063,3 +1063,55 @@ relations:
 - from: KNO-004
   type: depends_on
   to: CAP-001
+
+- from: VIS-019
+  type: explains
+  to: THY-001
+
+- from: VIS-020
+  type: explains
+  to: THY-002
+
+- from: VIS-021
+  type: explains
+  to: THY-003
+
+- from: VIS-022
+  type: explains
+  to: THY-004
+
+- from: VIS-023
+  type: explains
+  to: THY-004
+
+- from: VIS-024
+  type: explains
+  to: THY-004
+
+- from: VIS-025
+  type: explains
+  to: THY-004
+
+- from: VIS-026
+  type: explains
+  to: THY-005
+
+- from: VIS-027
+  type: explains
+  to: THY-006
+
+- from: THY-001
+  type: depends_on
+  to: CAP-008
+
+- from: THY-004
+  type: derived_from
+  to: DOM-001
+
+- from: THY-004
+  type: explains
+  to: ARC-008
+
+- from: THY-005
+  type: depends_on
+  to: THY-004

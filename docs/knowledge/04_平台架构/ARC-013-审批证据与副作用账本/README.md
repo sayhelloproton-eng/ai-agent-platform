@@ -63,5 +63,5 @@ completed 必须满足验收、必要 Approval、证据充分、副作用明确�
 ## 9. 关联文档
 
 - [ARC-009 轻量 Task Control](../ARC-009-轻量Task-Control架构/README.md)
-- [THY-005 可信 Agent 系统](../../03_架构思想与理论/THY-005-可信Agent系统基本原则.md)
+- [THY-005 可信 Agent 系统](../../03_Agent工程架构思想与方法论/THY-005-可信Agent系统基本原则/README.md)
 - [KNO-003 Token 与证据治理](../../05_上下文与知识系统/KNO-003-上下文Token与证据治理.md)

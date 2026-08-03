@@ -38,11 +38,11 @@ Formal documents use a two-stage authoring sequence. Do not design the final vis
 
 ### Stage B — design and insert the formal visual
 
-9. **Create the formal visual from the frozen information map** — use deterministic editable vector source for architecture, process and comparison diagrams. Read `references/03-human-first-ai-lossless.md` and `references/05-formal-diagram-style.md`.
+9. **Create the formal visual from the frozen information map** — use the approved visual tool and style only after Stage A is frozen. For multiple diagrams, follow the checkpointed single-target protocol in `references/06-long-running-visual-production.md`.
 10. **Review the visual separately** — reject rough, low-density, ambiguous or terminology-inconsistent output before inserting it into the document.
 11. **Create the semantic mirror** — every image is followed immediately by an AI-readable semantic equivalent.
 12. **Make it Git-first and Feishu-ready** — local relative assets, stable heading order, portable tables/code blocks, no Feishu URL in Git.
-13. **Review the complete bundle** — run the checklist and deterministic validator before presenting the candidate.
+13. **Review the complete bundle** — run the checklist and deterministic validator before presenting the candidate. Package construction is a separate final phase and must never trigger new image generation.
 
 ## Human-first, AI-lossless
 
@@ -79,6 +79,10 @@ Authoring does not grant lifecycle promotion, Registry mutation, Feishu publicat
 
 Route placement, stable IDs, lifecycle, Registry relations, bundle integrity, and publication eligibility to `project-knowledge-governance`.
 
+## Throughput strategy for image-heavy documents
+
+For image-heavy knowledge chapters, freeze the article set and Visual Manifest first, generate one named Visual Asset per call, persist and hash each accepted image immediately, checkpoint every 2–3 assets, insert visuals only after generation is complete, and build the package last. Do not create contact sheets, mosaics or derivative previews unless explicitly requested.
+
 ## Stop rules
 
 Stop and request clarification when the document’s core question, truth source, current/target boundary, primary reader, stable ID, or evidence is unresolved. Do not conceal conflicts through polished prose.
@@ -89,4 +93,5 @@ Stop and request clarification when the document’s core question, truth source
 - document structures: `references/02-document-type-patterns.md`;
 - visual blocks: `references/03-human-first-ai-lossless.md`;
 - final review: `references/04-review-checklist.md`;
-- formal diagram style: `references/05-formal-diagram-style.md`.
+- formal diagram style: `references/05-formal-diagram-style.md`;
+- long-running multi-image production and recovery: `references/06-long-running-visual-production.md`.

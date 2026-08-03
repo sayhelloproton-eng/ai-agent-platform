@@ -61,6 +61,6 @@ Command 表达意图并可被拒绝；Event 记录已发生事实且不可静默
 
 ## 9. 关联文档
 
-- [THY-005 可信 Agent 系统基本原则](../../03_架构思想与理论/THY-005-可信Agent系统基本原则.md)
+- [THY-005 可信 Agent 系统基本原则](../../03_Agent工程架构思想与方法论/THY-005-可信Agent系统基本原则/README.md)
 - [PRD-005 平台能力地图与产品成熟度](../../01_产品体系/PRD-005-平台能力地图与产品成熟度/README.md)
 - [ARC-001 平台总体架构](../ARC-001-ai-agent-platform总体架构/README.md)

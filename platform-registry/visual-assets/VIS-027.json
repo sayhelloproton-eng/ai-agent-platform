@@ -1,0 +1,24 @@
+{
+  "visual_asset_id": "VIS-027",
+  "title": "从真实事件到可复用工程方法",
+  "version": 2,
+  "status": "accepted",
+  "target_document": "docs/knowledge/03_Agent工程架构思想与方法论/THY-006-项目方法论与可复用工程启发/README.md",
+  "target_document_asset_id": "THY-006",
+  "source_documents": [
+    "THY-006",
+    "INS-001",
+    "WFL-004"
+  ],
+  "storage_model": "document_bundle",
+  "source_svg": "docs/knowledge/03_Agent工程架构思想与方法论/THY-006-项目方法论与可复用工程启发/assets/VIS-027-从真实事件到可复用工程方法.svg",
+  "preview_png": "docs/knowledge/03_Agent工程架构思想与方法论/THY-006-项目方法论与可复用工程启发/assets/VIS-027-从真实事件到可复用工程方法.png",
+  "markdown_image": "./assets/VIS-027-从真实事件到可复用工程方法.png",
+  "semantic_mirror_heading": "AI 可读语义镜像",
+  "width": 1672,
+  "height": 941,
+  "svg_sha256": "8c33c1b4122d748f5a9967f5773ae1d324c5a534bd19862c54792ba1b8aa9750",
+  "png_sha256": "d5f531a7c5d5f15dda668d38d6f0f673afea070b6c4d09782dfeb05c391e02b8",
+  "visual_style": "openclaw-inspired-formal-whitepaper-card-grid-high-density-image-gen-preview",
+  "review_notes": "正文、术语、来源与信息地图先冻结；每个 Visual Asset 独立生成与 Review。OpenAI image_gen 生成的 PNG 已获用户接受，是本次权威预览；现有 SVG 保留为可编辑来源，但尚未与新 PNG 完全同步，后续须在独立批次刷新，执行器不得自行重绘。"
+}

@@ -99,6 +99,25 @@ A failure report includes the last successful gate, raw error, side effects, wor
 
 In `apply_frozen_artifacts`, domain Skills are constraint references only and may not reinterpret the package.
 
+## Large document-and-visual delivery choreography
+
+For documentation chapters that combine heavy authoring and many formal diagrams, prefer short chained deliveries instead of one monolithic package.
+
+Recommended order:
+
+1. **article review bundle** — Markdown only or Markdown-first, for semantic review;
+2. **visual asset patch bundle** — approved images only, mapped to exact article paths;
+3. **final frozen execution bundle** — the combined reviewed result for mechanical application.
+
+Additional rules:
+
+- if a package change only repairs validation contracts or continuation scripts, prefer `continuation` over re-applying the full bundle;
+- the Executor does not reinterpret article meaning or redesign diagrams;
+- do not require large preview composites unless the Planner explicitly requests them;
+- long image-generation work should be upstream of the final frozen delivery, not inside the executor run.
+
+This reduces stalled runs caused by mixing semantic writing, asset design, validation, and execution in one handoff.
+
 ## Stop rules
 
 Stop when source or remote SHA, branch, workspace/index, package hash, Manifest, Scope, Context Access, Git policy, Artifact identity, validation evidence, or side effects differ from the contract. Report facts; do not adapt the contract silently.

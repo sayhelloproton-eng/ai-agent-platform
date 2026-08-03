@@ -383,12 +383,12 @@ skills/microsoft-dev-tunnels/references/official-cli-baseline.md,md,Official CLI
 skills/microsoft-dev-tunnels/references/security-and-limits.md,md,Security and Limits,keep,skills/microsoft-dev-tunnels/references/security-and-limits.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
 skills/microsoft-dev-tunnels/references/troubleshooting.md,md,Troubleshooting,keep,skills/microsoft-dev-tunnels/references/troubleshooting.md,,当前实现或测试证据，不因知识重构修改,implementation-frozen
 tsconfig.base.json,json,,keep_review,tsconfig.base.json,,保留并在相关批次复核,01-control-plane
-,md,从 AI 工具到 Agent 工程平台,materialize,docs/knowledge/03_架构思想与理论/THY-001-从AI工具到Agent工程平台.md,THY-001,基于官方产品事实、仓库实现、已接受知识和工程证据综合生成正式正文,03bc-codex-and-agent-theory
-,md,AI 开发范式演进,materialize,docs/knowledge/03_架构思想与理论/THY-002-AI开发范式演进.md,THY-002,基于官方产品事实、仓库实现、已接受知识和工程证据综合生成正式正文,03bc-codex-and-agent-theory
-,md,Agent + Skills 开发范式,materialize,docs/knowledge/03_架构思想与理论/THY-003-Agent与Skills开发范式.md,THY-003,基于官方产品事实、仓库实现、已接受知识和工程证据综合生成正式正文,03bc-codex-and-agent-theory
-,md,DDD 与 Agent 系统边界建模,materialize,docs/knowledge/03_架构思想与理论/THY-004-DDD与Agent系统边界建模.md,THY-004,基于官方产品事实、仓库实现、已接受知识和工程证据综合生成正式正文,03bc-codex-and-agent-theory
-,md,可信 Agent 系统基本原则,materialize,docs/knowledge/03_架构思想与理论/THY-005-可信Agent系统基本原则.md,THY-005,基于官方产品事实、仓库实现、已接受知识和工程证据综合生成正式正文,03bc-codex-and-agent-theory
-,md,项目方法论与可复用工程启发,materialize,docs/knowledge/03_架构思想与理论/THY-006-项目方法论与可复用工程启发.md,THY-006,基于官方产品事实、仓库实现、已接受知识和工程证据综合生成正式正文,03bc-codex-and-agent-theory
+,md,从 AI 工具到 Agent 工程平台,materialize,docs/knowledge/03_Agent工程架构思想与方法论/THY-001-从AI工具到Agent工程平台/README.md,THY-001,基于官方产品事实、仓库实现、已接受知识和工程证据综合生成正式正文,03bc-codex-and-agent-theory
+,md,AI 开发范式演进,materialize,docs/knowledge/03_Agent工程架构思想与方法论/THY-002-AI开发范式演进/README.md,THY-002,基于官方产品事实、仓库实现、已接受知识和工程证据综合生成正式正文,03bc-codex-and-agent-theory
+,md,Agent + Skills 开发范式,materialize,docs/knowledge/03_Agent工程架构思想与方法论/THY-003-Agent与Skills开发范式/README.md,THY-003,基于官方产品事实、仓库实现、已接受知识和工程证据综合生成正式正文,03bc-codex-and-agent-theory
+,md,DDD 与 Agent 系统边界建模,materialize,docs/knowledge/03_Agent工程架构思想与方法论/THY-004-DDD与Agent系统边界建模/README.md,THY-004,基于官方产品事实、仓库实现、已接受知识和工程证据综合生成正式正文,03bc-codex-and-agent-theory
+,md,可信 Agent 系统基本原则,materialize,docs/knowledge/03_Agent工程架构思想与方法论/THY-005-可信Agent系统基本原则/README.md,THY-005,基于官方产品事实、仓库实现、已接受知识和工程证据综合生成正式正文,03bc-codex-and-agent-theory
+,md,项目方法论与可复用工程启发,materialize,docs/knowledge/03_Agent工程架构思想与方法论/THY-006-项目方法论与可复用工程启发/README.md,THY-006,基于官方产品事实、仓库实现、已接受知识和工程证据综合生成正式正文,03bc-codex-and-agent-theory
 ,md,多窗口多角色多任务并行架构,materialize,docs/knowledge/04_平台架构/ARC-007-多窗口多角色多任务并行架构.md,ARC-007,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
 ,md,ai-agent-platform-DDD领域蓝图,materialize,docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图/README.md,ARC-008,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
 ,md,轻量Task-Control架构,materialize,docs/knowledge/04_平台架构/ARC-009-轻量Task-Control架构/README.md,ARC-009,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system

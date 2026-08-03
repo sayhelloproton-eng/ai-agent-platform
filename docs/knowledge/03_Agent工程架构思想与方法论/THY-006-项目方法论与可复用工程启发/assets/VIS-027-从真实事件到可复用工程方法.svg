@@ -1,0 +1,195 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3000" height="1688" viewBox="0 0 3000 1688">
+<defs><filter id="shadow" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#64748B" flood-opacity="0.12"/></filter><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#475569"/></marker></defs>
+<rect x="0" y="0" width="3000" height="1688" rx="0" fill="#FFFFFF" stroke="none" stroke-width="1"/>
+<text x="150" y="92" font-family="Noto Sans CJK SC" font-size="48" font-weight="700" fill="#111827" text-anchor="start">VIS-027｜从真实事件到可复用工程方法</text>
+<text x="150" y="140" font-family="Noto Sans CJK SC" font-size="24" font-weight="400" fill="#526079" text-anchor="start">方法必须包含问题、机制、适用条件、反例、检查项、证据与成熟度</text>
+<line x1="150" y1="166" x2="2850" y2="166" stroke="#D5DFEC" stroke-width="2"/>
+<circle cx="126" cy="228" r="26" fill="#6C35C9" stroke="none" stroke-width="1"/>
+<text x="126" y="237" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#fff" text-anchor="middle">1</text>
+<text x="172" y="237" font-family="Noto Sans CJK SC" font-size="28" font-weight="700" fill="#6C35C9" text-anchor="start">洞见形成闭环</text>
+<rect x="100.0" y="270" width="330.75" height="190" rx="15" fill="#EAF3FF" stroke="#B9D4FA" stroke-width="2" filter="url(#shadow)"/>
+<circle cx="134.0" cy="305" r="22" fill="#1F63C6" stroke="none" stroke-width="1"/>
+<text x="134.0" y="313" font-family="Noto Sans CJK SC" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">1</text>
+<text x="265.375" y="355" font-family="Noto Sans CJK SC" font-size="22" font-weight="700" fill="#1F63C6" text-anchor="middle">真实问题</text>
+<text x="265.375" y="400" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">发生了什么？</text>
+<line x1="430.75" y1="365" x2="449.75" y2="365" stroke="#475569" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="452.75" y="270" width="330.75" height="190" rx="15" fill="#F4EEFF" stroke="#D7C2F5" stroke-width="2" filter="url(#shadow)"/>
+<circle cx="486.75" cy="305" r="22" fill="#6C35C9" stroke="none" stroke-width="1"/>
+<text x="486.75" y="313" font-family="Noto Sans CJK SC" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">2</text>
+<text x="618.125" y="355" font-family="Noto Sans CJK SC" font-size="22" font-weight="700" fill="#6C35C9" text-anchor="middle">机制分析</text>
+<text x="618.125" y="400" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">为什么会发生？</text>
+<line x1="783.5" y1="365" x2="802.5" y2="365" stroke="#475569" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="805.5" y="270" width="330.75" height="190" rx="15" fill="#FFF6E7" stroke="#F2C98C" stroke-width="2" filter="url(#shadow)"/>
+<circle cx="839.5" cy="305" r="22" fill="#C96A00" stroke="none" stroke-width="1"/>
+<text x="839.5" y="313" font-family="Noto Sans CJK SC" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">3</text>
+<text x="970.875" y="355" font-family="Noto Sans CJK SC" font-size="22" font-weight="700" fill="#C96A00" text-anchor="middle">方法提炼</text>
+<text x="970.875" y="400" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">如何预防 / 复用？</text>
+<line x1="1136.25" y1="365" x2="1155.25" y2="365" stroke="#475569" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="1158.25" y="270" width="330.75" height="190" rx="15" fill="#ECF8F2" stroke="#B8DFC9" stroke-width="2" filter="url(#shadow)"/>
+<circle cx="1192.25" cy="305" r="22" fill="#16835A" stroke="none" stroke-width="1"/>
+<text x="1192.25" y="313" font-family="Noto Sans CJK SC" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">4</text>
+<text x="1323.625" y="355" font-family="Noto Sans CJK SC" font-size="22" font-weight="700" fill="#16835A" text-anchor="middle">适用条件</text>
+<text x="1323.625" y="400" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">何时成立？</text>
+<line x1="1489.0" y1="365" x2="1508.0" y2="365" stroke="#475569" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="1511.0" y="270" width="330.75" height="190" rx="15" fill="#FFF0F2" stroke="#F2B4BB" stroke-width="2" filter="url(#shadow)"/>
+<circle cx="1545.0" cy="305" r="22" fill="#C63D4A" stroke="none" stroke-width="1"/>
+<text x="1545.0" y="313" font-family="Noto Sans CJK SC" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">5</text>
+<text x="1676.375" y="355" font-family="Noto Sans CJK SC" font-size="22" font-weight="700" fill="#C63D4A" text-anchor="middle">反例 / 排除</text>
+<text x="1676.375" y="400" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">何时不成立？</text>
+<line x1="1841.75" y1="365" x2="1860.75" y2="365" stroke="#475569" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="1863.75" y="270" width="330.75" height="190" rx="15" fill="#EAF8FA" stroke="#B7E0E4" stroke-width="2" filter="url(#shadow)"/>
+<circle cx="1897.75" cy="305" r="22" fill="#087B8A" stroke="none" stroke-width="1"/>
+<text x="1897.75" y="313" font-family="Noto Sans CJK SC" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">6</text>
+<text x="2029.125" y="355" font-family="Noto Sans CJK SC" font-size="22" font-weight="700" fill="#087B8A" text-anchor="middle">检查项</text>
+<text x="2029.125" y="400" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">怎样执行？</text>
+<line x1="2194.5" y1="365" x2="2213.5" y2="365" stroke="#475569" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="2216.5" y="270" width="330.75" height="190" rx="15" fill="#EAF3FF" stroke="#B9D4FA" stroke-width="2" filter="url(#shadow)"/>
+<circle cx="2250.5" cy="305" r="22" fill="#1F63C6" stroke="none" stroke-width="1"/>
+<text x="2250.5" y="313" font-family="Noto Sans CJK SC" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">7</text>
+<text x="2381.875" y="355" font-family="Noto Sans CJK SC" font-size="22" font-weight="700" fill="#1F63C6" text-anchor="middle">仓库证据</text>
+<text x="2381.875" y="400" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">代码 / Test / </text>
+<text x="2381.875" y="428" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">Commit</text>
+<line x1="2547.25" y1="365" x2="2566.25" y2="365" stroke="#475569" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="2569.25" y="270" width="330.75" height="190" rx="15" fill="#F4EEFF" stroke="#D7C2F5" stroke-width="2" filter="url(#shadow)"/>
+<circle cx="2603.25" cy="305" r="22" fill="#6C35C9" stroke="none" stroke-width="1"/>
+<text x="2603.25" y="313" font-family="Noto Sans CJK SC" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">8</text>
+<text x="2734.625" y="355" font-family="Noto Sans CJK SC" font-size="22" font-weight="700" fill="#6C35C9" text-anchor="middle">成熟度</text>
+<text x="2734.625" y="400" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">Candidate → </text>
+<text x="2734.625" y="428" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">Established</text>
+<circle cx="126" cy="538" r="26" fill="#1F63C6" stroke="none" stroke-width="1"/>
+<text x="126" y="547" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#fff" text-anchor="middle">2</text>
+<text x="172" y="547" font-family="Noto Sans CJK SC" font-size="28" font-weight="700" fill="#1F63C6" text-anchor="start">项目方法矩阵</text>
+<rect x="110" y="580" width="430" height="64" rx="0" fill="#EAF3FF" stroke="#B9D4FA" stroke-width="1.5"/>
+<text x="325.0" y="622" font-family="Noto Sans CJK SC" font-size="20" font-weight="700" fill="#1F63C6" text-anchor="middle">方法</text>
+<rect x="540" y="580" width="520" height="64" rx="0" fill="#EAF3FF" stroke="#B9D4FA" stroke-width="1.5"/>
+<text x="800.0" y="622" font-family="Noto Sans CJK SC" font-size="20" font-weight="700" fill="#1F63C6" text-anchor="middle">主要解决</text>
+<rect x="1060" y="580" width="650" height="64" rx="0" fill="#EAF3FF" stroke="#B9D4FA" stroke-width="1.5"/>
+<text x="1385.0" y="622" font-family="Noto Sans CJK SC" font-size="20" font-weight="700" fill="#1F63C6" text-anchor="middle">不解决</text>
+<rect x="1710" y="580" width="650" height="64" rx="0" fill="#EAF3FF" stroke="#B9D4FA" stroke-width="1.5"/>
+<text x="2035.0" y="622" font-family="Noto Sans CJK SC" font-size="20" font-weight="700" fill="#1F63C6" text-anchor="middle">证据 / 检查</text>
+<rect x="2360" y="580" width="610" height="64" rx="0" fill="#EAF3FF" stroke="#B9D4FA" stroke-width="1.5"/>
+<text x="2665.0" y="622" font-family="Noto Sans CJK SC" font-size="20" font-weight="700" fill="#1F63C6" text-anchor="middle">成熟度起点</text>
+<rect x="110" y="644" width="430" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="325.0" y="686" font-family="Noto Sans CJK SC" font-size="17" font-weight="600" fill="#111827" text-anchor="middle">固定 SHA</text>
+<rect x="540" y="644" width="520" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="800.0" y="686" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">输入漂移</text>
+<rect x="1060" y="644" width="650" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="1385.0" y="686" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">不解决语义错误</text>
+<rect x="1710" y="644" width="650" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="2035.0" y="686" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">Commit / Remote 回读</text>
+<rect x="2360" y="644" width="610" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="2665.0" y="686" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">Candidate / Provisional</text>
+<rect x="110" y="709" width="430" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="325.0" y="751" font-family="Noto Sans CJK SC" font-size="17" font-weight="600" fill="#111827" text-anchor="middle">Scope Lock</text>
+<rect x="540" y="709" width="520" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="800.0" y="751" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">越界修改</text>
+<rect x="1060" y="709" width="650" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="1385.0" y="751" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">不解决内容质量</text>
+<rect x="1710" y="709" width="650" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="2035.0" y="751" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">路径表 + Dirty Scope</text>
+<rect x="2360" y="709" width="610" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="2665.0" y="751" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">Candidate / Provisional</text>
+<rect x="110" y="774" width="430" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="325.0" y="816" font-family="Noto Sans CJK SC" font-size="17" font-weight="600" fill="#111827" text-anchor="middle">单逻辑批次</text>
+<rect x="540" y="774" width="520" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="800.0" y="816" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">Review / 回滚</text>
+<rect x="1060" y="774" width="650" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="1385.0" y="816" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">过碎增加成本</text>
+<rect x="1710" y="774" width="650" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="2035.0" y="816" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">单 Commit + Release</text>
+<rect x="2360" y="774" width="610" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="2665.0" y="816" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">Candidate / Provisional</text>
+<rect x="110" y="839" width="430" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="325.0" y="881" font-family="Noto Sans CJK SC" font-size="17" font-weight="600" fill="#111827" text-anchor="middle">不确定性分工</text>
+<rect x="540" y="839" width="520" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="800.0" y="881" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">Token 与判断质量</text>
+<rect x="1060" y="839" width="650" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="1385.0" y="881" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">不替代权限</text>
+<rect x="1710" y="839" width="650" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="2035.0" y="881" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">Planner / Executor</text>
+<rect x="2360" y="839" width="610" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="2665.0" y="881" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">Candidate / Provisional</text>
+<rect x="110" y="904" width="430" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="325.0" y="946" font-family="Noto Sans CJK SC" font-size="17" font-weight="600" fill="#111827" text-anchor="middle">程序门禁</text>
+<rect x="540" y="904" width="520" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="800.0" y="946" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">确定性错误</text>
+<rect x="1060" y="904" width="650" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="1385.0" y="946" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">验证器也会出错</text>
+<rect x="1710" y="904" width="650" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="2035.0" y="946" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">Schema / Hash / Test</text>
+<rect x="2360" y="904" width="610" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="2665.0" y="946" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">Candidate / Provisional</text>
+<rect x="110" y="969" width="430" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="325.0" y="1011" font-family="Noto Sans CJK SC" font-size="17" font-weight="600" fill="#111827" text-anchor="middle">Intent Adapter</text>
+<rect x="540" y="969" width="520" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="800.0" y="1011" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">外部控制字段污染</text>
+<rect x="1060" y="969" width="650" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="1385.0" y="1011" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">不替代内部 Policy</text>
+<rect x="1710" y="969" width="650" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="2035.0" y="1011" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">Gateway Contract</text>
+<rect x="2360" y="969" width="610" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="2665.0" y="1011" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">Candidate / Provisional</text>
+<rect x="110" y="1034" width="430" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="325.0" y="1076" font-family="Noto Sans CJK SC" font-size="17" font-weight="600" fill="#111827" text-anchor="middle">真实路径验证</text>
+<rect x="540" y="1034" width="520" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="800.0" y="1076" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">完成声明失真</text>
+<rect x="1060" y="1034" width="650" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="1385.0" y="1076" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">不证明长期可靠</text>
+<rect x="1710" y="1034" width="650" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="2035.0" y="1076" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">正式入口 + 认证</text>
+<rect x="2360" y="1034" width="610" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="2665.0" y="1076" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">Candidate / Provisional</text>
+<rect x="110" y="1099" width="430" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="325.0" y="1141" font-family="Noto Sans CJK SC" font-size="17" font-weight="600" fill="#111827" text-anchor="middle">Git 单一真源</text>
+<rect x="540" y="1099" width="520" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="800.0" y="1141" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">版本与审计</text>
+<rect x="1060" y="1099" width="650" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="1385.0" y="1141" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">增加发布链成本</text>
+<rect x="1710" y="1099" width="650" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="2035.0" y="1141" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">Projection / Readback</text>
+<rect x="2360" y="1099" width="610" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="2665.0" y="1141" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">Candidate / Provisional</text>
+<rect x="110" y="1164" width="430" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="325.0" y="1206" font-family="Noto Sans CJK SC" font-size="17" font-weight="600" fill="#111827" text-anchor="middle">Phase-fit</text>
+<rect x="540" y="1164" width="520" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="800.0" y="1206" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">过度设计</text>
+<rect x="1060" y="1164" width="650" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="1385.0" y="1206" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">不替代长期规划</text>
+<rect x="1710" y="1164" width="650" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="2035.0" y="1206" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">最小探针 + 退出条件</text>
+<rect x="2360" y="1164" width="610" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="2665.0" y="1206" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">Candidate / Provisional</text>
+<rect x="110" y="1229" width="430" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="325.0" y="1271" font-family="Noto Sans CJK SC" font-size="17" font-weight="600" fill="#111827" text-anchor="middle">Stop Rules</text>
+<rect x="540" y="1229" width="520" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="800.0" y="1271" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">错误扩大</text>
+<rect x="1060" y="1229" width="650" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="1385.0" y="1271" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">不自动解决根因</text>
+<rect x="1710" y="1229" width="650" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="2035.0" y="1271" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">安全续跑点</text>
+<rect x="2360" y="1229" width="610" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="2665.0" y="1271" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">Candidate / Provisional</text>
+<rect x="110" y="1294" width="430" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="325.0" y="1336" font-family="Noto Sans CJK SC" font-size="17" font-weight="600" fill="#111827" text-anchor="middle">风险增量 Review</text>
+<rect x="540" y="1294" width="520" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="800.0" y="1336" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">审计成本</text>
+<rect x="1060" y="1294" width="650" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="1385.0" y="1336" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">高风险仍需完整 Review</text>
+<rect x="1710" y="1294" width="650" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="2035.0" y="1336" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">Diff + 风险等级</text>
+<rect x="2360" y="1294" width="610" height="65" rx="0" fill="#F8FAFC" stroke="#D5DFEC" stroke-width="1"/>
+<text x="2665.0" y="1336" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">Candidate / Provisional</text>
+<rect x="110" y="1359" width="430" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="325.0" y="1401" font-family="Noto Sans CJK SC" font-size="17" font-weight="600" fill="#111827" text-anchor="middle">Insight Maturity</text>
+<rect x="540" y="1359" width="520" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="800.0" y="1401" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">一次事件过度抽象</text>
+<rect x="1060" y="1359" width="650" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="1385.0" y="1401" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">不自动形成定律</text>
+<rect x="1710" y="1359" width="650" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="2035.0" y="1401" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">Occurrence / Review</text>
+<rect x="2360" y="1359" width="610" height="65" rx="0" fill="#fff" stroke="#D5DFEC" stroke-width="1"/>
+<text x="2665.0" y="1401" font-family="Noto Sans CJK SC" font-size="17" font-weight="400" fill="#111827" text-anchor="middle">Candidate / Provisional</text>
+<rect x="110" y="1450" width="2780" height="130" rx="16" fill="#FFF9E5" stroke="#EED79D" stroke-width="2"/>
+<text x="1500" y="1495" font-family="Noto Sans CJK SC" font-size="28" font-weight="700" fill="#9A6A00" text-anchor="middle">工程方法 = 可执行判断，而不是口号</text>
+<text x="1500" y="1540" font-family="Noto Sans CJK SC" font-size="21" font-weight="400" fill="#111827" text-anchor="middle">真实事件 → 证据 → 方法 → 检查项 → 重复验证 → 成熟度升级；未知时停止，避免把一次错误写成全局定律</text>
+</svg>

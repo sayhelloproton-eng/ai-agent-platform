@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3000" height="1688" viewBox="0 0 3000 1688">
+<defs><filter id="shadow" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#64748B" flood-opacity="0.12"/></filter><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#475569"/></marker></defs>
+<rect x="0" y="0" width="3000" height="1688" rx="0" fill="#FFFFFF" stroke="none" stroke-width="1"/>
+<text x="150" y="92" font-family="Noto Sans CJK SC" font-size="48" font-weight="700" fill="#111827" text-anchor="start">VIS-025｜Domain—Port—Adapter—Provider 边界模型</text>
+<text x="150" y="140" font-family="Noto Sans CJK SC" font-size="24" font-weight="400" fill="#526079" text-anchor="start">领域只依赖稳定能力契约；外部产品、协议、SDK 和 Provider 差异被 Adapter 隔离</text>
+<line x1="150" y1="166" x2="2850" y2="166" stroke="#D5DFEC" stroke-width="2"/>
+<circle cx="1500" cy="790" r="300" fill="#FFF6E7" stroke="#F2C98C" stroke-width="4"/>
+<text x="1500" y="730" font-family="Noto Sans CJK SC" font-size="42" font-weight="700" fill="#C96A00" text-anchor="middle">Domain Core</text>
+<text x="1500" y="785" font-family="Noto Sans CJK SC" font-size="24" font-weight="400" fill="#111827" text-anchor="middle">Task · Policy · Evidence</text>
+<text x="1500" y="830" font-family="Noto Sans CJK SC" font-size="24" font-weight="400" fill="#111827" text-anchor="middle">业务语言与不变量</text>
+<text x="1500" y="875" font-family="Noto Sans CJK SC" font-size="21" font-weight="400" fill="#526079" text-anchor="middle">不依赖 Codex / Feishu / SDK</text>
+<circle cx="1500" cy="350" r="120" fill="#FFF6E7" stroke="#F2C98C" stroke-width="3"/>
+<text x="1500" y="342" font-family="Noto Sans CJK SC" font-size="22" font-weight="700" fill="#C96A00" text-anchor="middle">Execution Port</text>
+<line x1="1500" y1="350" x2="1500" y2="790" stroke="#F2C98C" stroke-width="2" marker-end="url(#arrow)"/>
+<circle cx="1070" cy="520" r="120" fill="#ECF8F2" stroke="#B8DFC9" stroke-width="3"/>
+<text x="1070" y="512" font-family="Noto Sans CJK SC" font-size="22" font-weight="700" fill="#16835A" text-anchor="middle">Knowledge Port</text>
+<line x1="1070" y1="520" x2="1500" y2="790" stroke="#B8DFC9" stroke-width="2" marker-end="url(#arrow)"/>
+<circle cx="1930" cy="520" r="120" fill="#EAF3FF" stroke="#B9D4FA" stroke-width="3"/>
+<text x="1930" y="512" font-family="Noto Sans CJK SC" font-size="22" font-weight="700" fill="#1F63C6" text-anchor="middle">Result Port</text>
+<line x1="1930" y1="520" x2="1500" y2="790" stroke="#B9D4FA" stroke-width="2" marker-end="url(#arrow)"/>
+<circle cx="1050" cy="970" r="120" fill="#F4EEFF" stroke="#D7C2F5" stroke-width="3"/>
+<text x="1050" y="962" font-family="Noto Sans CJK SC" font-size="22" font-weight="700" fill="#6C35C9" text-anchor="middle">Policy Port</text>
+<line x1="1050" y1="970" x2="1500" y2="790" stroke="#D7C2F5" stroke-width="2" marker-end="url(#arrow)"/>
+<circle cx="1950" cy="970" r="120" fill="#EAF8FA" stroke="#B7E0E4" stroke-width="3"/>
+<text x="1950" y="962" font-family="Noto Sans CJK SC" font-size="22" font-weight="700" fill="#087B8A" text-anchor="middle">Notification </text>
+<text x="1950" y="994" font-family="Noto Sans CJK SC" font-size="22" font-weight="700" fill="#087B8A" text-anchor="middle">Port</text>
+<line x1="1950" y1="970" x2="1500" y2="790" stroke="#B7E0E4" stroke-width="2" marker-end="url(#arrow)"/>
+<circle cx="1500" cy="1180" r="120" fill="#FFF0F2" stroke="#F2B4BB" stroke-width="3"/>
+<text x="1500" y="1172" font-family="Noto Sans CJK SC" font-size="22" font-weight="700" fill="#C63D4A" text-anchor="middle">Artifact / </text>
+<text x="1500" y="1204" font-family="Noto Sans CJK SC" font-size="22" font-weight="700" fill="#C63D4A" text-anchor="middle">Evidence Port</text>
+<line x1="1500" y1="1180" x2="1500" y2="790" stroke="#F2B4BB" stroke-width="2" marker-end="url(#arrow)"/>
+<circle cx="106" cy="218" r="26" fill="#1F63C6" stroke="none" stroke-width="1"/>
+<text x="106" y="227" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#fff" text-anchor="middle">1</text>
+<text x="152" y="227" font-family="Noto Sans CJK SC" font-size="28" font-weight="700" fill="#1F63C6" text-anchor="start">Driving Adapters（驱动侧）</text>
+<rect x="90" y="270" width="560" height="165" rx="14" fill="#EAF3FF" stroke="#B9D4FA" stroke-width="2"/>
+<text x="112" y="308" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#1F63C6" text-anchor="start">ChatGPT Action</text>
+<text x="114" y="345" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="start">• HTTP / OpenAPI</text>
+<line x1="650" y1="352" x2="1120" y2="620" stroke="#B9D4FA" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="90" y="475" width="560" height="165" rx="14" fill="#EAF3FF" stroke="#B9D4FA" stroke-width="2"/>
+<text x="112" y="513" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#1F63C6" text-anchor="start">Web / CLI</text>
+<text x="114" y="550" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="start">• Command / Query</text>
+<line x1="650" y1="557" x2="1120" y2="660" stroke="#B9D4FA" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="90" y="680" width="560" height="165" rx="14" fill="#EAF3FF" stroke="#B9D4FA" stroke-width="2"/>
+<text x="112" y="718" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#1F63C6" text-anchor="start">Scheduler</text>
+<text x="114" y="755" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="start">• 定时或事件触发</text>
+<line x1="650" y1="762" x2="1120" y2="700" stroke="#B9D4FA" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="90" y="885" width="560" height="165" rx="14" fill="#EAF3FF" stroke="#B9D4FA" stroke-width="2"/>
+<text x="112" y="923" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#1F63C6" text-anchor="start">Test Harness</text>
+<text x="114" y="960" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="start">• 自动化验收</text>
+<line x1="650" y1="967" x2="1120" y2="740" stroke="#B9D4FA" stroke-width="2" marker-end="url(#arrow)"/>
+<circle cx="2326" cy="218" r="26" fill="#6C35C9" stroke="none" stroke-width="1"/>
+<text x="2326" y="227" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#fff" text-anchor="middle">2</text>
+<text x="2372" y="227" font-family="Noto Sans CJK SC" font-size="28" font-weight="700" fill="#6C35C9" text-anchor="start">Driven Adapters（被驱动侧）</text>
+<rect x="2350" y="270" width="560" height="165" rx="14" fill="#F4EEFF" stroke="#D7C2F5" stroke-width="2"/>
+<text x="2372" y="308" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#6C35C9" text-anchor="start">Codex / Work Adapter</text>
+<text x="2374" y="345" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="start">• Execution Port</text>
+<line x1="1880" y1="620" x2="2350" y2="352" stroke="#D7C2F5" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="2350" y="475" width="560" height="165" rx="14" fill="#F4EEFF" stroke="#D7C2F5" stroke-width="2"/>
+<text x="2372" y="513" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#6C35C9" text-anchor="start">Git / RAG Adapter</text>
+<text x="2374" y="550" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="start">• Knowledge / Artifact</text>
+<line x1="1880" y1="660" x2="2350" y2="557" stroke="#D7C2F5" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="2350" y="680" width="560" height="165" rx="14" fill="#F4EEFF" stroke="#D7C2F5" stroke-width="2"/>
+<text x="2372" y="718" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#6C35C9" text-anchor="start">Feishu Publisher</text>
+<text x="2374" y="755" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="start">• Projection / Readback</text>
+<line x1="1880" y1="700" x2="2350" y2="762" stroke="#D7C2F5" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="2350" y="885" width="560" height="165" rx="14" fill="#F4EEFF" stroke="#D7C2F5" stroke-width="2"/>
+<text x="2372" y="923" font-family="Noto Sans CJK SC" font-size="24" font-weight="700" fill="#6C35C9" text-anchor="start">MCP / External Service</text>
+<text x="2374" y="960" font-family="Noto Sans CJK SC" font-size="18" font-weight="400" fill="#111827" text-anchor="start">• Tool / Provider</text>
+<line x1="1880" y1="740" x2="2350" y2="967" stroke="#D7C2F5" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="700" y="1335" width="1600" height="235" rx="18" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="2"/>
+<text x="1500" y="1380" font-family="Noto Sans CJK SC" font-size="29" font-weight="700" fill="#111827" text-anchor="middle">防腐层与端口设计原则</text>
+<rect x="760" y="1420" width="460" height="50" rx="9" fill="#fff" stroke="#CBD5E1" stroke-width="1"/>
+<text x="990" y="1453" font-family="Noto Sans CJK SC" font-size="18" font-weight="600" fill="#111827" text-anchor="middle">Port 使用领域语言</text>
+<rect x="1260" y="1420" width="460" height="50" rx="9" fill="#fff" stroke="#CBD5E1" stroke-width="1"/>
+<text x="1490" y="1453" font-family="Noto Sans CJK SC" font-size="18" font-weight="600" fill="#111827" text-anchor="middle">Adapter 翻译外部模型</text>
+<rect x="1760" y="1420" width="460" height="50" rx="9" fill="#fff" stroke="#CBD5E1" stroke-width="1"/>
+<text x="1990" y="1453" font-family="Noto Sans CJK SC" font-size="18" font-weight="600" fill="#111827" text-anchor="middle">同一 Port 可有多个 Adapter</text>
+<rect x="760" y="1490" width="460" height="50" rx="9" fill="#fff" stroke="#CBD5E1" stroke-width="1"/>
+<text x="990" y="1523" font-family="Noto Sans CJK SC" font-size="18" font-weight="600" fill="#111827" text-anchor="middle">Domain 不出现 Provider Token / SDK 类型</text>
+<rect x="1260" y="1490" width="460" height="50" rx="9" fill="#fff" stroke="#CBD5E1" stroke-width="1"/>
+<text x="1490" y="1523" font-family="Noto Sans CJK SC" font-size="18" font-weight="600" fill="#111827" text-anchor="middle">先用测试 Adapter 验证核心</text>
+</svg>

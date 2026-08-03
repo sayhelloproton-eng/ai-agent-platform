@@ -1,0 +1,24 @@
+{
+  "visual_asset_id": "VIS-022",
+  "title": "Agent 系统统一语言与概念边界",
+  "version": 2,
+  "status": "accepted",
+  "target_document": "docs/knowledge/03_Agent工程架构思想与方法论/THY-004-DDD与Agent系统边界建模/README.md",
+  "target_document_asset_id": "THY-004",
+  "source_documents": [
+    "THY-004",
+    "DOM-001",
+    "REF-001"
+  ],
+  "storage_model": "document_bundle",
+  "source_svg": "docs/knowledge/03_Agent工程架构思想与方法论/THY-004-DDD与Agent系统边界建模/assets/VIS-022-Agent系统统一语言与概念边界.svg",
+  "preview_png": "docs/knowledge/03_Agent工程架构思想与方法论/THY-004-DDD与Agent系统边界建模/assets/VIS-022-Agent系统统一语言与概念边界.png",
+  "markdown_image": "./assets/VIS-022-Agent系统统一语言与概念边界.png",
+  "semantic_mirror_heading": "AI 可读语义镜像",
+  "width": 1672,
+  "height": 941,
+  "svg_sha256": "17bb7dc27b28d9345fc278f494943d100611ba1c2ee3593ef7ba4c161922327f",
+  "png_sha256": "3f0ef754da3578e39d229aab61c35299e5ea580f297556fe0e895791d88b2b69",
+  "visual_style": "openclaw-inspired-formal-whitepaper-card-grid-high-density-image-gen-preview",
+  "review_notes": "正文、术语、来源与信息地图先冻结；每个 Visual Asset 独立生成与 Review。OpenAI image_gen 生成的 PNG 已获用户接受，是本次权威预览；现有 SVG 保留为可编辑来源，但尚未与新 PNG 完全同步，后续须在独立批次刷新，执行器不得自行重绘。"
+}

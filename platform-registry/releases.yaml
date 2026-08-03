@@ -164,3 +164,13 @@ releases:
   repository_review_status: accepted
   publication_status: unpublished
   feishu_status: not_started
+
+- release_id: KNOWLEDGE-REBUILD-V2-BATCH-14
+  type: knowledge-review-and-authoring
+  status: completed
+  branch: knowledge-rebuild-v2
+  base_commit: d8213c407fc073dbbe28faf77f2e698702a4f0ea
+  content_scope: THY-001～THY-006, VIS-019～VIS-027, chapter rename, DDD boundary modeling, and formal single-visual generation fallback rules
+  repository_review_status: accepted
+  publication_status: unpublished
+  feishu_status: not_started

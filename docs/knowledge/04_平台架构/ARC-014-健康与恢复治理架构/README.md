@@ -68,4 +68,4 @@ Snapshot 保存 task_id、goal、version、status、已完成/剩余步骤、执
 
 - [ARC-009 轻量 Task Control](../ARC-009-轻量Task-Control架构/README.md)
 - [ARC-010 Execution Lane](../ARC-010-Execution-Lane执行通道模型/README.md)
-- [THY-005 可信 Agent 系统](../../03_架构思想与理论/THY-005-可信Agent系统基本原则.md)
+- [THY-005 可信 Agent 系统](../../03_Agent工程架构思想与方法论/THY-005-可信Agent系统基本原则/README.md)

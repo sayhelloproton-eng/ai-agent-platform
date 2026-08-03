@@ -1,0 +1,24 @@
+{
+  "visual_asset_id": "VIS-024",
+  "title": "Task Aggregate 状态、不变量与领域事件",
+  "version": 2,
+  "status": "accepted",
+  "target_document": "docs/knowledge/03_Agent工程架构思想与方法论/THY-004-DDD与Agent系统边界建模/README.md",
+  "target_document_asset_id": "THY-004",
+  "source_documents": [
+    "THY-004",
+    "ARC-009",
+    "DOM-001"
+  ],
+  "storage_model": "document_bundle",
+  "source_svg": "docs/knowledge/03_Agent工程架构思想与方法论/THY-004-DDD与Agent系统边界建模/assets/VIS-024-Task-Aggregate状态不变量与领域事件.svg",
+  "preview_png": "docs/knowledge/03_Agent工程架构思想与方法论/THY-004-DDD与Agent系统边界建模/assets/VIS-024-Task-Aggregate状态不变量与领域事件.png",
+  "markdown_image": "./assets/VIS-024-Task-Aggregate状态不变量与领域事件.png",
+  "semantic_mirror_heading": "AI 可读语义镜像",
+  "width": 1672,
+  "height": 941,
+  "svg_sha256": "3ca0289c8a85ecffa6f126cb4351833ff0a4eb4c118b4d79c9bf7eb69f4f3299",
+  "png_sha256": "fcdec9653b314fb0643f511a5c7d114bc4c6ce15071fe684074131a9cbeaee41",
+  "visual_style": "openclaw-inspired-formal-whitepaper-card-grid-high-density-image-gen-preview",
+  "review_notes": "正文、术语、来源与信息地图先冻结；每个 Visual Asset 独立生成与 Review。OpenAI image_gen 生成的 PNG 已获用户接受，是本次权威预览；现有 SVG 保留为可编辑来源，但尚未与新 PNG 完全同步，后续须在独立批次刷新，执行器不得自行重绘。"
+}

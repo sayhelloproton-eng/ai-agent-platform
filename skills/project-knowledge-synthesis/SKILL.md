@@ -115,3 +115,15 @@ Return `needs_evidence` or stop when:
 - `planner-executor-handoff` carries approved frozen artifacts to the Executor;
 - `engineering-document-authoring` turns approved synthesis into complete formal documents;
 - `planner-executor-handoff` applies approved artifacts through `implement_from_spec` or `apply_frozen_artifacts`.
+
+## Visual-heavy chapter synthesis guardrails
+
+For chapter-level synthesis that will later require formal diagrams, enforce the following sequence:
+
+1. freeze the article set and source inventory before any visual generation;
+2. produce, for each target document, a synthesis note containing: core question, retained facts, missing evidence, overlap, and a provisional visual information map;
+3. treat the visual information map as a planning artifact only — it is not yet an image-generation instruction;
+4. do not trigger formal image generation until the downstream authoring stage confirms that the document text and terminology are stable;
+5. when the scope is large, prefer phased outputs: article synthesis first, visual candidate list second, final package plan last.
+
+This prevents long mixed runs where synthesis, authoring, and visual production are entangled before the document meaning is stable.

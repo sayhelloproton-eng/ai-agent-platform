@@ -42,7 +42,7 @@ Git `skills/` 保存运行时真源；知识正文解释设计；Registry 关联
 
 ## 9. 关联文档
 
-- [THY-003 Agent + Skills 开发范式](../03_架构思想与理论/THY-003-Agent与Skills开发范式.md)
+- [THY-003 Agent + Skills 开发范式](../03_Agent工程架构思想与方法论/THY-003-Agent与Skills开发范式/README.md)
 - [CAP-008 平台核心能力模型与目标对齐：AGENTS、Rules、Skills、Hooks、MCP 与 Plugins](../02_基础产品与能力/CAP-008-平台核心能力模型与目标对齐/README.md)
 - [ARC-012 Agent-Profile与Skills资产化](../04_平台架构/ARC-012-Agent-Profile与Skills资产化/README.md)
 - [KNO-010 工程洞见提炼与注册表治理](../05_上下文与知识系统/KNO-010-工程洞见提炼与注册表治理.md)
