@@ -235,6 +235,9 @@ async function main() {
   const implementationSchema = JSON.parse(
     await read("platform-registry/schemas/implementation-status.schema.json"),
   );
+  const migrationSchema = JSON.parse(
+    await read("platform-registry/schemas/migration.schema.json"),
+  );
   const allowedAssetStatuses = new Set(
     assetSchema.properties.status.enum,
   );
@@ -249,6 +252,9 @@ async function main() {
   );
   const allowedImplementationStatuses = new Set(
     implementationSchema.properties.status.enum,
+  );
+  const allowedMigrationStatuses = new Set(
+    migrationSchema.properties.status.enum,
   );
 
   const assets = parseRecords(
@@ -500,15 +506,25 @@ async function main() {
   );
   const migration = parseTopLevelDocument(migrationText);
   const completedBatches = asArray(migration.completed_batches);
-  if (!["planned", "in_review", "completed", "blocked"].includes(migration.status)) {
+  if (!allowedMigrationStatuses.has(migration.status)) {
     fail(`migration has invalid status ${migration.status}`);
   }
   if (!migration.current_batch) fail("migration missing current_batch");
   if (completedBatches.includes(migration.current_batch)) {
     fail(`migration current_batch is already completed: ${migration.current_batch}`);
   }
-  if (migration.status === "in_review" && !migration.current_batch) {
-    fail("in_review migration requires current_batch");
+  if (["planned", "in_review"].includes(migration.status) &&
+      migration.current_batch === "none") {
+    fail(`${migration.status} migration requires a current batch other than none`);
+  }
+  if (migration.status === "completed" && migration.current_batch !== "none") {
+    fail("completed migration current_batch must be none");
+  }
+  if (!migration.next_batch) {
+    fail("migration missing next_batch");
+  }
+  if (!/^\s+feishu_write_allowed:\s+false\s*$/m.test(migrationText)) {
+    fail("migration feishu_write_allowed must remain false");
   }
   if (!isSafeRepositoryPath(migration.matrix, "migration matrix")) {
     fail("migration matrix path is invalid");

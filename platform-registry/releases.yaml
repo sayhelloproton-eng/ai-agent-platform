@@ -13,7 +13,7 @@ releases:
   branch: knowledge-rebuild-v2
   publication_status: unpublished
   feishu_status: not_started
-  notes: Knowledge content, registry migration, deterministic delivery governance, and ten formal visual assets completed and accepted; final integration is merged to main by Batch 10. Feishu publication remains not started.
+  notes: Knowledge content, registry migration, deterministic delivery governance, and formal Visual assets are materialized under the Visual Registry. Batch 10 records the historical main integration; later review continuations completed the Canonical docs/knowledge/00～10 content closure. Feishu publication remains unpublished and not started.
   repository_review_status: accepted
   implementation_commit: f377303025a260def940206ac264668913f6618b
   asset_implementation_commit: d2c628b5f1b201eea9f267d60ca92a03898525ba
@@ -164,6 +164,7 @@ releases:
   repository_review_status: accepted
   publication_status: unpublished
   feishu_status: not_started
+  implementation_commit: d8213c407fc073dbbe28faf77f2e698702a4f0ea
 
 - release_id: KNOWLEDGE-REBUILD-V2-BATCH-14
   type: knowledge-review-and-authoring
@@ -172,5 +173,83 @@ releases:
   base_commit: d8213c407fc073dbbe28faf77f2e698702a4f0ea
   content_scope: THY-001～THY-006, VIS-019～VIS-027, chapter rename, DDD boundary modeling, and formal single-visual generation fallback rules
   repository_review_status: accepted
+  publication_status: unpublished
+  feishu_status: not_started
+  implementation_commit: 9ea5f397c4e2d4db5ade60e5b30bfc8fd8610cf5
+
+- release_id: KNOWLEDGE-REBUILD-V2-BATCH-15
+  type: knowledge-review-and-authoring
+  status: completed
+  branch: knowledge-rebuild-v2
+  base_commit: 9ea5f397c4e2d4db5ade60e5b30bfc8fd8610cf5
+  content_scope: ARC-001 and ARC-016 platform architecture convergence, implementation mapping, historical architecture archival, and formal visuals
+  repository_review_status: accepted
+  publication_status: unpublished
+  feishu_status: not_started
+  implementation_commit: da818cad26a87afc0a4dc8cee3f251c2d1ca4bb8
+
+- release_id: KNOWLEDGE-REBUILD-V2-BATCH-16
+  type: knowledge-review-and-authoring
+  status: completed
+  branch: knowledge-rebuild-v2
+  base_commit: da818cad26a87afc0a4dc8cee3f251c2d1ca4bb8
+  content_scope: Context and knowledge system Canonical documents, governed context lifecycle, distribution, memory feedback, and six formal visuals
+  repository_review_status: accepted
+  publication_status: unpublished
+  feishu_status: not_started
+  implementation_commit: 8af8e249ea1fe2c12222f05e386345b5e5807e99
+
+- release_id: KNOWLEDGE-REBUILD-V2-BATCH-17
+  type: knowledge-review-and-authoring
+  status: completed
+  branch: knowledge-rebuild-v2
+  base_commit: 8af8e249ea1fe2c12222f05e386345b5e5807e99
+  content_scope: Agent asset system Canonical documents, governed Role/Profile/Skill/Knowledge Pack boundaries, legacy asset retention, and VIS-035
+  repository_review_status: accepted
+  publication_status: unpublished
+  feishu_status: not_started
+  implementation_commit: 9cbcda8d95478ae5a3a3b4a668ea4c42753add8f
+
+- release_id: KNOWLEDGE-REBUILD-V2-BATCH-18
+  type: knowledge-review-and-authoring
+  status: completed
+  branch: knowledge-rebuild-v2
+  base_commit: 9cbcda8d95478ae5a3a3b4a668ea4c42753add8f
+  content_scope: Workflow and project governance Canonical bundles, task contract, execution, checkpoint, approval, publication, and baseline governance
+  repository_review_status: accepted
+  publication_status: unpublished
+  feishu_status: not_started
+  implementation_commit: 93da9612e237f94cc6044d85ac7a2f0d7c37b203
+
+- release_id: KNOWLEDGE-REBUILD-V2-BATCH-19
+  type: knowledge-review-and-authoring
+  status: completed
+  branch: knowledge-rebuild-v2
+  base_commit: 93da9612e237f94cc6044d85ac7a2f0d7c37b203
+  content_scope: Experiment and portfolio evidence system, recovery observations, project story, capability evidence, and result navigation
+  repository_review_status: accepted
+  publication_status: unpublished
+  feishu_status: not_started
+  implementation_commit: a537e36a975893c75b91e051d418e023d5330ab5
+
+- release_id: KNOWLEDGE-REBUILD-V2-BATCH-20
+  type: knowledge-review-and-authoring
+  status: completed
+  branch: knowledge-rebuild-v2
+  base_commit: a537e36a975893c75b91e051d418e023d5330ab5
+  content_scope: Terminology and external source governance consolidation, Reference Bundle closure, Registry supersession, and active navigation repair
+  repository_review_status: accepted
+  publication_status: unpublished
+  feishu_status: not_started
+  implementation_commit: 180ee022af2ac0907bc2b3d99eb4ab86a41decc8
+
+- release_id: KNOWLEDGE-REBUILD-V2-BATCH-21
+  type: final-audit-control-plane-closure
+  status: completed
+  branch: main
+  base_commit: 180ee022af2ac0907bc2b3d99eb4ab86a41decc8
+  implementation_commit: beb4a4646a361ae253c110fd270df8fcb212db81
+  content_scope: Context alignment, visual main-registry closure, canonical navigation repair, evidence tightening, projection policy preparation, and deterministic cross-registry validation
+  repository_review_status: pending_chat_review
   publication_status: unpublished
   feishu_status: not_started

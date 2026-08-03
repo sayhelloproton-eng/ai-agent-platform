@@ -1,5 +1,5 @@
 version: 1
-baseline_commit: d8213c407fc073dbbe28faf77f2e698702a4f0ea
+baseline_commit: beb4a4646a361ae253c110fd270df8fcb212db81
 capabilities:
 - id: CAP-RUNTIME-STATUS
   status: verified

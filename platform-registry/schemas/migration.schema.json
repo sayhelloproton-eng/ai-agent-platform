@@ -50,7 +50,54 @@
       "minLength": 1
     },
     "rules": {
-      "type": "object"
+      "type": "object",
+      "required": [
+        "feishu_write_allowed"
+      ],
+      "properties": {
+        "feishu_write_allowed": {
+          "const": false
+        }
+      }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "completed"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "current_batch": {
+            "const": "none"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "planned",
+              "in_review"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "current_batch": {
+            "not": {
+              "const": "none"
+            }
+          }
+        }
+      }
+    }
+  ]
 }
