@@ -634,9 +634,6 @@ relations:
 - from: ARC-015
   type: depends_on
   to: CAP-008
-- from: ARC-015
-  type: derived_from
-  to: REF-003
 - from: APP-GATEWAY
   type: validated_by
   to: EXP-005
@@ -712,39 +709,6 @@ relations:
 - from: PRT-006
   type: depends_on
   to: PRT-005
-- from: REF-001
-  type: explains
-  to: ARC-008
-- from: REF-001
-  type: explains
-  to: AGT-002
-- from: REF-001
-  type: explains
-  to: KNO-007
-- from: REF-002
-  type: explains
-  to: CAP-001
-- from: REF-002
-  type: explains
-  to: CAP-006
-- from: REF-003
-  type: explains
-  to: ARC-015
-- from: REF-003
-  type: derived_from
-  to: DEC-001
-- from: REF-004
-  type: depends_on
-  to: ARC-016
-- from: REF-004
-  type: depends_on
-  to: PRT-003
-- from: REF-005
-  type: depends_on
-  to: KNO-007
-- from: REF-005
-  type: depends_on
-  to: PRT-006
 - from: CAP-008
   type: explains
   to: SKILL-PLANNER-EXECUTOR-HANDOFF
@@ -756,9 +720,6 @@ relations:
   to: SKILL-PLANNER-EXECUTOR-HANDOFF
 - from: ARC-001
   type: produces
-  to: VIS-001
-- from: REF-004
-  type: explains
   to: VIS-001
 - from: VIS-001
   type: derived_from
@@ -772,9 +733,6 @@ relations:
 - from: EXP-005
   type: produces
   to: VIS-002
-- from: REF-004
-  type: explains
-  to: VIS-002
 - from: VIS-002
   type: derived_from
   to: EXP-005
@@ -784,26 +742,17 @@ relations:
 - from: ARC-008
   type: produces
   to: VIS-003
-- from: REF-004
-  type: explains
-  to: VIS-003
 - from: VIS-003
   type: derived_from
   to: ARC-008
 - from: ARC-009
   type: produces
   to: VIS-004
-- from: REF-004
-  type: explains
-  to: VIS-004
 - from: VIS-004
   type: derived_from
   to: ARC-009
 - from: ARC-010
   type: produces
-  to: VIS-005
-- from: REF-004
-  type: explains
   to: VIS-005
 - from: VIS-005
   type: derived_from
@@ -813,9 +762,6 @@ relations:
   to: ARC-015
 - from: ARC-012
   type: produces
-  to: VIS-006
-- from: REF-004
-  type: explains
   to: VIS-006
 - from: VIS-006
   type: derived_from
@@ -829,17 +775,11 @@ relations:
 - from: ARC-013
   type: produces
   to: VIS-007
-- from: REF-004
-  type: explains
-  to: VIS-007
 - from: VIS-007
   type: derived_from
   to: ARC-013
 - from: ARC-014
   type: produces
-  to: VIS-008
-- from: REF-004
-  type: explains
   to: VIS-008
 - from: VIS-008
   type: derived_from
@@ -850,9 +790,6 @@ relations:
 - from: ARC-017
   type: produces
   to: VIS-009
-- from: REF-004
-  type: explains
-  to: VIS-009
 - from: VIS-009
   type: derived_from
   to: ARC-017
@@ -861,9 +798,6 @@ relations:
   to: WFL-011
 - from: KNO-005
   type: produces
-  to: VIS-010
-- from: REF-004
-  type: explains
   to: VIS-010
 - from: VIS-010
   type: derived_from
@@ -1384,3 +1318,30 @@ relations:
 - from: SKL-005
   type: superseded_by
   to: AGT-005
+- from: ARC-015
+  type: derived_from
+  to: REF-002
+- from: REF-001
+  type: explains
+  to: THY-004
+- from: REF-001
+  type: explains
+  to: ARC-001
+- from: REF-001
+  type: explains
+  to: ARC-002
+- from: REF-001
+  type: explains
+  to: AGT-001
+- from: REF-001
+  type: explains
+  to: WFL-001
+- from: REF-002
+  type: explains
+  to: CAP-001
+- from: REF-002
+  type: explains
+  to: CAP-006
+- from: REF-003
+  type: superseded_by
+  to: REF-002

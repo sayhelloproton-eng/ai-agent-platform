@@ -103,7 +103,10 @@ npm run verify
 - 失败和限制不隐藏；
 - 所有外部链接和 Demo 入口回读。
 
-## 10. 关联资产
+## 10. 关联资产与索引入口
 
-- [REF-004 架构图索引](../../10_术语与来源/REF-004-架构图索引.md)
-- [REF-005 知识文章与仓库资产索引](../../10_术语与来源/REF-005-知识文章与仓库资产索引.md)
+- [REF-001 核心术语与概念边界](../../10_术语与来源/REF-001-核心术语与概念边界/README.md)
+- [REF-002 外部来源与技术参考治理](../../10_术语与来源/REF-002-外部来源与技术参考治理/README.md)
+- [知识根 README](../../README.md)
+- [Platform Registry](../../../../platform-registry/README.md)
+- [Visual Asset Registry](../../../../platform-registry/visual-assets/README.md)
