@@ -122,38 +122,41 @@ assets:
   publication_status: unpublished
   migration_state: complete
 - asset_id: WFL-001
-  title: Knowledge Lifecycle
+  title: 工作流与项目治理总体模型
   asset_type: workflow
-  status: implemented
-  evidence_level: observed
+  status: accepted
+  evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/07_工作流与项目治理/WFL-001-知识生命周期与飞书发布.md
-  target_path:
-  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-001-知识生命周期与飞书发布.md
+  current_path: docs/knowledge/07_工作流与项目治理/WFL-001-工作流与项目治理总体模型/README.md
+  target_path: null
+  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-001-工作流与项目治理总体模型/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: WFL-002
-  title: ChatGPT Task Codex Git
+  title: 目标进入、决策规划与任务分解
   asset_type: workflow
-  status: proposed
-  evidence_level: hypothesis
+  status: accepted
+  evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/07_工作流与项目治理/WFL-002-ChatGPT任务到Codex与Git.md
-  target_path:
-  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-002-ChatGPT任务到Codex与Git.md
+  current_path: docs/knowledge/07_工作流与项目治理/WFL-002-目标进入决策规划与任务分解/README.md
+  target_path: null
+  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-002-目标进入决策规划与任务分解/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: WFL-003
-  title: AI Video Workflow
+  title: AI 视频工作流（已并入产品孵化与专项业务工作流框架）
   asset_type: workflow
-  status: proposed
-  evidence_level: hypothesis
-  materialized: true
-  current_path: docs/knowledge/07_工作流与项目治理/WFL-003-AI视频工作流.md
-  target_path:
-  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-003-AI视频工作流.md
+  status: superseded
+  evidence_level: decided
+  materialized: false
+  current_path: null
+  target_path: docs/knowledge/07_工作流与项目治理/WFL-011-产品孵化与专项业务工作流框架/README.md
+  canonical_path: null
   publication_status: unpublished
   migration_state: complete
+  superseded_by:
+  - WFL-011
+  - PRD-006
 - asset_id: ARC-002
   title: Context and Knowledge System Architecture
   asset_type: architecture
@@ -386,16 +389,17 @@ assets:
   publication_status: unpublished
   migration_state: complete
 - asset_id: WFL-004
-  title: Multi-Model Agent Execution Governance and Token Budget
+  title: 多模型 Agent 执行治理与 Token 预算（已并入执行通道）
   asset_type: workflow
-  status: proposed
+  status: superseded
   evidence_level: decided
-  materialized: true
-  current_path: docs/knowledge/07_工作流与项目治理/WFL-004-多模型Agent执行治理与Token预算.md
-  target_path:
-  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-004-多模型Agent执行治理与Token预算.md
+  materialized: false
+  current_path: null
+  target_path: docs/knowledge/07_工作流与项目治理/WFL-006-执行通道验证复审与集成/README.md
+  canonical_path: null
   publication_status: unpublished
   migration_state: complete
+  superseded_by: WFL-006
 - asset_id: SKL-002
   title: Engineering Insight Distillation Skill
   asset_type: skill
@@ -1098,91 +1102,92 @@ assets:
   publication_status: unpublished
   migration_state: complete
 - asset_id: WFL-005
-  title: 多角色任务合同
+  title: 任务合同与多角色协作
   asset_type: workflow
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/07_工作流与项目治理/WFL-005-多角色任务合同.md
-  target_path:
-  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-005-多角色任务合同.md
+  current_path: docs/knowledge/07_工作流与项目治理/WFL-005-任务合同与多角色协作/README.md
+  target_path: null
+  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-005-任务合同与多角色协作/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: WFL-006
-  title: 规划实现测试复审与集成
+  title: 执行通道、验证复审与集成
   asset_type: workflow
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/07_工作流与项目治理/WFL-006-规划实现测试复审与集成.md
-  target_path:
-  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-006-规划实现测试复审与集成.md
+  current_path: docs/knowledge/07_工作流与项目治理/WFL-006-执行通道验证复审与集成/README.md
+  target_path: null
+  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-006-执行通道验证复审与集成/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: WFL-007
-  title: 上下文Checkpoint与任务移交
+  title: 任务状态、Checkpoint、移交与恢复
   asset_type: workflow
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/07_工作流与项目治理/WFL-007-上下文Checkpoint与任务移交.md
-  target_path:
-  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-007-上下文Checkpoint与任务移交.md
+  current_path: docs/knowledge/07_工作流与项目治理/WFL-007-任务状态Checkpoint移交与恢复/README.md
+  target_path: null
+  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-007-任务状态Checkpoint移交与恢复/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: WFL-008
-  title: 任务暂停恢复与安全终止
+  title: 任务暂停恢复与安全终止（已并入任务状态与恢复）
   asset_type: workflow
-  status: accepted
+  status: superseded
   evidence_level: decided
-  materialized: true
-  current_path: docs/knowledge/07_工作流与项目治理/WFL-008-任务暂停恢复与安全终止.md
-  target_path:
-  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-008-任务暂停恢复与安全终止.md
+  materialized: false
+  current_path: null
+  target_path: docs/knowledge/07_工作流与项目治理/WFL-007-任务状态Checkpoint移交与恢复/README.md
+  canonical_path: null
   publication_status: unpublished
   migration_state: complete
+  superseded_by: WFL-007
 - asset_id: WFL-009
-  title: 审批工作流
+  title: 审批、权限校验与副作用治理
   asset_type: workflow
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/07_工作流与项目治理/WFL-009-审批工作流.md
-  target_path:
-  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-009-审批工作流.md
+  current_path: docs/knowledge/07_工作流与项目治理/WFL-009-审批权限校验与副作用治理/README.md
+  target_path: null
+  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-009-审批权限校验与副作用治理/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: WFL-010
-  title: 资产变更与关联同步工作流
+  title: 资产变更、发布与关联同步工作流
   asset_type: workflow
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/07_工作流与项目治理/WFL-010-资产变更与关联同步工作流.md
-  target_path:
-  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-010-资产变更与关联同步工作流.md
+  current_path: docs/knowledge/07_工作流与项目治理/WFL-010-资产变更发布与关联同步工作流/README.md
+  target_path: null
+  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-010-资产变更发布与关联同步工作流/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: WFL-011
-  title: 新产品孵化与资产生成工作流
+  title: 产品孵化与专项业务工作流框架
   asset_type: workflow
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/07_工作流与项目治理/WFL-011-新产品孵化与资产生成工作流.md
-  target_path:
-  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-011-新产品孵化与资产生成工作流.md
+  current_path: docs/knowledge/07_工作流与项目治理/WFL-011-产品孵化与专项业务工作流框架/README.md
+  target_path: null
+  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-011-产品孵化与专项业务工作流框架/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: WFL-012
-  title: 项目状态汇总与阶段汇报
+  title: 项目状态、阶段复审与基线治理
   asset_type: workflow
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/07_工作流与项目治理/WFL-012-项目状态汇总与阶段汇报.md
-  target_path:
-  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-012-项目状态汇总与阶段汇报.md
+  current_path: docs/knowledge/07_工作流与项目治理/WFL-012-项目状态阶段复审与基线治理/README.md
+  target_path: null
+  canonical_path: docs/knowledge/07_工作流与项目治理/WFL-012-项目状态阶段复审与基线治理/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: EXP-005

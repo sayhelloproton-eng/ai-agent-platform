@@ -42,5 +42,5 @@ Agent 可以在授权范围内拆分低风险子任务，但不能自行增加�
 - [ARC-009 轻量Task-Control架构](../04_平台架构/ARC-001-ai-agent-platform总体架构/README.md)
 - [ARC-010 Execution-Lane执行通道模型](../04_平台架构/ARC-001-ai-agent-platform总体架构/README.md)
 - [AGT-001 Agent角色体系](AGT-001-Agent角色体系.md)
-- [WFL-005 多角色任务合同](../07_工作流与项目治理/WFL-005-多角色任务合同.md)
-- [WFL-006 规划实现测试复审与集成](../07_工作流与项目治理/WFL-006-规划实现测试复审与集成.md)
+- [WFL-005 任务合同与多角色协作](../07_工作流与项目治理/WFL-005-任务合同与多角色协作/README.md)
+- [WFL-006 执行通道、验证复审与集成](../07_工作流与项目治理/WFL-006-执行通道验证复审与集成/README.md)

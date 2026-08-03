@@ -52,24 +52,6 @@ relations:
 - from: SKL-001
   type: validated_by
   to: EXP-002
-- from: WFL-001
-  type: implements
-  to: ARC-002
-- from: WFL-001
-  type: depends_on
-  to: SKL-001
-- from: WFL-002
-  type: implements
-  to: ARC-003
-- from: WFL-002
-  type: depends_on
-  to: DOM-001
-- from: WFL-003
-  type: implements
-  to: ARC-003
-- from: WFL-003
-  type: depends_on
-  to: DOM-001
 - from: ARC-002
   type: decided_by
   to: ADR-002
@@ -187,9 +169,6 @@ relations:
 - from: ARC-005
   type: governed_by
   to: ADR-002
-- from: WFL-001
-  type: implements
-  to: SOL-002
 - from: CTX-007
   type: explains
   to: ARC-001
@@ -225,7 +204,7 @@ relations:
   to: CAP-001
 - from: CAP-006
   type: derived_from
-  to: WFL-004
+  to: WFL-006
 - from: CAP-008
   type: derived_from
   to: PRD-007
@@ -282,7 +261,7 @@ relations:
   to: INS-001
 - from: THY-006
   type: derived_from
-  to: WFL-004
+  to: WFL-006
 - from: THY-006
   type: derived_from
   to: EXP-004
@@ -375,7 +354,7 @@ relations:
   to: KNO-002
 - from: KNO-003
   type: derived_from
-  to: WFL-004
+  to: WFL-006
 - from: KNO-004
   type: depends_on
   to: CAP-002
@@ -586,15 +565,6 @@ relations:
 - from: WFL-007
   type: depends_on
   to: ARC-014
-- from: WFL-008
-  type: depends_on
-  to: WFL-007
-- from: WFL-008
-  type: depends_on
-  to: ARC-014
-- from: WFL-008
-  type: depends_on
-  to: ARC-010
 - from: WFL-009
   type: depends_on
   to: ARC-013
@@ -682,9 +652,6 @@ relations:
 - from: ARC-014
   type: validated_by
   to: EXP-009
-- from: WFL-008
-  type: validated_by
-  to: EXP-009
 - from: PRT-003
   type: derived_from
   to: ARC-016
@@ -755,9 +722,6 @@ relations:
   type: governed_by
   to: SKILL-PLANNER-EXECUTOR-HANDOFF
 - from: WFL-006
-  type: uses_skill
-  to: SKILL-PLANNER-EXECUTOR-HANDOFF
-- from: WFL-008
   type: uses_skill
   to: SKILL-PLANNER-EXECUTOR-HANDOFF
 - from: ARC-001
@@ -874,9 +838,6 @@ relations:
 - from: VIS-010
   type: derived_from
   to: KNO-005
-- from: VIS-010
-  type: derived_from
-  to: WFL-001
 - from: VIS-010
   type: derived_from
   to: ARC-005
@@ -1063,55 +1024,42 @@ relations:
 - from: KNO-004
   type: depends_on
   to: CAP-001
-
 - from: VIS-019
   type: explains
   to: THY-001
-
 - from: VIS-020
   type: explains
   to: THY-002
-
 - from: VIS-021
   type: explains
   to: THY-003
-
 - from: VIS-022
   type: explains
   to: THY-004
-
 - from: VIS-023
   type: explains
   to: THY-004
-
 - from: VIS-024
   type: explains
   to: THY-004
-
 - from: VIS-025
   type: explains
   to: THY-004
-
 - from: VIS-026
   type: explains
   to: THY-005
-
 - from: VIS-027
   type: explains
   to: THY-006
-
 - from: THY-001
   type: depends_on
   to: CAP-008
-
 - from: THY-004
   type: derived_from
   to: DOM-001
-
 - from: THY-004
   type: explains
   to: ARC-008
-
 - from: THY-005
   type: depends_on
   to: THY-004
@@ -1331,3 +1279,45 @@ relations:
 - from: KNO-011
   type: consumes
   to: ARC-006
+- from: WFL-001
+  type: depends_on
+  to: ARC-001
+- from: WFL-001
+  type: depends_on
+  to: ARC-006
+- from: WFL-002
+  type: depends_on
+  to: WFL-001
+- from: WFL-002
+  type: depends_on
+  to: ARC-006
+- from: WFL-005
+  type: depends_on
+  to: WFL-002
+- from: WFL-006
+  type: depends_on
+  to: WFL-009
+- from: WFL-009
+  type: depends_on
+  to: WFL-007
+- from: WFL-010
+  type: depends_on
+  to: WFL-006
+- from: WFL-011
+  type: depends_on
+  to: WFL-001
+- from: WFL-003
+  type: superseded_by
+  to: WFL-011
+- from: WFL-003
+  type: superseded_by
+  to: PRD-006
+- from: WFL-004
+  type: superseded_by
+  to: WFL-006
+- from: WFL-008
+  type: superseded_by
+  to: WFL-007
+- from: WFL-007
+  type: validated_by
+  to: EXP-009

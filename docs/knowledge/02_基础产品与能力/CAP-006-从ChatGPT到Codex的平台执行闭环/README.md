@@ -357,4 +357,4 @@ Visual Asset ID：`VIS-018`
 - [CAP-002 ChatGPT 生态组件配置与能力差异](../CAP-002-生态组件配置与能力差异/README.md)
 - [CAP-008 平台核心能力模型与目标对齐](../CAP-008-平台核心能力模型与目标对齐/README.md)
 - [ARC-001 平台总体架构](../../04_平台架构/ARC-001-ai-agent-platform总体架构/README.md)
-- [WFL-004 多模型 Agent 执行治理与 Token 预算](../../07_工作流与项目治理/WFL-004-多模型Agent执行治理与Token预算.md)
+- [WFL-006 执行通道、验证复审与集成](../../07_工作流与项目治理/WFL-006-执行通道验证复审与集成/README.md)

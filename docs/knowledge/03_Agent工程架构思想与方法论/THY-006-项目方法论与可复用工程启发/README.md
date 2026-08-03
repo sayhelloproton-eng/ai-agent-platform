@@ -373,7 +373,7 @@ candidate
 - [`project-knowledge-synthesis`](../../../../skills/project-knowledge-synthesis/SKILL.md)
 - [`engineering-document-authoring`](../../../../skills/engineering-document-authoring/SKILL.md)
 - [EXP-005 Custom GPT Actions 链路实验](../../08_实验与复盘/EXP-005-Custom-GPT-Actions链路实验/README.md)
-- [WFL-004 多模型执行治理与 Token 预算](../../07_工作流与项目治理/WFL-004-多模型Agent执行治理与Token预算.md)
+- [WFL-006 执行通道、验证复审与集成](../../07_工作流与项目治理/WFL-006-执行通道验证复审与集成/README.md)
 
 ## 19. 结论
 
