@@ -10,7 +10,7 @@ Formal Baseline:
 Working Branch:
   Branch: knowledge-rebuild-v2
   Current HEAD: read from Git at runtime
-  Last Verified Review Source: d8213c407fc073dbbe28faf77f2e698702a4f0ea
+  Last Verified Review Source: 9ea5f397c4e2d4db5ade60e5b30bfc8fd8610cf5
 
 Phase:
   2.5 — Human Content Review and Governance Refinement
@@ -69,19 +69,20 @@ Document-ID-title/
 - Feishu URL、Media Token 与 Block ID 不回写 Git；
 - Git 和 Feishu 要求语义等价，不要求物理语法相同。
 
-当前 27 个正式视觉资产与对应文档共置；本轮新增 VIS-019～VIS-027，用于表达平台化责任、复杂度演进、Agent / Skill 边界、DDD 统一语言与限界上下文、Task Aggregate、Port / Adapter、可信链和工程方法。
+当前视觉资产 Registry 扩展到 29 个 ID。`VIS-028 v2` 与 `VIS-029 v2` 使用用户已确认的正式 PNG：VIS-028 保留总体架构与执行路径构图并补入 DDD 限界上下文映射，VIS-029 沿用此前确认的分阶段 MVP 路线图；包内 SVG 仅作为可编辑参考。旧 `VIS-001`、`VIS-003`～`VIS-009` 转入平台架构历史 Document Bundle，保留语义但不再作为当前架构入口。
 
 ## Current Review State
 
 - `00_项目入口`、`01_产品体系`、`02_基础产品与能力` 与 `03_Agent工程架构思想与方法论` 已经综合收敛并完成落库；
-- 当前主线继续逐目录正式内容人工 Review；
+- `04_平台架构` 已纠偏收敛为 ARC-001 与 ARC-016 两篇 Canonical 文档：ARC-001 纳入 DDD、运行、部署、信任和实现映射；ARC-016 纳入能力依赖、并行不变量、阶段门和证据等级。旧观点和旧图转入可追溯技术归档；
+- 当前主线进入 `05_上下文与知识系统` 正式内容人工 Review；
 - Skill 组合治理、Document Bundle、Human-first / AI-lossless 与 Publisher 本地图片转换规则已完成落库；
 - Feishu 最终覆盖发布、发布回读和整仓验收尚未开始；
 - 本次治理不执行 Feishu 写入。
 
 ## Next Actions
 
-1. 继续 `docs/knowledge/04_平台架构/` 人工 Review；
+1. 继续 `docs/knowledge/05_上下文与知识系统/` 人工 Review；
 2. 按目录生成冻结完整文件，由 Executor 机械落库；
 3. 全部正文 Review 后执行 Registry / 链接 / 文档包 / 图片语义镜像总验收；
 4. 独立授权 Git → Feishu 覆盖发布并回读；

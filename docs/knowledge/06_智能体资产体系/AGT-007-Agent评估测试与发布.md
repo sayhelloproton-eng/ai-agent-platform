@@ -49,7 +49,7 @@ Instructions、Knowledge、Tool、模型或 Policy 变化都可能触发回归�
 ## 9. 关联文档
 
 - [THY-005 可信 Agent 系统基本原则](../03_Agent工程架构思想与方法论/THY-005-可信Agent系统基本原则/README.md)
-- [ARC-013 审批证据与副作用账本](../04_平台架构/ARC-013-审批证据与副作用账本/README.md)
+- [ARC-013 审批证据与副作用账本](../../technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/README.md)
 - [KNO-010 工程洞见提炼与注册表治理](../05_上下文与知识系统/KNO-010-工程洞见提炼与注册表治理.md)
 - [AGT-002 Agent-Profile设计规范](AGT-002-Agent-Profile设计规范.md)
 - [AGT-005 Agent-Skill设计与治理](AGT-005-Agent-Skill设计与治理.md)

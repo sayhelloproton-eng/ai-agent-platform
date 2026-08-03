@@ -1,0 +1,26 @@
+{
+  "visual_asset_id": "VIS-029",
+  "title": "能力依赖、多任务并行与分阶段 MVP 路线图",
+  "version": 2,
+  "status": "accepted",
+  "target_document": "docs/knowledge/04_平台架构/ARC-016-能力依赖多任务并行与分阶段MVP路线图/README.md",
+  "target_document_asset_id": "ARC-016",
+  "source_documents": [
+    "ARC-016",
+    "ARC-007",
+    "ARC-011",
+    "ARC-013",
+    "ARC-014",
+    "ARC-015"
+  ],
+  "source_svg": "docs/knowledge/04_平台架构/ARC-016-能力依赖多任务并行与分阶段MVP路线图/assets/VIS-029-能力依赖多任务并行与分阶段MVP路线图.svg",
+  "preview_png": "docs/knowledge/04_平台架构/ARC-016-能力依赖多任务并行与分阶段MVP路线图/assets/VIS-029-能力依赖多任务并行与分阶段MVP路线图.png",
+  "width": 1086,
+  "height": 1448,
+  "svg_sha256": "092d08cfb55c57c2c9de5af1baee8a2add309255756fac42d5d51203323ee6ae",
+  "png_sha256": "66771a050406bdf8cfbb752488857ff0fac6e33aadb69edf192dc00995d2b747",
+  "review_notes": "用户确认沿用此前的能力依赖、多任务并行与分阶段 MVP 路线图 PNG。PNG 为本轮人工 Review 权威资产；SVG 仅保留为可编辑参考，后续如需对齐须单独 Review。",
+  "storage_model": "document_bundle",
+  "markdown_image": "./assets/VIS-029-能力依赖多任务并行与分阶段MVP路线图.png",
+  "semantic_mirror_heading": "AI 可读语义镜像"
+}

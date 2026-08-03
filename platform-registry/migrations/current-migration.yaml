@@ -22,8 +22,9 @@ completed_batches:
 - 12-product-system-review-and-authoring
 - 13-basic-products-and-capabilities-review
 - 14-agent-engineering-architecture-methodology-review
-current_batch: 15-platform-architecture-review
-next_batch: 继续 docs/knowledge/04_平台架构及后续目录人工 Review；全部正文完成后独立授权 Feishu 单向覆盖发布、发布回读和最终整仓验收。
+- 15-platform-architecture-review
+current_batch: 16-context-and-knowledge-system-review
+next_batch: 继续 docs/knowledge/05_上下文与知识系统及后续目录人工 Review；全部正文完成后独立授权 Feishu 单向覆盖发布、发布回读和最终整仓验收。
 matrix: platform-registry/migrations/asset-migration-matrix.csv
 rules:
   preserve_stable_ids: true

@@ -1,0 +1,26 @@
+{
+  "visual_asset_id": "VIS-028",
+  "title": "ai-agent-platform 总体架构与执行路径",
+  "version": 2,
+  "status": "accepted",
+  "target_document": "docs/knowledge/04_平台架构/ARC-001-ai-agent-platform总体架构/README.md",
+  "target_document_asset_id": "ARC-001",
+  "source_documents": [
+    "ARC-001",
+    "ARC-008",
+    "ARC-009",
+    "ARC-010",
+    "THY-004",
+    "THY-005"
+  ],
+  "source_svg": "docs/knowledge/04_平台架构/ARC-001-ai-agent-platform总体架构/assets/VIS-028-ai-agent-platform总体架构与执行路径.svg",
+  "preview_png": "docs/knowledge/04_平台架构/ARC-001-ai-agent-platform总体架构/assets/VIS-028-ai-agent-platform总体架构与执行路径.png",
+  "width": 1086,
+  "height": 1448,
+  "svg_sha256": "d6bfb4e2a5cb3e201dbe451a979423b50aa454932ab1909838424448c070e68f",
+  "png_sha256": "c4f60f9ebf30c9c13c2813f747495ce3ab3858d4e2a5f27bfe2ce436d4aa5a10",
+  "review_notes": "用户确认的正式 PNG 预览：保留原总体架构与执行路径构图，并在 ARC-001 中补入 DDD 限界上下文与平台模块映射。PNG 为本轮人工 Review 权威资产；SVG 仅保留为可编辑参考，后续如需对齐须单独 Review。",
+  "storage_model": "document_bundle",
+  "markdown_image": "./assets/VIS-028-ai-agent-platform总体架构与执行路径.png",
+  "semantic_mirror_heading": "AI 可读语义镜像"
+}

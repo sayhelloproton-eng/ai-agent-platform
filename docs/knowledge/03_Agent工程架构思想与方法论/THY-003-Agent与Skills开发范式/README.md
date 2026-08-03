@@ -269,7 +269,7 @@ Agent 判断
 - [THY-001 从 AI 工具到 Agent 工程平台](../THY-001-从AI工具到Agent工程平台/README.md)
 - [THY-004 DDD 与 Agent 系统边界建模](../THY-004-DDD与Agent系统边界建模/README.md)
 - [AGT-005 Agent Skill 设计与治理](../../06_智能体资产体系/AGT-005-Agent-Skill设计与治理.md)
-- [ARC-012 Agent Profile 与 Skills 资产化](../../04_平台架构/ARC-012-Agent-Profile与Skills资产化/README.md)
+- [ARC-012 Agent Profile 与 Skills 资产化](../../../technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/README.md)
 
 ## 12. 来源
 

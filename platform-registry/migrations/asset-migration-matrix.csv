@@ -397,7 +397,7 @@ tsconfig.base.json,json,,keep_review,tsconfig.base.json,,保留并在相关批�
 ,md,Agent-Profile与Skills资产化,materialize,docs/knowledge/04_平台架构/ARC-012-Agent-Profile与Skills资产化/README.md,ARC-012,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
 ,md,审批证据与副作用账本,materialize,docs/knowledge/04_平台架构/ARC-013-审批证据与副作用账本/README.md,ARC-013,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
 ,md,健康与恢复治理架构,materialize,docs/knowledge/04_平台架构/ARC-014-健康与恢复治理架构/README.md,ARC-014,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
-,md,架构能力与仓库实现映射,materialize,docs/knowledge/04_平台架构/ARC-016-架构能力与仓库实现映射.md,ARC-016,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
+,md,架构能力与仓库实现映射,materialize,docs/knowledge/04_平台架构/ARC-016-能力依赖多任务并行与分阶段MVP路线图/README.md,ARC-016,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
 ,md,AGENTS上下文契约与跨平台治理,materialize,docs/knowledge/05_上下文与知识系统/KNO-001-AGENTS上下文契约与跨平台治理.md,KNO-001,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
 ,md,多级领域上下文架构,materialize,docs/knowledge/05_上下文与知识系统/KNO-002-多级领域上下文架构.md,KNO-002,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
 ,md,上下文Token与证据治理,materialize,docs/knowledge/05_上下文与知识系统/KNO-003-上下文Token与证据治理.md,KNO-003,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
@@ -510,3 +510,6 @@ docs/knowledge/01_产品体系/PRD-007-平台与上层产品边界.md,md,PRD-007
 ,md,Custom GPT 产品能力与边界（聚合前版本）,archive,docs/technical/归档/历史资产/02_基础产品与能力_聚合前版本/CAP-004-CustomGPT产品能力与边界.md,CAP-004,由 CAP-001 与 CAP-002 承接,02-capability-system
 ,md,Custom GPT Instructions、Knowledge、Actions 与发布配置（聚合前版本）,archive,docs/technical/归档/历史资产/02_基础产品与能力_聚合前版本/CAP-005-CustomGPT-Instructions-Knowledge-Actions与发布配置.md,CAP-005,由 CAP-001 与 CAP-002 承接,02-capability-system
 ,md,Codex 配置、权限与执行基线（聚合前版本）,archive,docs/technical/归档/历史资产/02_基础产品与能力_聚合前版本/CAP-007-Codex配置权限与执行基线.md,CAP-007,由 CAP-002 与 CAP-006 承接,02-capability-system
+docs/knowledge/04_平台架构/,directory,04 平台架构两文档收敛,consolidate,docs/knowledge/04_平台架构/,,正式架构收敛为 ARC-001 与 ARC-016，其他有效观点与旧图转入技术归档,15-platform-architecture-review
+docs/knowledge/04_平台架构/ARC-016-能力依赖多任务并行与分阶段MVP路线图/README.md,md,ARC-016 能力依赖、多任务并行与分阶段 MVP 路线图,bundle_move,docs/knowledge/04_平台架构/ARC-016-能力依赖多任务并行与分阶段MVP路线图/README.md,ARC-016,保留稳定 ID，重写为分阶段 MVP 与依赖路线并共置正式视觉资产,15-platform-architecture-review
+docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/README.md,md,04 平台架构整合前观点与后续处理候选,archive_materialize,docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/README.md,,保存未进入两篇正式文档的有效观点与旧视觉资产,15-platform-architecture-review

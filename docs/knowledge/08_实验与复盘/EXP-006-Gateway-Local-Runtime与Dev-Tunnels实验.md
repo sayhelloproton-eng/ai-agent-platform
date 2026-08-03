@@ -51,6 +51,6 @@ Gateway、Runtime 和 Dev Tunnels 已形成可运行最小链路，并进入 `np
 
 ## 9. 关联资产
 
-- [ARC-010 Execution Lane](../04_平台架构/ARC-010-Execution-Lane执行通道模型/README.md)
-- [ARC-013 审批证据与副作用](../04_平台架构/ARC-013-审批证据与副作用账本/README.md)
+- [ARC-010 Execution Lane](../04_平台架构/ARC-001-ai-agent-platform总体架构/README.md)
+- [ARC-013 审批证据与副作用](../../technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/README.md)
 - [EXP-005 Actions 链路](./EXP-005-Custom-GPT-Actions链路实验/README.md)

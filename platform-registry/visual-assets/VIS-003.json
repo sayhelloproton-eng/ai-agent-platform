@@ -2,14 +2,14 @@
   "visual_asset_id": "VIS-003",
   "title": "DDD Bounded Context 蓝图",
   "version": 1,
-  "status": "accepted",
-  "target_document": "docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图/README.md",
+  "status": "archived",
+  "target_document": "docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/README.md",
   "target_document_asset_id": "ARC-008",
   "source_documents": [
     "ARC-008"
   ],
-  "source_svg": "docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图/assets/VIS-003-DDD领域蓝图.svg",
-  "preview_png": "docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图/assets/VIS-003-DDD领域蓝图.png",
+  "source_svg": "docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/assets/VIS-003-DDD领域蓝图.svg",
+  "preview_png": "docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/assets/VIS-003-DDD领域蓝图.png",
   "width": 1800,
   "height": 1100,
   "svg_sha256": "12c5aafd60d5074e95043e85721c1665eec150608f0344e8c15386fe94dbaec1",

@@ -235,8 +235,8 @@ Goal
 本文给出平台化的责任模型；当前平台的具体设计见：
 
 - [ARC-001 平台总体架构](../../04_平台架构/ARC-001-ai-agent-platform总体架构/README.md)
-- [ARC-008 DDD 领域蓝图](../../04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图/README.md)
-- [ARC-009 轻量 Task Control](../../04_平台架构/ARC-009-轻量Task-Control架构/README.md)
+- [ARC-008 DDD 领域蓝图](../../../technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/README.md)
+- [ARC-009 轻量 Task Control](../../04_平台架构/ARC-001-ai-agent-platform总体架构/README.md)
 - [CAP-008 平台核心能力模型](../../02_基础产品与能力/CAP-008-平台核心能力模型与目标对齐/README.md)
 
 ## 10. 官方与经典来源

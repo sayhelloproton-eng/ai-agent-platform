@@ -2,14 +2,14 @@
   "visual_asset_id": "VIS-004",
   "title": "Task Control 状态机",
   "version": 1,
-  "status": "accepted",
-  "target_document": "docs/knowledge/04_平台架构/ARC-009-轻量Task-Control架构/README.md",
+  "status": "archived",
+  "target_document": "docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/README.md",
   "target_document_asset_id": "ARC-009",
   "source_documents": [
     "ARC-009"
   ],
-  "source_svg": "docs/knowledge/04_平台架构/ARC-009-轻量Task-Control架构/assets/VIS-004-Task-Control状态机.svg",
-  "preview_png": "docs/knowledge/04_平台架构/ARC-009-轻量Task-Control架构/assets/VIS-004-Task-Control状态机.png",
+  "source_svg": "docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/assets/VIS-004-Task-Control状态机.svg",
+  "preview_png": "docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/assets/VIS-004-Task-Control状态机.png",
   "width": 1800,
   "height": 1100,
   "svg_sha256": "47ad6c262e34bdb492ba15e6559222f41ca12006415421b6fdcb6f5757bba249",

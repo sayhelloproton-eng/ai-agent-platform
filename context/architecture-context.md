@@ -1,97 +1,84 @@
 # Architecture Context
 
-## 长期六层架构
+## Canonical 架构入口
 
-```text
-Agent Interface
-  ↓
-Agent Brain
-  ↓
-Agent Runtime
-  ↓
-Tool Layer
-  ↓
-Knowledge Layer
-  ↓
-Infrastructure
-```
+平台架构由两篇正式文档共同定义：
+
+- `ARC-001`：System Context、DDD Bounded Context、模块责任、运行闭环、数据/状态/证据流、Adapter / Deployment、实现映射与正式占位；
+- `ARC-016`：当前证据、MVP-0～MVP-7、能力依赖、并行建设轨道、多任务不变量、阶段门和风险。
+
+`04_平台架构` 是前序理论与后续专题之间的结构中心：`03` 的平台化、DDD、Skills 与可信原则在此落位；`05～09` 围绕 ARC 的 Context、Agent、Workflow、实验和 Portfolio 挂点继续深化。
 
 ## 当前真实实现
 
 ```text
 Custom GPT
-  → Microsoft Dev Tunnels
-  → Action Gateway
-  → Local Runtime
-  → gateway.ping / runtime.status
+→ Microsoft Dev Tunnels
+→ Action Gateway
+→ Local Runtime
+→ gateway.ping / runtime.status
 ```
 
-当前已实现：
+已实现或已验证：Contracts、Auth、Policy、Gateway / Runtime 窄链路、开发期公网入口、人工 Planner–Executor Handoff、Git Knowledge / Context / Registry、测试、Commit 和真实调用证据。
 
-- Interface：正式 Custom GPT 与 Action；
-- Public Entry：Microsoft Dev Tunnels 开发期公网入口；
-- Control Boundary：Gateway 认证、Policy、Task 构造和 Runtime 转发；
-- Execution Boundary：Runtime 二次认证、二次 Policy、Capability 执行和 TaskResult；
-- Shared Contracts：contracts、auth、policy；
-- Knowledge and Skills：Git 文档、六个边界治理后的活跃 Skill、Document Bundle / Human-first AI-lossless 模型与 Engineering Insight Registry；
-- Evidence：测试、验收记录、Commit 和真实调用结果。
+## 目标运行闭环
 
-## 目标架构
+```text
+用户目标
+→ ChatGPT / Custom GPT 总控
+→ Browser Extension / Action
+→ Gateway / Bridge
+→ Mac Local Control / Runtime
+→ Task Control
+→ Agent Governance
+→ Context Builder
+→ Execution Lane / Executor Adapter
+→ Result / Evidence / Side Effects
+→ 状态与证据持久化
+→ Browser / Action 回传
+→ 总控与用户接受、继续、暂停、恢复或终止
+```
 
-### 认知平面
+## DDD Bounded Context
 
-- Chat / 总控 Agent；
-- 专业 Agent；
-- Agent Profile；
-- Knowledge Pack；
-- Skills；
-- 上下文选择与证据推理。
+- Task Control；
+- Agent Governance；
+- Context & Knowledge；
+- Execution Orchestration；
+- Evidence & Safety；
+- Publishing & Registry；
+- Product Domain（上层产品占位）；
+- Engineering Insight。
 
-### 控制平面
+这些边界表示状态和规则所有权，近期以模块化单体实现，不表示已经拆分微服务。
 
-- Task Contract；
-- Task State；
-- Agent / Executor Registry；
-- Policy；
-- Approval；
-- Evidence；
-- Side-effect Ledger；
-- Health Event；
-- Recovery；
-- Resource Lease。
+## 分阶段路线
 
-### 执行平面
+```text
+MVP-0 窄链路与人工闭环
+→ MVP-1 Mac Local Control / CLI 可观测
+→ MVP-2 Browser 单任务自调用
+→ MVP-3 持久 Task / Version / Role / Context
+→ MVP-4 Approval / Evidence / Side-effect / Recovery
+→ MVP-5 多角色 Handoff
+→ MVP-6 多任务依赖、Worktree 隔离和并行 Lane
+→ MVP-7 多执行器与 Capability Routing
+```
 
-- Codex / Work；
-- Local Runtime；
-- Browser / CLI / API Adapter；
-- Git Branch / Worktree；
-- 模型和外部 Provider；
-- 可替换执行器。
+## 架构不变量
 
-### 知识与资产平面
-
-- Git 正式知识；
-- Platform Registry；
-- Engineering Insight Registry；
-- Agent Profile；
-- Knowledge Pack；
-- Document Bundle、Visual Semantic Block 与 Feishu Projection；
-- Release 与变更影响。
+- Task 是任务事实来源；
+- 边界由状态和规则所有权决定，不按 Host 或 Agent 名称切分；
+- 总控拥有目标与语义决策，Executor 只执行授权 Contract；
+- Provider、模型、设备和 Host 差异限制在 Adapter；
+- 完成由 Acceptance 与 Evidence 共同判定；
+- 写操作默认拒绝，必须满足 Scope、Version、Approval、Idempotency 和隔离；
+- 默认串行，并行是满足依赖、资源、Scope 和合并条件后的显式能力；
+- Git 是代码和正式知识真源，Feishu 是可重建投影；
+- 当前、目标、阶段和历史候选必须分开。
 
 ## 当前差距
 
-最小 Runtime 已经存在，但完整执行生命周期、持久状态、重试、暂停、恢复、审批、证据和多执行器调度尚未实现。
+Browser Loop、Local CLI、持久 Task Store、Role Assignment、Context Builder、Approval / Evidence Store、Safe Continuation、Lane Registry、Codex Adapter、多任务并行和多执行器路由尚未形成完整代码闭环。
 
-Cloudflare Edge 是历史 superseded 路线。当前公网入口是 Microsoft Dev Tunnels，且只用于开发期 MVP。
-
-## 架构原则
-
-- 业务与模型、设备和 Provider 解耦；
-- 上层依赖 Contract、Port 和稳定接口；
-- 外部调用方只提交业务意图和必要参数；
-- 身份、权限、路由和内部协议由受信任服务端生成；
-- 默认拒绝、最小权限和双层校验；
-- 当前与目标必须分开；
-- 真实调用路径优先于 Mock；
-- 阶段适配优先于永久平台承诺。
+Cloudflare Edge 是历史 superseded 路线；Microsoft Dev Tunnels 仅用于开发期 MVP。

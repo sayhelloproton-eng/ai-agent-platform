@@ -49,7 +49,7 @@ Approval 绑定 task_id、task_version、action、target、scope、risk 和过�
 ## 9. 关联文档
 
 - [THY-005 可信 Agent 系统基本原则](../03_Agent工程架构思想与方法论/THY-005-可信Agent系统基本原则/README.md)
-- [ARC-013 审批证据与副作用账本](../04_平台架构/ARC-013-审批证据与副作用账本/README.md)
+- [ARC-013 审批证据与副作用账本](../../technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/README.md)
 - [CAP-008 平台核心能力模型与目标对齐：AGENTS、Rules、Skills、Hooks、MCP 与 Plugins](../02_基础产品与能力/CAP-008-平台核心能力模型与目标对齐/README.md)
 - [AGT-002 Agent-Profile设计规范](AGT-002-Agent-Profile设计规范.md)
 - [WFL-009 审批工作流](../07_工作流与项目治理/WFL-009-审批工作流.md)

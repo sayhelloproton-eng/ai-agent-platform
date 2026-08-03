@@ -74,7 +74,7 @@ assets:
   migration_state: complete
   superseded_by: PRT-006
 - asset_id: ARC-001
-  title: Platform Target Architecture
+  title: ai-agent-platform 总体架构与执行路径
   asset_type: architecture
   status: accepted
   evidence_level: decided
@@ -101,14 +101,15 @@ assets:
 - asset_id: DOM-001
   title: Core Domain Model
   asset_type: domain
-  status: proposed
+  status: superseded
   evidence_level: observed
   materialized: true
-  current_path: docs/knowledge/04_平台架构/DOM-001-核心领域模型.md
+  current_path: docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/legacy-assets/DOM-001.md
   target_path:
-  canonical_path: docs/knowledge/04_平台架构/DOM-001-核心领域模型.md
+  canonical_path: docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/legacy-assets/DOM-001.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by: ARC-001
 - asset_id: SKL-001
   title: 项目知识治理技能
   asset_type: skill
@@ -704,133 +705,150 @@ assets:
 - asset_id: ARC-007
   title: 多窗口多角色多任务并行架构
   asset_type: architecture
-  status: accepted
+  status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/04_平台架构/ARC-007-多窗口多角色多任务并行架构.md
+  current_path: docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/legacy-assets/ARC-007.md
   target_path:
-  canonical_path: docs/knowledge/04_平台架构/ARC-007-多窗口多角色多任务并行架构.md
+  canonical_path: docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/legacy-assets/ARC-007.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by: ARC-016
 - asset_id: ARC-008
   title: ai-agent-platform-DDD领域蓝图
   asset_type: architecture
-  status: accepted
+  status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图/README.md
+  current_path: docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/legacy-assets/ARC-008.md
   target_path:
-  canonical_path: docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图/README.md
+  canonical_path: docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/legacy-assets/ARC-008.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by: ARC-001
 - asset_id: ARC-009
   title: 轻量Task-Control架构
   asset_type: architecture
-  status: accepted
+  status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/04_平台架构/ARC-009-轻量Task-Control架构/README.md
+  current_path: docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/legacy-assets/ARC-009.md
   target_path:
-  canonical_path: docs/knowledge/04_平台架构/ARC-009-轻量Task-Control架构/README.md
+  canonical_path: docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/legacy-assets/ARC-009.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by: ARC-001
 - asset_id: ARC-010
   title: Execution-Lane执行通道模型
   asset_type: architecture
-  status: accepted
+  status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/04_平台架构/ARC-010-Execution-Lane执行通道模型/README.md
+  current_path: docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/legacy-assets/ARC-010.md
   target_path:
-  canonical_path: docs/knowledge/04_平台架构/ARC-010-Execution-Lane执行通道模型/README.md
+  canonical_path: docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/legacy-assets/ARC-010.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by: ARC-001
 - asset_id: ARC-011
   title: Git-Branch-Worktree与任务隔离
   asset_type: architecture
-  status: accepted
+  status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/04_平台架构/ARC-011-Git-Branch-Worktree与任务隔离.md
+  current_path: docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/legacy-assets/ARC-011.md
   target_path:
-  canonical_path: docs/knowledge/04_平台架构/ARC-011-Git-Branch-Worktree与任务隔离.md
+  canonical_path: docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/legacy-assets/ARC-011.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by:
+  - ARC-001
+  - ARC-016
 - asset_id: ARC-012
   title: Agent-Profile与Skills资产化
   asset_type: architecture
-  status: accepted
+  status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/04_平台架构/ARC-012-Agent-Profile与Skills资产化/README.md
+  current_path: docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/legacy-assets/ARC-012.md
   target_path:
-  canonical_path: docs/knowledge/04_平台架构/ARC-012-Agent-Profile与Skills资产化/README.md
+  canonical_path: docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/legacy-assets/ARC-012.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by: ARC-001
 - asset_id: ARC-013
   title: 审批证据与副作用账本
   asset_type: architecture
-  status: accepted
+  status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/04_平台架构/ARC-013-审批证据与副作用账本/README.md
+  current_path: docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/legacy-assets/ARC-013.md
   target_path:
-  canonical_path: docs/knowledge/04_平台架构/ARC-013-审批证据与副作用账本/README.md
+  canonical_path: docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/legacy-assets/ARC-013.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by:
+  - ARC-001
+  - ARC-016
 - asset_id: ARC-014
   title: 健康与恢复治理架构
   asset_type: architecture
-  status: accepted
+  status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/04_平台架构/ARC-014-健康与恢复治理架构/README.md
+  current_path: docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/legacy-assets/ARC-014.md
   target_path:
-  canonical_path: docs/knowledge/04_平台架构/ARC-014-健康与恢复治理架构/README.md
+  canonical_path: docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/legacy-assets/ARC-014.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by:
+  - ARC-001
+  - ARC-016
 - asset_id: ARC-015
   title: 多平台执行器与Usher适配架构
   asset_type: architecture
-  status: accepted
+  status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/04_平台架构/ARC-015-多平台执行器与Usher适配架构.md
+  current_path: docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/legacy-assets/ARC-015.md
   target_path:
-  canonical_path: docs/knowledge/04_平台架构/ARC-015-多平台执行器与Usher适配架构.md
+  canonical_path: docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/legacy-assets/ARC-015.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by:
+  - ARC-001
+  - ARC-016
 - asset_id: ARC-016
-  title: 架构能力与仓库实现映射
+  title: 能力依赖、多任务并行与分阶段 MVP 路线图
   asset_type: architecture
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/04_平台架构/ARC-016-架构能力与仓库实现映射.md
+  current_path: docs/knowledge/04_平台架构/ARC-016-能力依赖多任务并行与分阶段MVP路线图/README.md
   target_path:
-  canonical_path: docs/knowledge/04_平台架构/ARC-016-架构能力与仓库实现映射.md
+  canonical_path: docs/knowledge/04_平台架构/ARC-016-能力依赖多任务并行与分阶段MVP路线图/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: ARC-017
   title: 产品孵化与需求治理体系
   asset_type: architecture
-  status: accepted
+  status: archived
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/04_平台架构/ARC-017-产品孵化与需求治理体系/README.md
+  current_path: docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/legacy-assets/ARC-017.md
   target_path:
-  canonical_path: docs/knowledge/04_平台架构/ARC-017-产品孵化与需求治理体系/README.md
+  canonical_path: docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/legacy-assets/ARC-017.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: ARC-018
   title: 项目治理与汇报架构
   asset_type: architecture
-  status: accepted
+  status: archived
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/04_平台架构/ARC-018-项目治理与汇报架构.md
+  current_path: docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/legacy-assets/ARC-018.md
   target_path:
-  canonical_path: docs/knowledge/04_平台架构/ARC-018-项目治理与汇报架构.md
+  canonical_path: docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/legacy-assets/ARC-018.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: KNO-001
@@ -1444,7 +1462,7 @@ assets:
 - asset_id: VIS-001
   title: 平台六层总体架构
   asset_type: visual
-  status: accepted
+  status: archived
   evidence_level: verified
   materialized: true
   current_path: platform-registry/visual-assets/VIS-001.json
@@ -1466,7 +1484,7 @@ assets:
 - asset_id: VIS-003
   title: DDD Bounded Context 蓝图
   asset_type: visual
-  status: accepted
+  status: archived
   evidence_level: verified
   materialized: true
   current_path: platform-registry/visual-assets/VIS-003.json
@@ -1477,7 +1495,7 @@ assets:
 - asset_id: VIS-004
   title: Task Control 状态机
   asset_type: visual
-  status: accepted
+  status: archived
   evidence_level: verified
   materialized: true
   current_path: platform-registry/visual-assets/VIS-004.json
@@ -1488,7 +1506,7 @@ assets:
 - asset_id: VIS-005
   title: Execution Lane 与多执行器
   asset_type: visual
-  status: accepted
+  status: archived
   evidence_level: verified
   materialized: true
   current_path: platform-registry/visual-assets/VIS-005.json
@@ -1499,7 +1517,7 @@ assets:
 - asset_id: VIS-006
   title: Agent Profile、Skill 与 Knowledge Pack
   asset_type: visual
-  status: accepted
+  status: archived
   evidence_level: verified
   materialized: true
   current_path: platform-registry/visual-assets/VIS-006.json
@@ -1510,7 +1528,7 @@ assets:
 - asset_id: VIS-007
   title: 审批、证据与副作用账本
   asset_type: visual
-  status: accepted
+  status: archived
   evidence_level: verified
   materialized: true
   current_path: platform-registry/visual-assets/VIS-007.json
@@ -1521,7 +1539,7 @@ assets:
 - asset_id: VIS-008
   title: 健康、恢复与终止快照
   asset_type: visual
-  status: accepted
+  status: archived
   evidence_level: verified
   materialized: true
   current_path: platform-registry/visual-assets/VIS-008.json
@@ -1532,7 +1550,7 @@ assets:
 - asset_id: VIS-009
   title: 产品孵化与需求治理
   asset_type: visual
-  status: accepted
+  status: archived
   evidence_level: verified
   materialized: true
   current_path: platform-registry/visual-assets/VIS-009.json
@@ -1866,5 +1884,27 @@ assets:
   current_path: platform-registry/visual-assets/VIS-027.json
   target_path:
   canonical_path: platform-registry/visual-assets/VIS-027.json
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: VIS-028
+  title: ai-agent-platform 总体架构与执行路径
+  asset_type: visual
+  status: accepted
+  evidence_level: verified
+  materialized: true
+  current_path: platform-registry/visual-assets/VIS-028.json
+  target_path:
+  canonical_path: platform-registry/visual-assets/VIS-028.json
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: VIS-029
+  title: 能力依赖、多任务并行与分阶段 MVP 路线图
+  asset_type: visual
+  status: accepted
+  evidence_level: verified
+  materialized: true
+  current_path: platform-registry/visual-assets/VIS-029.json
+  target_path:
+  canonical_path: platform-registry/visual-assets/VIS-029.json
   publication_status: unpublished
   migration_state: complete

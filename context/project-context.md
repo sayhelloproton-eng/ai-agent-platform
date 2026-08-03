@@ -8,7 +8,7 @@
 
 `ai-agent-platform` 是当前主产品、底层平台和仓库主体。AI 视频工作流是首个计划验证的上层产品；可信任务控制台、专业 Agent 资产工作台、项目知识治理工作台和第二垂直工作流仅处于机会方向，不是正式产品承诺。
 
-平台建立在 ChatGPT、Projects、Custom GPT、Plugins / Apps、Actions、Work、Codex 和 OpenAI API 等生态能力之上，但不把 Host 产品功能冒充为平台实现。 `03_Agent工程架构思想与方法论` 负责解释平台化责任、复杂度升级、Agent / Skill 分工、DDD 边界与可信系统原则；`04_平台架构` 才负责这些方法在当前平台中的具体落位。平台核心是可信 Context、Planner–Executor Handoff、Task Control、身份与 Policy、Approval、Evidence、Recovery、Executor / Provider Adapter、Agent 资产治理和知识发布。
+平台建立在 ChatGPT、Projects、Custom GPT、Plugins / Apps、Actions、Work、Codex 和 OpenAI API 等生态能力之上，但不把 Host 产品功能冒充为平台实现。 `03_Agent工程架构思想与方法论` 负责解释平台化责任、复杂度升级、Agent / Skill 分工、DDD 边界与可信系统原则；`04_平台架构` 是结构中心，负责把这些方法落成 System Context、DDD Bounded Context、平台运行模块、信任边界与分阶段演进，并为 `05～09` 的知识、Agent、Workflow、实验和 Portfolio 提供挂点。平台核心执行路径是 ChatGPT 总控 → Browser / Action → Gateway → Mac Local Control / Runtime → Task、Agent、Context、Execution、Evidence → 回传；能力按只读本机控制、浏览器自调用、持久 Task、可信写执行、多角色、多任务和多执行器逐阶段建设。
 
 项目与产品不同：项目承载建设历史、学习、实验、治理和 Portfolio；产品承诺为明确用户持续交付价值与体验。潜在方向只有通过问题证据、产品形态、最小纵向切片和停止条件，才升级为正式产品概念。
 

@@ -2,14 +2,14 @@
   "visual_asset_id": "VIS-007",
   "title": "审批、证据与副作用账本",
   "version": 1,
-  "status": "accepted",
-  "target_document": "docs/knowledge/04_平台架构/ARC-013-审批证据与副作用账本/README.md",
+  "status": "archived",
+  "target_document": "docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/README.md",
   "target_document_asset_id": "ARC-013",
   "source_documents": [
     "ARC-013"
   ],
-  "source_svg": "docs/knowledge/04_平台架构/ARC-013-审批证据与副作用账本/assets/VIS-007-审批证据与副作用账本.svg",
-  "preview_png": "docs/knowledge/04_平台架构/ARC-013-审批证据与副作用账本/assets/VIS-007-审批证据与副作用账本.png",
+  "source_svg": "docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/assets/VIS-007-审批证据与副作用账本.svg",
+  "preview_png": "docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处理候选/assets/VIS-007-审批证据与副作用账本.png",
   "width": 1800,
   "height": 1100,
   "svg_sha256": "9f9c742db8350d4877c2d67ff01ce6384b14d89332b8b99588cf9ad6957504b2",
