@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1100" viewBox="0 0 1800 1100">
+<rect width="1800" height="1100" fill="#F5F7FB"/>
+<style>text{font-family:'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif;fill:#122033}.muted{fill:#64748B}.small{font-size:18px}.body{font-size:22px}.label{font-size:20px;font-weight:700}.title{font-size:36px;font-weight:800}.subtitle{font-size:20px;fill:#64748B}.cardTitle{font-size:25px;font-weight:800}.badge{font-size:18px;font-weight:800}</style>
+<text x="72" y="64" class="title">AI 视频工作流：产品体验与低成本验证切片</text>
+<text x="72" y="104" class="subtitle">先验证领域对象与人工修订价值，再进入分镜、Provider 和质量闭环；当前尚未开始业务实现。</text>
+<rect x="1545" y="38" width="180" height="48" rx="24" fill="#DCEAFE"/><text x="1635" y="69" text-anchor="middle" class="badge" style="fill:#2563EB">VIS-013</text>
+<line x1="72" y1="132" x2="1728" y2="132" stroke="#B8C4D6" stroke-width="2"/>
+<defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#64748B"/></marker><marker id="arrowBlue" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#2563EB"/></marker></defs>
+<text x="84" y="180" font-size="25" font-weight="800" fill="#2563EB" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">目标产品体验</text>
+<rect x="72" y="210" width="240" height="126" rx="18" fill="#DCEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="192" y="252" font-size="22" font-weight="800" fill="#2563EB" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">故事输入</text>
+<text x="192" y="294" font-size="18" font-weight="700" fill="#122033" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">文本 / 设定</text>
+<line x1="312" y1="273" x2="342" y2="273" stroke="#64748B" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="354" y="210" width="240" height="126" rx="18" fill="#CCFBF1" stroke="#0F766E" stroke-width="2"/>
+<text x="474" y="252" font-size="22" font-weight="800" fill="#0F766E" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">结构理解</text>
+<text x="474" y="294" font-size="18" font-weight="700" fill="#122033" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">人物 / 场景 / 章节</text>
+<line x1="594" y1="273" x2="624" y2="273" stroke="#64748B" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="636" y="210" width="240" height="126" rx="18" fill="#EDE9FE" stroke="#7C3AED" stroke-width="2"/>
+<text x="756" y="252" font-size="22" font-weight="800" fill="#7C3AED" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">分镜规划</text>
+<text x="756" y="294" font-size="18" font-weight="700" fill="#122033" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">镜头 / 节奏 / 连续性</text>
+<line x1="876" y1="273" x2="906" y2="273" stroke="#64748B" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="918" y="210" width="240" height="126" rx="18" fill="#FEF3C7" stroke="#B45309" stroke-width="2"/>
+<text x="1038" y="252" font-size="22" font-weight="800" fill="#B45309" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">生成执行</text>
+<text x="1038" y="294" font-size="18" font-weight="700" fill="#122033" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">图像 / 视频 / 音频</text>
+<line x1="1158" y1="273" x2="1188" y2="273" stroke="#64748B" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="1200" y="210" width="240" height="126" rx="18" fill="#FEE2E2" stroke="#B91C1C" stroke-width="2"/>
+<text x="1320" y="252" font-size="22" font-weight="800" fill="#B91C1C" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">质量复审</text>
+<text x="1320" y="294" font-size="18" font-weight="700" fill="#122033" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">一致性 / 成本 / 风险</text>
+<line x1="1440" y1="273" x2="1470" y2="273" stroke="#64748B" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="1482" y="210" width="240" height="126" rx="18" fill="#DCFCE7" stroke="#15803D" stroke-width="2"/>
+<text x="1602" y="252" font-size="22" font-weight="800" fill="#15803D" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">作品输出</text>
+<text x="1602" y="294" font-size="18" font-weight="700" fill="#122033" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">版本 / 证据 / Demo</text>
+<text x="84" y="402" font-size="25" font-weight="800" fill="#2563EB" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">验证切片与停止条件</text>
+<rect x="72" y="426" width="1656" height="430" rx="22" fill="#FFFFFF" stroke="#B8C4D6" stroke-width="2"/>
+<rect x="96" y="472" width="370" height="310" rx="20" fill="#DCEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="120" y="514" font-size="20" font-weight="900" fill="#2563EB" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">Slice 1</text>
+<text x="120" y="552" font-size="21" font-weight="800" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">Story → 结构化 JSON</text>
+<text x="120" y="612" font-size="18" font-weight="800" fill="#2563EB" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">验证</text>
+<text x="120" y="646" font-size="18" font-weight="650" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="120" dy="0">对象是否帮助人工理解与修订</tspan></text>
+<text x="120" y="708" font-size="18" font-weight="800" fill="#2563EB" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">停止条件</text>
+<text x="120" y="742" font-size="18" font-weight="650" fill="#64748B" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="120" dy="0">只是摘要，没有编辑价值</tspan></text>
+<line x1="466" y1="628" x2="493" y2="628" stroke="#64748B" stroke-width="3" marker-end="url(#arrow)" stroke-dasharray="8 7"/>
+<rect x="502" y="472" width="370" height="310" rx="20" fill="#CCFBF1" stroke="#0F766E" stroke-width="2"/>
+<text x="526" y="514" font-size="20" font-weight="900" fill="#0F766E" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">Slice 2</text>
+<text x="526" y="552" font-size="21" font-weight="800" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">JSON → Storyboard / Shot</text>
+<text x="526" y="612" font-size="18" font-weight="800" fill="#0F766E" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">验证</text>
+<text x="526" y="646" font-size="18" font-weight="650" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="526" dy="0">镜头计划与版本可追溯</tspan></text>
+<text x="526" y="708" font-size="18" font-weight="800" fill="#0F766E" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">停止条件</text>
+<text x="526" y="742" font-size="18" font-weight="650" fill="#64748B" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="526" dy="0">无法稳定修改或回溯</tspan></text>
+<line x1="872" y1="628" x2="899" y2="628" stroke="#64748B" stroke-width="3" marker-end="url(#arrow)" stroke-dasharray="8 7"/>
+<rect x="908" y="472" width="370" height="310" rx="20" fill="#FEF3C7" stroke="#B45309" stroke-width="2"/>
+<text x="932" y="514" font-size="20" font-weight="900" fill="#B45309" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">Slice 3</text>
+<text x="932" y="552" font-size="21" font-weight="800" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">Shot → Prompt → 单 Provider</text>
+<text x="932" y="612" font-size="18" font-weight="800" fill="#B45309" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">验证</text>
+<text x="932" y="646" font-size="18" font-weight="650" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="932" dy="0">Adapter、成本和失败记录</tspan></text>
+<text x="932" y="708" font-size="18" font-weight="800" fill="#B45309" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">停止条件</text>
+<text x="932" y="742" font-size="18" font-weight="650" fill="#64748B" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="932" dy="0">成本或可用性超预算</tspan></text>
+<line x1="1278" y1="628" x2="1305" y2="628" stroke="#64748B" stroke-width="3" marker-end="url(#arrow)" stroke-dasharray="8 7"/>
+<rect x="1314" y="472" width="370" height="310" rx="20" fill="#DCFCE7" stroke="#15803D" stroke-width="2"/>
+<text x="1338" y="514" font-size="20" font-weight="900" fill="#15803D" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">Slice 4</text>
+<text x="1338" y="552" font-size="21" font-weight="800" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">Review → Retry → Demo</text>
+<text x="1338" y="612" font-size="18" font-weight="800" fill="#15803D" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">验证</text>
+<text x="1338" y="646" font-size="18" font-weight="650" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="1338" dy="0">质量、审批、证据与交付</tspan></text>
+<text x="1338" y="708" font-size="18" font-weight="800" fill="#15803D" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">停止条件</text>
+<text x="1338" y="742" font-size="18" font-weight="650" fill="#64748B" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="1338" dy="0">无法形成修订闭环</tspan></text>
+<rect x="72" y="886" width="1656" height="88" rx="20" fill="#E9EEF5" stroke="#B8C4D6" stroke-width="1"/>
+<text x="100" y="922" font-size="20" font-weight="800" fill="#B91C1C" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">当前状态</text>
+<text x="250" y="922" font-size="20" font-weight="750" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">concept accepted / implementation not started；不直接建设完整视频编辑器，也不提前冻结全部 DDD 对象。</text>
+<text x="72" y="1055" class="small muted">ai-agent-platform · Formal Visual Asset · v2</text>
+</svg>

@@ -263,7 +263,7 @@ Chat 规划与复审
 - [THY-001 从 AI 工具到 Agent 工程平台](../THY-001-从AI工具到Agent工程平台/README.md)
 - [THY-003 Agent 与 Skills 开发范式](../THY-003-Agent与Skills开发范式/README.md)
 - [THY-005 可信 Agent 系统基本原则](../THY-005-可信Agent系统基本原则/README.md)
-- [PRD-005 平台能力与产品成熟度](../../01_产品体系/PRD-005-平台能力地图与产品成熟度/README.md)
+- [PRD-005 平台能力与产品成熟度](../../00_项目与产品/PRD-005-平台能力地图与产品成熟度/README.md)
 
 ## 13. 来源
 

@@ -485,6 +485,11 @@ async function main() {
     "require_write_preview: true",
     "require_human_confirmation: true",
     "require_readback_verification: true",
+    "navigation_mode: governed_tree",
+    "source_asset_id: CTX-001",
+    "title: 智能体工程探索录",
+    "group_id: project-and-product",
+    "title: 项目与产品",
   ]) {
     if (!projection.includes(required)) fail(`projection policy missing ${required}`);
   }

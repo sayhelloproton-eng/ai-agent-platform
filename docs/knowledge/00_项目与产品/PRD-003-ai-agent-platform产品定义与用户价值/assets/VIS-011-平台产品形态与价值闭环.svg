@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1100" viewBox="0 0 1800 1100">
+<rect width="1800" height="1100" fill="#F5F7FB"/>
+<style>text{font-family:'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif;fill:#122033}.muted{fill:#64748B}.small{font-size:18px}.body{font-size:22px}.label{font-size:20px;font-weight:700}.title{font-size:36px;font-weight:800}.subtitle{font-size:20px;fill:#64748B}.cardTitle{font-size:25px;font-weight:800}.badge{font-size:18px;font-weight:800}</style>
+<text x="72" y="64" class="title">ai-agent-platform 产品工作系统与价值闭环</text>
+<text x="72" y="104" class="subtitle">产品价值来自可恢复事实、冻结合同、受控执行和可回查证据，而不是增加一个聊天界面。</text>
+<rect x="1545" y="38" width="180" height="48" rx="24" fill="#DCEAFE"/><text x="1635" y="69" text-anchor="middle" class="badge" style="fill:#2563EB">VIS-011</text>
+<line x1="72" y1="132" x2="1728" y2="132" stroke="#B8C4D6" stroke-width="2"/>
+<defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#64748B"/></marker><marker id="arrowBlue" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#2563EB"/></marker></defs>
+<text x="84" y="180" font-size="25" font-weight="800" fill="#2563EB" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">用户输入</text>
+<rect x="72" y="202" width="310" height="210" rx="22" fill="#DCEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="104" y="245" font-size="23" font-weight="700" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="104" dy="0">目标与约束</tspan><tspan x="104" dy="48">可信 Context</tspan><tspan x="104" dy="48">代码与已有证据</tspan></text>
+<line x1="394" y1="307" x2="464" y2="307" stroke="#64748B" stroke-width="3" marker-end="url(#arrowBlue)"/>
+<text x="474" y="180" font-size="25" font-weight="800" fill="#7C3AED" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">产品工作系统</text>
+<rect x="454" y="202" width="940" height="390" rx="22" fill="#FFFFFF" stroke="#B8C4D6" stroke-width="2"/>
+<rect x="486" y="238" width="164" height="136" rx="22" fill="#DCEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="568" y="270" font-size="21" font-weight="800" fill="#2563EB" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">人机入口</text>
+<text x="568" y="310" font-size="16" font-weight="650" fill="#122033" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="568" dy="0">Chat / GPT</tspan><tspan x="568" dy="28">用户 Review</tspan></text>
+<rect x="670" y="238" width="164" height="136" rx="22" fill="#EDE9FE" stroke="#7C3AED" stroke-width="2"/>
+<text x="752" y="270" font-size="21" font-weight="800" fill="#7C3AED" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">规划交接</text>
+<text x="752" y="310" font-size="16" font-weight="650" fill="#122033" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="752" dy="0">Planner</tspan><tspan x="752" dy="28">Contract</tspan></text>
+<rect x="854" y="238" width="164" height="136" rx="22" fill="#CCFBF1" stroke="#0F766E" stroke-width="2"/>
+<text x="936" y="270" font-size="21" font-weight="800" fill="#0F766E" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">受控执行</text>
+<text x="936" y="310" font-size="16" font-weight="650" fill="#122033" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="936" dy="0">Gateway</tspan><tspan x="936" dy="28">Runtime</tspan></text>
+<rect x="1038" y="238" width="164" height="136" rx="22" fill="#FEF3C7" stroke="#B45309" stroke-width="2"/>
+<text x="1120" y="270" font-size="21" font-weight="800" fill="#B45309" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">知识真源</text>
+<text x="1120" y="310" font-size="16" font-weight="650" fill="#122033" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="1120" dy="0">Git / Docs</tspan><tspan x="1120" dy="28">Registry</tspan></text>
+<rect x="1222" y="238" width="140" height="136" rx="22" fill="#DCFCE7" stroke="#15803D" stroke-width="2"/>
+<text x="1292" y="270" font-size="21" font-weight="800" fill="#15803D" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">证明</text>
+<text x="1292" y="310" font-size="16" font-weight="650" fill="#122033" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="1292" dy="0">Tests</tspan><tspan x="1292" dy="28">Demo</tspan></text>
+<line x1="650" y1="306" x2="670" y2="306" stroke="#64748B" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="834" y1="306" x2="854" y2="306" stroke="#64748B" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="1018" y1="306" x2="1038" y2="306" stroke="#64748B" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="1202" y1="306" x2="1222" y2="306" stroke="#64748B" stroke-width="3" marker-end="url(#arrow)"/>
+<text x="486" y="425" font-size="20" font-weight="800" fill="#15803D" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">当前已存在</text>
+<rect x="610" y="402" width="170" height="34" rx="17" fill="#DCFCE7" stroke="#15803D" stroke-width="1"/><text x="695.0" y="426" font-size="16" font-weight="800" fill="#15803D" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">入口 / Handoff</text>
+<rect x="795" y="402" width="205" height="34" rx="17" fill="#CCFBF1" stroke="#0F766E" stroke-width="1"/><text x="897.5" y="426" font-size="16" font-weight="800" fill="#0F766E" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">Gateway / Runtime MVP</text>
+<rect x="1015" y="402" width="205" height="34" rx="17" fill="#FEF3C7" stroke="#B45309" stroke-width="1"/><text x="1117.5" y="426" font-size="16" font-weight="800" fill="#B45309" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">Git / Context / Registry</text>
+<text x="486" y="478" font-size="20" font-weight="800" fill="#7C3AED" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">尚未完整物化</text>
+<rect x="650" y="456" width="170" height="34" rx="17" fill="#EDE9FE" stroke="#7C3AED" stroke-width="1"/><text x="735.0" y="480" font-size="16" font-weight="800" fill="#7C3AED" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">Task State</text>
+<rect x="835" y="456" width="185" height="34" rx="17" fill="#EDE9FE" stroke="#7C3AED" stroke-width="1"/><text x="927.5" y="480" font-size="16" font-weight="800" fill="#7C3AED" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">Approval / Evidence</text>
+<rect x="1035" y="456" width="220" height="34" rx="17" fill="#EDE9FE" stroke="#7C3AED" stroke-width="1"/><text x="1145.0" y="480" font-size="16" font-weight="800" fill="#7C3AED" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">Checkpoint / Recovery</text>
+<text x="486" y="548" font-size="19" font-weight="700" fill="#64748B" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">核心边界：平台治理工程过程；业务产品拥有用户体验、业务对象和专属质量标准。</text>
+<line x1="1406" y1="307" x2="1476" y2="307" stroke="#64748B" stroke-width="3" marker-end="url(#arrowBlue)"/>
+<text x="1486" y="180" font-size="25" font-weight="800" fill="#15803D" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">用户结果</text>
+<rect x="1456" y="202" width="272" height="390" rx="22" fill="#DCFCE7" stroke="#15803D" stroke-width="2"/>
+<text x="1490" y="245" font-size="25" font-weight="800" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="1490" dy="0">少搬运</tspan><tspan x="1490" dy="55">少误执行</tspan><tspan x="1490" dy="55">少丢现场</tspan><tspan x="1490" dy="55">少事实漂移</tspan><tspan x="1490" dy="55">可证明</tspan></text>
+<text x="84" y="650" font-size="25" font-weight="800" fill="#2563EB" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">价值闭环</text>
+<rect x="72" y="672" width="1656" height="260" rx="22" fill="#FFFFFF" stroke="#B8C4D6" stroke-width="2"/>
+<rect x="104" y="718" width="280" height="140" rx="22" fill="#E9EEF5" stroke="#B8C4D6" stroke-width="2"/>
+<text x="244" y="756" font-size="22" font-weight="800" fill="#2563EB" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">Context 可恢复</text>
+<text x="244" y="800" font-size="19" font-weight="700" fill="#64748B" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">新会话少搬运</text>
+<rect x="410" y="718" width="280" height="140" rx="22" fill="#E9EEF5" stroke="#B8C4D6" stroke-width="2"/>
+<text x="550" y="756" font-size="22" font-weight="800" fill="#7C3AED" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">Contract + Scope</text>
+<text x="550" y="800" font-size="19" font-weight="700" fill="#64748B" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">执行前少歧义</text>
+<rect x="716" y="718" width="280" height="140" rx="22" fill="#E9EEF5" stroke="#B8C4D6" stroke-width="2"/>
+<text x="856" y="756" font-size="22" font-weight="800" fill="#0F766E" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">Snapshot + Handoff</text>
+<text x="856" y="800" font-size="19" font-weight="700" fill="#64748B" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">失败后少丢现场</text>
+<rect x="1022" y="718" width="280" height="140" rx="22" fill="#E9EEF5" stroke="#B8C4D6" stroke-width="2"/>
+<text x="1162" y="756" font-size="22" font-weight="800" fill="#B45309" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">Git 单一真源</text>
+<text x="1162" y="800" font-size="19" font-weight="700" fill="#64748B" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">减少多端漂移</text>
+<rect x="1328" y="718" width="368" height="140" rx="22" fill="#E9EEF5" stroke="#B8C4D6" stroke-width="2"/>
+<text x="1512" y="756" font-size="22" font-weight="800" fill="#15803D" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">Evidence + Demo</text>
+<text x="1512" y="800" font-size="19" font-weight="700" fill="#64748B" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">工程能力可回查</text>
+<text x="104" y="900" font-size="19" font-weight="700" fill="#64748B" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">产品成熟的下一门槛：把人工外部流程中的 Task State、Approval、Evidence 和 Recovery 物化进可信控制面。</text>
+<text x="72" y="1055" class="small muted">ai-agent-platform · Formal Visual Asset · v2</text>
+</svg>

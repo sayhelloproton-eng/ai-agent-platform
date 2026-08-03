@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1100" viewBox="0 0 1800 1100">
+<rect width="1800" height="1100" fill="#F5F7FB"/>
+<style>text{font-family:'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif;fill:#122033}.muted{fill:#64748B}.small{font-size:18px}.body{font-size:22px}.label{font-size:20px;font-weight:700}.title{font-size:36px;font-weight:800}.subtitle{font-size:20px;fill:#64748B}.cardTitle{font-size:25px;font-weight:800}.badge{font-size:18px;font-weight:800}</style>
+<text x="72" y="64" class="title">平台能力成熟度与证据门</text>
+<text x="72" y="104" class="subtitle">成熟度由可定位证据升级；当前 L1 已接受、L2 窄链路已验证，主缺口位于 L3。</text>
+<rect x="1545" y="38" width="180" height="48" rx="24" fill="#DCEAFE"/><text x="1635" y="69" text-anchor="middle" class="badge" style="fill:#2563EB">VIS-012</text>
+<line x1="72" y1="132" x2="1728" y2="132" stroke="#B8C4D6" stroke-width="2"/>
+<defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#64748B"/></marker><marker id="arrowBlue" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#2563EB"/></marker></defs>
+<text x="84" y="180" font-size="25" font-weight="800" fill="#2563EB" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">证据门原则</text>
+<text x="250" y="180" font-size="20" font-weight="700" fill="#64748B" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">上一层没有可复现证据，不扩大下一层实现；每层同时写清已有证据与关键缺口。</text>
+<rect x="72" y="218" width="1656" height="640" rx="22" fill="#FFFFFF" stroke="#B8C4D6" stroke-width="2"/>
+<rect x="98" y="260" width="286" height="520" rx="22" fill="#DCEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="122" y="308" font-size="34" font-weight="900" fill="#2563EB" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">L1</text>
+<text x="122" y="348" font-size="23" font-weight="800" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">知识可恢复</text>
+<rect x="122" y="372" width="160" height="34" rx="17" fill="#FFFFFF" stroke="#2563EB" stroke-width="1"/><text x="202.0" y="396" font-size="16" font-weight="800" fill="#2563EB" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">accepted</text>
+<text x="122" y="442" font-size="18" font-weight="800" fill="#2563EB" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">能力与证据</text>
+<text x="122" y="480" font-size="19" font-weight="650" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="122" dy="0">Git 真源 / Context</tspan><tspan x="122" dy="38">知识 / Registry</tspan><tspan x="122" dy="38">Document Bundle</tspan></text>
+<text x="122" y="620" font-size="18" font-weight="800" fill="#2563EB" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">关键门槛</text>
+<text x="122" y="657" font-size="18" font-weight="700" fill="#64748B" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="122" dy="0">Feishu 发布回读</tspan></text>
+<line x1="384" y1="520" x2="406" y2="520" stroke="#64748B" stroke-width="3" marker-end="url(#arrow)" stroke-dasharray="8 7"/>
+<rect x="420" y="260" width="286" height="520" rx="22" fill="#CCFBF1" stroke="#0F766E" stroke-width="2"/>
+<text x="444" y="308" font-size="34" font-weight="900" fill="#0F766E" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">L2</text>
+<text x="444" y="348" font-size="23" font-weight="800" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">安全链路可调用</text>
+<rect x="444" y="372" width="160" height="34" rx="17" fill="#FFFFFF" stroke="#0F766E" stroke-width="1"/><text x="524.0" y="396" font-size="16" font-weight="800" fill="#0F766E" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">MVP verified</text>
+<text x="444" y="442" font-size="18" font-weight="800" fill="#0F766E" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">能力与证据</text>
+<text x="444" y="480" font-size="19" font-weight="650" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="444" dy="0">Contracts / Auth</tspan><tspan x="444" dy="38">Gateway / Runtime</tspan><tspan x="444" dy="38">真实窄调用</tspan></text>
+<text x="444" y="620" font-size="18" font-weight="800" fill="#0F766E" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">关键门槛</text>
+<text x="444" y="657" font-size="18" font-weight="700" fill="#64748B" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="444" dy="0">动态身份 / 生产入口</tspan></text>
+<line x1="706" y1="520" x2="728" y2="520" stroke="#64748B" stroke-width="3" marker-end="url(#arrow)" stroke-dasharray="8 7"/>
+<rect x="742" y="260" width="286" height="520" rx="22" fill="#EDE9FE" stroke="#7C3AED" stroke-width="2"/>
+<text x="766" y="308" font-size="34" font-weight="900" fill="#7C3AED" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">L3</text>
+<text x="766" y="348" font-size="23" font-weight="800" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">任务可治理</text>
+<rect x="766" y="372" width="160" height="34" rx="17" fill="#FFFFFF" stroke="#7C3AED" stroke-width="1"/><text x="846.0" y="396" font-size="16" font-weight="800" fill="#7C3AED" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">next</text>
+<text x="766" y="442" font-size="18" font-weight="800" fill="#7C3AED" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">能力与证据</text>
+<text x="766" y="480" font-size="19" font-weight="650" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="766" dy="0">Goal / Task / State</tspan><tspan x="766" dy="38">Approval / Evidence</tspan><tspan x="766" dy="38">Checkpoint / Recovery</tspan></text>
+<text x="766" y="620" font-size="18" font-weight="800" fill="#7C3AED" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">关键门槛</text>
+<text x="766" y="657" font-size="18" font-weight="700" fill="#64748B" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="766" dy="0">当前主缺口</tspan></text>
+<line x1="1028" y1="520" x2="1050" y2="520" stroke="#64748B" stroke-width="3" marker-end="url(#arrow)" stroke-dasharray="8 7"/>
+<rect x="1064" y="260" width="286" height="520" rx="22" fill="#FEF3C7" stroke="#B45309" stroke-width="2"/>
+<text x="1088" y="308" font-size="34" font-weight="900" fill="#B45309" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">L4</text>
+<text x="1088" y="348" font-size="23" font-weight="800" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">多 Agent / 执行器</text>
+<rect x="1088" y="372" width="160" height="34" rx="17" fill="#FFFFFF" stroke="#B45309" stroke-width="1"/><text x="1168.0" y="396" font-size="16" font-weight="800" fill="#B45309" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">target</text>
+<text x="1088" y="442" font-size="18" font-weight="800" fill="#B45309" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">能力与证据</text>
+<text x="1088" y="480" font-size="19" font-weight="650" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="1088" dy="0">Profile / Pack</tspan><tspan x="1088" dy="38">Lane / Adapter</tspan><tspan x="1088" dy="38">Eval / Release</tspan></text>
+<text x="1088" y="620" font-size="18" font-weight="800" fill="#B45309" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">关键门槛</text>
+<text x="1088" y="657" font-size="18" font-weight="700" fill="#64748B" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="1088" dy="0">尚未物化</tspan></text>
+<line x1="1350" y1="520" x2="1372" y2="520" stroke="#64748B" stroke-width="3" marker-end="url(#arrow)" stroke-dasharray="8 7"/>
+<rect x="1386" y="260" width="286" height="520" rx="22" fill="#DCFCE7" stroke="#15803D" stroke-width="2"/>
+<text x="1410" y="308" font-size="34" font-weight="900" fill="#15803D" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">L5</text>
+<text x="1410" y="348" font-size="23" font-weight="800" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">真实产品可证明</text>
+<rect x="1410" y="372" width="160" height="34" rx="17" fill="#FFFFFF" stroke="#15803D" stroke-width="1"/><text x="1490.0" y="396" font-size="16" font-weight="800" fill="#15803D" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">future</text>
+<text x="1410" y="442" font-size="18" font-weight="800" fill="#15803D" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">能力与证据</text>
+<text x="1410" y="480" font-size="19" font-weight="650" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="1410" dy="0">业务纵向切片</tspan><tspan x="1410" dy="38">质量 / 成本</tspan><tspan x="1410" dy="38">Demo / Portfolio</tspan></text>
+<text x="1410" y="620" font-size="18" font-weight="800" fill="#15803D" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">关键门槛</text>
+<text x="1410" y="657" font-size="18" font-weight="700" fill="#64748B" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="1410" dy="0">AI 视频待验证</tspan></text>
+<rect x="72" y="890" width="1656" height="86" rx="20" fill="#E9EEF5" stroke="#B8C4D6" stroke-width="1"/>
+<text x="100" y="925" font-size="20" font-weight="800" fill="#2563EB" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">当前判断</text>
+<text x="245" y="925" font-size="20" font-weight="750" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">L1 已接受；L2 MVP 已验证；下一阶段先完成 L3 任务治理，再讨论 L4 自动协作和 L5 业务扩展。</text>
+<text x="72" y="1055" class="small muted">ai-agent-platform · Formal Visual Asset · v2</text>
+</svg>

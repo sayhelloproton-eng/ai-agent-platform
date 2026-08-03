@@ -6,36 +6,38 @@
 
 本文回答：**`ai-agent-platform` 的产品能力如何分层、当前位于哪里、每一级需要什么证据才能升级。**
 
-即时执行顺序见 `context/roadmap.md`，当前事实见 [CTX-005](../../00_项目入口/CTX-005-当前能力与演进差距.md)。本文保持稳定的成熟度模型，不保存易漂移的批次和日期。
+即时执行顺序见 `context/roadmap.md`，当前事实见 [CTX-005](../CTX-005-当前能力与演进差距.md)。本文保持稳定的成熟度模型，不保存易漂移的批次和日期。
 
 ## 2. 成熟度阶梯
 
-![平台能力成熟度阶梯](./assets/VIS-012-平台能力成熟度阶梯.png)
+![平台能力成熟度与证据门](./assets/VIS-012-平台能力成熟度阶梯.png)
 
 ### AI 可读语义镜像
 
 ```text
-L1 知识可恢复：accepted。
-能力：Git 真源、Context、正式知识、Registry、Document Bundle、Projection 规则。
-证据：新 Agent 可按入口恢复项目，正式知识可校验并发布。
+成熟度由证据门升级，不由功能数量、文档数量或计划日期升级。
 
-L2 安全链路可调用：MVP verified。
-能力：Contracts、Auth、Policy、Gateway、Runtime、开发期公网入口。
-证据：本地和公网真实调用、未认证拒绝、结果校验、测试与日志。
+L1 知识可恢复 — accepted：
+- 已有 Git 真源、Context、正式知识、Registry、Document Bundle；
+- 剩余发布门：Feishu 全量覆盖与 Readback。
 
-L3 任务可治理：next。
-能力：Goal / Task / Version / State、Approval、Evidence、Ledger、Checkpoint、Recovery。
-证据：跨 Session 继续，非法状态被拒，审批和执行绑定，失败可恢复或终止。
+L2 安全链路可调用 — MVP verified：
+- 已有 Contracts、Auth、Policy、Gateway、Runtime 与真实窄链路；
+- 缺口：动态身份、生产入口和更广 Capability。
 
-L4 多 Agent / 多执行器协作：target。
-能力：Agent Profile、Knowledge Pack、Execution Lane、Adapter、Release、评估。
-证据：角色可重建，写入任务隔离，执行器可替换，权限和知识受控。
+L3 任务可治理 — next：
+- 需要 Goal / Task / Version / State、Approval、Evidence、Ledger、Checkpoint、Recovery；
+- 通过门：跨 Session 可继续、非法状态拒绝、审批和执行版本绑定。
 
-L5 真实产品可证明：future。
-能力：上层业务纵向切片、Provider 替换、质量/成本记录、Demo 与 Portfolio。
-证据：用户看到完整成果，失败路径可解释，业务对象稳定。
+L4 多 Agent / 多执行器 — target：
+- 需要 Agent Profile、Knowledge Pack、Execution Lane、Adapter、Eval、Release；
+- 通过门：角色可重建、执行器可替换、知识与权限受控。
 
-原则：上一层没有可定位证据，不扩大下一层实现。
+L5 真实产品可证明 — future：
+- 需要上层业务纵向切片、Provider 替换、质量和成本证据、用户可见 Demo；
+- 首个候选验证产品是 AI 视频工作流。
+
+当前主缺口位于 L3；上一层没有可定位证据时，不扩大下一层实现。
 ```
 
 - Visual Asset ID：`VIS-012`；
@@ -120,5 +122,5 @@ L5 真实产品可证明：future。
 
 - [PRD-003 ai-agent-platform 产品定义与用户价值](../PRD-003-ai-agent-platform产品定义与用户价值/README.md)
 - [PRD-006 AI 视频工作流产品概念与验证计划](../PRD-006-AI视频工作流产品概念与验证计划/README.md)
-- [CTX-005 当前能力与演进差距](../../00_项目入口/CTX-005-当前能力与演进差距.md)
+- [CTX-005 当前能力与演进差距](../CTX-005-当前能力与演进差距.md)
 - [ARC-016 能力依赖、多任务并行与分阶段 MVP 路线图](../../04_平台架构/ARC-016-能力依赖多任务并行与分阶段MVP路线图/README.md)

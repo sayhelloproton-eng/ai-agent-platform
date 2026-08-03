@@ -29,8 +29,9 @@ completed_batches:
 - 19-experiments-and-portfolio-review
 - 20-terminology-and-sources-review
 - 21-final-audit-control-plane-closure
+- 22-project-product-convergence-and-visual-refresh
 current_batch: none
-next_batch: 独立授权 Feishu Preview、全量覆盖发布与 Readback Verification；发布完成后使用独立 Commit 记录 publication status。
+next_batch: Feishu 知识库旧树清理、CTX-001 根首页与 ARC-001 Pilot；用户确认后再全量覆盖和 Readback。
 matrix: platform-registry/migrations/asset-migration-matrix.csv
 rules:
   preserve_stable_ids: true

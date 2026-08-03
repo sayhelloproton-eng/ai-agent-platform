@@ -178,5 +178,5 @@ notes
 
 - [CAP-001 ChatGPT 生态体系与配置全景](../../02_基础产品与能力/CAP-001-ChatGPT生态体系与配置全景/README.md)
 - [CAP-006 从 ChatGPT 到 Codex 的平台执行闭环](../../02_基础产品与能力/CAP-006-从ChatGPT到Codex的平台执行闭环/README.md)
-- [DEC-001 架构决策演进摘要](../../00_项目入口/DEC-001-架构决策演进摘要.md)
+- [DEC-001 架构决策演进摘要](../../00_项目与产品/DEC-001-架构决策演进摘要.md)
 - [EXP-005 Custom GPT Actions 链路实验](../../08_实验与复盘/EXP-005-Custom-GPT-Actions链路实验/README.md)

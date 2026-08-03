@@ -518,3 +518,10 @@ docs/knowledge/05_上下文与知识系统/KNO-005-项目知识生命周期/READ
 ,md,Context and Knowledge System Canonical Bundle,materialize,docs/knowledge/05_上下文与知识系统/ARC-002-上下文与知识系统总体架构/README.md,ARC-002,五领域、外部协作、多消费者和双循环总览,16-context-and-knowledge-system-review
 ,md,规划者与执行器任务交接技能,archive_supersede,docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/SKL-003-规划者与执行器任务交接技能.md,SKL-003,运行时真源保留在 skills/**，工作流关系归 07,13-agent-asset-system
 ,md,项目知识综合技能,archive_supersede,docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/SKL-004-项目知识综合技能.md,SKL-004,运行时真源保留在 skills/**，设计关系并入 AGT-005,13-agent-asset-system
+docs/knowledge/00_项目入口/CTX-001-项目总览.md,md,CTX-001 智能体工程探索录,move_bundle,docs/knowledge/00_项目与产品/CTX-001-智能体工程探索录/README.md,CTX-001,项目与产品合并；Stable ID 保留；转换为含正式总揽图的 Document Bundle,22-project-product-convergence-and-visual-refresh
+docs/knowledge/00_项目入口/CTX-005-当前能力与演进差距.md,md,CTX-005 当前能力与演进差距,move,docs/knowledge/00_项目与产品/CTX-005-当前能力与演进差距.md,CTX-005,移动到合并后的项目与产品知识域,22-project-product-convergence-and-visual-refresh
+docs/knowledge/00_项目入口/DEC-001-架构决策演进摘要.md,md,DEC-001 架构决策演进摘要,move,docs/knowledge/00_项目与产品/DEC-001-架构决策演进摘要.md,DEC-001,移动到合并后的项目与产品知识域,22-project-product-convergence-and-visual-refresh
+docs/knowledge/01_产品体系/PRD-003-ai-agent-platform产品定义与用户价值/README.md,md,PRD-003 Product Bundle,move_bundle,docs/knowledge/00_项目与产品/PRD-003-ai-agent-platform产品定义与用户价值/README.md,PRD-003,产品体系并入项目与产品；重生成 VIS-011,22-project-product-convergence-and-visual-refresh
+docs/knowledge/01_产品体系/PRD-005-平台能力地图与产品成熟度/README.md,md,PRD-005 Product Bundle,move_bundle,docs/knowledge/00_项目与产品/PRD-005-平台能力地图与产品成熟度/README.md,PRD-005,产品体系并入项目与产品；重生成 VIS-012,22-project-product-convergence-and-visual-refresh
+docs/knowledge/01_产品体系/PRD-006-AI视频工作流产品概念与验证计划/README.md,md,PRD-006 Product Bundle,move_bundle,docs/knowledge/00_项目与产品/PRD-006-AI视频工作流产品概念与验证计划/README.md,PRD-006,产品体系并入项目与产品；重生成 VIS-013,22-project-product-convergence-and-visual-refresh
+docs/knowledge/01_产品体系/PRD-007-产品组合演进与平台边界/README.md,md,PRD-007 Product Bundle,move_bundle,docs/knowledge/00_项目与产品/PRD-007-产品组合演进与平台边界/README.md,PRD-007,产品体系并入项目与产品；重生成 VIS-014,22-project-product-convergence-and-visual-refresh

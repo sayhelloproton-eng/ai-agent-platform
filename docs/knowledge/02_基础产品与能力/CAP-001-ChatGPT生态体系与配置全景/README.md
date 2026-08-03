@@ -291,4 +291,4 @@ Visual Asset ID：`VIS-015`
 - [CAP-002 生态组件配置与能力差异](../CAP-002-生态组件配置与能力差异/README.md)
 - [CAP-008 平台核心能力模型与目标对齐](../CAP-008-平台核心能力模型与目标对齐/README.md)
 - [CAP-006 从 ChatGPT 到 Codex 的平台执行闭环](../CAP-006-从ChatGPT到Codex的平台执行闭环/README.md)
-- [PRD-003 产品定义与用户价值](../../01_产品体系/PRD-003-ai-agent-platform产品定义与用户价值/README.md)
+- [PRD-003 产品定义与用户价值](../../00_项目与产品/PRD-003-ai-agent-platform产品定义与用户价值/README.md)

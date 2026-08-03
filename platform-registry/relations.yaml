@@ -1,4 +1,4 @@
-version: 5
+version: 6
 project: ai-agent-platform
 relations:
 - from: CTX-002
@@ -1360,3 +1360,6 @@ relations:
 - from: VIS-034
   type: explains
   to: KNO-009
+- from: VIS-036
+  type: explains
+  to: CTX-001

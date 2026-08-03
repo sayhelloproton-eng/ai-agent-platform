@@ -56,8 +56,8 @@ capabilities:
   status: idea
   implemented_by: []
   evidence:
-  - docs/knowledge/01_产品体系/PRD-006-AI视频工作流产品概念与验证计划/README.md
-  - docs/knowledge/01_产品体系/PRD-007-产品组合演进与平台边界/README.md
+  - docs/knowledge/00_项目与产品/PRD-006-AI视频工作流产品概念与验证计划/README.md
+  - docs/knowledge/00_项目与产品/PRD-007-产品组合演进与平台边界/README.md
 - id: CAP-PLANNER-EXECUTOR-HANDOFF
   status: verified
   implemented_by:

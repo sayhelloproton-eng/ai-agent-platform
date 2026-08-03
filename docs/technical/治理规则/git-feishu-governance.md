@@ -25,7 +25,10 @@ Feishu 文本块 + 图片块 + 同一语义镜像
 
 - one-way；
 - overwrite；
-- one Git document bundle → one Feishu document node；
+- one Canonical Git document → one Feishu document node；
+- Feishu 导航树由 Projection Policy 编译，不要求机械复制 Git 目录；
+- `CTX-001《智能体工程探索录》` 作为独立根首页，其余 CTX / DEC / PRD 进入“项目与产品”；
+- Git 目录 README 只服务本地和 Agent 导航，不作为独立正文页面；
 - 发布前不读取 Feishu 正文做语义 Diff；
 - 不合并、不反向同步；
 - 本地图片在发布阶段上传并插入原位置；

@@ -27,27 +27,20 @@
 ### AI 可读语义镜像
 
 ```text
-当前主产品：ai-agent-platform。
-状态：active build。
-定义：个人 Agent 工程协作与可信执行平台，是当前仓库主体。
+产品组合分为三层：
+1. 当前主产品：ai-agent-platform，active build / MVP early；
+2. 计划验证产品：AI 视频工作流，concept accepted / implementation not started；
+3. 潜在方向池：可信任务控制台、Agent 资产工作台、知识治理工作台和第二垂直工作流，均为 idea / discovery，不是产品承诺。
 
-计划验证产品：AI 视频工作流。
-状态：concept accepted / implementation not started。
-定义：首个依托平台的上层业务纵向切片。
+四类对象必须分开：
+- 项目：建设、学习、实验、治理和 Portfolio 的过程载体；
+- 产品：为明确用户解决重复问题并交付结果；
+- 平台能力：跨产品复用的 Contract、Task、Policy、Evidence、Recovery、Knowledge 和运行机制；
+- Provider：可替换的模型、工具、网络、存储和外部服务。
 
-潜在方向池：不是产品承诺，仅处于 idea / discovery。
-候选方向包括：
-- 可信任务控制台；
-- 专业 Agent 资产工作台；
-- 项目知识治理工作台；
-- 第二个尚未命名的垂直业务工作流。
-这些方向可能成为平台模块、独立产品或被拒绝，必须先通过产品判定标准。
+升级条件：潜在方向只有同时具备用户、重复问题、结果、产品形态、最小切片、证据门和停止条件，才升级为正式产品概念。
 
-四类对象：
-项目 = 建设、学习和 Portfolio 的过程载体；
-产品 = 为明确用户解决重复问题并交付结果；
-平台能力 = 跨产品复用的 Contract、治理和运行机制；
-Provider = 可替换的模型、工具、网络和外部服务。
+仓库原则：当前不创建根级 products/；真实产品进入设计或开发后，按资产类型进入现有目录，并由 Registry 表达归属。
 ```
 
 - Visual Asset ID：`VIS-014`；

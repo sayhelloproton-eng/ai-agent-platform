@@ -1,4 +1,4 @@
-version: 1
+version: 2
 project: ai-agent-platform
 provider: feishu
 direction: git_to_feishu
@@ -8,8 +8,28 @@ semantic_diff: false
 reverse_write: false
 source_root: docs/knowledge/
 structure: one_to_one
+navigation_mode: governed_tree
 document_entry: README.md
+directory_readmes_published: false
 image_source: document_bundle
+homepage:
+  source_asset_id: CTX-001
+  source_path: docs/knowledge/00_项目与产品/CTX-001-智能体工程探索录/README.md
+  title: 智能体工程探索录
+  preserve_existing_root_node: true
+  projected_parent: root
+  exclude_from_navigation_groups: true
+navigation_groups:
+- group_id: project-and-product
+  title: 项目与产品
+  order: 0
+  source_root: docs/knowledge/00_项目与产品/
+  excluded_assets:
+  - CTX-001
+  asset_prefix_order:
+  - CTX
+  - DEC
+  - PRD
 require_write_preview: true
 require_human_confirmation: true
 require_readback_verification: true

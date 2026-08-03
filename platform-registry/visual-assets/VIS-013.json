@@ -1,22 +1,22 @@
 {
   "visual_asset_id": "VIS-013",
-  "title": "AI视频工作流产品体验与验证切片",
-  "version": 1,
+  "title": "AI视频工作流产品体验与低成本验证切片",
+  "version": 2,
   "status": "accepted",
-  "target_document": "docs/knowledge/01_产品体系/PRD-006-AI视频工作流产品概念与验证计划/README.md",
+  "target_document": "docs/knowledge/00_项目与产品/PRD-006-AI视频工作流产品概念与验证计划/README.md",
   "target_document_asset_id": "PRD-006",
   "source_documents": [
     "PRD-006",
     "PRD-007"
   ],
   "storage_model": "document_bundle",
-  "source_svg": "docs/knowledge/01_产品体系/PRD-006-AI视频工作流产品概念与验证计划/assets/VIS-013-AI视频工作流产品体验与验证切片.svg",
-  "preview_png": "docs/knowledge/01_产品体系/PRD-006-AI视频工作流产品概念与验证计划/assets/VIS-013-AI视频工作流产品体验与验证切片.png",
+  "source_svg": "docs/knowledge/00_项目与产品/PRD-006-AI视频工作流产品概念与验证计划/assets/VIS-013-AI视频工作流产品体验与验证切片.svg",
+  "preview_png": "docs/knowledge/00_项目与产品/PRD-006-AI视频工作流产品概念与验证计划/assets/VIS-013-AI视频工作流产品体验与验证切片.png",
   "markdown_image": "./assets/VIS-013-AI视频工作流产品体验与验证切片.png",
   "semantic_mirror_heading": "AI 可读语义镜像",
   "width": 1800,
   "height": 1100,
-  "svg_sha256": "e646a7b4554ea90aff60015311dcfe7932850a428e5e04dcc977861b17aed33e",
-  "png_sha256": "501f0bdca372dbba27950c332f10352b2eef073b7899216827d3d9323ee9ab6f",
-  "review_notes": "产品体系人工 Review 后生成；视觉图与 AI 可读语义镜像共同表达产品定义、成熟度或组合边界。"
+  "svg_sha256": "6a601e4fb42c43395dd4b7935f44d07c95181f91c3cc1f787f0fe194c2b4334b",
+  "png_sha256": "9386b85f8d831ce43cffb446d72ede10a7d1798ded7b75ce86c28aacbc31dafc",
+  "review_notes": "正文、术语、状态边界与信息图谱冻结后重生成；SVG 与 PNG 同目录，图中明确区分已验证、正式设计和计划中。"
 }

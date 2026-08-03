@@ -6,7 +6,7 @@
 
 本文拥有 Opportunity Intake、产品候选、Product Decision Gate、Asset Plan 和 Specialized Workflow Plug-in Contract。
 
-产品愿景、用户、需求和业务对象属于 `01_产品体系`；平台通用控制能力属于其他 WFL 文档。本文不直接创建未立项产品的代码目录，也不把单一技术功能自动升级为产品。
+产品愿景、用户、需求和业务对象属于 `00_项目与产品`；平台通用控制能力属于其他 WFL 文档。本文不直接创建未立项产品的代码目录，也不把单一技术功能自动升级为产品。
 
 ## 2. 核心对象
 
@@ -152,7 +152,7 @@ platform_capabilities_reused
 
 ## 10. AI 视频示例边界
 
-AI 视频可以包含 Story、Character、Scene、Shot、Prompt、Generation、Evaluation 等业务对象和流程。详细内容应由 `01_产品体系` 的 AI 视频资产及未来真实实现拥有。
+AI 视频可以包含 Story、Character、Scene、Shot、Prompt、Generation、Evaluation 等业务对象和流程。详细内容由 `00_项目与产品` 的 AI 视频资产及未来真实实现拥有。
 
 `07` 只规定：
 

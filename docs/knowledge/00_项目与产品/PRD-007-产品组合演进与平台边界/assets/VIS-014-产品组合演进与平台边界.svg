@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1100" viewBox="0 0 1800 1100">
+<rect width="1800" height="1100" fill="#F5F7FB"/>
+<style>text{font-family:'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif;fill:#122033}.muted{fill:#64748B}.small{font-size:18px}.body{font-size:22px}.label{font-size:20px;font-weight:700}.title{font-size:36px;font-weight:800}.subtitle{font-size:20px;fill:#64748B}.cardTitle{font-size:25px;font-weight:800}.badge{font-size:18px;font-weight:800}</style>
+<text x="72" y="64" class="title">产品组合、演进阶段与平台边界</text>
+<text x="72" y="104" class="subtitle">当前主产品、计划验证产品和机会池使用不同承诺等级；平台能力不等于独立产品。</text>
+<rect x="1545" y="38" width="180" height="48" rx="24" fill="#DCEAFE"/><text x="1635" y="69" text-anchor="middle" class="badge" style="fill:#2563EB">VIS-014</text>
+<line x1="72" y1="132" x2="1728" y2="132" stroke="#B8C4D6" stroke-width="2"/>
+<defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#64748B"/></marker><marker id="arrowBlue" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#2563EB"/></marker></defs>
+<text x="84" y="180" font-size="25" font-weight="800" fill="#2563EB" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">产品组合</text>
+<rect x="72" y="212" width="500" height="300" rx="22" fill="#DCEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="102" y="252" font-size="21" font-weight="800" fill="#2563EB" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">当前主产品</text>
+<text x="322" y="315" font-size="31" font-weight="900" fill="#122033" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">ai-agent-platform</text>
+<rect x="215" y="344" width="215" height="34" rx="17" fill="#FFFFFF" stroke="#2563EB" stroke-width="1"/><text x="322.5" y="368" font-size="16" font-weight="800" fill="#2563EB" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">active build / MVP early</text>
+<text x="322" y="420" font-size="20" font-weight="750" fill="#122033" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">个人 Agent 工程协作与可信执行平台</text>
+<text x="322" y="462" font-size="18" font-weight="700" fill="#64748B" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">下一证据：L3 Task Control + 业务切片</text>
+<line x1="584" y1="362" x2="644" y2="362" stroke="#64748B" stroke-width="3" marker-end="url(#arrow)" stroke-dasharray="8 7"/>
+<rect x="654" y="212" width="500" height="300" rx="22" fill="#CCFBF1" stroke="#0F766E" stroke-width="2"/>
+<text x="684" y="252" font-size="21" font-weight="800" fill="#0F766E" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">计划验证产品</text>
+<text x="904" y="315" font-size="31" font-weight="900" fill="#122033" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">AI 视频工作流</text>
+<rect x="775" y="344" width="260" height="34" rx="17" fill="#FFFFFF" stroke="#0F766E" stroke-width="1"/><text x="905.0" y="368" font-size="16" font-weight="800" fill="#0F766E" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">concept accepted / not started</text>
+<text x="904" y="420" font-size="20" font-weight="750" fill="#122033" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">首个上层业务纵向切片</text>
+<text x="904" y="462" font-size="18" font-weight="700" fill="#64748B" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">下一证据：Story → JSON Slice 1</text>
+<line x1="1166" y1="362" x2="1226" y2="362" stroke="#64748B" stroke-width="3" marker-end="url(#arrow)" stroke-dasharray="8 7"/>
+<rect x="1236" y="212" width="492" height="300" rx="22" fill="#EDE9FE" stroke="#7C3AED" stroke-width="2"/>
+<text x="1266" y="252" font-size="21" font-weight="800" fill="#7C3AED" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">潜在方向池</text>
+<text x="1482" y="315" font-size="31" font-weight="900" fill="#122033" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">非产品承诺</text>
+<rect x="1392" y="344" width="180" height="34" rx="17" fill="#FFFFFF" stroke="#7C3AED" stroke-width="1"/><text x="1482.0" y="368" font-size="16" font-weight="800" fill="#7C3AED" text-anchor="middle" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">idea / discovery</text>
+<text x="1280" y="410" font-size="19" font-weight="700" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="1280" dy="0">可信任务控制台 · Agent 资产工作台</tspan><tspan x="1280" dy="38">知识治理工作台 · 第二垂直工作流</tspan></text>
+<text x="84" y="570" font-size="25" font-weight="800" fill="#2563EB" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">四类对象边界</text>
+<rect x="72" y="596" width="1656" height="316" rx="22" fill="#FFFFFF" stroke="#B8C4D6" stroke-width="2"/>
+<rect x="98" y="642" width="370" height="194" rx="18" fill="#DCEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="122" y="684" font-size="23" font-weight="850" fill="#2563EB" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">项目</text>
+<text x="122" y="730" font-size="17" font-weight="650" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="122" dy="0">建设、学习、实验、治理</tspan><tspan x="122" dy="31">和 Portfolio 的过程载体</tspan></text>
+<rect x="504" y="642" width="370" height="194" rx="18" fill="#CCFBF1" stroke="#0F766E" stroke-width="2"/>
+<text x="528" y="684" font-size="23" font-weight="850" fill="#0F766E" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">产品</text>
+<text x="528" y="730" font-size="17" font-weight="650" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="528" dy="0">为明确用户解决重复问题</tspan><tspan x="528" dy="31">并交付可观察结果</tspan></text>
+<rect x="910" y="642" width="370" height="194" rx="18" fill="#FEF3C7" stroke="#B45309" stroke-width="2"/>
+<text x="934" y="684" font-size="23" font-weight="850" fill="#B45309" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">平台能力</text>
+<text x="934" y="730" font-size="17" font-weight="650" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="934" dy="0">跨产品复用的 Contract、Task、Policy</tspan><tspan x="934" dy="31">Evidence、Recovery 和 Knowledge</tspan></text>
+<rect x="1316" y="642" width="370" height="194" rx="18" fill="#EDE9FE" stroke="#7C3AED" stroke-width="2"/>
+<text x="1340" y="684" font-size="23" font-weight="850" fill="#7C3AED" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">Provider</text>
+<text x="1340" y="730" font-size="17" font-weight="650" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif"><tspan x="1340" dy="0">可替换的模型、工具、网络</tspan><tspan x="1340" dy="31">存储和外部服务</tspan></text>
+<text x="98" y="878" font-size="18" font-weight="750" fill="#64748B" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">升级规则：同时具备用户、重复问题、产品结果、最小切片、证据门和停止条件，才从机会升级为正式产品概念。</text>
+<rect x="72" y="938" width="1656" height="55" rx="18" fill="#E9EEF5" stroke="#B8C4D6" stroke-width="1"/>
+<text x="100" y="973" font-size="18" font-weight="750" fill="#122033" text-anchor="start" font-family="'Noto Sans CJK SC','Noto Sans SC','Microsoft YaHei',sans-serif">仓库原则：当前不创建根级 products/；真实产品按资产类型进入现有目录，并由 Registry 表达归属。</text>
+<text x="72" y="1055" class="small muted">ai-agent-platform · Formal Visual Asset · v2</text>
+</svg>

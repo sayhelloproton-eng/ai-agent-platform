@@ -6,7 +6,7 @@
 
 本文回答：**当前主产品为谁服务、解决什么问题、以什么形态交付、创造什么价值，以及怎样判断它开始成为可信产品。**
 
-项目为什么存在见 [CTX-001 项目总览](../../00_项目入口/CTX-001-项目总览.md)；当前完成度见 [CTX-005 当前能力与演进差距](../../00_项目入口/CTX-005-当前能力与演进差距.md)；架构实现见 [ARC-001 总体架构](../../04_平台架构/ARC-001-ai-agent-platform总体架构/README.md)。本文不重复项目历史、即时进度和技术实现细节。
+项目为什么存在见 [CTX-001 智能体工程探索录](../CTX-001-智能体工程探索录/README.md)；当前完成度见 [CTX-005 当前能力与演进差距](../CTX-005-当前能力与演进差距.md)；架构实现见 [ARC-001 总体架构](../../04_平台架构/ARC-001-ai-agent-platform总体架构/README.md)。本文不重复项目历史、即时进度和技术实现细节。
 
 ## 2. 产品身份
 
@@ -45,28 +45,28 @@
 
 ## 4. 产品形态与价值闭环
 
-![平台产品形态与价值闭环](./assets/VIS-011-平台产品形态与价值闭环.png)
+![平台产品工作系统与价值闭环](./assets/VIS-011-平台产品形态与价值闭环.png)
 
 ### AI 可读语义镜像
 
 ```text
-输入：用户目标与约束、Chat / 专业 Agent、仓库 Context 与证据。
+产品输入：用户目标与约束、可信 Context、仓库代码与证据。
 
-ai-agent-platform 由五个产品面组成：
-1. 人机入口：Chat、Custom GPT、人工审批；
-2. 控制面：Task、Policy、Approval、Evidence；
-3. 执行面：Gateway、Runtime、Codex、Tools；
-4. 知识面：Context、正式文档、Registry、Feishu Projection；
-5. 证明面：Tests、Demo、Portfolio Evidence。
+产品工作系统分为五个面：
+1. 人机入口（已存在）：Chat / Custom GPT、用户 Review；
+2. 规划与交接（已验证）：Planner、Task Contract、Scope、Git Policy、冻结 Artifact；
+3. 受控执行（MVP verified）：Gateway、Runtime、Codex / Tools，目前只有窄 Capability；
+4. 知识真源（accepted）：Git、Context、正式知识、Registry、Document Bundle；
+5. 证明与继续（observed）：Tests、Diff、Commit、远端回读、Portfolio Evidence。
 
-输出：可验证结果、可继续的项目状态、可复用工程资产。
+尚未完整物化的控制能力：持久 Task State、结构化 Approval、Evidence Ledger、Checkpoint 与自动 Recovery。
 
 价值闭环：
-Context 可恢复 → 少搬运；
-Contract + Policy → 少误执行；
-Snapshot + Handoff → 少丢现场；
+目标与事实可恢复 → 少搬运；
+合同与范围先冻结 → 少误执行；
+证据与快照可回查 → 少丢现场；
 Git 单一真源 → 少事实漂移；
-Evidence + Demo → 可证明。
+真实代码、测试和 Demo → 可证明。
 ```
 
 - Visual Asset ID：`VIS-011`；

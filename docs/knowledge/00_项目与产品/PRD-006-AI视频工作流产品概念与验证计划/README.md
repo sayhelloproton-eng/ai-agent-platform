@@ -32,26 +32,32 @@ AI 视频创作不是一次“输入 Prompt → 输出视频”。稳定作品�
 
 ## 4. 期望产品体验
 
-![AI 视频工作流产品体验与验证切片](./assets/VIS-013-AI视频工作流产品体验与验证切片.png)
+![AI 视频工作流产品体验与低成本验证切片](./assets/VIS-013-AI视频工作流产品体验与验证切片.png)
 
 ### AI 可读语义镜像
 
 ```text
-完整体验链：
-故事输入
-→ 结构理解（人物、场景、章节、冲突）
-→ 分镜规划（镜头、节奏、相机）
-→ 生成执行（图像、视频、音频 Provider）
-→ 质量复审（一致性、成本、风险）
-→ 作品输出（版本、证据、Demo）。
+完整产品体验（目标设计）：
+故事输入 → 结构理解 → 分镜规划 → 生成执行 → 质量复审 → 作品输出。
 
-验证切片：
-Slice 1：Story → Character / Scene / Chapter JSON，验证领域对象和人工修订；
-Slice 2：JSON → Storyboard / Shot Plan，验证创作结构与版本；
-Slice 3：Shot → Prompt → 单 Provider，验证 Adapter、成本和失败记录；
-Slice 4：Review → Retry → Demo，验证质量、审批、证据和交付。
+当前只按四个低成本验证切片推进：
+Slice 1：Story → Character / Scene / Chapter JSON。
+- 验证领域对象是否帮助人工理解与修订；
+- 停止条件：结构化结果只是摘要，没有编辑价值。
 
-当前状态：concept accepted / implementation not started。
+Slice 2：批准 JSON → Storyboard / Shot Plan。
+- 验证镜头计划、连续性约束和版本关系；
+- 停止条件：计划无法被人稳定修改或追溯到故事对象。
+
+Slice 3：一个 Shot → Prompt → 单 Provider。
+- 验证 Adapter、参数、成本和失败记录；
+- 停止条件：成本或可用性不满足预设预算。
+
+Slice 4：Review → Retry → Demo。
+- 验证质量、人工批准、证据和作品交付；
+- 停止条件：无法形成可解释的修订闭环。
+
+当前状态：concept accepted / implementation not started。不会直接建设完整视频编辑器，也不会提前冻结全部 DDD 对象。
 ```
 
 - Visual Asset ID：`VIS-013`；

@@ -1,16 +1,16 @@
-version: 5
+version: 6
 project: ai-agent-platform
 canonical_source: git
 assets:
 - asset_id: CTX-001
-  title: Project Context
+  title: 智能体工程探索录
   asset_type: context
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/00_项目入口/CTX-001-项目总览.md
+  current_path: docs/knowledge/00_项目与产品/CTX-001-智能体工程探索录/README.md
   target_path:
-  canonical_path: docs/knowledge/00_项目入口/CTX-001-项目总览.md
+  canonical_path: docs/knowledge/00_项目与产品/CTX-001-智能体工程探索录/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: CTX-002
@@ -442,9 +442,9 @@ assets:
   status: accepted
   evidence_level: verified
   materialized: true
-  current_path: docs/knowledge/00_项目入口/CTX-005-当前能力与演进差距.md
+  current_path: docs/knowledge/00_项目与产品/CTX-005-当前能力与演进差距.md
   target_path:
-  canonical_path: docs/knowledge/00_项目入口/CTX-005-当前能力与演进差距.md
+  canonical_path: docs/knowledge/00_项目与产品/CTX-005-当前能力与演进差距.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: CTX-006
@@ -482,9 +482,9 @@ assets:
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/00_项目入口/DEC-001-架构决策演进摘要.md
+  current_path: docs/knowledge/00_项目与产品/DEC-001-架构决策演进摘要.md
   target_path:
-  canonical_path: docs/knowledge/00_项目入口/DEC-001-架构决策演进摘要.md
+  canonical_path: docs/knowledge/00_项目与产品/DEC-001-架构决策演进摘要.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: PRD-003
@@ -493,9 +493,9 @@ assets:
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/01_产品体系/PRD-003-ai-agent-platform产品定义与用户价值/README.md
+  current_path: docs/knowledge/00_项目与产品/PRD-003-ai-agent-platform产品定义与用户价值/README.md
   target_path:
-  canonical_path: docs/knowledge/01_产品体系/PRD-003-ai-agent-platform产品定义与用户价值/README.md
+  canonical_path: docs/knowledge/00_项目与产品/PRD-003-ai-agent-platform产品定义与用户价值/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: PRD-004
@@ -516,9 +516,9 @@ assets:
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/01_产品体系/PRD-005-平台能力地图与产品成熟度/README.md
+  current_path: docs/knowledge/00_项目与产品/PRD-005-平台能力地图与产品成熟度/README.md
   target_path:
-  canonical_path: docs/knowledge/01_产品体系/PRD-005-平台能力地图与产品成熟度/README.md
+  canonical_path: docs/knowledge/00_项目与产品/PRD-005-平台能力地图与产品成熟度/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: PRD-006
@@ -527,9 +527,9 @@ assets:
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/01_产品体系/PRD-006-AI视频工作流产品概念与验证计划/README.md
+  current_path: docs/knowledge/00_项目与产品/PRD-006-AI视频工作流产品概念与验证计划/README.md
   target_path:
-  canonical_path: docs/knowledge/01_产品体系/PRD-006-AI视频工作流产品概念与验证计划/README.md
+  canonical_path: docs/knowledge/00_项目与产品/PRD-006-AI视频工作流产品概念与验证计划/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: PRD-007
@@ -538,9 +538,9 @@ assets:
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/01_产品体系/PRD-007-产品组合演进与平台边界/README.md
+  current_path: docs/knowledge/00_项目与产品/PRD-007-产品组合演进与平台边界/README.md
   target_path:
-  canonical_path: docs/knowledge/01_产品体系/PRD-007-产品组合演进与平台边界/README.md
+  canonical_path: docs/knowledge/00_项目与产品/PRD-007-产品组合演进与平台边界/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: CAP-001
@@ -1721,7 +1721,7 @@ assets:
   publication_status: unpublished
   migration_state: complete
 - asset_id: VIS-011
-  title: 平台产品形态与价值闭环
+  title: 平台产品工作系统与价值闭环
   asset_type: visual
   status: accepted
   evidence_level: verified
@@ -1732,7 +1732,7 @@ assets:
   publication_status: unpublished
   migration_state: complete
 - asset_id: VIS-012
-  title: 平台能力成熟度阶梯
+  title: 平台能力成熟度与证据门
   asset_type: visual
   status: accepted
   evidence_level: verified
@@ -1743,7 +1743,7 @@ assets:
   publication_status: unpublished
   migration_state: complete
 - asset_id: VIS-013
-  title: AI视频工作流产品体验与验证切片
+  title: AI视频工作流产品体验与低成本验证切片
   asset_type: visual
   status: accepted
   evidence_level: verified
@@ -2002,5 +2002,16 @@ assets:
   current_path: platform-registry/visual-assets/VIS-035.json
   target_path:
   canonical_path: platform-registry/visual-assets/VIS-035.json
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: VIS-036
+  title: 项目平台与真实执行总揽架构
+  asset_type: visual
+  status: accepted
+  evidence_level: verified
+  materialized: true
+  current_path: platform-registry/visual-assets/VIS-036.json
+  target_path:
+  canonical_path: platform-registry/visual-assets/VIS-036.json
   publication_status: unpublished
   migration_state: complete

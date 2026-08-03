@@ -79,5 +79,5 @@ Cloudflare 历史实现和安全文档保留为 Superseded 证据，不再作为
 ## 9. 关联资产
 
 - [EXP-006 Gateway、Local Runtime 与 Dev Tunnels 安全链路实验](../EXP-006-Gateway-Local-Runtime与Dev-Tunnels实验/README.md)
-- [DEC-001 架构决策演进摘要](../../00_项目入口/DEC-001-架构决策演进摘要.md)
-- [PRD-005 平台能力地图与产品成熟度](../../01_产品体系/PRD-005-平台能力地图与产品成熟度/README.md)
+- [DEC-001 架构决策演进摘要](../../00_项目与产品/DEC-001-架构决策演进摘要.md)
+- [PRD-005 平台能力地图与产品成熟度](../../00_项目与产品/PRD-005-平台能力地图与产品成熟度/README.md)

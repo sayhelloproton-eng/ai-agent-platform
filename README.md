@@ -78,10 +78,10 @@ Custom GPT
 当前处于：
 
 ```text
-Phase 2.5 — Knowledge Review Closure and Feishu Publication Preparation
+Phase 2.5 — Homepage Convergence and Feishu Publication Preparation
 ```
 
-`docs/knowledge/00～10` 已完成本轮 Canonical 内容 Review、聚合与落库。当前工作不再是继续扩写章节，而是同步 Context、Registry、Relations、Migration、Release、Navigation、Evidence 与 Projection 前置状态，形成可回读的正式 Git 基线。
+正式知识已完成内容 Review；原 `00_项目入口` 与 `01_产品体系` 已收敛为 `00_项目与产品`，`CTX-001《智能体工程探索录》` 成为总览正文和 Feishu 根首页来源。当前工作是应用冻结文档与视觉资产，并进入 Feishu 清空、Pilot 和全量覆盖准备。
 
 内容完成不等于 Agent Runtime 完成。Agent Profile、Knowledge Pack、Task Store、Approval、Evidence 等目标能力仍未实现。
 

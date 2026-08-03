@@ -1,4 +1,4 @@
-version: 5
+version: 6
 project: ai-agent-platform
 source_of_truth:
   type: git
@@ -17,6 +17,13 @@ projection:
   mode: overwrite
   direction: one_way
   structure: one_to_one
+  navigation_mode: governed_tree
+  homepage_asset_id: CTX-001
+  homepage_preserve_root_node: true
+  directory_readmes_published: false
+  project_product_group_title: 项目与产品
+  project_product_group_source: docs/knowledge/00_项目与产品/
+  project_product_group_excluded_assets: [CTX-001]
   pre_read_content: false
   semantic_diff: false
   reverse_write_allowed: false
