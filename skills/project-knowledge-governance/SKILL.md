@@ -69,13 +69,15 @@ Do not silently scan all Git or all Feishu. Current task state must not be infer
 ## Feishu projection
 
 - source is always the reviewed Git document bundle;
-- publish by overwrite, never merge or reverse sync;
+- publish by mechanical overwrite, never merge, semantic-diff or reverse sync; do not read the old Feishu body before overwrite;
 - treat the Feishu Space root as the navigation container: standalone entries and navigation groups are level-1 siblings, never implicit children of a homepage;
 - compile the public Desired Projection before reading the private Existing Tree, then build a Mapping Diff and an explicit operation plan before any delete, create or reuse action;
 - local images are uploaded during projection and replaced by Feishu media/image blocks at the same location;
 - Feishu media tokens, URLs and Block IDs never write back into Git;
 - the AI-readable semantic mirror remains ordinary text;
 - publication requires preview, human confirmation, API verification and read-back.
+
+For a controlled publication run, use the bounded fast path in `references/07-feishu-execution-efficiency.md`: resolve structure once, overwrite without content comparison, keep raw CLI envelopes in `.local-state/**`, emit token-free summaries, and execute each remote phase through one deterministic process instead of one model round-trip per node.
 
 ## Frozen artifact boundary
 
@@ -93,3 +95,4 @@ Stop on ambiguous stable ID, conflicting canonical owner, missing replacement ta
 - bundles and visuals: `references/04-document-bundles-and-visuals.md`;
 - Feishu: `references/05-feishu-projection.md`;
 - write/security gates: `references/06-write-security-and-review.md`.
+- Feishu execution budget, checkpoints and token control: `references/07-feishu-execution-efficiency.md`.

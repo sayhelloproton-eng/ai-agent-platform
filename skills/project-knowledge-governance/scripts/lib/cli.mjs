@@ -1,19 +1,23 @@
 import { spawnSync } from 'node:child_process';
 
-export function run(command, args, { allowFailure = false } = {}) {
+export function run(command, args, { allowFailure = false, timeoutMs = 90_000 } = {}) {
   const env = { ...process.env, LARKSUITE_CLI_NO_UPDATE_NOTIFIER: '1', LARKSUITE_CLI_NO_SKILLS_NOTIFIER: '1' };
-  const result = spawnSync(command, args, { encoding: 'utf8', env, shell: false, maxBuffer: 50 * 1024 * 1024 });
+  const result = spawnSync(command, args, { encoding: 'utf8', env, shell: false, maxBuffer: 50 * 1024 * 1024, timeout: timeoutMs, killSignal: 'SIGTERM' });
   const stdout = result.stdout || '';
   const stderr = result.stderr || '';
-  if (result.error) throw result.error;
-  if (result.status !== 0 && !allowFailure) {
-    const error = new Error(`${command} exited with ${result.status}: ${stderr || stdout}`);
-    error.exitCode = result.status;
+  const timedOut = result.error?.code === 'ETIMEDOUT';
+  if (result.error && !timedOut) throw result.error;
+  const status = timedOut ? 124 : (result.status ?? 0);
+  if (status !== 0 && !allowFailure) {
+    const detail = timedOut ? `timed out after ${timeoutMs} ms` : (stderr || stdout);
+    const error = new Error(`${command} exited with ${status}: ${detail}`);
+    error.exitCode = status;
     error.stdout = stdout;
     error.stderr = stderr;
+    error.timedOut = timedOut;
     throw error;
   }
-  return { status: result.status ?? 0, stdout, stderr };
+  return { status, stdout, stderr, timedOut };
 }
 
 export function parseJsonLoose(text) {

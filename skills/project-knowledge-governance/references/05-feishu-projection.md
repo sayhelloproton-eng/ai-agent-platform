@@ -2,6 +2,8 @@
 
 Projection is `Git canonical document → Feishu document node` with overwrite semantics. The Publisher parses local Markdown images, validates bundle ownership, uploads files, publishes text, inserts image/media blocks at stable headings and reads back content and revision.
 
+Overwrite is mechanical. Never fetch the existing Feishu body for comparison, merging, rewriting or approval. Mapping-first governs node identity and hierarchy only; it must not become a content-review phase.
+
 ## Governed reading tree
 
 Canonical pages remain one-to-one, but Feishu navigation does not have to mechanically copy Git directories.
@@ -42,6 +44,8 @@ Before any delete, create or reuse operation, write these private execution arti
 - `operation-plan.json`.
 
 `platform-registry/projections.yaml` stores public desired rules only. `mappings: []` means actual Feishu mapping has not been persisted. `node_token`, `obj_token`, private URLs and actual mapping evidence belong only in `.local-state/**` and must never enter Git.
+
+After the Mapping Diff and Operation Plan pass, apply the complete Git source directly. Do not add per-page semantic inspection, old-body fetch, content diff or model review between planning and overwrite.
 
 ## Token types
 

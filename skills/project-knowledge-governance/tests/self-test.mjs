@@ -9,6 +9,7 @@ import {
   normalizeNode,
   walk,
 } from '../scripts/lark_read.mjs';
+import { run as runCommand } from '../scripts/lib/cli.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const tmp = path.join(root, 'tests/.tmp');
@@ -27,8 +28,16 @@ const result = JSON.parse(run(['scripts/query_index.mjs', '--index', index, '--q
 if (!result.candidates.some((candidate) => candidate.node_token === 'gateway')) throw new Error('Gateway not retrieved');
 
 const skill = fs.readFileSync(path.join(root, 'SKILL.md'), 'utf8');
-for (const marker of ['Document Bundle', 'AI 可读语义镜像', 'project-knowledge-synthesis', 'engineering-document-authoring', 'apply_frozen_artifacts', 'Desired Projection', 'Mapping Diff']) {
+for (const marker of ['Document Bundle', 'AI 可读语义镜像', 'project-knowledge-synthesis', 'engineering-document-authoring', 'apply_frozen_artifacts', 'Desired Projection', 'Mapping Diff', '07-feishu-execution-efficiency.md']) {
   if (!skill.includes(marker)) throw new Error(`missing ${marker}`);
+}
+const projectionReference = fs.readFileSync(path.join(root, 'references/05-feishu-projection.md'), 'utf8');
+const efficiencyReference = fs.readFileSync(path.join(root, 'references/07-feishu-execution-efficiency.md'), 'utf8');
+for (const marker of ['Overwrite is mechanical', 'Never fetch the existing Feishu body', 'Mapping-first governs node identity and hierarchy only']) {
+  if (!projectionReference.includes(marker)) throw new Error(`projection fast path missing ${marker}`);
+}
+for (const marker of ['five-minute execution budget', 'performance failure', 'at most three model-visible checkpoints']) {
+  if (!efficiencyReference.includes(marker)) throw new Error(`Feishu efficiency contract missing ${marker}`);
 }
 
 const envelope = JSON.parse(fs.readFileSync(path.join(root, 'tests/fixtures/lark-node-list-envelope.json'), 'utf8'));
@@ -58,6 +67,30 @@ const applyDelete = buildWikiNodeDeleteArgs({ spaceId: 'spcREDACTED001', nodeTok
 if (dryDelete[dryDelete.indexOf('--obj-type') + 1] !== 'wiki' || dryDelete.includes('docx')) throw new Error('delete input token type must be wiki');
 if (!dryDelete.includes('--dry-run') || !applyDelete.includes('--yes')) throw new Error('delete safety flags missing');
 
+const timeout = runCommand(process.execPath, ['-e', 'setTimeout(() => {}, 1000)'], { allowFailure: true, timeoutMs: 10 });
+if (!timeout.timedOut || timeout.status !== 124) throw new Error('CLI timeout must fail with stable status 124');
+
+const projectionState = path.join(tmp, 'projection-state');
+fs.mkdirSync(projectionState, { recursive: true });
+const sourceSha = 'a'.repeat(40);
+const stateDocuments = {
+  'desired-projection.json': { source_sha: sourceSha, standalone_entries: [{ asset_id: 'CTX-001' }], navigation_groups: [{ title: '平台架构', canonical_pages: [{ asset_id: 'ARC-001' }] }] },
+  'existing-tree.json': { source_sha: sourceSha, node_count: 3, nodes: [] },
+  'mapping-diff.json': { source_sha: sourceSha, desired_count: 3 },
+  'operation-plan.json': {
+    source_sha: sourceSha,
+    reuse: [{ title: '智能体工程探索录', level: 1, node_token: 'wikcnSECRET', obj_token: 'docxSECRET' }],
+    delete_deepest_first: [{ title: '旧页面', level: 2, node_token: 'wikcnDELETE' }],
+    create: [{ asset_id: 'ARC-001', title: 'ARC-001 总体架构与执行路径', level: 2, parent: '平台架构' }],
+    hard_stop_after_readback: true,
+  },
+};
+for (const [file, document] of Object.entries(stateDocuments)) fs.writeFileSync(path.join(projectionState, file), JSON.stringify(document));
+const safeSummary = run(['scripts/summarize-feishu-execution.mjs', 'tests/.tmp/projection-state']);
+if (safeSummary.includes('wikcn') || safeSummary.includes('docxSECRET') || !safeSummary.includes('"mapping_first_artifacts": "4/4"')) {
+  throw new Error('Feishu execution summary must be complete and token-free');
+}
+
 fs.rmSync(tmp, { recursive: true, force: true });
 console.log(JSON.stringify({
   ok: true,
@@ -68,4 +101,6 @@ console.log(JSON.stringify({
   missing_token_fails: true,
   conflicting_parent_fails: true,
   delete_token_type: 'wiki',
+  cli_timeout_status: 124,
+  token_free_execution_summary: true,
 }, null, 2));
