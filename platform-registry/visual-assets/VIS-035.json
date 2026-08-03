@@ -1,0 +1,28 @@
+{
+  "visual_asset_id": "VIS-035",
+  "title": "智能体资产体系总体架构",
+  "version": 1,
+  "status": "accepted",
+  "target_document": "docs/knowledge/06_智能体资产体系/AGT-001-智能体资产体系总体架构/README.md",
+  "target_document_asset_id": "AGT-001",
+  "source_documents": [
+    "AGT-001",
+    "AGT-002",
+    "AGT-003",
+    "AGT-005",
+    "AGT-007",
+    "AGT-008",
+    "ARC-002",
+    "WFL-005"
+  ],
+  "source_svg": "docs/knowledge/06_智能体资产体系/AGT-001-智能体资产体系总体架构/assets/VIS-035-智能体资产体系总体架构.svg",
+  "preview_png": "docs/knowledge/06_智能体资产体系/AGT-001-智能体资产体系总体架构/assets/VIS-035-智能体资产体系总体架构.png",
+  "width": 1491,
+  "height": 1055,
+  "svg_sha256": "7bbf880da174ca0186874bf73a0106935f865914159d01debc693a105773e747",
+  "png_sha256": "1e5dc0264ccf88ef7e7850617d2ed526913bb7bda0e588100297eb42a55ab910",
+  "review_notes": "AGT-001 正文冻结后生成的唯一正式视觉资产；其余五篇不生成图片。图区分 Agent Governance 与 05、07 的状态所有权，并明确 P0 路径。",
+  "storage_model": "document_bundle",
+  "markdown_image": "./assets/VIS-035-智能体资产体系总体架构.png",
+  "semantic_mirror_heading": "AI 可读语义镜像"
+}

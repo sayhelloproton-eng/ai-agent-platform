@@ -111,16 +111,17 @@ assets:
   migration_state: complete
   superseded_by: ARC-001
 - asset_id: SKL-001
-  title: 项目知识治理技能
+  title: 项目知识治理技能（旧知识说明）
   asset_type: skill
-  status: implemented
+  status: superseded
   evidence_level: verified
   materialized: true
-  current_path: docs/knowledge/06_智能体资产体系/SKL-001-项目知识治理技能.md
+  current_path: docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/SKL-001-项目知识治理技能.md
   target_path:
-  canonical_path: docs/knowledge/06_智能体资产体系/SKL-001-项目知识治理技能.md
+  canonical_path: docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/SKL-001-项目知识治理技能.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by: AGT-005
 - asset_id: WFL-001
   title: 工作流与项目治理总体模型
   asset_type: workflow
@@ -401,16 +402,17 @@ assets:
   migration_state: complete
   superseded_by: WFL-006
 - asset_id: SKL-002
-  title: Engineering Insight Distillation Skill
+  title: 工程洞见提炼技能（旧知识说明）
   asset_type: skill
-  status: implemented
+  status: superseded
   evidence_level: verified
   materialized: true
-  current_path: docs/knowledge/06_智能体资产体系/SKL-002-工程洞见提炼技能.md
+  current_path: docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/SKL-002-工程洞见提炼技能.md
   target_path:
-  canonical_path: docs/knowledge/06_智能体资产体系/SKL-002-工程洞见提炼技能.md
+  canonical_path: docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/SKL-002-工程洞见提炼技能.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by: AGT-005
 - asset_id: EXP-004
   title: Engineering Insight Distillation Skill Pilot Evaluation
   asset_type: experiment
@@ -992,115 +994,119 @@ assets:
   publication_status: unpublished
   migration_state: complete
 - asset_id: AGT-001
-  title: Agent角色体系
+  title: 智能体资产体系总体架构
   asset_type: knowledge-document
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/06_智能体资产体系/AGT-001-Agent角色体系.md
+  current_path: docs/knowledge/06_智能体资产体系/AGT-001-智能体资产体系总体架构/README.md
   target_path:
-  canonical_path: docs/knowledge/06_智能体资产体系/AGT-001-Agent角色体系.md
+  canonical_path: docs/knowledge/06_智能体资产体系/AGT-001-智能体资产体系总体架构/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: AGT-002
-  title: Agent-Profile设计规范
+  title: 角色、Agent Profile 与组合模型
   asset_type: knowledge-document
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/06_智能体资产体系/AGT-002-Agent-Profile设计规范.md
+  current_path: docs/knowledge/06_智能体资产体系/AGT-002-角色Agent-Profile与组合模型/README.md
   target_path:
-  canonical_path: docs/knowledge/06_智能体资产体系/AGT-002-Agent-Profile设计规范.md
+  canonical_path: docs/knowledge/06_智能体资产体系/AGT-002-角色Agent-Profile与组合模型/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: AGT-003
-  title: Agent知识记忆与行为模型
+  title: Agent知识、上下文、记忆与行为装配
   asset_type: knowledge-document
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/06_智能体资产体系/AGT-003-Agent知识记忆与行为模型.md
+  current_path: docs/knowledge/06_智能体资产体系/AGT-003-Agent知识上下文记忆与行为装配/README.md
   target_path:
-  canonical_path: docs/knowledge/06_智能体资产体系/AGT-003-Agent知识记忆与行为模型.md
+  canonical_path: docs/knowledge/06_智能体资产体系/AGT-003-Agent知识上下文记忆与行为装配/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: AGT-004
-  title: Agent工具权限与审批边界
+  title: Agent工具权限与审批边界（已并入 AGT-005）
   asset_type: knowledge-document
-  status: accepted
+  status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/06_智能体资产体系/AGT-004-Agent工具权限与审批边界.md
+  current_path: docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/AGT-004-Agent工具权限与审批边界.md
   target_path:
-  canonical_path: docs/knowledge/06_智能体资产体系/AGT-004-Agent工具权限与审批边界.md
+  canonical_path: docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/AGT-004-Agent工具权限与审批边界.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by: AGT-005
 - asset_id: AGT-005
-  title: Agent-Skill设计与治理
+  title: Skill、Capability、Tool、Permission 与 Policy 资产治理
   asset_type: knowledge-document
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/06_智能体资产体系/AGT-005-Agent-Skill设计与治理.md
+  current_path: docs/knowledge/06_智能体资产体系/AGT-005-Skill能力工具权限与策略资产治理/README.md
   target_path:
-  canonical_path: docs/knowledge/06_智能体资产体系/AGT-005-Agent-Skill设计与治理.md
+  canonical_path: docs/knowledge/06_智能体资产体系/AGT-005-Skill能力工具权限与策略资产治理/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: AGT-006
-  title: 多Agent协作角色模型
+  title: 多Agent协作角色模型（已并入 AGT-002 与 07）
   asset_type: knowledge-document
-  status: accepted
+  status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/06_智能体资产体系/AGT-006-多Agent协作角色模型.md
+  current_path: docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/AGT-006-多Agent协作角色模型.md
   target_path:
-  canonical_path: docs/knowledge/06_智能体资产体系/AGT-006-多Agent协作角色模型.md
+  canonical_path: docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/AGT-006-多Agent协作角色模型.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by: AGT-002
 - asset_id: AGT-007
-  title: Agent评估测试与发布
+  title: Agent评估、发布与生命周期治理
   asset_type: knowledge-document
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/06_智能体资产体系/AGT-007-Agent评估测试与发布.md
+  current_path: docs/knowledge/06_智能体资产体系/AGT-007-Agent评估发布与生命周期治理/README.md
   target_path:
-  canonical_path: docs/knowledge/06_智能体资产体系/AGT-007-Agent评估测试与发布.md
+  canonical_path: docs/knowledge/06_智能体资产体系/AGT-007-Agent评估发布与生命周期治理/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: AGT-008
-  title: 专业智能体目录
+  title: 专业智能体目录与P0资产化路线
   asset_type: knowledge-document
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/06_智能体资产体系/AGT-008-专业智能体目录.md
+  current_path: docs/knowledge/06_智能体资产体系/AGT-008-专业智能体目录与P0资产化路线/README.md
   target_path:
-  canonical_path: docs/knowledge/06_智能体资产体系/AGT-008-专业智能体目录.md
+  canonical_path: docs/knowledge/06_智能体资产体系/AGT-008-专业智能体目录与P0资产化路线/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: AGT-009
-  title: 需求与产品孵化智能体
+  title: 需求与产品孵化智能体（已并入 AGT-008）
   asset_type: knowledge-document
-  status: accepted
+  status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/06_智能体资产体系/AGT-009-需求与产品孵化智能体.md
+  current_path: docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/AGT-009-需求与产品孵化智能体.md
   target_path:
-  canonical_path: docs/knowledge/06_智能体资产体系/AGT-009-需求与产品孵化智能体.md
+  canonical_path: docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/AGT-009-需求与产品孵化智能体.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by: AGT-008
 - asset_id: AGT-010
-  title: 项目治理与汇报智能体
+  title: 项目治理与汇报智能体（已并入 AGT-008）
   asset_type: knowledge-document
-  status: accepted
+  status: superseded
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/06_智能体资产体系/AGT-010-项目治理与汇报智能体.md
+  current_path: docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/AGT-010-项目治理与汇报智能体.md
   target_path:
-  canonical_path: docs/knowledge/06_智能体资产体系/AGT-010-项目治理与汇报智能体.md
+  canonical_path: docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/AGT-010-项目治理与汇报智能体.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by: AGT-008
 - asset_id: WFL-005
   title: 任务合同与多角色协作
   asset_type: workflow
@@ -1590,16 +1596,17 @@ assets:
   publication_status: unpublished
   migration_state: complete
 - asset_id: SKL-003
-  title: 规划者与执行器任务交接技能
+  title: 规划者与执行器任务交接技能（旧知识说明）
   asset_type: skill
-  status: accepted
+  status: superseded
   evidence_level: verified
   materialized: true
-  current_path: docs/knowledge/06_智能体资产体系/SKL-003-规划者与执行器任务交接技能.md
+  current_path: docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/SKL-003-规划者与执行器任务交接技能.md
   target_path:
-  canonical_path: docs/knowledge/06_智能体资产体系/SKL-003-规划者与执行器任务交接技能.md
+  canonical_path: docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/SKL-003-规划者与执行器任务交接技能.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by: AGT-005
 - asset_id: SKILL-PLANNER-EXECUTOR-HANDOFF
   title: Planner Executor Handoff Skill（含冻结 Artifact 交付）
   asset_type: skill
@@ -1634,16 +1641,17 @@ assets:
   publication_status: unpublished
   migration_state: complete
 - asset_id: SKL-004
-  title: 项目知识综合技能
+  title: 项目知识综合技能（旧知识说明）
   asset_type: skill
-  status: implemented
+  status: superseded
   evidence_level: verified
   materialized: true
-  current_path: docs/knowledge/06_智能体资产体系/SKL-004-项目知识综合技能.md
+  current_path: docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/SKL-004-项目知识综合技能.md
   target_path:
-  canonical_path: docs/knowledge/06_智能体资产体系/SKL-004-项目知识综合技能.md
+  canonical_path: docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/SKL-004-项目知识综合技能.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by: AGT-005
 - asset_id: SKILL-PROJECT-KNOWLEDGE-SYNTHESIS
   title: Project Knowledge Synthesis Skill
   asset_type: skill
@@ -1667,16 +1675,17 @@ assets:
   publication_status: unpublished
   migration_state: complete
 - asset_id: SKL-005
-  title: 工程文档编写技能
+  title: 工程文档编写技能（旧知识说明）
   asset_type: skill
-  status: implemented
+  status: superseded
   evidence_level: verified
   materialized: true
-  current_path: docs/knowledge/06_智能体资产体系/SKL-005-工程文档编写技能.md
+  current_path: docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/SKL-005-工程文档编写技能.md
   target_path:
-  canonical_path: docs/knowledge/06_智能体资产体系/SKL-005-工程文档编写技能.md
+  canonical_path: docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/SKL-005-工程文档编写技能.md
   publication_status: unpublished
   migration_state: complete
+  superseded_by: AGT-005
 - asset_id: SKILL-ENGINEERING-DOCUMENT-AUTHORING
   title: Engineering Document Authoring Skill
   asset_type: skill
@@ -1926,5 +1935,16 @@ assets:
   current_path: platform-registry/visual-assets/VIS-029.json
   target_path:
   canonical_path: platform-registry/visual-assets/VIS-029.json
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: VIS-035
+  title: 智能体资产体系总体架构
+  asset_type: visual
+  status: accepted
+  evidence_level: verified
+  materialized: true
+  current_path: platform-registry/visual-assets/VIS-035.json
+  target_path:
+  canonical_path: platform-registry/visual-assets/VIS-035.json
   publication_status: unpublished
   migration_state: complete

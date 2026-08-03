@@ -410,16 +410,16 @@ tsconfig.base.json,json,,keep_review,tsconfig.base.json,,保留并在相关批�
 ,md,工程洞见提炼与注册表治理,materialize,docs/knowledge/05_上下文与知识系统/KNO-010-工程洞见提炼与注册表治理.md,KNO-010,基于已接受架构、真实实现、治理规则与历史知识综合生成正式正文,04-platform-architecture-and-knowledge-system
 ,md,产品孵化与需求治理体系,materialize,docs/knowledge/04_平台架构/ARC-017-产品孵化与需求治理体系/README.md,ARC-017,基于已接受架构、知识系统、项目实践与治理规则综合生成正式正文,05-agent-assets-and-workflow-governance
 ,md,项目治理与汇报架构,materialize,docs/knowledge/04_平台架构/ARC-018-项目治理与汇报架构.md,ARC-018,基于已接受架构、知识系统、项目实践与治理规则综合生成正式正文,05-agent-assets-and-workflow-governance
-,md,Agent角色体系,materialize,docs/knowledge/06_智能体资产体系/AGT-001-Agent角色体系.md,AGT-001,基于已接受架构、知识系统、项目实践与治理规则综合生成正式正文,05-agent-assets-and-workflow-governance
-,md,Agent-Profile设计规范,materialize,docs/knowledge/06_智能体资产体系/AGT-002-Agent-Profile设计规范.md,AGT-002,基于已接受架构、知识系统、项目实践与治理规则综合生成正式正文,05-agent-assets-and-workflow-governance
-,md,Agent知识记忆与行为模型,materialize,docs/knowledge/06_智能体资产体系/AGT-003-Agent知识记忆与行为模型.md,AGT-003,基于已接受架构、知识系统、项目实践与治理规则综合生成正式正文,05-agent-assets-and-workflow-governance
-,md,Agent工具权限与审批边界,materialize,docs/knowledge/06_智能体资产体系/AGT-004-Agent工具权限与审批边界.md,AGT-004,基于已接受架构、知识系统、项目实践与治理规则综合生成正式正文,05-agent-assets-and-workflow-governance
-,md,Agent-Skill设计与治理,materialize,docs/knowledge/06_智能体资产体系/AGT-005-Agent-Skill设计与治理.md,AGT-005,基于已接受架构、知识系统、项目实践与治理规则综合生成正式正文,05-agent-assets-and-workflow-governance
-,md,多Agent协作角色模型,materialize,docs/knowledge/06_智能体资产体系/AGT-006-多Agent协作角色模型.md,AGT-006,基于已接受架构、知识系统、项目实践与治理规则综合生成正式正文,05-agent-assets-and-workflow-governance
-,md,Agent评估测试与发布,materialize,docs/knowledge/06_智能体资产体系/AGT-007-Agent评估测试与发布.md,AGT-007,基于已接受架构、知识系统、项目实践与治理规则综合生成正式正文,05-agent-assets-and-workflow-governance
-,md,专业智能体目录,materialize,docs/knowledge/06_智能体资产体系/AGT-008-专业智能体目录.md,AGT-008,基于已接受架构、知识系统、项目实践与治理规则综合生成正式正文,05-agent-assets-and-workflow-governance
-,md,需求与产品孵化智能体,materialize,docs/knowledge/06_智能体资产体系/AGT-009-需求与产品孵化智能体.md,AGT-009,基于已接受架构、知识系统、项目实践与治理规则综合生成正式正文,05-agent-assets-and-workflow-governance
-,md,项目治理与汇报智能体,materialize,docs/knowledge/06_智能体资产体系/AGT-010-项目治理与汇报智能体.md,AGT-010,基于已接受架构、知识系统、项目实践与治理规则综合生成正式正文,05-agent-assets-and-workflow-governance
+,md,智能体资产体系总体架构,bundle_rewrite,docs/knowledge/06_智能体资产体系/AGT-001-智能体资产体系总体架构/README.md,AGT-001,六篇 P0 Canonical 文档之一，加入唯一总体架构图,13-agent-asset-system
+,md,角色、Agent Profile 与组合模型,bundle_rewrite,docs/knowledge/06_智能体资产体系/AGT-002-角色Agent-Profile与组合模型/README.md,AGT-002,六篇 P0 Canonical 文档之一,13-agent-asset-system
+,md,Agent知识、上下文、记忆与行为装配,bundle_rewrite,docs/knowledge/06_智能体资产体系/AGT-003-Agent知识上下文记忆与行为装配/README.md,AGT-003,六篇 P0 Canonical 文档之一,13-agent-asset-system
+,md,Agent工具权限与审批边界,archive_supersede,docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/AGT-004-Agent工具权限与审批边界.md,AGT-004,合并到 AGT-005；审批运行机制由 05/07 拥有,13-agent-asset-system
+,md,Skill、Capability、Tool、Permission 与 Policy 资产治理,bundle_rewrite,docs/knowledge/06_智能体资产体系/AGT-005-Skill能力工具权限与策略资产治理/README.md,AGT-005,六篇 P0 Canonical 文档之一,13-agent-asset-system
+,md,多Agent协作角色模型,archive_supersede,docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/AGT-006-多Agent协作角色模型.md,AGT-006,静态角色归 AGT-002；协作流程归 07,13-agent-asset-system
+,md,Agent评估、发布与生命周期治理,bundle_rewrite,docs/knowledge/06_智能体资产体系/AGT-007-Agent评估发布与生命周期治理/README.md,AGT-007,六篇 P0 Canonical 文档之一,13-agent-asset-system
+,md,专业智能体目录与P0资产化路线,bundle_rewrite,docs/knowledge/06_智能体资产体系/AGT-008-专业智能体目录与P0资产化路线/README.md,AGT-008,六篇 P0 Canonical 文档之一,13-agent-asset-system
+,md,需求与产品孵化智能体,archive_supersede,docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/AGT-009-需求与产品孵化智能体.md,AGT-009,并入 AGT-008 目录条目,13-agent-asset-system
+,md,项目治理与汇报智能体,archive_supersede,docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/AGT-010-项目治理与汇报智能体.md,AGT-010,并入 AGT-008 目录条目,13-agent-asset-system
 ,md,多角色任务合同,materialize,docs/knowledge/07_工作流与项目治理/WFL-005-多角色任务合同.md,WFL-005,基于已接受架构、知识系统、项目实践与治理规则综合生成正式正文,05-agent-assets-and-workflow-governance
 ,md,规划实现测试复审与集成,materialize,docs/knowledge/07_工作流与项目治理/WFL-006-规划实现测试复审与集成.md,WFL-006,基于已接受架构、知识系统、项目实践与治理规则综合生成正式正文,05-agent-assets-and-workflow-governance
 ,md,上下文Checkpoint与任务移交,materialize,docs/knowledge/07_工作流与项目治理/WFL-007-上下文Checkpoint与任务移交.md,WFL-007,基于已接受架构、知识系统、项目实践与治理规则综合生成正式正文,05-agent-assets-and-workflow-governance
@@ -443,8 +443,8 @@ tsconfig.base.json,json,,keep_review,tsconfig.base.json,,保留并在相关批�
 ,md,开源项目与框架索引,materialize,docs/knowledge/10_术语与来源/REF-003-开源项目与框架索引.md,REF-003,基于真实实验、已接受架构、代码证据和来源索引生成正式正文,06-experiments-portfolio-references-and-path-closure
 ,md,架构图索引,materialize,docs/knowledge/10_术语与来源/REF-004-架构图索引.md,REF-004,基于真实实验、已接受架构、代码证据和来源索引生成正式正文,06-experiments-portfolio-references-and-path-closure
 ,md,知识文章与仓库资产索引,materialize,docs/knowledge/10_术语与来源/REF-005-知识文章与仓库资产索引.md,REF-005,基于真实实验、已接受架构、代码证据和来源索引生成正式正文,06-experiments-portfolio-references-and-path-closure
-docs/knowledge/Agent与能力/Skill设计/SKL-001-AI知识技能.md,md,AI Knowledge Skill,move,docs/knowledge/06_智能体资产体系/SKL-001-AI知识技能.md,SKL-001,完成目标知识树路径收口并保持稳定资产 ID,06-experiments-portfolio-references-and-path-closure
-docs/knowledge/Agent与能力/Skill设计/SKL-002-工程洞见提炼技能.md,md,Engineering Insight Distillation Skill,move,docs/knowledge/06_智能体资产体系/SKL-002-工程洞见提炼技能.md,SKL-002,完成目标知识树路径收口并保持稳定资产 ID,06-experiments-portfolio-references-and-path-closure
+,md,项目知识治理技能,archive_supersede,docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/SKL-001-项目知识治理技能.md,SKL-001,运行时真源保留在 skills/**，设计关系并入 AGT-005,13-agent-asset-system
+,md,工程洞见提炼技能,archive_supersede,docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/SKL-002-工程洞见提炼技能.md,SKL-002,运行时真源保留在 skills/**，设计关系并入 AGT-005,13-agent-asset-system
 docs/knowledge/工作流/WFL-001-知识生命周期.md,md,Knowledge Lifecycle,move,docs/knowledge/07_工作流与项目治理/WFL-001-知识生命周期与飞书发布.md,WFL-001,完成目标知识树路径收口并保持稳定资产 ID,06-experiments-portfolio-references-and-path-closure
 docs/knowledge/工作流/WFL-002-ChatGPT任务到Codex与Git.md,md,ChatGPT Task Codex Git,move,docs/knowledge/07_工作流与项目治理/WFL-002-ChatGPT任务到Codex与Git.md,WFL-002,完成目标知识树路径收口并保持稳定资产 ID,06-experiments-portfolio-references-and-path-closure
 docs/knowledge/工作流/WFL-003-AI视频工作流.md,md,AI Video Workflow,move,docs/knowledge/07_工作流与项目治理/WFL-003-AI视频工作流.md,WFL-003,完成目标知识树路径收口并保持稳定资产 ID,06-experiments-portfolio-references-and-path-closure
@@ -485,7 +485,7 @@ skills/ai-knowledge/,path,AI Knowledge Skill,supersede_move,skills/project-knowl
 skills/deterministic-delivery/,path,Deterministic Delivery Skill,merge_supersede,skills/planner-executor-handoff/,SKILL-DETERMINISTIC-DELIVERY,确定性交付并入 Planner Executor Handoff 的 apply_frozen_artifacts 模式,11-skill-portfolio-and-document-bundles
 skills/microsoft-dev-tunnels/,path,Microsoft Dev Tunnels Skill,demote_move,apps/dev-tunnel/docs/,SKILL-DEV-TUNNELS,工具操作降级为应用 Runbook，不再作为独立 Agent Skill,11-skill-portfolio-and-document-bundles
 ,path,Engineering Document Authoring Skill,materialize,skills/engineering-document-authoring/,SKILL-ENGINEERING-DOCUMENT-AUTHORING,新增正式工程文档编写能力，承接 Human-first 与 AI-lossless 表达,11-skill-portfolio-and-document-bundles
-,md,工程文档编写技能,materialize,docs/knowledge/06_智能体资产体系/SKL-005-工程文档编写技能.md,SKL-005,记录新 Skill 的正式知识说明与边界,11-skill-portfolio-and-document-bundles
+,md,工程文档编写技能,archive_supersede,docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/SKL-005-工程文档编写技能.md,SKL-005,运行时真源保留在 skills/**，设计关系并入 AGT-005,13-agent-asset-system
 ,md,文档包与 Human-first、AI-lossless,materialize,docs/adr/ADR-003-document-bundles-human-first-ai-lossless.md,ADR-003,接受文档资源共置、相对路径、语义镜像与投影转换决策,11-skill-portfolio-and-document-bundles
 docs/knowledge/04_平台架构/ARC-001-ai-agent-platform总体架构.md,md,ARC-001 Document Bundle,bundle_move,docs/knowledge/04_平台架构/ARC-001-ai-agent-platform总体架构/README.md,ARC-001,正文与专属视觉资源共置；图片下方补齐 AI 可读语义镜像,11-skill-portfolio-and-document-bundles
 docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图.md,md,ARC-008 Document Bundle,bundle_move,docs/knowledge/04_平台架构/ARC-008-ai-agent-platform-DDD领域蓝图/README.md,ARC-008,正文与专属视觉资源共置；图片下方补齐 AI 可读语义镜像,11-skill-portfolio-and-document-bundles
@@ -516,3 +516,5 @@ docs/technical/归档/历史资产/04_平台架构_整合前观点与后续处�
 docs/knowledge/05_上下文与知识系统/,directory,05 上下文与知识系统六文档收敛,consolidate,docs/knowledge/05_上下文与知识系统/,,收敛为 ARC-002/005/006 与 KNO-006/009/011；补齐六张正式视觉资产,16-context-and-knowledge-system-review
 docs/knowledge/05_上下文与知识系统/KNO-005-项目知识生命周期/README.md,md,KNO-005 项目知识生命周期,archive_supersede,docs/technical/归档/历史资产/05_上下文与知识系统_整合前观点与候选/legacy-assets/KNO-005-项目知识生命周期.md,KNO-005,生命周期与 VIS-010 由 ARC-005 承接，旧文和旧图保留历史追溯,16-context-and-knowledge-system-review
 ,md,Context and Knowledge System Canonical Bundle,materialize,docs/knowledge/05_上下文与知识系统/ARC-002-上下文与知识系统总体架构/README.md,ARC-002,五领域、外部协作、多消费者和双循环总览,16-context-and-knowledge-system-review
+,md,规划者与执行器任务交接技能,archive_supersede,docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/SKL-003-规划者与执行器任务交接技能.md,SKL-003,运行时真源保留在 skills/**，工作流关系归 07,13-agent-asset-system
+,md,项目知识综合技能,archive_supersede,docs/technical/归档/历史资产/06_智能体资产体系_整合前观点与候选/legacy-assets/SKL-004-项目知识综合技能.md,SKL-004,运行时真源保留在 skills/**，设计关系并入 AGT-005,13-agent-asset-system

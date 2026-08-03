@@ -64,7 +64,7 @@ capabilities:
   - SKILL-PLANNER-EXECUTOR-HANDOFF
   evidence:
   - skills/planner-executor-handoff/tests/self-test.mjs
-  - docs/knowledge/06_智能体资产体系/SKL-003-规划者与执行器任务交接技能.md
+  - docs/knowledge/07_工作流与项目治理/WFL-005-任务合同与多角色协作/README.md
   - docs/knowledge/05_上下文与知识系统/KNO-011-上下文运行流转与恢复机制/README.md
   - skills/planner-executor-handoff/references/10-frozen-artifact-delivery.md
   - skills/planner-executor-handoff/scripts/validate-frozen-delivery.mjs
@@ -75,7 +75,7 @@ capabilities:
   evidence:
   - skills/project-knowledge-synthesis/tests/self-test.mjs
   - skills/project-knowledge-synthesis/tests/pilots/00-project-entry/synthesis-result.json
-  - docs/knowledge/06_智能体资产体系/SKL-004-项目知识综合技能.md
+  - docs/knowledge/06_智能体资产体系/AGT-005-Skill能力工具权限与策略资产治理/README.md
 - id: CAP-PROJECT-KNOWLEDGE-GOVERNANCE
   status: implemented
   implemented_by:
@@ -83,7 +83,7 @@ capabilities:
   evidence:
   - skills/project-knowledge-governance/tests/self-test.mjs
   - scripts/visual-asset-check.mjs
-  - docs/knowledge/06_智能体资产体系/SKL-001-项目知识治理技能.md
+  - docs/knowledge/06_智能体资产体系/AGT-005-Skill能力工具权限与策略资产治理/README.md
   - docs/adr/ADR-003-document-bundles-human-first-ai-lossless.md
 - id: CAP-ENGINEERING-DOCUMENT-AUTHORING
   status: implemented
@@ -91,7 +91,7 @@ capabilities:
   - SKILL-ENGINEERING-DOCUMENT-AUTHORING
   evidence:
   - skills/engineering-document-authoring/tests/self-test.mjs
-  - docs/knowledge/06_智能体资产体系/SKL-005-工程文档编写技能.md
+  - docs/knowledge/06_智能体资产体系/AGT-005-Skill能力工具权限与策略资产治理/README.md
   - docs/adr/ADR-003-document-bundles-human-first-ai-lossless.md
   - skills/engineering-document-authoring/references/05-formal-diagram-style.md
   - docs/knowledge/02_基础产品与能力/CAP-001-ChatGPT生态体系与配置全景/README.md

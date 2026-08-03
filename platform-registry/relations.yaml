@@ -555,7 +555,7 @@ relations:
   to: ARC-011
 - from: WFL-006
   type: depends_on
-  to: AGT-006
+  to: AGT-002
 - from: WFL-007
   type: depends_on
   to: WFL-005
@@ -570,7 +570,7 @@ relations:
   to: ARC-013
 - from: WFL-009
   type: depends_on
-  to: AGT-004
+  to: AGT-005
 - from: WFL-009
   type: depends_on
   to: WFL-005
@@ -588,7 +588,7 @@ relations:
   to: ARC-017
 - from: WFL-011
   type: depends_on
-  to: AGT-009
+  to: AGT-008
 - from: WFL-011
   type: depends_on
   to: WFL-005
@@ -600,7 +600,7 @@ relations:
   to: ARC-018
 - from: WFL-012
   type: depends_on
-  to: AGT-010
+  to: AGT-008
 - from: WFL-012
   type: depends_on
   to: KNO-003
@@ -1321,3 +1321,36 @@ relations:
 - from: WFL-007
   type: validated_by
   to: EXP-009
+- from: VIS-035
+  type: derived_from
+  to: AGT-001
+- from: AGT-001
+  type: depends_on
+  to: ARC-002
+- from: AGT-004
+  type: superseded_by
+  to: AGT-005
+- from: AGT-006
+  type: superseded_by
+  to: AGT-002
+- from: AGT-009
+  type: superseded_by
+  to: AGT-008
+- from: AGT-010
+  type: superseded_by
+  to: AGT-008
+- from: SKL-001
+  type: superseded_by
+  to: AGT-005
+- from: SKL-002
+  type: superseded_by
+  to: AGT-005
+- from: SKL-003
+  type: superseded_by
+  to: AGT-005
+- from: SKL-004
+  type: superseded_by
+  to: AGT-005
+- from: SKL-005
+  type: superseded_by
+  to: AGT-005

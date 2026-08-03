@@ -110,6 +110,11 @@ Git document bundle
 
 ## Current implementation
 
-已实现 Git 真源、Context、正式知识、技术文档、Platform Registry、Engineering Insight Registry、六个活跃 Skill、Document Bundle 规则、34 个共置视觉资产和 Feishu 本地图片投影逻辑。
+已实现 Git 真源、Context、正式知识、技术文档、Platform Registry、Engineering Insight Registry、六个活跃 Skill、Document Bundle 规则、35 个共置视觉资产和 Feishu 本地图片投影逻辑。
 
 `05_上下文与知识系统` 已收敛为知识资产治理、上下文编译与策略、上下文运行与连续性、知识分发与投影、记忆反馈与学习五个领域，并形成六篇 Canonical 文档与六张共置视觉资产。当前已实现的仍是 Git 真源、项目 Context、Registry、人工 Handoff 与冻结交付；通用 Context Builder、Context Runtime、Knowledge Pack Publisher、Agent Profile Publisher、外部 Knowledge Service / RAG 和自动 Memory 晋升仍是目标设计。
+
+
+## Agent asset publication boundary
+
+`06_智能体资产体系` 已形成六篇 Canonical 文档和一张总体架构图。Role、Agent Profile、Skill、Knowledge Pack、Capability、Tool、Policy、Eval 与 Host Release 以 Git 为正式资产来源；Custom GPT、Codex、Runtime、Plugin 与本地模型只作为 Host / Executor / Provider。`07_工作流与项目治理` 已落库并拥有 Task、Handoff、阶段门、审批和工作流实例。当前仍未物化正式 `agents/**`、`knowledge-packs/**`、Agent Eval 数据集或 Host Publisher，这些属于 P0 后续实现。

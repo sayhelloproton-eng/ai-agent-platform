@@ -89,6 +89,14 @@ MVP-0 窄链路与人工闭环
 
 前三者构成可信知识、最小充分 Context Package 与可恢复运行的核心；后两者负责 Feishu、Custom GPT Knowledge、Knowledge Pack、RAG 等派生分发，以及 Experience → Feedback → Insight → Review → Knowledge 的受控自迭代。User、Task、Agent、Execution 与 Evidence 仍由外部协作领域拥有事实，本系统只通过 Contract 获取视图。
 
+## 智能体资产体系
+
+`06_智能体资产体系` 将 Agent Governance 细化为 Role Definition、Agent Profile、Skill / Capability / Tool Binding、Knowledge Pack 引用、Policy、Eval、Host Release 与 Catalog。Agent Profile 是组合根，只保存稳定引用和契约，不保存 Task State、Context Package、Approval、Evidence、Secret 或 Session。Host 与 Executor 可替换，但不能拥有或改写角色语义。
+
+## 工作流与项目治理
+
+`07_工作流与项目治理` 拥有目标进入、Task Contract、角色分配、Handoff、Execution Lane、验证复审、审批、副作用、Checkpoint、恢复和项目基线流程。`06` 提供可选择的角色与 Profile，`07` 决定这些资产如何进入具体 Task 和 Workflow Instance；两者通过稳定 ID 与版本引用连接。
+
 ## 当前差距
 
 Browser Loop、Local CLI、持久 Task Store、Role Assignment、Context Builder、Approval / Evidence Store、Safe Continuation、Lane Registry、Codex Adapter、多任务并行和多执行器路由尚未形成完整代码闭环。
