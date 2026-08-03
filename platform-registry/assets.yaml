@@ -225,25 +225,25 @@ assets:
   publication_status: unpublished
   migration_state: complete
 - asset_id: EXP-001
-  title: Public Feishu Wiki Read
+  title: 公开飞书知识库读取与权限边界实验
   asset_type: experiment
   status: validated
   evidence_level: verified
   materialized: true
-  current_path: docs/knowledge/08_实验与复盘/EXP-001-公开飞书知识库读取实验.md
+  current_path: docs/knowledge/08_实验与复盘/EXP-001-公开飞书知识库读取实验/README.md
   target_path:
-  canonical_path: docs/knowledge/08_实验与复盘/EXP-001-公开飞书知识库读取实验.md
+  canonical_path: docs/knowledge/08_实验与复盘/EXP-001-公开飞书知识库读取实验/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: EXP-002
-  title: Public Feishu Wiki Export
+  title: 飞书异构知识节点递归导出与完整性实验
   asset_type: experiment
   status: validated
   evidence_level: verified
   materialized: true
-  current_path: docs/knowledge/08_实验与复盘/EXP-002-公开飞书知识库递归导出实验.md
+  current_path: docs/knowledge/08_实验与复盘/EXP-002-公开飞书知识库递归导出实验/README.md
   target_path:
-  canonical_path: docs/knowledge/08_实验与复盘/EXP-002-公开飞书知识库递归导出实验.md
+  canonical_path: docs/knowledge/08_实验与复盘/EXP-002-公开飞书知识库递归导出实验/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: ADR-001
@@ -324,36 +324,36 @@ assets:
   publication_status: unpublished
   migration_state: complete
 - asset_id: PRT-001
-  title: Project Story
+  title: ai-agent-platform 项目故事与价值主线
   asset_type: portfolio
   status: proposed
   evidence_level: observed
   materialized: true
-  current_path: docs/knowledge/09_作品集/PRT-001-ai-agent-platform项目故事.md
+  current_path: docs/knowledge/09_作品集/PRT-001-ai-agent-platform项目故事/README.md
   target_path:
-  canonical_path: docs/knowledge/09_作品集/PRT-001-ai-agent-platform项目故事.md
+  canonical_path: docs/knowledge/09_作品集/PRT-001-ai-agent-platform项目故事/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: PRT-002
-  title: Demo Roadmap
+  title: 可演示纵向切片与 Portfolio Release 路线图
   asset_type: portfolio
   status: proposed
   evidence_level: hypothesis
   materialized: true
-  current_path: docs/knowledge/09_作品集/PRT-002-Demo路线图.md
+  current_path: docs/knowledge/09_作品集/PRT-002-Demo路线图/README.md
   target_path:
-  canonical_path: docs/knowledge/09_作品集/PRT-002-Demo路线图.md
+  canonical_path: docs/knowledge/09_作品集/PRT-002-Demo路线图/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: EXP-003
-  title: Knowledge System Initialization Retrospective
+  title: 知识系统初始化与单一真源收敛复盘
   asset_type: experiment
   status: validated
   evidence_level: verified
   materialized: true
-  current_path: docs/knowledge/08_实验与复盘/EXP-003-知识系统初始化阶段复盘.md
+  current_path: docs/knowledge/08_实验与复盘/EXP-003-知识系统初始化阶段复盘/README.md
   target_path:
-  canonical_path: docs/knowledge/08_实验与复盘/EXP-003-知识系统初始化阶段复盘.md
+  canonical_path: docs/knowledge/08_实验与复盘/EXP-003-知识系统初始化阶段复盘/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: ARC-005
@@ -414,14 +414,14 @@ assets:
   migration_state: complete
   superseded_by: AGT-005
 - asset_id: EXP-004
-  title: Engineering Insight Distillation Skill Pilot Evaluation
+  title: 工程洞见提炼 Skill 首轮评测
   asset_type: experiment
   status: validated
   evidence_level: verified
   materialized: true
-  current_path: docs/knowledge/08_实验与复盘/EXP-004-工程洞见提炼Skill首轮评测.md
+  current_path: docs/knowledge/08_实验与复盘/EXP-004-工程洞见提炼Skill首轮评测/README.md
   target_path:
-  canonical_path: docs/knowledge/08_实验与复盘/EXP-004-工程洞见提炼Skill首轮评测.md
+  canonical_path: docs/knowledge/08_实验与复盘/EXP-004-工程洞见提炼Skill首轮评测/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: INS-001
@@ -1197,7 +1197,7 @@ assets:
   publication_status: unpublished
   migration_state: complete
 - asset_id: EXP-005
-  title: Custom-GPT-Actions链路实验
+  title: Custom GPT Actions 最小可信执行链实验
   asset_type: experiment
   status: accepted
   evidence_level: observed
@@ -1208,91 +1208,91 @@ assets:
   publication_status: unpublished
   migration_state: complete
 - asset_id: EXP-006
-  title: Gateway-Local-Runtime与Dev-Tunnels实验
+  title: Gateway、Local Runtime 与 Dev Tunnels 安全链路实验
   asset_type: experiment
   status: accepted
   evidence_level: observed
   materialized: true
-  current_path: docs/knowledge/08_实验与复盘/EXP-006-Gateway-Local-Runtime与Dev-Tunnels实验.md
+  current_path: docs/knowledge/08_实验与复盘/EXP-006-Gateway-Local-Runtime与Dev-Tunnels实验/README.md
   target_path:
-  canonical_path: docs/knowledge/08_实验与复盘/EXP-006-Gateway-Local-Runtime与Dev-Tunnels实验.md
+  canonical_path: docs/knowledge/08_实验与复盘/EXP-006-Gateway-Local-Runtime与Dev-Tunnels实验/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: EXP-007
-  title: Cloudflare路线替代复盘
+  title: Cloudflare 到 Dev Tunnels 路线替代复盘
   asset_type: experiment
   status: accepted
   evidence_level: observed
   materialized: true
-  current_path: docs/knowledge/08_实验与复盘/EXP-007-Cloudflare路线替代复盘.md
+  current_path: docs/knowledge/08_实验与复盘/EXP-007-Cloudflare路线替代复盘/README.md
   target_path:
-  canonical_path: docs/knowledge/08_实验与复盘/EXP-007-Cloudflare路线替代复盘.md
+  canonical_path: docs/knowledge/08_实验与复盘/EXP-007-Cloudflare路线替代复盘/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: EXP-008
-  title: 长上下文与知识综合复盘
+  title: 长上下文、冻结交付与知识综合复盘
   asset_type: experiment
   status: accepted
   evidence_level: observed
   materialized: true
-  current_path: docs/knowledge/08_实验与复盘/EXP-008-长上下文与知识综合复盘.md
+  current_path: docs/knowledge/08_实验与复盘/EXP-008-长上下文与知识综合复盘/README.md
   target_path:
-  canonical_path: docs/knowledge/08_实验与复盘/EXP-008-长上下文与知识综合复盘.md
+  canonical_path: docs/knowledge/08_实验与复盘/EXP-008-长上下文与知识综合复盘/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: EXP-009
-  title: 健康恢复与任务快照实验
+  title: 任务中断、健康恢复与快照续跑实验
   asset_type: experiment
   status: accepted
   evidence_level: hypothesis
   materialized: true
-  current_path: docs/knowledge/08_实验与复盘/EXP-009-健康恢复与任务快照实验.md
+  current_path: docs/knowledge/08_实验与复盘/EXP-009-健康恢复与任务快照实验/README.md
   target_path:
-  canonical_path: docs/knowledge/08_实验与复盘/EXP-009-健康恢复与任务快照实验.md
+  canonical_path: docs/knowledge/08_实验与复盘/EXP-009-健康恢复与任务快照实验/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: PRT-003
-  title: 核心架构亮点
+  title: 核心架构判断与可信边界
   asset_type: portfolio
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/09_作品集/PRT-003-核心架构亮点.md
+  current_path: docs/knowledge/09_作品集/PRT-003-核心架构亮点/README.md
   target_path:
-  canonical_path: docs/knowledge/09_作品集/PRT-003-核心架构亮点.md
+  canonical_path: docs/knowledge/09_作品集/PRT-003-核心架构亮点/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: PRT-004
-  title: 工程能力证明
+  title: 工程能力与证据映射
   asset_type: portfolio
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/09_作品集/PRT-004-工程能力证明.md
+  current_path: docs/knowledge/09_作品集/PRT-004-工程能力证明/README.md
   target_path:
-  canonical_path: docs/knowledge/09_作品集/PRT-004-工程能力证明.md
+  canonical_path: docs/knowledge/09_作品集/PRT-004-工程能力证明/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: PRT-005
-  title: 关键问题与解决过程
+  title: 关键问题、失败与架构收敛
   asset_type: portfolio
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/09_作品集/PRT-005-关键问题与解决过程.md
+  current_path: docs/knowledge/09_作品集/PRT-005-关键问题与解决过程/README.md
   target_path:
-  canonical_path: docs/knowledge/09_作品集/PRT-005-关键问题与解决过程.md
+  canonical_path: docs/knowledge/09_作品集/PRT-005-关键问题与解决过程/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: PRT-006
-  title: 项目成果索引
+  title: 项目成果与证据索引
   asset_type: portfolio
   status: accepted
   evidence_level: decided
   materialized: true
-  current_path: docs/knowledge/09_作品集/PRT-006-项目成果索引.md
+  current_path: docs/knowledge/09_作品集/PRT-006-项目成果索引/README.md
   target_path:
-  canonical_path: docs/knowledge/09_作品集/PRT-006-项目成果索引.md
+  canonical_path: docs/knowledge/09_作品集/PRT-006-项目成果索引/README.md
   publication_status: unpublished
   migration_state: complete
 - asset_id: REF-001

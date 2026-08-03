@@ -22,7 +22,7 @@
 07_工作流与项目治理
   把目标、角色、Task、Context、Execution、Evidence、Approval、Release 串成受控执行线
           ↓
-08_实验与证据
+08_实验与复盘
   定义实验、Evidence 质量、评估、Replay 和可重复性
 ```
 

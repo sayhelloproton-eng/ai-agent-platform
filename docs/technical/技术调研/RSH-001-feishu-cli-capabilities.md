@@ -28,6 +28,6 @@ related_assets: [EXP-001, EXP-002, SOL-001]
 
 ## Sources
 
-- [`EXP-001`](../../knowledge/08_实验与复盘/EXP-001-公开飞书知识库读取实验.md)
-- [`EXP-002`](../../knowledge/08_实验与复盘/EXP-002-公开飞书知识库递归导出实验.md)
+- [`EXP-001`](../../knowledge/08_实验与复盘/EXP-001-公开飞书知识库读取实验/README.md)
+- [`EXP-002`](../../knowledge/08_实验与复盘/EXP-002-公开飞书知识库递归导出实验/README.md)
 - [`external/waytoagi-feishu-cli-export/`](./external/waytoagi-feishu-cli-export)
