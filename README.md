@@ -81,7 +81,7 @@ Custom GPT
 Phase 2.5 — Homepage Convergence and Feishu Publication Preparation
 ```
 
-正式知识已完成内容 Review；原 `00_项目入口` 与 `01_产品体系` 已收敛为 `00_项目与产品`，`CTX-001《智能体工程探索录》` 成为总览正文和 Feishu 根首页来源。当前工作是应用冻结文档与视觉资产，并进入 Feishu 清空、Pilot 和全量覆盖准备。
+正式知识与视觉资产已在 `main` 完成应用并形成 Git 基线；原 `00_项目入口` 与 `01_产品体系` 已收敛为 `00_项目与产品`，`CTX-001《智能体工程探索录》` 成为总览正文和 Feishu 根首页来源。当前工作进入 Feishu 清空、Pilot 和全量覆盖前的复审与准备。
 
 内容完成不等于 Agent Runtime 完成。Agent Profile、Knowledge Pack、Task Store、Approval、Evidence 等目标能力仍未实现。
 

@@ -41,7 +41,7 @@ Execution Lane 绑定：
 - 预算；
 - 日志、结果和副作用。
 
-当前普通知识落库可以在已授权的 `knowledge-rebuild-v2` 分支直接执行；Branch、Worktree、Remote Branch 和 PR 不是默认步骤，而由 Git Operating Policy 决定。
+知识落库必须在 Task Contract 与 Git Operating Policy 明确授权的分支上执行；Branch、Worktree、Remote Branch 和 PR 不是默认步骤，而由 Git Operating Policy 决定。
 
 ## 4. Executor Routing
 
