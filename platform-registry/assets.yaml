@@ -2015,3 +2015,58 @@ assets:
   canonical_path: platform-registry/visual-assets/VIS-036.json
   publication_status: unpublished
   migration_state: complete
+- asset_id: ADR-004
+  title: 第二阶段四个 MVP 验证与串联
+  asset_type: adr
+  status: accepted
+  evidence_level: decided
+  materialized: true
+  current_path: docs/adr/ADR-004-phase-2-four-mvp-validation.md
+  target_path:
+  canonical_path: docs/adr/ADR-004-phase-2-four-mvp-validation.md
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: SOL-CTL-001
+  title: 总控 Agent 与动态上下文 MVP
+  asset_type: solution
+  status: candidate
+  evidence_level: hypothesis
+  materialized: true
+  current_path: docs/technical/技术方案/第二阶段/SOL-CTL-001-总控Agent与动态上下文MVP.md
+  target_path:
+  canonical_path: docs/technical/技术方案/第二阶段/SOL-CTL-001-总控Agent与动态上下文MVP.md
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: SOL-LCL-001
+  title: Local Control 与 CLI MVP
+  asset_type: solution
+  status: candidate
+  evidence_level: hypothesis
+  materialized: true
+  current_path: docs/technical/技术方案/第二阶段/SOL-LCL-001-Local-Control与CLI-MVP.md
+  target_path:
+  canonical_path: docs/technical/技术方案/第二阶段/SOL-LCL-001-Local-Control与CLI-MVP.md
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: SOL-TSK-001
+  title: 任务消息中心与单任务调度 MVP
+  asset_type: solution
+  status: candidate
+  evidence_level: hypothesis
+  materialized: true
+  current_path: docs/technical/技术方案/第二阶段/SOL-TSK-001-任务消息中心与单任务调度MVP.md
+  target_path:
+  canonical_path: docs/technical/技术方案/第二阶段/SOL-TSK-001-任务消息中心与单任务调度MVP.md
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: SOL-BHR-001
+  title: ChatGPT Browser Host Runtime 扩展 MVP
+  asset_type: solution
+  status: candidate
+  evidence_level: hypothesis
+  materialized: true
+  current_path: docs/technical/技术方案/第二阶段/SOL-BHR-001-ChatGPT-Browser-Host-Runtime扩展MVP.md
+  target_path:
+  canonical_path: docs/technical/技术方案/第二阶段/SOL-BHR-001-ChatGPT-Browser-Host-Runtime扩展MVP.md
+  publication_status: unpublished
+  migration_state: complete

@@ -1363,3 +1363,24 @@ relations:
 - from: VIS-036
   type: explains
   to: CTX-001
+- from: SOL-CTL-001
+  type: decided_by
+  to: ADR-004
+- from: SOL-LCL-001
+  type: decided_by
+  to: ADR-004
+- from: SOL-LCL-001
+  type: depends_on
+  to: SOL-CTL-001
+- from: SOL-TSK-001
+  type: decided_by
+  to: ADR-004
+- from: SOL-TSK-001
+  type: depends_on
+  to: SOL-LCL-001
+- from: SOL-BHR-001
+  type: decided_by
+  to: ADR-004
+- from: SOL-BHR-001
+  type: depends_on
+  to: SOL-TSK-001
