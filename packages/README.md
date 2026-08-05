@@ -13,6 +13,7 @@
 - `contracts/`：Task、Result、Error、Capability、Controller Context / Claim / Command 与运行时校验的公共协议包。
 - `auth/`：Bearer 解析、API Key 校验、安全比较和 Header 脱敏的基础认证包。
 - `policy/`：Capability 级允许与拒绝决策包。
+- `local-control/`：`SOL-LCL-001` 的无状态本机能力 CLI；通过注册表、策略和固定 Adapter 返回 Canonical Local Result。
 
 `contracts` 定义协议，`auth` 验证身份，`policy` 判断能力是否允许。三者都不承担完整应用职责。
 
@@ -35,6 +36,7 @@
 npm run check:contracts
 npm run check:auth
 npm run check:policy
+npm run check:local-control
 ```
 
 ## Maintenance

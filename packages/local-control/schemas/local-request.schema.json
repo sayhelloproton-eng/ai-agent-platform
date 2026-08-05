@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-agent-platform.local/schemas/local-request-0.1.0.json",
+  "title": "LocalRequest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "local_request_version",
+    "request_id",
+    "capability",
+    "execution_mode",
+    "actor",
+    "parameters"
+  ],
+  "properties": {
+    "local_request_version": { "const": "0.1.0" },
+    "request_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "capability": {
+      "enum": [
+        "local.health.read",
+        "local.capabilities.read",
+        "local.project.describe",
+        "local.repository.snapshot.read",
+        "local.repository.tree.read",
+        "local.repository.file.read",
+        "local.runtime.status.read",
+        "local.executor.status.read",
+        "local.query.batch",
+        "local.service.ensure_running"
+      ]
+    },
+    "execution_mode": { "enum": ["SYNC", "ASYNC"] },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actor_type", "actor_id"],
+      "properties": {
+        "actor_type": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "actor_id": { "type": "string", "minLength": 1, "maxLength": 128 }
+      }
+    },
+    "correlation": { "type": "object" },
+    "scope": { "type": "object" },
+    "parameters": { "type": "object" },
+    "budget": { "type": "object" },
+    "idempotency_key": { "type": "string", "minLength": 1, "maxLength": 128 }
+  }
+}

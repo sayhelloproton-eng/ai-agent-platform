@@ -1,0 +1,33 @@
+{
+  "name": "@ai-agent-platform/local-control",
+  "version": "0.1.0",
+  "description": "Stateless, policy-bounded local resource control CLI for ai-agent-platform.",
+  "type": "module",
+  "bin": {
+    "aap-local": "./dist/cli.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "schemas",
+    "docs",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20 <21",
+    "npm": ">=10 <11"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test tests/*.test.mjs",
+    "verify": "npm test",
+    "pack:check": "npm run build && npm pack --dry-run"
+  }
+}

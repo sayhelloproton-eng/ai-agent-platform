@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-agent-platform.local/schemas/local-result-0.1.0.json",
+  "title": "LocalResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "local_result_version",
+    "request_id",
+    "capability",
+    "status",
+    "data",
+    "error",
+    "warnings",
+    "evidence",
+    "meta"
+  ],
+  "properties": {
+    "local_result_version": { "const": "0.1.0" },
+    "request_id": { "type": "string" },
+    "capability": { "type": "string" },
+    "status": { "enum": ["SUCCEEDED", "PARTIAL", "ACCEPTED", "FAILED"] },
+    "data": { "type": ["object", "null"] },
+    "error": { "type": ["object", "null"] },
+    "warnings": { "type": "array", "items": { "type": "string" } },
+    "evidence": { "type": "object" },
+    "meta": { "type": "object" }
+  }
+}
