@@ -1,66 +1,82 @@
-# SOL-LCL-001 MVP Verification
+# SOL-LCL-001 Integration Readiness Verification
 
 ## Baseline
 
 ```text
-Source archive commit identity:
-5b1edbe303aa8c3c4388804149a875f8f34ca9dd
+Audited repository baseline:
+main@eb1444044b50c9a8e00d7da9283d9999e3256d9e
 
-Audited design:
-第二阶段(2).zip / SOL-LCL-001-Local-Control与CLI-MVP.md
+Audit date:
+2026-08-05
 ```
 
-## Implemented Scope
+## Implemented scope
 
-- 新增 `@ai-agent-platform/local-control`；
-- 10 个 `local.*` Capability；
-- stdin/stdout 单 JSON 协议；
-- Project / Runtime / Executor / Service Registry；
-- Git / File / Runtime / Executor / Service Adapter；
-- 路径、敏感资源、预算和固定命令策略；
-- npm pack 与离线安装测试；
-- Gateway 接入合同文档。
+在既有 Local Control MVP 上增加：
 
-未修改 Gateway、Task Control、Controller、Browser Host 或公共 Contracts 的内部实现。
+- Canonical Local Result 运行时验证；
+- Gateway 安全 CLI Process Adapter；
+- 无状态 Task Work Consumer Adapter；
+- Result Persistence Port；
+- Transport Error；
+- Gateway / Work Consumer 正式接入文档；
+- 审计整改测试。
 
-## Verification Results
+没有修改 Task、Plan、Claim、WorkItem 或 Controller 语义。
 
-在当前执行环境完成：
+## Local Control verification
 
-- Local Control：12/12 tests passed；
-- Contracts：17/17 tests passed；
-- Auth：12/12 tests passed；
-- Policy：12/12 tests passed；
-- Action Gateway：79/79 tests passed；
-- Local Runtime：44/44 tests passed；
-- Local Chain：6/6 tests passed；
-- Local Stack：5/5 tests passed；
-- Skills Check：通过；
-- Engineering Document Authoring Self-test：通过；
-- Planner-Executor Handoff Self-test：通过；
-- npm pack：通过；
-- 打包产物离线安装与 `aap-local` 二进制调用：通过。
+当前领域测试：
 
-## Environment Limitation
+```text
+20 passed
+0 failed
+```
 
-执行沙盒为 Node.js `v22.16.0`，仓库正式要求 Node.js 20。所有 TypeScript 构建和测试均通过，但落库执行器仍必须在项目规定的 Node 20 / npm 10 环境重新运行正式门禁。
+新增测试覆盖：
 
-上传的是 GitHub 风格源码归档，不含 `.git`，因此以下门禁无法在本环境成立：
+- 真实 CLI 子进程调用；
+- CLI 与直接调用结果一致；
+- 重复只读请求；
+- Timeout；
+- stdout / stderr 预算；
+- 非单一 JSON；
+- Result 身份不一致；
+- Invalid Path；
+- Sensitive File；
+- 受信任绝对路径和环境白名单；
+- Work Consumer Result Ref 注入；
+- Error Code、Retryable、Summary 和 Evidence Ref 回报。
 
-- 实时 Branch / HEAD / Remote 一致性；
-- Worktree / Index 洁净度；
-- `git diff --check`；
-- `scripts/repo-check.mjs` 的 Git 跟踪文件检查。
+原有测试继续覆盖：
 
-这不是代码测试失败。正式应用时必须以固定 Base Commit、干净 Worktree 和 Node 20 重新验证。
+- 10 个 Capability；
+- Git / File / Runtime / Executor / Service；
+- 路径穿越和软链逃逸；
+- Batch；
+- `ensure_running`；
+- npm pack；
+- 离线安装和 `aap-local` Binary。
 
-源码归档还存在一个与本实现无关的文件名编码限制：部分中文路径在 ZIP 中以字面量 `#U...` 形式出现，而 Registry 中记录的是规范中文路径，因此 `check:registry` 在当前解压副本中无法通过。不得通过修改 Registry 或公共语义绕过；应在保留真实 Unicode 文件名的正式 Git Worktree 中复验。
+## Environment note
 
-## Governance Notes
+当前生成环境使用 Node.js `v22.16.0` 和 npm `10.9.2`。正式仓库门禁要求 Node 20 / npm 10，因此落库执行器必须在正式 Git Worktree 重跑：
 
-- 同步只读查询不强制创建 Work Item；
-- 异步状态只由 Task Control 保存；
-- CLI 无长期状态；
-- 没有新增 Local Control Service、Daemon 或第二 Gateway；
-- Gateway Adapter 和共享合同仍等待总控跨领域审计；
-- 未单方面修改平台公共语义。
+```bash
+npm ci
+npm run verify --workspace @ai-agent-platform/local-control
+npm run pack:check --workspace @ai-agent-platform/local-control
+npm run verify
+```
+
+## Integration status
+
+```text
+Local Control implementation: ready
+Gateway Process Adapter: implemented
+Work Consumer Adapter: implemented
+Gateway HTTP local.* route: not implemented by LCL
+TSK WorkItem mapping: not implemented by LCL
+Public Result Ref: pending total-control freeze
+Four-domain E2E: pending total-control integration
+```

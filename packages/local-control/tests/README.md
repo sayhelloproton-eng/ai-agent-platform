@@ -13,3 +13,7 @@
 - `ensure_running` 幂等和固定模板；
 - CLI stdout 单 JSON；
 - `npm pack` 发布清单。
+
+## 综合审计整改测试
+
+`integration-adapters.test.mjs` 验证 Gateway 固定进程调用、CLI/直接结果一致、重复请求、Timeout、输出预算、非法 stdout、路径与敏感资源拒绝、Work Consumer Result Ref 注入，以及 Error / Retryable / Summary / Evidence Ref 回报。

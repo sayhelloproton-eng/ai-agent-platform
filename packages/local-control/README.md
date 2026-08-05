@@ -12,6 +12,12 @@ aap-local invoke --input - --output json
 
 stdin 只接收一个 `LocalRequest` JSON，stdout 只返回一个 `LocalResult` JSON。CLI 一次请求、一次结果、一次退出，不保存 Task、Plan、Claim 或长期 Execution 状态。
 
+综合审计整改后，本包还正式导出：
+
+- `createLocalControlProcessClient()`：供唯一 Gateway 以安全子进程调用固定 CLI；
+- `createLocalWorkConsumer()`：供 Task Worker 在已转换为 `LocalRequest` 后执行并回报；
+- `validateLocalResult()`：校验 stdout Canonical Local Result 及请求身份一致性。
+
 ## Boundary
 
 本包拥有：
@@ -73,6 +79,8 @@ npm run pack:check --workspace @ai-agent-platform/local-control
 
 - `docs/technical/技术方案/第二阶段/SOL-LCL-001-Local-Control与CLI-MVP.md`
 - `docs/GATEWAY-INTEGRATION.md`
+- `docs/WORK-CONSUMER-INTEGRATION.md`
+- `docs/AUDIT-REMEDIATION-2026-08-05.md`
 - `docs/RUNBOOK.md`
 - `docs/MVP-VERIFICATION.md`
 - `AGENTS.md`

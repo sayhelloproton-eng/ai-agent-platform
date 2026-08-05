@@ -53,3 +53,24 @@ export {
   type ProcessRunner,
 } from "./process.js";
 export { validateLocalRequest } from "./request-validator.js";
+
+export {
+  LOCAL_CONTROL_FIXED_ARGS,
+  LocalControlTransportError,
+  createLocalControlProcessClient,
+  type LocalControlClient,
+  type LocalControlProcessClientOptions,
+  type LocalControlTransportErrorCode,
+} from "./gateway-process-adapter.js";
+export {
+  createLocalWorkConsumer,
+  summarizeLocalResult,
+  type LocalResultPersistencePort,
+  type LocalWorkConsumerOptions,
+  type LocalWorkConsumerReport,
+  type PersistedLocalResultReferences,
+} from "./work-consumer-adapter.js";
+export {
+  validateLocalResult,
+  type ExpectedLocalResultIdentity,
+} from "./result-validator.js";

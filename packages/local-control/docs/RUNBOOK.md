@@ -1,13 +1,14 @@
-# Local Control MVP Runbook
+# Local Control Integration Runbook
 
-## 前置
+## Prerequisites
 
 - Node.js 20.x；
 - npm 10.x；
-- Git 可执行；
-- `LOCAL_PROJECT_ROOT` 指向 `ai-agent-platform` 仓库，或当前工作目录位于该仓库内。
+- Git；
+- `LOCAL_PROJECT_ROOT` 指向 `ai-agent-platform`；
+- 固定安装的 `@ai-agent-platform/local-control`。
 
-## 构建与测试
+## Build and verify
 
 ```bash
 npm ci
@@ -15,7 +16,7 @@ npm run check:local-control
 npm run pack:check --workspace @ai-agent-platform/local-control
 ```
 
-## 机器调用示例
+## Direct machine protocol
 
 ```bash
 cat <<'JSON' | ./node_modules/.bin/aap-local invoke --input - --output json
@@ -28,24 +29,50 @@ cat <<'JSON' | ./node_modules/.bin/aap-local invoke --input - --output json
     "actor_type": "gateway",
     "actor_id": "action-gateway-primary"
   },
-  "parameters": {}
+  "parameters": {},
+  "budget": {
+    "timeout_ms": 5000,
+    "max_stdout_bytes": 65536,
+    "max_result_chars": 50000
+  }
 }
 JSON
 ```
 
-## 仓库读取
+## Gateway Process Adapter
 
-调用端只能提供 `project_id=ai-agent-platform` 和相对路径。绝对路径、`..`、软链逃逸、`.env*`、私钥、认证缓存、`.git` 内部和 `node_modules` 会被拒绝。
+```ts
+import { createLocalControlProcessClient } from "@ai-agent-platform/local-control";
 
-## Runtime 与 Service
+const client = createLocalControlProcessClient({
+  executable: absoluteAapLocalPath,
+  cwd: repositoryRoot,
+  environment: {
+    LOCAL_PROJECT_ROOT: repositoryRoot,
+  },
+});
 
-默认 Gateway Probe：
-
-```text
-http://127.0.0.1:8787/health
+const result = await client.execute(localRequest);
 ```
 
-可以设置 `LOCAL_GATEWAY_HEALTH_URL`，但只接受 Loopback URL。
+Gateway 必须自己处理认证、HTTP 和 Transport Error 映射。
+
+## Work Consumer Adapter
+
+```ts
+import { createLocalWorkConsumer } from "@ai-agent-platform/local-control";
+
+const consumer = createLocalWorkConsumer({
+  client,
+  resultPersistence,
+});
+
+const report = await consumer.run(localRequest);
+```
+
+Task Control / Worker 必须自己处理 WorkItem Claim、状态、去重、重试和 Result Ref 持久化。
+
+## Service start
 
 `local.service.ensure_running` 默认关闭。完成本机审计后显式设置：
 
@@ -53,15 +80,14 @@ http://127.0.0.1:8787/health
 export LOCAL_CONTROL_ALLOW_SERVICE_START=true
 ```
 
-它只会运行注册模板 `npm run local:start`，不会接受调用端命令、参数或环境变量。
+它只运行 Service Registry 固定模板，不接收调用端命令。
 
-## 故障处理
+## Troubleshooting
 
+- `LOCAL_CLI_NOT_AVAILABLE`：检查固定 npm 包和 Binary Path；
+- `LOCAL_CLI_TIMEOUT`：检查 Gateway 上限和 Local Request Budget；
+- `LOCAL_CLI_OUTPUT_TOO_LARGE`：缩小读取范围；
+- `LOCAL_CLI_INVALID_RESULT`：停止接入，检查包版本或 stdout 污染；
 - `PROJECT_NOT_REGISTERED`：设置 `LOCAL_PROJECT_ROOT`；
-- `SENSITIVE_RESOURCE_DENIED`：改用非敏感、已治理的仓库文件；
-- `PROCESS_TIMEOUT`：缩小请求或检查注册依赖；
-- `OUTPUT_TOO_LARGE`：缩小行范围、页大小或 Batch；
-- `SERVICE_START_NOT_ALLOWED`：不要绕过策略，先完成本机启动授权；
-- `ACCEPTED`：由 Task Control 保存状态并按 `poll` 再查询。
-
-不得通过修改 CLI Contract、放开任意 Shell 或删除安全测试来消除失败。
+- `SENSITIVE_RESOURCE_DENIED`：不得绕过策略；
+- `ACCEPTED`：Task Control 保存状态并按 Poll Hint 继续查询。

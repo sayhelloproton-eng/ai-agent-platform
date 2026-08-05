@@ -447,6 +447,8 @@ test("npm pack publishes the binary, dist, schemas, docs and README only", async
     assert.ok(names.includes("schemas/local-result.schema.json"));
     assert.ok(names.includes("README.md"));
     assert.ok(names.includes("docs/GATEWAY-INTEGRATION.md"));
+    assert.ok(names.includes("docs/WORK-CONSUMER-INTEGRATION.md"));
+    assert.ok(names.includes("docs/AUDIT-REMEDIATION-2026-08-05.md"));
     assert.ok(names.includes("docs/RUNBOOK.md"));
     assert.ok(names.includes("docs/MVP-VERIFICATION.md"));
     assert.equal(names.some((name) => name.startsWith("tests/")), false);

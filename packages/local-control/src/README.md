@@ -10,5 +10,8 @@
 - `capabilities/`：高层 `local.*` 处理器。
 - `invoke.ts`：一次请求、一次结果的应用入口。
 - `cli.ts`：stdin/stdout 机器协议。
+- `result-validator.ts`：Canonical Local Result 与请求身份校验。
+- `gateway-process-adapter.ts`：`shell:false` 的固定 CLI Process Client。
+- `work-consumer-adapter.ts`：无状态 Work Consumer Runner 与 Result Persistence Port。
 
 任何新增能力必须先进入 Capability Catalog，并通过 Registry、Policy、Adapter 和测试，不得增加 `shell.exec`、`git.raw` 或任意路径入口。
