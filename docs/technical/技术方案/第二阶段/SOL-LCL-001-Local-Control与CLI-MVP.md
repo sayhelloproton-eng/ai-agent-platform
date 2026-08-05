@@ -4,536 +4,444 @@
 |---|---|
 | 方案 ID | `SOL-LCL-001` |
 | 状态 | Candidate |
+| 版本 | `0.2.0-draft` |
 | 所属阶段 | 第二阶段 MVP-2 |
-| 核心领域 | Local Resource Access / Local Control |
-| 第一消费者 | 总控 Custom GPT |
-| 其他消费者 | CLI、测试、未来 Task / MCP / 管理后台 |
-| MVP 安全级别 | 严格只读 |
+| 核心领域 | Local Control / Local Resource Access |
+| 第一消费者 | 总控 Custom GPT，经唯一 Gateway 调用 |
+| 其他消费者 | 任务执行端、Browser Host 本机组件、自动化脚本、测试程序 |
+| 实现载体 | 可发布 npm 包 `@ai-agent-platform/local-control` |
+| CLI 二进制 | `aap-local` |
+| MVP 安全级别 | 严格只读为主；只保留注册服务的受控启动实验 |
+| 状态真源 | Task Control 保存任务与异步状态；CLI 不保存长期状态 |
+| 文档边界 | Git-only，不进入 `docs/knowledge/**`，不触发飞书发布 |
 
-## 一、目标
+## 一、本文拥有的问题
 
-本 MVP 解决当前最直接的工程问题：
+本文只回答一个问题：
 
-> 总控无需手工接收完整仓库 ZIP，即可通过受控接口获得本机仓库、文件、Runtime 和 Artifact 的真实最新状态。
+> 上层调用端给出明确、受约束的本机能力请求后，Local Control CLI 能否在 Mac 上读取注册仓库、文件、Runtime、Executor 和 Service 的真实状态，并返回稳定、结构化、可审计的结果，使总控不再依赖完整 ZIP 或原始终端文本。
 
-CLI 不是核心领域，而是 Local Control Application Service 的一个 Adapter：
+Local Control 是本机能力领域；本 MVP 选择一个可发布 npm CLI 作为实现载体，不建设第二个 Gateway、常驻 HTTP Service 或 Daemon。
+
+## 二、关键结论
 
 ```text
-Custom GPT Action ─┐
-CLI ───────────────┼→ Local Control Application Service
-测试 Adapter ──────┘              ↓
-                       Git / File / Runtime / Artifact Adapters
+Custom GPT Action / 其他受信任调用端
+        ↓
+唯一 Gateway：认证、预算、命名空间路由
+        ↓ local.*
+固定版本 Local Control CLI
+        ↓
+Git / Node fs / Runtime Probe / Executor / Registered Service
+        ↓
+Canonical Local Result
 ```
 
-## 二、需要回答的核心问题
+固定原则：
 
-1. 总控能否通过一次高层请求获得足够的项目 Bootstrap？
-2. Local Control 能否只读取注册项目，拒绝任意路径和任意 Shell？
-3. 同一能力能否同时通过 Action JSON 和 CLI 人类视图消费？
-4. 大结果能否以摘要、分页和 Artifact Ref 返回，而不是占满模型上下文？
-5. 未提交修改能否被正确标记，而不是与正式 Commit 混淆？
-6. 敏感文件、软链逃逸、绝对路径和 `../` 是否始终被拒绝？
-7. 结果是否具备版本、来源、Hash、时间和稳定错误语义？
+1. Gateway 是唯一外部入口；Local Control 不新增网关。
+2. Gateway 通过安全进程 API 调用固定版本 CLI，`shell: false`。
+3. CLI 一次请求、一次结果、一次退出，不保存 Task、Plan 或长期 Execution 状态。
+4. 默认只读；唯一副作用实验是注册服务的 `ensure_running`。
+5. 调用者只能引用注册资源，不能提交绝对路径、任意命令、任意参数或环境变量。
+6. 同步读取可以在总控当前回合直接调用，不要求先创建 Work Item。
+7. 只有跨回合、长时、需要角色交接或异步轮询的操作，才由 Task Control 建立 Work Item / Execution 状态。
 
 ## 三、领域边界
 
-### 3.1 本领域拥有
+### 3.1 Local Control 拥有
 
-- 注册项目和资源配置；
-- 本机资源定位规则；
-- Capability Catalog；
-- Resource Snapshot；
-- Canonical Result；
-- Resource Error；
-- Git / File / Runtime / Artifact Adapter；
-- 读取预算与安全策略；
-- CLI、Action 和测试 Presenter。
+- Local Capability Catalog；
+- Project / Runtime / Executor / Service Registry；
+- Local Request、Local Result、Local Error；
+- 路径、敏感资源、命令模板和预算策略；
+- Git、File、Runtime、Executor、Service Adapter；
+- CLI stdin/stdout 机器协议；
+- 当前观察的最小审计元数据。
 
-### 3.2 本领域不拥有
+### 3.2 Local Control 不拥有
 
-- Goal 和 Task；
-- 总控语义决策；
-- 工作流状态和处理者；
-- 执行器调度；
-- 浏览器页面和会话；
-- 审批；
-- Artifact 的完整业务生命周期；
-- 管理后台业务流程。
+| 对象 | 所属领域 |
+|---|---|
+| Goal、Requirement、验收语义 | Goal / Planning |
+| Task、Plan、Plan Node、Task Version | Task Control |
+| Controller Claim、Work Claim、Dispatch Claim | Task Control |
+| 总控推理与 Controller Command | Controller |
+| Browser Session、DOM、Screenshot | Browser Host |
+| Approval 与一次性授权 | Approval |
+| Artifact / Evidence 生命周期 | Artifact / Evidence |
+| 模型推理 Provider、Role Profile | Model Inference |
+| Codex / OpenCode 任务语义 | Execution |
 
-Task、Context 和总控只保存或消费 `resource_ref / result_ref`，不得直接读取 Local Control 内部表或路径。
-
-## 四、MVP 范围
-
-### 4.1 固定环境
-
-```text
-单用户
-单 Gateway
-单 Mac Local Runtime
-单注册项目：ai-agent-platform
-单项目固定根目录
-```
-
-合同仍预留：
-
-```text
-actor_id
-project_id
-capability_id
-request_id
-snapshot_id
-```
-
-### 4.2 严格只读
-
-MVP 禁止：
-
-```text
-file.write
-git.commit
-git.push
-process.exec
-shell.exec
-git.raw
-任意命令拼接
-```
-
-可以读取未提交内容，但必须准确标记：
-
-```text
-committed
-modified
-staged
-untracked
-```
-
-## 五、最小架构
-
-```text
-Local Control
-├── Application Service
-├── Project Registry
-├── Capability Registry
-├── Request Validator
-├── Budget Guard
-├── Security Policy
-├── Resource Adapters
-│   ├── Git Adapter
-│   ├── File Adapter
-│   ├── Runtime Adapter
-│   └── Artifact Adapter
-├── Canonical Result Builder
-└── Presenters
-    ├── Action JSON
-    ├── CLI Human View
-    └── Test Fixture View
-```
-
-### 5.1 Application Service
-
-负责：
-
-- 校验调用者、项目和 Capability；
-- 解析受控参数；
-- 调用专业 Adapter；
-- 应用时间、文件、字符和结果预算；
-- 生成统一 Result / Error；
-- 记录最小审计元数据。
-
-### 5.2 Project Registry
-
-MVP 只注册：
+关联字段只用于日志和结果回挂，不授予 Task 修改权：
 
 ```json
 {
-  "project_id": "ai-agent-platform",
-  "root_alias": "project-root",
-  "allowed_resource_types": [
-    "git",
-    "file",
-    "runtime",
-    "artifact"
-  ]
+  "correlation": {
+    "task_id": "task-001",
+    "task_version": 8,
+    "claim_id": "controller-claim-001",
+    "plan_node_id": "node-runtime-check",
+    "correlation_id": "corr-001"
+  }
 }
 ```
 
-对外永不返回真实绝对路径。调用方只能使用 `project_id` 和项目相对资源标识。
+## 四、同步查询与异步工作
+
+### 4.1 同步查询
+
+以下场景可以由总控通过 Action → Gateway → CLI 直接读取：
+
+- 当前仓库 HEAD 与工作区摘要；
+- 指定受控文件片段；
+- Runtime 当前状态；
+- Git、Node、Codex、OpenCode 的安装与版本；
+- 多个只读子查询组成的受预算 batch。
+
+同步结果直接返回当前 Agent 回合，并可按需形成 `result_ref`。Task Control 可以记录引用，但不需要为了每次读取创建 Work Item。
+
+### 4.2 异步或可交接工作
+
+出现下列任一条件时，应由 Task Control 建立 Work Item 或 Execution 状态：
+
+- 操作跨越当前请求预算；
+- 需要轮询；
+- 需要其他角色领取；
+- 需要重试、暂停或恢复；
+- 具有副作用；
+- 结果将在后续回合消费。
+
+`local.service.ensure_running` 属于异步实验：CLI 只执行一次受控“确保运行”尝试并返回当前观察与轮询提示，Task Control 保存后续状态。
+
+## 五、唯一 Gateway 与 CLI 协议
+
+### 5.1 Gateway 负责
+
+- 外部认证与调用者识别；
+- Action Schema、大小、频率和预算校验；
+- 路由 `local.*`；
+- 注入 Actor 与 Correlation；
+- 调用锁定版本的 `aap-local`；
+- 设置超时和输出上限；
+- 解析并返回 Local Result。
+
+Gateway 不拼接底层命令，不判断文件路径安全，也不解释 Git 输出；这些属于 Local Control。
+
+### 5.2 机器入口
+
+```bash
+aap-local invoke --input - --output json
+```
+
+- stdin：一个完整 Local Request JSON；
+- stdout：一个完整 Local Result JSON；
+- stderr：受控诊断，不含 Secret、正文、绝对路径或 Stack；
+- 不输出 Banner、ANSI、npm 提示或其他混杂文本。
+
+Gateway 通过锁文件和精确版本调用本地已安装包，不在每次请求时联网下载浮动版本。
+
+### 5.3 候选 HTTP 映射
+
+```text
+POST /v1/local/queries
+POST /v1/local/commands
+```
+
+`queries` 仅接收读取能力；`commands` 在 MVP 仅接收注册服务的 `ensure_running`。路径和 Operation ID 在四个 MVP 接口审计后冻结。
 
 ## 六、最小 Capability Catalog
 
-### 6.1 `capabilities.describe`
+| Capability | 模式 | 副作用 | 主要结果 |
+|---|---|---:|---|
+| `local.health.read` | SYNC | 否 | CLI、合同、注册表健康 |
+| `local.capabilities.read` | SYNC | 否 | 能力、模式、预算、错误摘要 |
+| `local.project.describe` | SYNC | 否 | 注册项目公开元数据 |
+| `local.repository.snapshot.read` | SYNC | 否 | Branch、HEAD、Upstream、工作区、最近提交 |
+| `local.repository.tree.read` | SYNC | 否 | 分页目录树 |
+| `local.repository.file.read` | SYNC | 否 | 文本片段、Hash、Git 状态 |
+| `local.runtime.status.read` | SYNC | 否 | 生命周期、健康、版本、错误摘要 |
+| `local.executor.status.read` | SYNC | 否 | Git / Node / Codex / OpenCode 状态 |
+| `local.query.batch` | SYNC | 否 | 受预算的只读子结果集合 |
+| `local.service.ensure_running` | ASYNC | 是 | 启动尝试、当前状态、轮询提示 |
 
-返回：
+能力不能退化为 `git.raw`、`shell.exec`、任意 URL、任意脚本或任意文件读取。
 
-- 可用能力；
-- 输入 Schema；
-- 输出类型；
-- 读取预算；
-- 是否依赖 Snapshot；
-- 可能错误；
-- 结果分页方式。
-
-### 6.2 `context.bootstrap`
-
-为总控提供高信息密度本机事实摘要：
-
-```text
-项目身份
-当前分支与 HEAD
-Worktree 状态摘要
-关键 Context 文件索引
-关键 Registry 状态
-Runtime 服务摘要
-可继续查询的资源
-Snapshot ID
-```
-
-它不是完整 Context 领域，只是 Local Control 提供的本机事实包。
-
-### 6.3 `context.collect`
-
-一次执行多个受控子查询：
+## 七、Local Request Contract
 
 ```json
 {
-  "snapshot_id": "snap-001",
-  "queries": [
-    {"type": "git.status"},
-    {"type": "file.read", "resource": "context/current-status.md"},
-    {"type": "runtime.status"}
-  ]
+  "local_request_version": "0.1.0",
+  "request_id": "req-001",
+  "capability": "local.repository.snapshot.read",
+  "execution_mode": "SYNC",
+  "actor": {
+    "actor_type": "gateway",
+    "actor_id": "action-gateway-primary"
+  },
+  "correlation": {
+    "task_id": "task-001",
+    "task_version": 8,
+    "claim_id": "controller-claim-001",
+    "plan_node_id": "node-runtime-check",
+    "correlation_id": "corr-001"
+  },
+  "scope": {
+    "project_id": "ai-agent-platform"
+  },
+  "parameters": {},
+  "budget": {
+    "timeout_ms": 5000,
+    "max_stdout_bytes": 65536,
+    "max_result_chars": 50000
+  },
+  "idempotency_key": "idem-001"
 }
 ```
 
-请求必须设置或由服务端强制设置：
+规则：
 
-```text
-max_queries
-max_files
-max_total_chars
-timeout_ms
-```
+- 所有读取只接受 `SYNC`；
+- `ensure_running` 只接受 `ASYNC`；
+- Actor 不是无限授权，CLI 仍校验 Capability、Project、Registry 与 Policy；
+- CLI 不校验 Task 合法迁移；
+- 读取天然可重试；`ensure_running` 的幂等语义是“确保目标服务处于运行”，不是重复执行启动脚本。
 
-### 6.4 `resource.fetch`
-
-获取单个已注册资源或分页结果：
-
-- 文件片段；
-- 目录树；
-- Diff 摘要；
-- 日志页；
-- Artifact 元数据；
-- Registry 记录摘要。
-
-### 6.5 `artifact.ingest`
-
-用于 ChatGPT 生成文件进入本机 Artifact Store 的控制通道。MVP 可验证以下可靠路径：
-
-```text
-Action 接收文件引用
-→ Gateway 下载临时文件
-→ 校验大小、类型和 Hash
-→ 写入受控 Artifact 目录
-→ 返回 artifact_id
-```
-
-Artifact Store 的正式领域模型可后续实现；本 MVP 只提供受控落地 Adapter 和引用。
-
-## 七、Canonical Result
-
-所有 Adapter 返回统一结果：
+## 八、Local Result Contract
 
 ```json
 {
-  "result_contract_version": "1.0.0",
+  "local_result_version": "0.1.0",
   "request_id": "req-001",
-  "operation": "context.bootstrap",
-  "project_id": "ai-agent-platform",
-  "snapshot_id": "snap-001",
+  "capability": "local.repository.snapshot.read",
   "status": "SUCCEEDED",
   "data": {},
-  "summary": "仓库位于 main，工作区干净。",
+  "error": null,
   "warnings": [],
-  "errors": [],
-  "evidence_refs": [],
-  "cursor": null,
-  "truncated": false,
-  "generated_at": "2026-08-04T12:00:00Z"
+  "evidence": {
+    "source_type": "local_observation",
+    "content_hash": "sha256:...",
+    "observed_at": "2026-08-05T12:00:00+08:00"
+  },
+  "meta": {
+    "cli_package": "@ai-agent-platform/local-control",
+    "cli_version": "0.2.0",
+    "duration_ms": 31,
+    "truncated": false
+  }
 }
 ```
 
-### 7.1 Presenter 分离
-
-同一 Canonical Result 可以投影为：
+状态：
 
 ```text
-Action：紧凑 JSON
-CLI：人类可读文本
-Context：Bootstrap / Delta 输入
-Task：Result Ref 和摘要
-Evidence：Hash、日志和来源
+SUCCEEDED
+PARTIAL
+ACCEPTED
+FAILED
 ```
 
-禁止把带 ANSI 的 Git 原始终端输出作为领域合同。
+- `PARTIAL` 用于分页、截断或 batch 部分失败；
+- `ACCEPTED` 仅表示异步动作已形成合法初始结果，不代表任务完成；
+- `FAILED` 返回稳定 Error Code，不要求上层解析 stderr。
 
-## 八、错误模型
+结果正文超过 Action 预算时，返回摘要、分页 cursor 或受治理的 `result_ref`，Artifact / Evidence 的正式创建与保留由相应领域决定。
 
-最小稳定错误代码：
+## 九、本机注册表
 
-```text
-PROJECT_NOT_REGISTERED
-CAPABILITY_DENIED
-RESOURCE_NOT_REGISTERED
-PATH_OUT_OF_SCOPE
-SYMLINK_ESCAPE
-SENSITIVE_RESOURCE
-SNAPSHOT_EXPIRED
-RESULT_TOO_LARGE
-TIMEOUT
-RUNTIME_UNAVAILABLE
-REPOSITORY_DIRTY
-CURSOR_INVALID
+MVP 仅注册一个项目：
+
+```yaml
+projects:
+  ai-agent-platform:
+    root: ${LOCAL_PROJECT_ROOT}
+    access_mode: READ_ONLY_WITH_CONTROLLED_SERVICE_START
 ```
 
-结构：
+调用端只能传 `project_id` 和注册引用。真实绝对路径、可执行文件、固定参数、工作目录、环境白名单和启动模板只存在于本机配置。
 
-```json
-{
-  "code": "PATH_OUT_OF_SCOPE",
-  "message": "请求资源不在注册项目范围内。",
-  "retryable": false,
-  "recommended_action": "使用 project-relative resource id。",
-  "details_ref": null
-}
-```
+Registry 至少包括：
 
-总控不需要解析自然语言日志来判断是否可重试。
+- Project Registry；
+- Runtime Registry；
+- Executor Registry；
+- Service Registry。
 
-## 九、安全设计
+未注册引用一律拒绝。
 
-### 9.1 路径治理
+## 十、安全策略
 
-必须执行：
+### 10.1 路径
 
-- project-relative path；
-- `realpath` 归一化；
-- 根目录前缀校验；
-- 软链逃逸检测；
-- 禁止绝对路径；
-- 禁止 `..`；
-- 禁止未注册目录；
-- 禁止设备文件和特殊文件。
+- 只接受项目相对路径；
+- 禁止绝对路径、`..` 和设备文件；
+- 使用 `realpath` 归一化；
+- 校验项目根前缀；
+- 检测符号链接逃逸；
+- 正常结果不暴露绝对路径。
 
-### 9.2 敏感资源
+### 10.2 敏感资源
 
-默认排除：
+默认拒绝：
 
 ```text
 .env*
+*.pem
+*.key
 SSH 私钥
-浏览器 Cookie
-证书和 Key
-Token 缓存
+浏览器 Cookie / Token / 认证缓存
 系统 Keychain
-二进制大文件
-node_modules
 .git/objects
+node_modules
+二进制大文件
+仓库外资源
 ```
 
-敏感路径即使位于项目根目录内也必须拒绝。
+敏感资源即使位于项目根目录内也不能读取。
 
-### 9.3 预算
+### 10.3 命令与进程
 
-每次请求必须限制：
+- 固定可执行文件和参数模板；
+- 使用 `spawn` 或等价 API；
+- `shell: false`；
+- 环境变量白名单；
+- 固定工作目录；
+- 超时、输出和并发上限；
+- 安全终止超时子进程；
+- 不接受模型生成的任意命令。
 
-- 总时长；
-- 子查询数量；
-- 文件数量；
-- 单文件字符；
-- 总字符；
-- 日志行数；
-- Diff 大小；
-- Artifact 大小。
+### 10.4 预算
 
-### 9.4 大结果策略
+每个请求限制时间、输出字节、结果字符、树深度、文件行数、Batch 子项和并发。超预算返回稳定 `PARTIAL` 或 Error，不静默丢失。
 
-默认返回：
+## 十一、包内部结构
 
 ```text
-Summary + Index + Hash + Ref
+packages/local-control/
+├── package.json
+├── src/
+│   ├── cli.ts
+│   ├── invoke.ts
+│   ├── request-validator.ts
+│   ├── capability-registry.ts
+│   ├── result-builder.ts
+│   ├── contracts/
+│   ├── capabilities/
+│   ├── adapters/
+│   ├── registry/
+│   └── policy/
+└── tests/
 ```
 
-只有总控明确请求时才分页读取正文。完整日志、Diff 和二进制内容通过受控 Artifact Ref 获取。
+Adapter 是包内模块，不是独立服务。Git Adapter 只允许固定读取操作；File Adapter 使用 Node 文件 API；Runtime / Executor / Service Adapter 只操作注册探针和模板。
 
-## 十、CLI Adapter
+## 十二、错误语义
 
-建议形态：
+至少固定：
 
 ```text
-aap-local capabilities describe
-aap-local context bootstrap --project ai-agent-platform
-aap-local context collect --request request.json
-aap-local resource fetch --resource context/current-status.md
+INVALID_REQUEST
+CAPABILITY_NOT_FOUND
+EXECUTION_MODE_NOT_SUPPORTED
+PROJECT_NOT_REGISTERED
+RESOURCE_NOT_REGISTERED
+PATH_OUT_OF_SCOPE
+SENSITIVE_RESOURCE_DENIED
+BUDGET_EXCEEDED
+OUTPUT_TOO_LARGE
+PROCESS_TIMEOUT
+PROCESS_FAILED
+RESULT_SERIALIZATION_FAILED
+SERVICE_NOT_REGISTERED
+SERVICE_START_NOT_ALLOWED
 ```
 
-CLI 负责：
+Task 版本冲突、Controller Claim 冲突和 Plan 操作非法不属于 Local Control Error，由 Task Control 返回。
 
-- 参数读取；
-- 调用 Application Service；
-- 人类输出；
-- 退出码；
-- 调试日志。
+## 十三、MVP 验证场景
 
-CLI 不实现业务逻辑，也不允许直接调用 Git 子进程绕开领域服务。
+1. `npm pack`、固定版本安装与 `aap-local invoke` Smoke Test；
+2. Gateway → CLI → JSON Result 真实链路；
+3. 仓库 Snapshot：分支、HEAD、Upstream、Ahead/Behind、Staged/Modified/Untracked；
+4. 分页 Tree 与受控 File Range；
+5. Runtime 正常、未运行、超时和错误；
+6. Git、Node、Codex、OpenCode 已安装与未安装；
+7. 只读 Batch，单项失败不破坏其他结果；
+8. 路径穿越、符号链接、敏感文件和绝对路径拒绝；
+9. `ensure_running` 的已运行、未运行、未注册和非法输入；
+10. Task Control 保存异步状态并轮询，CLI 无本地 Task 数据库；
+11. stdout 只有一个 JSON，stderr 无 Secret；
+12. 现有 Gateway、Runtime、Contracts、Auth、Policy 和本地链路无未解释回归。
 
-## 十一、Action Adapter
+## 十四、交付物
 
-Action Schema 只暴露高层业务能力，不镜像 Git 命令。
+- `@ai-agent-platform/local-control` npm 包；
+- `aap-local` CLI；
+- Local Request / Result / Error Schema；
+- Capability Catalog；
+- 四类 Registry；
+- Git / File / Runtime / Executor / Service Adapter；
+- Gateway `local.*` Router 与 CLI Client；
+- 安全策略与测试；
+- Task Control Fixture Poll Test；
+- Runbook 与验证报告。
 
-建议 Operation：
+## 十五、验收标准
 
-```text
-describeLocalCapabilities
-getLocalContextBootstrap
-collectLocalContext
-fetchLocalResource
-ingestArtifact
-```
+MVP 通过必须同时满足：
 
-所有读取 Operation 明确为非副作用。未来写能力必须独立命名、独立权限和独立审批，不得在同一通用接口中通过参数切换。
+- npm 包可打包、固定版本安装并运行；
+- 唯一 Gateway 可安全调用 CLI；
+- 不存在 Shell 拼接、任意 Shell 和任意路径；
+- 能读取真实仓库状态、受控文件、Runtime 与 Executor 状态；
+- 未提交修改与正式 Commit 表达准确；
+- 大结果可分页、截断或稳定失败；
+- 默认严格只读；
+- `ensure_running` 只能使用注册模板；
+- 路径、软链、敏感资源和预算测试通过；
+- 同步查询不强制创建 Work Item；
+- 异步状态由 Task Control 保存；
+- CLI 不保存 Task、Plan、Claim 或 Execution 长期状态；
+- 不新增 Local Control Service、Daemon 或第二 Gateway；
+- 结果可替换总控 MVP 中相应 Fixture；
+- 现有链路无未解释回归。
 
-## 十二、测试场景
+## 十六、非目标
 
-### 12.1 正常 Bootstrap
+不实现：任意 Shell、文件写入、Git 写操作、代码修改任务、完整 Artifact Ingest、正式 Approval、Browser DOM、模型推理服务、多项目 RBAC、消息队列、Local Control Daemon 或第二 Gateway。
 
-```text
-总控请求 context.bootstrap
-→ 返回 main / SHA / dirty summary / runtime summary / snapshot_id
-```
+## 十七、与其他 MVP 的合同
 
-### 12.2 批量收集
+### 17.1 对 `SOL-CTL-001`
 
-一次请求包含 Git 状态、Context 文件和 Runtime 状态，结果在预算内返回。
+总控先查询 Task Decision Context并 Claim。需要本机事实时，直接调用高层 `local.*` Capability；Local Control 返回事实，总控解释并提交 Controller Command。Local Control 不决定计划下一步。
 
-### 12.3 未提交内容
+### 17.2 对 `SOL-TSK-001`
 
-修改一个测试文件后：
+同步读取可以直接返回；Task Control只保存必要 Result Ref。异步、可交接或具有副作用的操作才建立 Work Item / Execution 状态。Local Control 不读取 Task 内部表。
 
-```text
-→ 返回 modified
-→ 同时保留 source_commit
-```
+### 17.3 对 `SOL-BHR-001`
 
-不得把本地修改描述为正式 Git 真相。
+Browser Host 不通过 DOM 搬运 Local Result。页面驱动与本机资源访问是两个领域；未来本机组件直接调用 CLI时也只能通过受控 Bridge，不能执行任意 Shell。
 
-### 12.4 路径攻击
+### 17.4 对 `SOL-MOB-001`
 
-测试：
+模型推理不进入 `local.*`。DeepSeek、手机模型和推理 Role Profile属于独立 Model Inference Port；Local Control只可提供设备或服务的确定性健康事实，不代理模型语义。
 
-```text
-../../.ssh/id_rsa
-/Users/...
-symlink-to-secret
-```
+## 十八、待联合审计事项
 
-全部拒绝。
+- npm 包、二进制和合同正式版本；
+- 最终 HTTP 路径与 Action Operation ID；
+- Actor / Correlation 公共结构；
+- Result Ref 由 Gateway、Task Control 还是 Evidence 创建；
+- 合同提升到 `packages/contracts/` 的时机；
+- 现有 `apps/local-runtime` 的兼容或退役策略。
 
-### 12.5 结果过大
+## 十九、来源与相关文档
 
-大日志和大 Diff：
-
-```text
-→ truncated = true
-→ 返回 cursor 或 artifact_ref
-```
-
-### 12.6 Action 与 CLI 一致性
-
-同一请求的以下字段必须一致：
-
-```text
-status
-snapshot_id
-data hash
-error code
-```
-
-允许 Presenter 文本不同。
-
-### 12.7 Artifact Ingest
-
-使用测试文件引用：
-
-```text
-下载
-→ Hash 校验
-→ 受控目录落地
-→ 返回不含绝对路径的 artifact_id
-```
-
-## 十三、交付物
-
-```text
-Local Control Application Service
-Project Registry
-Capability Catalog
-Git Adapter
-File Adapter
-Runtime Adapter
-Artifact Adapter（最小）
-Canonical Result / Error Schema
-CLI Adapter
-Action Adapter
-Security Test Suite
-Integration Fixture
-Runbook
-```
-
-## 十四、验收标准
-
-- 能真实读取 `ai-agent-platform`；
-- 严格只读；
-- Action 和 CLI 共用核心服务；
-- 总控可以完成 Bootstrap 与定向 Fetch；
-- 路径和敏感文件门禁通过；
-- 大结果支持摘要、分页或 Ref；
-- 未提交状态表达准确；
-- 所有错误结构化；
-- 不暴露绝对路径；
-- 不提供通用 Shell；
-- 结果可以直接替换总控 MVP 的 Mock Result。
-
-## 十五、非目标
-
-- 不修改文件；
-- 不 Commit / Push；
-- 不调用 Codex 执行写任务；
-- 不管理 Task；
-- 不驱动 Chrome；
-- 不建设完整 Artifact / Evidence 领域；
-- 不支持任意本机目录；
-- 不支持多用户和多 Runtime；
-- 不建设完整后台页面。
-
-## 十六、后续衔接
-
-MVP-3 只保存：
-
-```text
-capability_ref
-work_item_id
-resource_result_ref
-summary
-error_code
-```
-
-不得复制 Local Control 的详细资源数据。
-
-MVP-4 不通过 DOM 搬运 Local Control 结果。网页端角色始终通过 Action 获取正式 Result。
-
-## 十七、外部事实来源
-
-最后复核：2026-08-04。
-
-- OpenAI Help Center：Configuring actions in GPTs
-  https://help.openai.com/en/articles/9442513-configuring-actions-in-gpts
+- [ADR-004｜第二阶段核心四个 MVP 与可选端侧推理扩展](../../../adr/ADR-004-phase-2-four-mvp-validation.md)
+- [第二阶段技术方案目录](./README.md)
+- [SOL-CTL-001](./SOL-CTL-001-总控Agent与动态上下文MVP.md)
+- [SOL-TSK-001](./SOL-TSK-001-任务消息中心与单任务调度MVP.md)
+- [SOL-BHR-001](./SOL-BHR-001-ChatGPT-Browser-Host-Runtime扩展MVP.md)
+- [SOL-MOB-001](./SOL-MOB-001-手机端单模型多角色服务MVP.md)

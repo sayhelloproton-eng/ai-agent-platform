@@ -4,596 +4,570 @@
 |---|---|
 | 方案 ID | `SOL-BHR-001` |
 | 状态 | Candidate |
+| 版本 | `0.1.0-draft` |
 | 所属阶段 | 第二阶段 MVP-4 |
-| 核心领域 | Browser Host |
-| 宿主 | Chrome + ChatGPT 网页端 |
-| 主要开源参考 | MCP-SuperAssistant |
-| 上游 | Task Center Host Command |
-| 辅助能力 | 本地视觉模型、测试审批 Fixture |
+| 核心领域 | Browser Host / Browser Runtime Adapter |
+| 第一宿主 | Chrome Manifest V3 扩展 |
+| 第一适配页面 | ChatGPT 网页端及 Custom GPT 会话 |
+| 一级页面分析器 | Local Vision Decision Service；MVP 先接 DeepSeek，手机模型可后置接入 |
+| Task 与调度真源 | Task Control |
+| 浏览器事实真源 | Browser Observation / Host Execution Result |
+| 正式模型输出通道 | Custom GPT Action → 唯一 Gateway |
+| 文档边界 | Git-only，不进入 `docs/knowledge/**`，不触发飞书发布 |
 
-## 一、定位
+## 一、本文拥有的问题
 
-Chrome 扩展的正式定位是：
+本文只回答一个问题：
 
-> ChatGPT 网页端的 Browser Host Runtime Adapter。
+> 如何把运行在用户真实 Chrome 环境中的扩展建设为 ChatGPT 网页端的 Browser Host Runtime Adapter，使它能够观察页面、恢复或打开会话、向正确角色注入最小唤醒信息，并把 Task Control 已授权的 Host Command 转换为一次可验证、可恢复、可审计的浏览器动作。
 
-它不是简单的自动填输入框工具，也不是总控 Agent。它负责把平台中的调度和经过授权的 Host Command 转换为真实浏览器行为：
+BHR 不是业务大脑、任务中心、审批系统、通用 RPA 或任意网页 Agent。
+
+## 二、核心结论
 
 ```text
-任务中心 Host Command
-→ Chrome 扩展
-→ ChatGPT 页面 / 会话 / DOM
-→ Host Result
-→ 任务中心
+BHR：浏览器观察、会话路由、页面动作、宿主结果
+DeepSeek / 手机模型：可替换的页面初判与验证 Provider
+Controller / 专有 GPT：业务语义与计划决策
+Task Control：Task、Plan、Dispatch、Claim、状态和调度真源
+Approval：高风险动作一次性授权
+Gateway：认证、校验、命名空间路由
 ```
 
-从用户体验看，它让 GPT “自调用”；从系统实现看，它是外部 Driver 让网页端角色再次进入下一轮。
+固定原则：
 
-## 二、需要回答的核心问题
+1. BHR 主动观察、轮询和驱动网页；GPT 不直接调用扩展内部 API。
+2. GPT 的正式机器结果走 Action，不从聊天正文解析 Controller Command。
+3. BHR 只向 GPT 注入最小 Wake Envelope，完整 Task / Plan 由 GPT 再通过 Action 查询。
+4. Screenshot、DOM、Visible Text 和 Page State 是浏览器事实，不是批准或业务完成证明。
+5. 本地模型只形成观察、候选和验证建议，不修改 Task，不批准高风险动作。
+6. DeepSeek 是当前基线和兜底；手机模型可按同一 Provider 合同后置替换，不是本 MVP 前置依赖。
+7. 页面动作前重校验，动作后重新观察；不确定即停止，不盲目重试。
 
-1. 扩展能否持续发现任务中心的待处理 Host Command？
-2. 能否定位或恢复正确的总控会话，而不是误发到其他 Chat？
-3. 能否为固定测试审计角色打开新页面或新会话并完成绑定？
-4. 能否只注入最小任务引导，让角色通过 Action 获取正式上下文？
-5. 能否观察消息发送、生成开始、生成完成、超时和页面异常？
-6. 扩展重启或页面刷新后能否恢复未完成投递？
-7. 能否采集截图、DOM 与可访问性语义，并交给本地视觉模型分析？
-8. 获得一次性正式授权后，能否重新校验精确 DOM 并执行一次受控点击？
-9. 相同 Host Command 是否不会重复发送或重复点击？
-
-## 三、领域边界
-
-### 3.1 Browser Host 拥有
-
-- 浏览器标签页；
-- ChatGPT 页面状态；
-- 角色与会话绑定；
-- Content Script 页面适配；
-- 输入、发送和响应观察；
-- 截图与 DOM 采集；
-- Host Command 的领取、执行和回报；
-- 经过授权的一次性 UI Actuation；
-- 扩展本地持久状态。
-
-### 3.2 Browser Host 不拥有
-
-| 对象 | 所属限界上下文 |
-|---|---|
-| Task 和工作流状态 | Task Control |
-| Role 的业务职责 | Agent Governance |
-| Goal / Context 正文 | Goal / Context |
-| 是否需要审计 | 总控 Decision + Task Control |
-| 是否允许敏感点击 | Approval |
-| 本机资源 | Local Control |
-| 结果是否合格 | 总控 / Reviewer |
-| 截图的正式证据生命周期 | Evidence |
-
-扩展不能直接写 Task 数据库，也不能根据 GPT 回复文本自行推进业务状态。
-
-## 四、三类核心能力
-
-### 4.1 继续已有角色会话
+## 三、MVP 闭环
 
 ```text
-Task Center：CONTINUE_SESSION
-→ 扩展找到 conversation_ref
-→ 校验角色、URL、页面状态
-→ 注入最小 Wake Message
-→ 发送
-→ 观察响应
+扩展注册 Browser Host
+→ 发现并绑定 ChatGPT 标签页 / Conversation
+→ FOLLOW_LATEST 并采集 Observation
+→ DeepSeek / 确定性规则初判
+→ 需要总控时形成可审核 Wake Envelope
+→ 人工批准后注入并发送
+→ 总控通过 Action 查询 Decision Context、Claim 并提交 Controller Command
+→ Task Control 原子更新 Task / Plan / Event
+→ Task Control 生成 Browser Dispatch / Host Command
+→ BHR 轮询、Claim、前置检查和审批校验
+→ 执行一次真实网页动作
+→ 再次观察与验证
 → 回报 Host Result
+→ Task Control 决定继续、等待、阻塞、暂停或停止
 ```
 
-最小消息：
+第二阶段只验证单任务、单浏览器、少量预注册动作，不建设无人监督通用网页自动化。
+
+## 四、领域边界
+
+### 4.1 Browser Host 拥有
+
+- Browser Host Instance；
+- Window / Tab 发现与内部引用；
+- Session Binding；
+- ChatGPT Page Adapter；
+- Browser Observation；
+- Screenshot、Visible Text、DOM Summary、Interactive Element Snapshot；
+- `FOLLOW_LATEST`；
+- Browser Dispatch / Host Command 的宿主侧 Claim 与局部 Journal；
+- Browser Action Executor；
+- Host Execution Result；
+- 页面 Adapter 健康与局部恢复；
+- 用户暂停和 Emergency Stop。
+
+### 4.2 Browser Host 不拥有
+
+| 对象或决策 | 所属领域 |
+|---|---|
+| Goal、Requirement、业务验收 | Goal / Planning |
+| Task、Task Version、Plan、Plan Node | Task Control |
+| Controller Claim 与计划语义 | Controller / Task Control |
+| 本机仓库和 Runtime 事实 | Local Control |
+| 正式 Approval 与授权审计 | Approval |
+| Artifact / Evidence 生命周期 | Artifact / Evidence |
+| 模型、Role Profile、推理路由 | Model Inference |
+| 代码修改、Commit、Push | Execution / Git Governance |
+| 最终任务完成判定 | Controller / Task Control / Acceptance |
+
+BHR 可以携带 `task_id`、`task_version`、`plan_node_id` 和 `dispatch_ref` 做关联，但不能解释或修改这些对象。
+
+### 4.3 本地模型边界
+
+本地模型只拥有一次推理结果中的：
+
+- 页面状态分类；
+- 可见信息摘要；
+- 置信度与警告；
+- 证据引用；
+- 低风险补充观察请求；
+- 候选动作；
+- 动作后验证结论；
+- 是否升级给总控或人工的建议。
+
+本地模型不拥有 Task、Plan、Approval、Host Command 合法性和副作用授权。
+
+## 五、标识与 Claim
+
+| 标识 | 含义 | 所属 |
+|---|---|---|
+| `host_id` | Browser Host 实例 | Browser Host Registry |
+| `tab_ref` | BHR 内部稳定标签页引用 | Browser Host |
+| `gpt_ref` | Custom GPT Provider 资源引用 | Agent / Provider Registry |
+| `conversation_ref` | ChatGPT Conversation 定位引用 | Browser Host Binding |
+| `binding_id` | Role / Conversation 与 Tab 的绑定 | Browser Host |
+| `task_id` | 业务 Task | Task Control |
+| `dispatch_ref` | 一次 Browser 调度 | Task Control |
+| `command_id` | Host Command | Task Control / Browser Contract |
+| `approval_ref` | 正式审批引用 | Approval |
+| `artifact_ref` | Screenshot / DOM / Evidence 引用 | Artifact / Evidence |
+
+GPT URL 中的 `g-...` 和 Conversation URL 只用于定位，不是身份授权凭证。
+
+三类租约必须分开：
 
 ```text
-继续处理 task-001。请先通过 Action 获取最新任务状态。
+Controller Claim：总控获得 Task 语义推进权
+Work Item Claim：专业执行者获得工作项处理权
+Browser Dispatch Claim：某个 Host 获得一次投递或页面动作处理权
 ```
 
-扩展不需要知道为什么继续，也不把完整 Task、Context 或 Result 放进 DOM。
+BHR Claim 不能赋予 Task / Plan 修改权；页面投递失败也不能直接把业务 Task 标为失败。
 
-### 4.2 打开指定角色的新会话
+## 六、Session Binding
 
-用于固定测试审计角色：
+候选最小结构：
 
-```text
-Task Center：OPEN_ROLE_SESSION
-→ 扩展打开指定 Custom GPT 页面
-→ 新建会话
-→ 建立 role_ref / conversation_ref / tab_id 绑定
-→ 注入 task_id + role_ref + dispatch_token
-→ 发送
-→ 回报 session_opened / response_started
+```json
+{
+  "binding_id": "binding-controller-001",
+  "host_id": "bhr-mac-001",
+  "provider": "chatgpt-web",
+  "browser_profile_ref": "chrome-profile-ai",
+  "window_ref": "window-001",
+  "tab_ref": "tab-controller-001",
+  "role_ref": "controller",
+  "gpt_ref": "gpt-ai-agent-platform-controller",
+  "conversation_ref": "conversation-controller-20260805",
+  "mode": "FOLLOW_LATEST",
+  "state": "READY",
+  "last_seen_at": "2026-08-05T12:00:00+08:00"
+}
 ```
 
-完整 Goal、Task、Context 和结果不得直接塞入 DOM。角色通过 Action 获取正式数据。
+规则：
 
-### 4.3 经过授权的网页 UI 动作
+- 一个 Binding 同时只绑定一个 Tab；
+- 同一 GPT 可以有多个 Conversation；
+- Task 不永久绑定 Conversation；
+- Tab 关闭、导航或会话失效后 Binding 进入 `STALE`；
+- 重新绑定必须重新确认 Provider、Role、GPT 和 Conversation，不静默转绑未知页面。
 
-```text
-页面观察
-→ 截图 + DOM + 可访问性信息
-→ 本地视觉模型返回结构化候选
-→ Approval Fixture / 领域生成一次性授权
-→ Task Center 产生 EXECUTE_APPROVED_UI_ACTION
-→ 扩展重新检查页面和 DOM
-→ 点击一次
-→ 回报动作结果和页面变化
-```
-
-视觉模型只提供感知证据，不提供授权。
-
-## 五、最小架构
+## 七、扩展内部结构
 
 ```text
-Chrome Extension
+Chrome Extension（Manifest V3）
 ├── Background Service Worker
-│   ├── Command Poller
-│   ├── Claim / Ack
-│   ├── Retry / Recovery
-│   └── State Reconciliation
-├── Session Registry
-│   ├── role_ref
-│   ├── conversation_ref
-│   ├── tab_id
-│   └── page fingerprint
-├── ChatGPT Page Adapter
-│   ├── detectPage
-│   ├── locateComposer
-│   ├── submitMessage
-│   ├── observeResponse
-│   └── readPageState
-├── Page Observer
-│   ├── DOM
-│   ├── Accessibility Semantics
-│   └── Screenshot Capture
-├── Local Vision Bridge
-│   └── structured page analysis
-├── Authorized UI Actuator
-│   └── exact DOM action
-├── Side Panel / Debug UI
-└── Host Result Reporter
+│   ├── Host Registration / Heartbeat
+│   ├── Gateway Client
+│   ├── Dispatch Poller / Claim
+│   ├── Window / Tab Registry
+│   ├── Screenshot Coordinator
+│   ├── Command Journal
+│   ├── Approval Validation Client
+│   └── Host Event Reporter
+├── Content Script
+│   ├── ChatGPT Page Adapter
+│   ├── DOM / Visible Text Observer
+│   ├── FOLLOW_LATEST Controller
+│   ├── Composer Adapter
+│   ├── Message Lifecycle Observer
+│   ├── Interactive Element Catalog
+│   └── Blocking UI Detector
+└── Side Panel / Popup
+    ├── Host State
+    ├── Binding State
+    ├── Pending Review
+    ├── Pause / Resume
+    └── Emergency Stop
 ```
 
-Manifest V3 Service Worker 是事件驱动后台，不应依赖永久驻留死循环。MVP 使用：
+Service Worker 可以被浏览器回收，因此正式状态不能只在内存中。扩展只持久化恢复所需的 Binding、Journal、游标和本地执行状态，Task 真源仍在 Task Control。
 
-- 定期轮询或短轮询；
-- `chrome.alarms`；
-- 本地持久状态；
-- 页面事件；
-- 启动和恢复时对账。
-
-## 六、Host Command
-
-### 6.1 命令类型
-
-MVP 必须实现：
-
-```text
-CONTINUE_SESSION
-OPEN_ROLE_SESSION
-SUBMIT_WAKE_MESSAGE
-OBSERVE_RESPONSE
-```
-
-受控验证实现：
-
-```text
-EXECUTE_APPROVED_UI_ACTION
-```
-
-未来预留：
-
-```text
-FOCUS_SESSION
-RELEASE_SESSION
-CAPTURE_PAGE_EVIDENCE
-```
-
-### 6.2 命令结构
+## 八、Browser Observation Contract
 
 ```json
 {
-  "host_command_version": "1.0.0",
-  "host_command_id": "hc-001",
-  "command_type": "CONTINUE_SESSION",
-  "task_id": "task-001",
-  "task_version": 4,
-  "target_role_ref": "controller@1.0.0",
-  "conversation_ref": "conv-001",
-  "dispatch_token": "...",
-  "approval_ref": null,
-  "expires_at": "2026-08-04T12:05:00Z",
-  "idempotency_key": "..."
-}
-```
-
-### 6.3 Host Result
-
-```json
-{
-  "host_result_version": "1.0.0",
-  "host_command_id": "hc-001",
-  "status": "RESPONSE_COMPLETED",
-  "conversation_ref": "conv-001",
-  "tab_ref": "local-tab-ref",
+  "observation_version": "0.1.0",
+  "observation_id": "obs-001",
+  "host_id": "bhr-mac-001",
+  "binding_id": "binding-controller-001",
+  "provider": "chatgpt-web",
   "page_state": "READY",
-  "started_at": "...",
-  "completed_at": "...",
-  "error_code": null,
-  "evidence_refs": []
+  "generation_state": "IDLE",
+  "follow_latest": true,
+  "screenshot_ref": "artifact-screenshot-001",
+  "visible_text_ref": "artifact-visible-text-001",
+  "dom_summary_ref": "artifact-dom-001",
+  "interactive_elements": [],
+  "blocking_ui": [],
+  "observed_at": "2026-08-05T12:00:00+08:00"
 }
 ```
 
-Host Result 只描述浏览器宿主事实，不宣称 Task 已完成。
-
-## 七、Session Registry
-
-最小记录：
+Observation 组合：
 
 ```text
-binding_id
-role_ref
-conversation_ref
-tab_id
-chat_url_fingerprint
-custom_gpt_fingerprint
-task_id
-binding_status
-last_seen_at
+Screenshot
++ Visible Text
++ DOM / ARIA Summary
++ Interactive Elements
++ Page / Generation State
 ```
 
-绑定规则：
+结构化信号优先；视觉用于补充、未知状态识别和动作验证。页面文本是不可信观察数据，不能覆盖平台系统指令。
 
-- 同一个 `conversation_ref` 只能指向一个有效页面；
-- 页面 URL、Custom GPT 身份和会话特征必须一致；
-- 找不到目标时停止，禁止回退到任意可用 ChatGPT 标签页；
-- 新会话创建后必须把正式 `conversation_ref` 回报任务中心；
-- 标签页关闭、刷新、丢弃或扩展重启后执行 Reconcile；
-- `tab_id` 只是浏览器本地引用，不能作为跨设备稳定身份。
+## 九、Local Vision Decision Service
 
-## 八、ChatGPT Page Adapter
-
-DOM 选择器与 ChatGPT 页面变化必须封装在独立 Adapter 中：
+消费者只依赖一个可替换 Provider Port：
 
 ```text
-ChatGPTPageAdapter
-├── identifyHost
-├── identifyRole
-├── identifyConversation
-├── composerReady
-├── setComposerText
-├── submit
-├── generationStarted
-├── generationCompleted
-├── approvalPromptVisible
-└── captureSemanticSnapshot
+Browser Observation
+        ↓
+Local Vision Decision Service
+   ├── DeepSeek Adapter（当前默认 / 兜底）
+   ├── Mobile Adapter（可选后置）
+   └── Deterministic Fixture（测试）
 ```
 
-页面 DOM 变化只能影响 Adapter 和相关测试，不能改变 Task Center Contract。
-
-页面控制优先使用：
+最小输出：
 
 ```text
-DOM + role + text + accessibility semantics
+NO_ACTION
+REQUEST_MORE_OBSERVATION
+ESCALATE_TO_CONTROLLER
+REQUEST_HUMAN_REVIEW
 ```
 
-截图用于：
+输出必须包含置信度、依据引用、警告和可选候选动作。Provider 选择不改变 BHR、Task 或 Controller 合同。
 
-- 浮层和遮挡；
-- 图标缺少稳定文本；
-- DOM 与视觉状态不一致；
-- 确认动作前复核；
-- 保存操作前后证据。
+## 十、Wake Envelope
 
-## 九、网页截图与本地视觉模型
-
-从产品能力看，截图分析属于扩展模块；从内部职责看：
-
-```text
-扩展：采集、传输、消费分析结果、执行动作
-本地视觉模型：页面语义识别
-```
-
-### 9.1 视觉输入
-
-```text
-screenshot_ref
-page_url_fingerprint
-conversation_ref
-DOM candidates
-accessibility snapshot
-expected_ui_state
-```
-
-### 9.2 视觉输出
+BHR 唤醒 GPT 时只发送：
 
 ```json
 {
-  "page_state": "APPROVAL_REQUIRED",
-  "candidates": [
-    {
-      "role": "button",
-      "text": "允许",
-      "candidate_selector": "...",
-      "confidence": 0.97
-    }
-  ],
-  "warnings": []
+  "wake_version": "0.1.0",
+  "task_id": "task-001",
+  "required_role": "controller",
+  "event_id": "event-103",
+  "dispatch_ref": "dispatch-controller-018",
+  "conversation_ref": "conversation-controller-20260805",
+  "instruction": "请查询最新 Decision Context，确认角色后再 Claim 并继续处理。"
 }
 ```
 
-视觉输出不能直接触发点击，也不能把“页面上存在按钮”解释为“审批已经通过”。
+禁止注入完整 Task、Plan、仓库正文、Local Result 或隐藏系统数据。所有向 GPT 注入并发送消息的动作在 MVP 阶段都必须人工审核。
 
-## 十、受控 UI Actuator
-
-### 10.1 授权要求
-
-执行前必须同时校验：
+总控收到 `task_id` 后仍必须：
 
 ```text
-approval_ref
-one_time_token
-task_id
-task_version
-conversation_ref
-command_type
-expected_button_role
-expected_button_text
-expected_page_state
-expires_at
-not_used
+查询 Decision Context
+→ 检查 required_role 与版本
+→ Claim Controller Task
+→ 按需查询 Local / Knowledge / History
+→ 提交 Controller Command
 ```
 
-### 10.2 动作前重新校验
+## 十一、Browser Dispatch 与 Host Command
 
-视觉分析和真实点击之间页面可能变化，因此扩展必须重新读取当前 DOM：
+Task Control 生成版本化 Browser Dispatch。候选 Host Command：
+
+```json
+{
+  "host_command_version": "0.1.0",
+  "command_id": "host-command-001",
+  "dispatch_ref": "browser-dispatch-001",
+  "task_id": "task-001",
+  "target": {
+    "role_ref": "controller",
+    "gpt_ref": "gpt-ai-agent-platform-controller",
+    "conversation_ref": "conversation-controller-20260805"
+  },
+  "action": {
+    "type": "SUBMIT_MESSAGE",
+    "payload_ref": "wake-envelope-001"
+  },
+  "preconditions": {},
+  "approval_ref": "approval-001",
+  "idempotency_key": "host-command-001",
+  "expires_at": "2026-08-05T12:10:00+08:00"
+}
+```
+
+公共合同不包含 CSS Selector、Chrome Tab ID、坐标或任意 JavaScript。Page Adapter 在宿主内部把语义动作映射到当前页面。
+
+## 十二、动作目录与风险
+
+MVP 只允许预注册动作：
+
+- 观察页面和生成状态；
+- `FOLLOW_LATEST`；
+- 打开或恢复指定 GPT / Conversation；
+- 设置 Composer 文本；
+- 发送已经审核的消息；
+- 停止生成；
+- 点击少量预登记、可验证的 UI 动作。
+
+禁止：任意 JavaScript、任意 DOM Patch、任意坐标点击、Cookie 导出、私有网络 API 逆向、浏览器外 Shell。
+
+风险分级：
+
+- 低风险纯观察：无需副作用授权；
+- 页面状态改变、发送消息、确认、删除、发布等：必须一次性 Approval Grant；
+- 无法确定风险：停止并请求人工。
+
+## 十三、Approval Grant
+
+```json
+{
+  "approval_ref": "approval-001",
+  "grant_id": "approval-grant-001",
+  "action_fingerprint": "sha256:...",
+  "binding_id": "binding-controller-001",
+  "task_id": "task-001",
+  "command_id": "host-command-001",
+  "allowed_action_type": "SUBMIT_MESSAGE",
+  "page_precondition_hash": "sha256:...",
+  "single_use": true,
+  "expires_at": "2026-08-05T12:10:00+08:00"
+}
+```
+
+执行前校验：审批已通过、未过期、未使用、动作指纹一致、Binding/Task/Command 一致、页面前置条件仍成立、未暂停或撤销。
+
+页面变化导致指纹失配：
 
 ```text
-匹配唯一候选
-+ 页面仍处于预期状态
-+ 会话未变化
-+ Token 未过期
-+ 动作未执行
+APPROVAL_PRECONDITION_CHANGED
+→ 不执行
+→ 重新观察
+→ 重新申请审批
 ```
 
-任何一项不确定立即停止。
+MVP 可使用本地 Approval Fixture，但必须保留引用、一次性消费和审计字段，不能用普通布尔开关代替。
 
-### 10.3 明确禁止
+## 十四、ChatGPT Page Adapter
 
-- 通用自动点击“允许”“确认”“继续”；
-- 仅按屏幕坐标点击；
-- 视觉模型直接批准；
-- 一个 Token 重复使用；
-- 无法确认 DOM 时猜测；
-- 声称普通 Content Script 可以直接控制 Chrome 原生权限气泡或 macOS 系统弹窗。
-
-## 十一、开源参考策略
-
-主参考：
+最小接口：
 
 ```text
-srbhptl39/MCP-SuperAssistant
+detectPage
+identifyProvider
+identifyGPT
+identifyConversation
+readPageState
+readGenerationState
+ensureFollowLatest
+collectVisibleText
+collectMessageSummary
+collectInteractiveElements
+locateComposer
+setComposerText
+submitComposer
+stopGeneration
+waitForResponseChange
+detectBlockingUI
+verifyExpectedPageChange
 ```
 
-适合审计和复用的部分：
-
-- Manifest V3 扩展结构；
-- ChatGPT Site Adapter；
-- Content Script；
-- DOM Observer；
-- 输入框定位；
-- 文本插入和表单提交；
-- Tool Call Card；
-- 扩展与本地 Proxy 通信；
-- SSE / WebSocket / Streamable HTTP；
-- Side Panel；
-- 多网站 Adapter 架构；
-- Auto Execute / Auto Submit 的技术实现。
-
-本项目必须新增：
-
-- Task Center Host Command；
-- `task_id / role_ref / conversation_ref`；
-- 会话注册与恢复；
-- 多 Custom GPT 标签页路由；
-- Dispatch Claim / Ack；
-- 幂等与防重；
-- 页面截图和本地视觉桥；
-- 一次性授权 UI Actuator；
-- Evidence 引用；
-- 与总控 Action 正式数据通道分离。
-
-采用流程：
+元素定位优先级：
 
 ```text
-许可证核验
-→ 依赖、权限和数据流审计
-→ ChatGPT 相关模块代码审计
-→ 决定局部复用、裁剪或独立实现
-→ 最小权限
-→ 接入 Task Center
+ARIA Role / Accessible Name
+→ 可见文字
+→ 稳定语义属性
+→ 相对结构
+→ DOM 特征
+→ 视觉 / 坐标辅助
 ```
 
-不得未经审计直接将整个项目并入主仓库。
+不把单个 CSS Selector 当作公共协议。具体 Selector 必须在实现时针对真实页面测试并作为 Adapter 内部版本化细节维护。
 
-## 十二、MVP 验证链路
-
-### 12.1 链路 A：继续总控
+## 十五、执行、验证与不确定性
 
 ```text
-Task Center 创建 CONTINUE_SESSION
-→ 扩展领取
-→ 定位原总控会话
-→ 注入最小 Wake Message
-→ 发送一次
-→ 观察生成开始和结束
-→ Ack
+Claim Host Command
+→ 检查命令、过期、Binding、页面和审批
+→ 动作前重新观察
+→ 执行一次
+→ 等待可观察变化
+→ 再次采集 Observation
+→ 确定性规则 + 推理 Provider 验证
+→ SUCCEEDED / FAILED / UNCERTAIN
+→ 回报结果并释放 Claim
 ```
 
-### 12.2 链路 B：打开固定审计角色
+`UNCERTAIN` 不自动重复发送或点击。相同 `command_id`、`dispatch_ref` 或 `idempotency_key` 不得产生重复副作用。
+
+Host Result 只描述页面事实：
 
 ```text
-Task Center 创建 OPEN_ROLE_SESSION
-→ 扩展打开指定 Custom GPT
-→ 新建会话并绑定
-→ 注入 task_id / role_ref / dispatch_token
-→ 审计 GPT 调用 Mock 或真实 Action
-→ 扩展观察一轮响应
-→ Ack
+DELIVERED
+ACTION_SUCCEEDED
+ACTION_FAILED
+UNCERTAIN
+BLOCKED
+EXPIRED
+CANCELLED
 ```
 
-该链只验证 Host 路由，不代表通用多角色编排已实现。
+它不宣称 Task 或 Plan 已完成。
 
-### 12.3 链路 C：受控确认
+## 十六、恢复、预算与人工接管
 
-在受控测试页面或可重复的 ChatGPT 测试状态中：
+### 16.1 Service Worker 恢复
 
-```text
-截图与 DOM 采集
-→ Vision Fixture 识别
-→ Approval Fixture 生成 Token
-→ Host Command
-→ DOM 再校验
-→ 点击一次
-→ Token 作废
-→ 回报
-```
+重启后：
 
-该链只验证 Browser Host 的授权执行能力，不代表正式 Approval 领域已经完成。
+1. 重新注册 Host；
+2. 恢复 Binding 与 Journal；
+3. 重新发现 Tab；
+4. 从 Task Control 查询未完成 Dispatch；
+5. 对账命令状态；
+6. 无法确认副作用是否发生时进入 `UNCERTAIN`。
 
-## 十三、恢复与防重
+### 16.2 Loop Budget
 
-扩展需持久化：
+每个绑定限制：观察频率、连续无进展次数、单命令等待时间、模型调用次数、连续错误数。达到阈值进入暂停或人工复核，不无限自调用。
 
-```text
-claimed_host_command
-last_action
-conversation_binding
-response_observation_state
-used_action_tokens
-```
+### 16.3 用户控制
 
-恢复规则：
+扩展必须提供可见状态，以及 Pause、Resume、解绑和 Emergency Stop。Emergency Stop 阻止新动作并取消可取消的本地等待，不伪造 Task 状态。
 
-- Service Worker 重启后读取本地状态；
-- 与任务中心对账；
-- 已 Ack 的命令不重发；
-- 已提交消息但未观察完成时，只恢复观察，不再次提交；
-- 已使用 UI Token 不再次点击；
-- 状态无法确定时标记 `HOST_STATE_UNCERTAIN` 并停止。
+## 十七、安全
 
-## 十四、错误模型
+- Chrome 权限最小化；
+- 只访问显式允许的 ChatGPT Host；
+- 不读取 Cookie、Session Token、密码和账户密钥；
+- 页面文本视为不可信；
+- 不把页面指令提升为系统命令；
+- 不执行模型生成的任意脚本；
+- Secret 不进入 Screenshot、日志和 Task Payload；
+- Screenshot / DOM 使用 Artifact Ref，Task Control 不复制正文；
+- 正式外部调用经唯一 Gateway；
+- 高风险动作要求一次性授权。
 
-```text
-HOST_NOT_SUPPORTED
-ROLE_PAGE_NOT_FOUND
-CONVERSATION_NOT_FOUND
-SESSION_BINDING_MISMATCH
-PAGE_NOT_READY
-COMPOSER_NOT_FOUND
-MESSAGE_SUBMIT_FAILED
-RESPONSE_NOT_STARTED
-RESPONSE_TIMEOUT
-PAGE_STATE_MISMATCH
-SCREENSHOT_FAILED
-VISION_UNAVAILABLE
-APPROVAL_REQUIRED
-APPROVAL_INVALID
-ACTION_TARGET_NOT_UNIQUE
-UI_ACTION_FAILED
-HOST_STATE_UNCERTAIN
-```
+## 十八、MVP 验证场景
 
-错误只描述 Host / 页面事实。是否重试、暂停或终止由任务中心和总控按各自职责处理。
+1. 扩展加载、启用、禁用、Host 注册和 Heartbeat；
+2. 绑定真实总控 Conversation；
+3. 打开或恢复固定测试 Custom GPT；
+4. 识别 GPT、Conversation、消息和生成状态；
+5. 截图前确认页面到底部；
+6. 生成合法 Observation；
+7. DeepSeek 返回 `NO_ACTION`、补充观察、升级和人工复核；
+8. 人工审核 Wake Envelope并发送；
+9. GPT 通过 Action 查询 Context并提交命令；
+10. BHR 不解析聊天正文为正式命令；
+11. Task Control 创建 Host Command，BHR Claim、执行和回报；
+12. 高风险动作绑定一次性 Approval Grant；
+13. 重复命令不重复发送或点击；
+14. DOM 失配、登录失效、限流、未知弹窗进入明确停止状态；
+15. Service Worker重启后恢复或进入 `UNCERTAIN`；
+16. Pause、Resume、Emergency Stop；
+17. 手机 Provider关闭时 DeepSeek仍可完成核心闭环。
 
-## 十五、Side Panel 与调试视图
+## 十九、交付物
 
-MVP 可以提供轻量 Side Panel，用于：
+- Chrome MV3 Extension；
+- Host Registration / Heartbeat；
+- ChatGPT Page Adapter；
+- Session Binding；
+- Browser Observation Contract；
+- Local Vision Decision Service Port与 DeepSeek Adapter；
+- Wake Envelope；
+- Browser Dispatch / Host Command / Host Result Contract；
+- Claim、Idempotency、Journal与恢复逻辑；
+- Approval Fixture Client；
+- Side Panel / Popup 状态与人工控制；
+- 安全、集成和真实页面测试；
+- Runbook与验证报告。
 
-- 查看 Gateway / Task Center 连接状态；
-- 查看当前角色和会话绑定；
-- 查看待处理 Host Command；
-- 查看最近 Host Result；
-- 手动触发 Reconcile；
-- 在测试模式中确认固定角色页面；
-- 展示待审批 UI 动作，但不绕过正式授权。
+## 二十、验收标准
 
-Side Panel 不是任务中心管理后台，也不能直接修改 Task。
+MVP通过必须同时满足：
 
-## 十六、权限最小化
+- 能绑定并恢复一个真实总控 Conversation；
+- 能稳定观察最新页面并生成结构化 Observation；
+- DeepSeek / Fixture 可通过统一 Port返回合法 Assessment；
+- 本地模型不能修改 Task、批准动作或直接执行任意脚本；
+- 发送 GPT 消息经过人工审核；
+- Wake Envelope只包含最小 Task / Role / Dispatch信息；
+- 总控通过 Action查询正式 Context；
+- BHR不从聊天正文提取正式 Controller Command；
+- Task Control能生成 Host Dispatch；
+- BHR可 Claim、前置校验、执行一次并回报；
+- 高风险动作绑定一次性授权；
+- 动作前后都有可引用 Observation；
+- 重复命令无重复副作用；
+- 不确定结果停止而非盲目重试；
+- 重启可恢复或明确 `UNCERTAIN`；
+- 用户可暂停和紧急停止；
+- 不存在任意 JS、任意 Shell、Cookie导出和 Task直接写入；
+- 手机模型缺席不阻塞本 MVP。
 
-扩展实现前必须审计并限制：
+## 二十一、非目标
 
-- `host_permissions`；
-- `tabs`、`activeTab`、`scripting`、`storage`、`alarms` 等权限；
-- 本地 Gateway 访问范围；
-- 截图能力使用条件；
-- Content Script 匹配域；
-- 日志中敏感内容；
-- 扩展本地存储中的 Token 和会话数据。
+不实现通用互联网 Agent、多浏览器调度、无人监督任意网页操作、私有 API 逆向、完整 Approval/Evidence/Recovery 产品、完整管理后台、正式手机部署或多任务并发。
 
-MVP 优先只支持 ChatGPT 相关域，不因参考项目支持多个网站而扩大权限。
+## 二十二、与其他 MVP 的合同
 
-## 十七、交付物
+### 22.1 对 `SOL-CTL-001`
 
-```text
-Manifest V3 Extension Skeleton
-Background Service Worker
-Task Center Command Client
-Session Registry
-ChatGPT Page Adapter
-Content Script
-Response Observer
-Screenshot / DOM Observer
-Local Vision Bridge Fixture
-Authorized UI Actuator
-Side Panel / Debug View
-Host Result Reporter
-Recovery / Idempotency Tests
-Open-Source Audit Report
-MVP Runbook
-```
+只提供 `task_id`、`required_role`、`event_id / dispatch_ref` 和可选 `conversation_ref`。总控被唤醒后重新查询 Decision Context、Claim并提交 Controller Command。
 
-## 十八、验收标准
+### 22.2 对 `SOL-LCL-001`
 
-- 同一总控会话只被唤醒一次；
-- 错误会话绝不接收消息；
-- 能打开固定审计角色新会话并绑定；
-- 注入内容只有最小引导；
-- 业务结果仍通过 Action 写回；
-- 能识别响应开始和完成；
-- 扩展重启后不重复发送；
-- 截图和 DOM 能交给本地视觉分析；
-- 视觉感知与审批授权分离；
-- UI 动作只在 Token 和 DOM 全部匹配时执行；
-- 不能确定时停止；
-- Host Result 能被任务中心记录。
+BHR不通过 DOM搬运 Local Result，Browser操作不进入 `aap-local`。本机资源读取和浏览器交互是两个领域。
 
-## 十九、非目标
+### 22.3 对 `SOL-TSK-001`
 
-- 不做通用浏览器 Agent；
-- 不读取 GPT 输出并自行做业务决策；
-- 不直接修改 Task；
-- 不自动批准所有网页操作；
-- 不控制 Chrome 原生 UI 或 macOS 系统弹窗；
-- 不实现完整多角色调度；
-- 不实现正式 Approval / Evidence 领域；
-- 不支持所有 AI 网站；
-- 不承诺无人值守长期运行；
-- 不依赖永久后台死循环。
+Task Control提供 Browser Dispatch、Host Command版本、Target引用、Dispatch Claim、Expiry、Approval Ref、Result Ref、幂等和取消状态。BHR不读取 Task内部表。
 
-## 二十、外部事实来源
+### 22.4 对 `SOL-MOB-001`
 
-最后复核：2026-08-04。
+BHR只依赖 Model Inference Port，不依赖手机设备或模型品牌。DeepSeek为当前默认和兜底；手机模型先影子评测，达标后才处理低风险页面观察。
 
-- Chrome for Developers：Manifest
-  https://developer.chrome.com/docs/extensions/reference/manifest
-- Chrome for Developers：Extension Service Workers
-  https://developer.chrome.com/docs/extensions/develop/concepts/service-workers
-- Chrome for Developers：Content Scripts
-  https://developer.chrome.com/docs/extensions/reference/manifest/content-scripts
-- Chrome for Developers：Tabs API
-  https://developer.chrome.com/docs/extensions/reference/api/tabs
-- MCP-SuperAssistant
-  https://github.com/srbhptl39/MCP-SuperAssistant
+### 22.5 对 Approval / Artifact / Evidence
+
+BHR消费一次性 Grant并产生观察引用；审批决定与 Artifact 生命周期由各自领域拥有。
+
+## 二十三、待联合审计事项
+
+- 扩展与 npm包正式名称；
+- Host/Observation/Command/Result合同版本；
+- `browser.*`最终路径；
+- Host Dispatch是否作为 Task Control内部对象或专用 Browser Work Item；
+- Dispatch Claim最终字段；
+- Screenshot Ref的创建者与保留策略；
+- Approval Fixture入口；
+- Side Panel和Native Messaging是否需要；
+- 多标签页截图和窗口焦点策略；
+- ChatGPT真实 DOM适配证据；
+- 合同提升到 `packages/contracts/`的时机。
+
+## 二十四、来源与相关文档
+
+- [ADR-004｜第二阶段核心四个 MVP 与可选端侧推理扩展](../../../adr/ADR-004-phase-2-four-mvp-validation.md)
+- [第二阶段技术方案目录](./README.md)
+- [SOL-CTL-001](./SOL-CTL-001-总控Agent与动态上下文MVP.md)
+- [SOL-LCL-001](./SOL-LCL-001-Local-Control与CLI-MVP.md)
+- [SOL-TSK-001](./SOL-TSK-001-任务消息中心与单任务调度MVP.md)
+- [SOL-MOB-001](./SOL-MOB-001-手机端单模型多角色服务MVP.md)

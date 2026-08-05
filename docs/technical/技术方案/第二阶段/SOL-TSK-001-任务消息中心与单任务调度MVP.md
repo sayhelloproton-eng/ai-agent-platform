@@ -7,185 +7,590 @@
 | 所属阶段 | 第二阶段 MVP-3 |
 | 核心领域 | Task Control |
 | 产品归属 | Platform Management Console 的“任务与工作流”模块 |
-| 上游 | 总控 Decision、Goal / Context Ref |
-| 下游 | Local Control Work Item、Browser Host Command |
+| 上游 | Requirement / Goal Ref、Controller Command、Local Result、Host Result |
+| 下游 | Controller Decision Context、Role Work Item、Browser Host Command |
 
-## 一、目标
+## 一、本文拥有的问题
 
-任务消息中心 MVP 不是建设普通消息队列，而是验证：
+本文只回答一个核心问题：
 
-> 单个任务能否依靠声明式规则、版本化状态、工作单、事件和调度信号，在不侵入上下游领域内部的前提下，从总控流转到 Local Control，再重新调度总控并最终结束。
+> 单个 Task 能否把目标引用、结构化 Plan、当前处理角色、工作请求、执行结果、事件和宿主投递组织成一个可持久化、可解释、可恢复的控制闭环，并在不侵入相邻领域内部模型的前提下驱动总控、Local Control 和 Browser Host 协作？
 
-任务中心是：
+任务消息中心不是普通消息队列，也不是通用工作流引擎。它是第二阶段的最小任务控制面：
 
 ```text
-调度中心
-+ 工作流控制面
-+ 流程解释真源
+Task Aggregate
++ 结构化 Plan
++ 业务命令
++ 角色 Claim
++ Work Item
++ Task Event
++ Dispatch Signal / Host Command
++ Timeline Read Model
 ```
 
-它不一定亲自触发浏览器或执行器，但负责声明下一步由谁处理、等待什么以及为什么。
+## 二、已确认前提
 
-## 二、需要回答的核心问题
+1. Task 中必须存在结构化 `plan` 字段。
+2. Plan 可以由前置需求规划角色生成，也可以由总控首次处理时生成。
+3. 简单 Task 仍有 Plan，但可以只有一个节点。
+4. 任务推进不是单独修改 `task.status`，而是同步更新 Task、Plan / PlanNode、Event 和必要的下游引用。
+5. Task 长期归属于 `required_role`，具体 Agent Profile 只领取短期 Claim。
+6. 总控必须先读取完整 Decision Context，再领取 Task，不能看到 `task_id` 就直接 Claim。
+7. Task Control 只校验结构、状态、版本、权限和合法迁移，不自行推理 Plan 应该写什么。
+8. Local Control、Browser Host、Approval、Evidence 和模型推理 Provider 各自拥有自己的内部状态；Task Control 只保存引用和协调状态。
+9. 总控当前回合的同步 Local Query 可以直接经 Gateway 返回，不强制创建 Work Item；跨回合、长时、需要交接、轮询或副作用的工作才进入 Work Item。
+10. 第二阶段只验证单 Task，不建设多 Task DAG、生产队列或通用 Workflow DSL。
 
-1. Task 能否成为单任务当前状态的唯一解释入口？
-2. 总控能否通过业务命令提交 Decision，而不是直接修改状态字段？
-3. Local Control 能否领取 Work Item 并只返回结果引用？
-4. Browser Host 能否领取 Dispatch Signal，而不读取完整 Task 业务数据？
-5. 旧版本、重复命令和非法状态迁移能否被拒绝？
-6. 浏览器投递失败是否只影响 Host Signal，而不污染 Task 业务状态？
-7. 通过 Event 时间线能否回答“发生了什么、为什么、下一步是谁”？
+## 三、领域边界
 
-## 三、上下游领域限制
+### 3.1 Task Control 拥有
 
-### 3.1 总控
+- Task Aggregate；
+- Task 当前版本和生命周期状态；
+- Task 内嵌的 Plan 运行态；
+- Plan Node 的结构状态和关联引用；
+- `required_role` 与当前 Controller Claim；
+- Work Item；
+- Task Event；
+- Dispatch Signal / Host Command 的任务侧记录；
+- 合法业务命令与迁移规则；
+- 幂等、乐观并发和 Claim 租约；
+- Timeline / Decision Context 读模型。
 
-任务中心接收：
+### 3.2 Task Control 不拥有
+
+| 对象 | 所属领域 | Task Control 只保存 |
+|---|---|---|
+| 需求正文、产品定义、Goal 语义 | Requirement / Goal / Planning | `requirement_ref`、`goal_ref`、必要摘要 |
+| 总控角色规则与 Custom GPT 配置 | Agent Governance | `required_role`、`profile_ref` |
+| 模型推理过程 | Controller / Inference Provider | Command 和业务原因摘要 |
+| 本机 Git、文件、Runtime 状态 | Local Control | `capability_ref`、`result_ref`、摘要、错误码 |
+| 真实执行 Attempt | Execution | `execution_ref` |
+| Artifact 文件本体 | Artifact | `artifact_ref` |
+| 审批决定与令牌 | Approval | `approval_ref`、等待状态 |
+| 截图、日志和 Readback | Evidence | `evidence_ref` |
+| 浏览器标签页、DOM 和会话本体 | Browser Host | `conversation_ref`、`host_command_ref`、Host Result |
+| 手机或 DeepSeek 模型实例 | Model Inference | `inference_result_ref` |
+
+核心规则：
+
+> Task Control 拥有协调事实，不复制专业领域内部实体；聚合公开结果不转移数据所有权。
+
+### 3.3 领域自治与平台公共语义治理
+
+Task Control 可以独立设计、实现和迭代自己的内部模型与代码，包括：
+
+- Aggregate、Entity、Value Object 和 Domain Policy 的内部组织；
+- Application Service、Repository、事务和持久化实现；
+- 单 Task 调度器 / Reconciler 的内部算法；
+- Timeline、任务关注列表和调试读模型；
+- SQLite 到 PostgreSQL 的存储迁移；
+- 不改变外部语义的性能、索引、缓存和模块拆分。
+
+Task Control 不得独立改变以下平台公共语义：
 
 ```text
-ControllerDecision
+task_id / task_version / plan_version
+required_role / profile_ref
+Controller Claim / Work Item Claim / Dispatch Claim
+Task / PlanNode / WorkItem / Dispatch 状态含义
+Controller Command / Worker Result / Host Result
+Decision Context
+Result Ref / Approval Ref / Evidence Ref / Conversation Ref
+correlation_id / causation_id / idempotency_key
+总控 → Task Control → Local Control / Browser Host 的端到端链路
 ```
 
-任务中心只验证：
+公共合同由总控治理面维护架构基线、合同版本、兼容性规则、跨领域变更审计和最终串联验收。Task Control 领域可以提出合同变更，但不得先在实现中改变语义再要求其他领域适配。
 
-- `task_version`；
-- 当前状态；
-- Decision Schema；
-- Transition Rule；
-- 幂等键；
-- 下一处理者是否合法。
-
-任务中心不读取聊天历史、不保存推理过程、不改写 Decision 语义，也不根据自然语言猜测下一步。
-
-### 3.2 Goal / Context
-
-任务中心只保存：
+公共合同变更至少必须经过：
 
 ```text
-goal_ref
-context_ref
+领域提出 Change Proposal
+→ 说明问题、影响范围和兼容策略
+→ 总控进行跨领域审计
+→ 冻结新合同版本与迁移窗口
+→ 各领域分别实现
+→ Contract Test 与端到端串联验收
+→ 才能提升为新的平台公共语义
 ```
 
-不保存 Goal 正文、Context 正文和编译规则。
+Task Control 对 Host Command、Local Result、Approval Ref 等对象只拥有本领域的引用和协调记录，不拥有这些公共合同的单方面解释权。
 
-### 3.3 Local Control
 
-任务中心创建：
+## 四、Task Aggregate
 
-```text
-Work Item
+### 4.1 最小结构
+
+```json
+{
+  "task_id": "task-001",
+  "task_version": 12,
+  "title": "验证本地 Runtime 当前状态",
+  "objective": "获得最新 Runtime 状态并决定是否继续后续验证",
+  "requirement_ref": "requirement-001",
+  "goal_ref": "goal-001",
+  "required_role": "controller",
+  "status": "READY_FOR_CONTROLLER",
+  "plan": {
+    "plan_version": 4,
+    "source": {
+      "type": "controller",
+      "ref": "ai-agent-platform-controller"
+    },
+    "status": "ACTIVE",
+    "current_node_id": "node-02",
+    "nodes": []
+  },
+  "controller_claim": null,
+  "latest_event_id": "event-118",
+  "latest_result_refs": ["result-runtime-001"],
+  "approval_refs": [],
+  "conversation_ref": "conversation-001",
+  "created_at": "...",
+  "updated_at": "..."
+}
 ```
 
-Local Control 返回：
+### 4.2 Task 的不变量
+
+- `task_id` 创建后不变；
+- 每次被接受的业务变更递增 `task_version`；
+- `required_role` 表示长期处理资格，不表示某个会话永久占有；
+- 非终止 Task 必须拥有可解释的当前处理阶段；
+- Task 完成时 Plan 必须满足完成条件；
+- Task 失败或取消时，未完成 Plan Node 必须进入可解释的停止状态；
+- Task 不保存模型完整思维过程；
+- Task 不允许通过任意字段 Patch 修改。
+
+## 五、结构化 Plan
+
+### 5.1 Plan 的定位
+
+Plan 是 Task Aggregate 内的版本化执行计划，不单独建设完整 Planning 平台。
+
+来源可以是：
 
 ```text
-result_ref + status + error_code
+用户或需求正文
+产品经理 / 规划角色
+总控首次处理
+结构化任务模板
 ```
 
-任务中心不生成 Shell、不读取 Git、不解释文件内容，也不操作 Local Control 内部状态。
+Task 创建时允许：
 
-### 3.4 Browser Host
+- 已携带合法 Plan；
+- 暂无 Plan，但必须进入 `PLAN_REQUIRED` 或 `READY_FOR_CONTROLLER`，由总控生成；
+- 简单 Task 携带一个单节点 Plan。
 
-任务中心创建：
-
-```text
-Host Command / Dispatch Signal
-```
-
-扩展返回投递状态。扩展不能修改 Task，任务中心不能操作 DOM。
-
-### 3.5 Execution / Artifact / Approval / Evidence
-
-MVP 仅预留引用，不实现完整领域：
+### 5.2 Plan 最小字段
 
 ```text
-execution_ref
-artifact_ref
-approval_ref
-evidence_ref
-```
-
-## 四、声明式控制模型
-
-任务中心通过一组版本化表或记录解释流程：
-
-```text
-Workflow Definition
-→ Transition Rule
-→ Task Snapshot
-→ Work Item
-→ Task Event
-→ Dispatch Signal / Host Command
-```
-
-数据库不是领域本身。所有写入必须经过 Application Service，直接插表只能作为测试 Fixture，不能作为正式业务入口。
-
-## 五、最小数据模型
-
-### 5.1 `workflow_definitions`
-
-```text
-workflow_id
-workflow_version
-name
-initial_state
-terminal_states
+plan_version
+source
 status
-```
-
-MVP 只有一个固定单任务工作流。
-
-### 5.2 `transition_rules`
-
-```text
-workflow_id
-workflow_version
-from_state
-trigger_type
-to_state
-next_handler
-required_fields
-rule_version
-```
-
-示例：
-
-```text
-READY_FOR_CONTROLLER
-+ REQUEST_CAPABILITY
-→ WAITING_FOR_LOCAL_CONTROL
-→ local_control
-```
-
-### 5.3 `tasks`
-
-```text
-task_id
-task_version
-workflow_id
-workflow_version
-status
-current_handler
-next_handler
-goal_ref
-context_ref
-conversation_ref
-latest_result_ref
+current_node_id
+nodes[]
 created_at
 updated_at
 ```
 
-Task 是当前 Snapshot，可以更新；每次业务变更递增 `task_version`。
+Plan 状态：
 
-### 5.4 `work_items`
+```text
+DRAFT
+ACTIVE
+BLOCKED
+COMPLETED
+CANCELLED
+```
+
+### 5.3 Plan Node 最小字段
+
+```json
+{
+  "node_id": "node-02",
+  "title": "判断是否需要启动 Runtime",
+  "kind": "DECISION",
+  "status": "BLOCKED",
+  "required_role": "controller",
+  "depends_on": ["node-01"],
+  "acceptance_criteria": [
+    "根据最新 Runtime Result 给出下一步"
+  ],
+  "work_refs": [],
+  "result_refs": ["result-runtime-001"],
+  "approval_ref": null,
+  "summary": "Runtime 当前不可连接"
+}
+```
+
+Node 类型保持最小：
+
+```text
+ACTION
+DECISION
+REVIEW
+APPROVAL
+SUMMARY
+```
+
+Node 状态：
+
+```text
+PENDING
+READY
+IN_PROGRESS
+WAITING_RESULT
+WAITING_APPROVAL
+BLOCKED
+COMPLETED
+SKIPPED
+CANCELLED
+FAILED
+```
+
+### 5.4 MVP 计划形态
+
+MVP 使用版本化 Node List：
+
+- 默认顺序推进；
+- 允许少量 `depends_on`；
+- 支持插入、替换、跳过、取消和完成节点；
+- 一个 Node 可以关联一个或多个 Work Item；
+- 一个 Work Item 只服务一个主要 Node；
+- 不实现任意 DAG、并行 Join、循环表达式和通用条件 DSL。
+
+### 5.5 语义所有权
+
+| 行为 | 总控 / 规划角色 | Task Control |
+|---|---:|---:|
+| 决定 Plan 有哪些节点 | 是 | 否 |
+| 判断原计划是否仍成立 | 是 | 否 |
+| 提交节点插入、替换、完成 | 是 | 接收并校验 |
+| 校验 Node ID、版本、状态和引用 | 否 | 是 |
+| 保证 Task / Plan / Event 原子一致 | 否 | 是 |
+| 自行根据错误日志发明补救节点 | 否 | 否 |
+
+> 智能角色拥有计划语义，Task Control 拥有计划运行态和一致性。
+
+## 六、角色归属与三类 Claim
+
+### 6.1 Task 长期归属
+
+```text
+required_role = controller
+```
+
+表示当前 Task 需要具备 `controller` 角色的 Agent 处理。
+
+Task 不永久绑定某个 Custom GPT、某个 Chat 会话或某个 Provider ID。
+
+### 6.2 Controller Claim
+
+总控在读取 Decision Context 并确认资格后，领取短期处理租约：
+
+```json
+{
+  "claim_id": "claim-controller-001",
+  "task_id": "task-001",
+  "role_id": "controller",
+  "claimed_by_profile": "ai-agent-platform-controller",
+  "claimed_from_task_version": 12,
+  "expires_at": "..."
+}
+```
+
+前置条件：
+
+- Task 当前允许总控处理；
+- 调用凭据解析出的角色与 `required_role` 匹配；
+- `expected_task_version` 正确；
+- 当前无有效 Controller Claim，或旧 Claim 已过期；
+- Profile 的项目范围包含该 Task；
+- 幂等键有效。
+
+### 6.3 Work Item Claim
+
+专业执行域只领取 Task Control 已创建的异步或可交接 Work Item，不领取 Task 的语义所有权。同步 `local.*` 查询不需要 Work Item Claim；它在当前 Controller 回合返回 Canonical Local Result。
+
+### 6.4 Dispatch Claim
+
+Browser Host 只领取 Dispatch Signal / Host Command，不领取 Task 或 Controller Claim。
+
+### 6.5 同角色接管
+
+以下场景允许新的同角色总控接管：
+
+- 原 Claim 超时；
+- 原总控主动释放；
+- 原 Chat 会话关闭；
+- Browser Host 打开新的同角色会话；
+- 人工在另一个同角色入口提交 `task_id`；
+- Task 因结果、审批或错误重新进入待总控处理状态。
+
+新总控通过 Decision Context 和 Event 历史恢复，不继承旧聊天全文。
+
+## 七、Task 状态机
+
+### 7.1 最小状态
+
+```text
+CREATED
+PLAN_REQUIRED
+READY_FOR_CONTROLLER
+WAITING_FOR_ROLE_WORK
+WAITING_FOR_APPROVAL
+BLOCKED
+PAUSED
+COMPLETED
+FAILED
+CANCELLED
+```
+
+### 7.2 正常循环
+
+```text
+CREATED
+→ PLAN_REQUIRED / READY_FOR_CONTROLLER
+→ READY_FOR_CONTROLLER
+→ WAITING_FOR_ROLE_WORK
+→ READY_FOR_CONTROLLER
+→ COMPLETED
+```
+
+### 7.3 状态与 Plan 必须联动
+
+| 场景 | Task 状态 | Plan / Node 变化 |
+|---|---|---|
+| 总控生成首版计划 | `PLAN_REQUIRED → READY_FOR_CONTROLLER` | `plan_version=1`，首节点 Ready |
+| 请求执行角色工作 | `READY_FOR_CONTROLLER → WAITING_FOR_ROLE_WORK` | 当前 Node Waiting Result，绑定 Work Item |
+| 工作成功 | `WAITING_FOR_ROLE_WORK → READY_FOR_CONTROLLER` | 记录 Result，当前 Node 可完成或等待总控复审 |
+| 工作失败 | `WAITING_FOR_ROLE_WORK → READY_FOR_CONTROLLER / BLOCKED` | Node 记录失败；总控决定重试或改计划 |
+| 请求审批 | `READY_FOR_CONTROLLER → WAITING_FOR_APPROVAL` | Node Waiting Approval，绑定 `approval_ref` |
+| 审批完成 | `WAITING_FOR_APPROVAL → READY_FOR_CONTROLLER` | Node 获得审批结果引用 |
+| 完成 | `READY_FOR_CONTROLLER → COMPLETED` | Plan Completed，必需 Node 满足验收 |
+| 终止 | 任意允许状态 → `FAILED / CANCELLED` | 未执行 Node 取消并记录原因 |
+
+Browser Host 投递状态不直接进入 Task 业务状态：
+
+```text
+Task.status = READY_FOR_CONTROLLER
+DispatchSignal.status = PENDING / CLAIMED / DELIVERED / FAILED
+```
+
+Host 投递失败不会把 Task 标记为业务失败。
+
+## 八、Controller Decision Context
+
+### 8.1 查询入口
+
+```text
+task.getDecisionContext(task_id)
+```
+
+总控必须先读取，再 Claim。
+
+### 8.2 最小返回
+
+```json
+{
+  "contract_version": "1.0.0",
+  "task": {
+    "task_id": "task-001",
+    "task_version": 12,
+    "required_role": "controller",
+    "status": "READY_FOR_CONTROLLER",
+    "objective": "获得 Runtime 状态并决定下一步",
+    "plan": {
+      "plan_version": 4,
+      "current_node_id": "node-02",
+      "nodes": []
+    }
+  },
+  "requirement": {
+    "ref": "requirement-001",
+    "summary": "只读检查，不允许启动或修改服务",
+    "acceptance_criteria": []
+  },
+  "recent_events": [],
+  "latest_results": [],
+  "constraints": [],
+  "pending_approvals": [],
+  "available_context_refs": [],
+  "allowed_controller_commands": [],
+  "active_claim": null,
+  "next_event_cursor": "event-118"
+}
+```
+
+### 8.3 聚合边界
+
+Decision Context 可以包含：
+
+- Task / Plan 当前快照；
+- 上一个 Cursor 之后的 Task Event；
+- 最新 Result 摘要与引用；
+- Requirement / Goal 摘要；
+- Approval 状态摘要；
+- 可继续查询的 Local / Knowledge / Evidence / Host 引用。
+
+它不得：
+
+- 复制 Local Control 原始大日志；
+- 复制浏览器 DOM 全文；
+- 保存 Custom GPT 聊天历史；
+- 把推理 Provider 的内部会话当作 Task 状态；
+- 跨库读取其他领域私有表。
+
+## 九、业务命令
+
+### 9.1 禁止字段 Patch
+
+禁止：
+
+```http
+PATCH /tasks/task-001
+{"status":"COMPLETED"}
+```
+
+必须使用有语义的业务命令。
+
+### 9.2 Controller Command
+
+最小类型：
+
+```text
+CREATE_PLAN
+REVISE_PLAN
+ADVANCE_PLAN_NODE
+REQUEST_ROLE_WORK
+REQUEST_APPROVAL
+BLOCK_TASK
+PAUSE_TASK
+COMPLETE_TASK
+FAIL_TASK
+RELEASE_CLAIM
+```
+
+统一信封：
+
+```json
+{
+  "command_contract_version": "1.0.0",
+  "task_id": "task-001",
+  "claim_token": "claim-token",
+  "expected_task_version": 12,
+  "expected_plan_version": 4,
+  "idempotency_key": "controller-run-018:revise-plan",
+  "command": {
+    "type": "REVISE_PLAN",
+    "reason_summary": "Runtime 不可连接，原计划缺少连接诊断",
+    "payload": {
+      "operations": []
+    }
+  }
+}
+```
+
+Task Control 校验：
+
+- 调用者身份和角色；
+- Controller Claim；
+- Task / Plan Expected Version；
+- Command Schema；
+- 当前状态是否允许；
+- Node / 引用是否存在；
+- 结构操作是否冲突；
+- 幂等键；
+- 是否需要创建 Work、Approval 或 Dispatch 引用。
+
+### 9.3 Worker Result Command
+
+领取 Work Item 的 Worker / Execution Adapter 只能提交：
+
+```text
+REPORT_WORK_RESULT
+REPORT_WORK_FAILURE
+```
+
+不能提交 Plan 修订或 Task 完成。
+
+### 9.4 Host Result Command
+
+Browser Host 只能提交：
+
+```text
+ACK_HOST_COMMAND
+FAIL_HOST_COMMAND
+REPORT_RESPONSE_STATE
+```
+
+Host Result 只描述宿主事实，不宣称业务完成。
+
+## 十、原子推进规则
+
+每个被接受的 Controller Command 必须在一个应用事务语义中完成：
+
+```text
+校验身份、Claim、Task Version、Plan Version
+→ 校验 Command 和状态迁移
+→ 更新 Task Snapshot
+→ 更新 Plan / PlanNode
+→ 创建不可变 Task Event
+→ 创建或更新 Work Item / Approval Ref / Dispatch Signal
+→ 递增 Task Version
+→ 返回新版本和引用
+```
+
+任何一步失败：
+
+```text
+Task、Plan、Event 和下游请求都不能部分落地。
+```
+
+### 10.1 示例：请求异步角色工作
+
+```text
+当前 Node = READY
+→ REQUEST_ROLE_WORK
+→ Node = WAITING_RESULT
+→ 创建 Work Item
+→ Task = WAITING_FOR_ROLE_WORK
+→ 生成 TASK_ROLE_WORK_REQUESTED Event
+```
+
+如果总控只需要一次同步仓库、文件或 Runtime 查询，则直接调用 `local.*` 并在当前回合获得 Local Result；Task Control 可记录 Result Ref，但不创建 Work Item。
+
+### 10.2 示例：失败后修订计划
+
+```text
+Local Result = FAILED
+→ Task 回到 READY_FOR_CONTROLLER
+→ 总控 Claim
+→ REVISE_PLAN：插入诊断 Node
+→ 原 Node = BLOCKED
+→ 新 Node = READY
+→ plan_version + 1
+→ task_version + 1
+→ 生成 TASK_PLAN_REVISED Event
+```
+
+## 十一、Work Item
+
+最小字段：
 
 ```text
 work_item_id
 task_id
+plan_node_id
 created_from_task_version
 target_domain
+required_role
 capability_ref
-arguments_ref
+input_ref
 expected_result_type
 status
 claimed_by
@@ -197,33 +602,78 @@ claimed_at
 completed_at
 ```
 
-Work Item 是调度单，不是 Execution 领域完整记录。
+Work Item 回答：
 
-### 5.5 `task_events`
+> 哪个专业领域需要完成什么跨回合、异步或可交接工作，并把结果以什么合同返回？
+
+它不是所有能力调用的通用包装，也不是完整 Execution Attempt。一次同步 Local Query、一次纯读 Context 查询或一次短小的确定性读取不应为了“统一”被强制建成 Work Item。
+
+状态：
+
+```text
+PENDING
+CLAIMED
+SUCCEEDED
+FAILED
+CANCELLED
+```
+
+## 十二、Task Event
+
+最小字段：
 
 ```text
 event_id
 task_id
 task_version
 event_type
-producer
+producer_ref
 payload_ref
 correlation_id
 causation_id
 created_at
 ```
 
-Event 不可变，表达已经发生的事实。
+Event 不可变。
 
-### 5.6 `dispatch_signals`
+关键事件：
+
+```text
+TASK_CREATED
+TASK_PLAN_CREATED
+TASK_PLAN_REVISED
+CONTROLLER_CLAIMED
+CONTROLLER_CLAIM_RELEASED
+ROLE_WORK_REQUESTED
+ROLE_WORK_SUCCEEDED
+ROLE_WORK_FAILED
+APPROVAL_REQUESTED
+APPROVAL_RESOLVED
+TASK_BLOCKED
+TASK_PAUSED
+TASK_COMPLETED
+TASK_FAILED
+TASK_CANCELLED
+HOST_DISPATCH_CREATED
+HOST_DISPATCH_DELIVERED
+HOST_DISPATCH_FAILED
+COMMAND_REJECTED
+```
+
+Event 只记录业务事实和必要引用，不保存模型隐藏思维过程。
+
+## 十三、Dispatch Signal 与 Host Command
+
+### 13.1 Dispatch Signal
 
 ```text
 signal_id
 task_id
 created_from_task_version
 signal_type
-target_handler
+target_role
 conversation_ref
+host_command_ref
 status
 claimed_by
 attempt_count
@@ -233,11 +683,9 @@ delivered_at
 last_error
 ```
 
-Signal 表示等待 Host / Driver 完成的一次投递。
+### 13.2 Host Command
 
-### 5.7 Host Command
-
-扩展 MVP 接入后，Signal 可承载或引用以下 Host Command：
+MVP 类型：
 
 ```text
 CONTINUE_SESSION
@@ -247,78 +695,28 @@ OBSERVE_RESPONSE
 EXECUTE_APPROVED_UI_ACTION
 ```
 
-当前任务中心只需支持继续总控和打开固定测试审计角色所需的最小命令。
+Task Control 只生成任务侧意图和最小路由信息。Browser Host 拥有页面执行细节。
 
-## 六、Task、Event、Signal 与 Work Item 分离
+## 十四、公开 Application Interface
 
-```text
-Task Snapshot
-回答：现在是什么状态？
-
-Task Event
-回答：已经发生了什么？
-
-Dispatch Signal
-回答：等待哪个 Driver 完成一次网页宿主投递？
-
-Work Item
-回答：等待哪个专业领域完成一次工作？
-```
-
-不能把四者压缩成一个“消息表”，否则无法区分当前事实、历史事实、执行请求和宿主投递。
-
-## 七、最小状态机
-
-```text
-CREATED
-READY_FOR_CONTROLLER
-WAITING_FOR_LOCAL_CONTROL
-COMPLETED
-PAUSED
-FAILED
-```
-
-正常循环：
-
-```text
-CREATED
-→ READY_FOR_CONTROLLER
-→ WAITING_FOR_LOCAL_CONTROL
-→ READY_FOR_CONTROLLER
-→ COMPLETED
-```
-
-Local Control Result 返回后，任务中心重新进入 `READY_FOR_CONTROLLER`，同时创建新的 Controller Dispatch Signal。
-
-浏览器投递状态不进入 Task 业务状态：
-
-```text
-Task.status = READY_FOR_CONTROLLER
-Signal.status = PENDING / CLAIMED / DELIVERED / FAILED
-```
-
-## 八、公开业务接口
-
-### 8.1 任务入口
+### 14.1 任务入口
 
 ```text
 task.create
 task.get
+task.getDecisionContext
 task.listEvents
 ```
 
-任务可以由测试脚本、用户入口或前置规划导入，但正式创建必须经过 `task.create`。
-
-### 8.2 总控接口
+### 14.2 总控入口
 
 ```text
-task.getControllerInput
-task.submitDecision
+task.claimController
+task.submitControllerCommand
+task.releaseControllerClaim
 ```
 
-`submitDecision` 接收总控 MVP 的 Decision Contract，而不是任意状态 Patch。
-
-### 8.3 Local Control 接口
+### 14.3 Role Work 入口
 
 ```text
 work.listAvailable
@@ -327,7 +725,7 @@ work.reportResult
 work.reportFailure
 ```
 
-### 8.4 Browser Host 接口
+### 14.4 Browser Host 入口
 
 ```text
 dispatch.listPending
@@ -336,259 +734,553 @@ dispatch.ack
 dispatch.fail
 ```
 
-MVP 不建设通用消息总线。以上接口是 Task Control 面向明确上下游提供的 Application Interface。
+接口是领域 Application Interface，不等于最终 HTTP 路径或数据库表名。
 
-## 九、业务命令而不是字段修改
+### 14.5 公共合同版本与兼容门禁
 
-禁止提供：
+Task Control 的公开 Application Interface 必须消费并返回明确的合同版本，不允许依赖数据库表结构作为跨领域合同。
+
+最小门禁：
+
+- 请求中的 `contract_version` / `command_contract_version` 必须在支持范围内；
+- 新增可选字段必须保持旧消费者可继续解析；
+- 删除字段、改变枚举含义、改变状态迁移或 Claim 权限属于破坏性变更；
+- 破坏性变更必须发布新的主版本，并由总控完成跨领域迁移审计；
+- Task Control 的内部表名、索引和 Repository 结构不属于公共合同；
+- `packages/contracts/` 中的公共 Schema 由总控基线治理，Task Control 负责实现与合同测试，不能私自改义。
+
+每个跨领域入口至少应有：
 
 ```text
-PATCH /tasks/{id}
-{"status": "COMPLETED"}
+Schema Validation
+Contract Version Test
+Authorization Test
+Idempotency Test
+Expected Version Test
+Cross-domain Fixture Test
 ```
 
-应提供：
 
-```text
-submitControllerDecision
-reportWorkResult
-reportWorkFailure
-ackHostCommand
-pauseTask
-```
+## 十五、版本、幂等与冲突
 
-Application Service 依据当前 Task、expected version 和 Transition Rule 决定是否合法，并在同一事务中更新 Snapshot、创建 Event 及必要的 Work Item / Signal。
+### 15.1 Expected Version
 
-## 十、版本、幂等与领取
-
-### 10.1 Expected Version
-
-每个写命令必须携带：
+所有写命令必须携带适用版本：
 
 ```text
 expected_task_version
+expected_plan_version（涉及 Plan 时）
 ```
 
-版本不一致时返回：
+冲突返回：
 
 ```text
 TASK_VERSION_CONFLICT
+PLAN_VERSION_CONFLICT
 ```
 
-### 10.2 幂等
+### 15.2 幂等
 
-创建 Work Item、Signal 和提交 Decision 必须携带：
+创建 Task、Controller Command、Work Item 和 Dispatch Signal 必须使用 `idempotency_key`。
+
+同一调用者 + 同一业务操作 + 同一幂等键：
+
+- 只产生一次业务副作用；
+- 重复调用返回首次结果；
+- 不重复创建 Event、Work Item 或 Signal。
+
+### 15.3 Claim 冲突
 
 ```text
-idempotency_key
+CONTROLLER_ALREADY_CLAIMED
+WORK_ALREADY_CLAIMED
+DISPATCH_ALREADY_CLAIMED
+CLAIM_EXPIRED
+CLAIM_TOKEN_INVALID
 ```
 
-重复请求返回原结果，不重复产生副作用。
+MVP 采用简单过期租约，不实现抢占、优先级竞争和分布式一致性协议。
 
-### 10.3 Claim
+## 十六、失败语义
 
-Work Item 与 Signal 使用最小 Claim Token，防止两个消费者同时处理同一记录。
-
-MVP 为单任务、单消费者，不实现复杂租约、抢占和动态再分配；字段可以预留，规则保持简单。
-
-## 十一、完整串联流程
+### 16.1 角色不匹配
 
 ```text
-1. task.create
-2. Task = READY_FOR_CONTROLLER
-3. 创建 Controller Dispatch Signal
-4. Mock Browser Host ack
-5. 总控读取 Controller Input
-6. 总控提交 REQUEST_CAPABILITY
-7. Task Center 验证版本和 Transition
-8. 创建 Local Control Work Item
-9. Task = WAITING_FOR_LOCAL_CONTROL
-10. Local Control claim
-11. Local Control reportResult(result_ref)
-12. Task = READY_FOR_CONTROLLER
-13. 创建新的 Controller Dispatch Signal
-14. 总控读取最新 Result Ref
-15. 总控提交 COMPLETE
-16. Task = COMPLETED
-17. Event 时间线可完整回放
+required_role = controller
+调用方 role = reporter
+→ ROLE_NOT_ALLOWED
 ```
 
-## 十二、异常语义
-
-### 12.1 旧 Decision
+### 16.2 旧 Command
 
 ```text
 expected_task_version < current
 → 拒绝
-→ 不生成 Work Item 或状态迁移 Event
+→ 不更新 Task / Plan
+→ 不产生业务副作用
 ```
 
-可记录独立审计拒绝，但不能改变 Task 业务状态。
+可以记录 `COMMAND_REJECTED` 审计 Event，但不能改变 Task 业务状态。
 
-### 12.2 Local Control 失败
+### 16.3 非法 Plan 操作
 
-Local Control 返回：
+例如：
+
+- 插入重复 `node_id`；
+- 完成不存在的 Node；
+- 跳过必需 Node 却直接完成 Task；
+- 修改已经 Completed 的历史 Node；
+- 依赖引用不存在；
+- Plan 已完成仍追加普通执行节点。
+
+返回：
 
 ```text
-status = FAILED
-error_code
-retryable
-result_ref / evidence_ref
+PLAN_OPERATION_NOT_ALLOWED
 ```
 
-MVP 最小规则将 Task 重新调度给总控：
+### 16.4 Local Control 失败
 
 ```text
-Task = READY_FOR_CONTROLLER
+Work Item = FAILED
+Task = READY_FOR_CONTROLLER 或 BLOCKED
+当前 Node 记录失败结果
+创建 Controller Dispatch Signal
 ```
 
-由总控判断重试、暂停或失败。任务中心不自行进行语义重试。
+任务中心不自行解释错误并重试，由总控决定。
 
-### 12.3 Browser Host 失败
+### 16.5 Browser Host 失败
 
 ```text
-Signal = FAILED
-Task 仍保持 READY_FOR_CONTROLLER
+Dispatch Signal = FAILED
+Task 业务状态保持不变
 ```
 
-MVP 允许人工重新产生 Signal；复杂自动恢复后续实现。
+可以人工或规则化重新创建 Signal。
 
-### 12.4 无进展
+### 16.6 无进展
 
-总控连续提交相同 Decision 且没有新 Result：
+同一 Task 在没有新 Event / Result / Approval 的情况下，连续提交语义等价命令超过预算：
 
 ```text
-→ PAUSED
+→ Task = PAUSED
 → reason = NO_PROGRESS
 ```
 
-该规则可由任务中心基于确定性计数执行，无需模型判断。
+该计数可由 Task Control 确定性执行。
 
-### 12.5 非法迁移
-
-在 `WAITING_FOR_LOCAL_CONTROL` 状态提交 `COMPLETE`：
+## 十七、完整单 Task 串联
 
 ```text
-→ TRANSITION_NOT_ALLOWED
+1. task.create(requirement_ref, required_role=controller, plan 或 plan=null)
+2. Task = PLAN_REQUIRED / READY_FOR_CONTROLLER
+3. 创建 Controller Dispatch Signal
+4. Browser Host 或人工唤醒总控
+5. 总控 task.getDecisionContext
+6. 总控确认角色和最新版本
+7. 总控 task.claimController
+8. 总控 CREATE_PLAN 或 REQUEST_ROLE_WORK
+9. Task Control 原子更新 Task + Plan + Event + Work Item
+10. Worker / Execution Adapter claim Work Item
+11. Worker / Execution Adapter reportResult(result_ref)
+12. Task Control 更新 Node 结果并重新调度 controller
+13. Browser Host 注入最小 Wake Message
+14. 总控重新查询 Decision Context
+15. 总控 ADVANCE / REVISE_PLAN / REQUEST_APPROVAL / COMPLETE_TASK
+16. Task = COMPLETED / PAUSED / FAILED
+17. Timeline 可解释完整过程
 ```
 
-## 十三、管理后台读模型
+## 十八、管理后台读模型
 
-任务中心是未来 `Platform Management Console` 的一个模块。
-
-MVP 可提供最小只读页面或调试视图：
+MVP 提供只读调试视图所需数据：
 
 ```text
-Task 概览
-当前状态
-当前 / 下一处理者
+Task 基本信息
+Requirement / Goal Ref
+required_role
+当前 Task 状态和版本
+当前 Plan / Plan Version / Node List
+Controller Claim
 Work Item
-Event 时间线
+Result Ref
+Approval Ref
 Dispatch Signal
-关联 Ref
-错误和停止原因
+Event 时间线
+停止、错误和无进展原因
 ```
 
-前端不得直接修改表。暂停、恢复、重发 Signal 等操作未来必须调用业务命令。
+后台不能直接改表。后续操作仍必须调用业务命令。
 
-完整控制台不属于本 MVP。
+## 十九、最小存储建议
 
-## 十四、测试场景
+MVP 可以使用 SQLite 或现有受控数据库。
 
-### 14.1 正常单任务闭环
-
-按第十一节完整执行并完成。
-
-### 14.2 版本冲突
-
-使用旧 `task_version` 提交 Decision，必须拒绝且无业务副作用。
-
-### 14.3 幂等
-
-重复提交同一 Decision：
+逻辑存储至少包括：
 
 ```text
-Work Item 仍只有一个
-Event 不重复
+tasks
+task_events
+work_items
+dispatch_signals
+idempotency_records
 ```
 
-### 14.4 非法迁移
+Plan 可以先作为 Task Aggregate 的结构化 JSON 保存；只有真实查询、并发和局部更新需求证明需要时，再拆出独立表。
 
-非法 Decision 返回稳定错误，Task 保持原状态。
+这避免为了一个 Node List 提前建设通用 Workflow Schema。
 
-### 14.5 Local Control 失败
+### 19.1 Task Control 内部实现结构
 
-Task 不被误标完成，重新调度总控。
+以下结构属于 Task Control 领域内部实现，可以独立迭代，但必须持续满足公共合同：
 
-### 14.6 Host 投递失败
+```text
+Task Control
+├── Domain
+│   ├── Task Aggregate
+│   ├── Plan / PlanNode
+│   ├── Controller Claim
+│   ├── WorkItem / WorkItem Claim
+│   ├── DispatchSignal / Dispatch Claim
+│   ├── TaskEvent
+│   ├── TaskTransitionPolicy
+│   ├── PlanOperationPolicy
+│   └── TaskSchedulingPolicy
+├── Application
+│   ├── TaskCommandService
+│   ├── DecisionContextQueryService
+│   ├── ControllerClaimService
+│   ├── WorkItemService
+│   ├── DispatchService
+│   ├── TaskReconciler
+│   └── TimelineProjectionService
+├── Ports
+│   ├── TaskRepository
+│   ├── TaskEventRepository
+│   ├── WorkItemRepository
+│   ├── DispatchRepository
+│   ├── IdempotencyRepository
+│   ├── TransactionManager
+│   └── Clock / IdGenerator
+└── Adapters
+    ├── SQLite Store
+    ├── HTTP / Gateway Adapter
+    ├── Test Fixture Adapter
+    └── Fake Browser / Worker Adapter
+```
 
-Signal 失败，Task 业务状态不变。
+Gateway Adapter 只负责认证结果传递、Schema 校验、错误映射和领域路由；业务迁移必须进入 Application / Domain 层。
 
-### 14.7 Event 回放
+### 19.2 单 Task 调度器 / Reconciler
 
-从 Event 顺序重建的关键 Task 状态与当前 Snapshot 一致。
+MVP 的“单任务调度”由一个确定性的 `TaskReconciler` 实现，不建设通用工作流引擎或生产消息队列。
 
-### 14.8 直接数据库写入防线
+触发来源：
 
-正式 API 外直接插入不完整 Task 不应被系统接受为正常业务记录；测试 Fixture 必须与正式数据明确隔离。
+```text
+Task 创建成功
+Controller Command 接受
+Work Result / Failure 接受
+Host Result 接受
+Claim 或 Dispatch 到期
+人工执行 reconcile(task_id)
+进程恢复后的周期扫描
+```
 
-## 十五、交付物
+单次调和规则：
+
+```text
+1. 在事务中读取 Task Aggregate 和相关 WorkItem / Dispatch
+2. 若 Task 为 COMPLETED / FAILED / CANCELLED，则取消未开始的下游协调对象
+3. 若 Task 为 PAUSED，则不创建新的 WorkItem 或 Dispatch
+4. 处理过期 Controller Claim、Work Item Claim 和 Dispatch Claim
+5. 校验当前 Plan / Node 与 Task 状态是否一致
+6. 若 READY_FOR_CONTROLLER 且不存在有效 Controller Dispatch，则幂等创建 Dispatch Signal
+7. 若 Node 已请求异步角色工作且不存在有效 WorkItem，则幂等创建 WorkItem
+8. 若 WorkItem 已产生结果，则把 Task 恢复到允许总控复审的状态，并创建 Controller Dispatch
+9. 若等待审批，则只保存 Approval Ref 和等待状态，不伪造审批结果
+10. 追加必要 Task Event，递增版本并提交
+```
+
+`TaskReconciler` 只执行确定性规则，不读取自然语言日志来推理新计划，不替总控决定重试、改计划或完成任务。
+
+为避免重复调度，至少使用下列唯一语义：
+
+```text
+一个 Task 版本下同一 controller wake 只存在一个有效 Dispatch
+一个 PlanNode 的同一 work request 只存在一个有效 WorkItem
+一个 WorkItem Attempt 的同一 dispatch 类型只存在一个有效 Signal
+```
+
+### 19.3 任务消息中心的派生读模型
+
+消息中心不是独立 Aggregate。MVP 从 Task、WorkItem、DispatchSignal 和 TaskEvent 派生三类读模型：
+
+```text
+Task Timeline
+    面向单个 Task 的完整事实时间线
+
+Role Attention Inbox
+    面向角色的待关注、待处理和已阻断事项
+
+Runtime Dispatch Queue
+    面向 Browser Host / Worker Adapter 的可领取驱动请求
+```
+
+最小 `Role Attention Inbox` 字段：
+
+```text
+entry_id
+task_id
+source_event_id
+required_role
+attention_type
+work_item_id / dispatch_ref / approval_ref
+status
+created_at
+read_at
+resolved_at
+```
+
+`attention_type` MVP 可以限定为：
+
+```text
+CONTROLLER_ACTION_REQUIRED
+ROLE_WORK_AVAILABLE
+APPROVAL_WAITING
+TASK_BLOCKED
+TASK_PAUSED
+TASK_TERMINAL
+```
+
+该 Inbox 是可重建投影：删除或重建 Inbox 不得改变 Task 事实。只有 WorkItem Claim、Dispatch Claim 或 Controller Claim 才授予实际处理权，读取消息本身不授予权限。
+
+### 19.4 事务实现边界
+
+一个业务命令的写入必须由 `TransactionManager` 包住：
+
+```text
+读取当前 Aggregate 与幂等记录
+→ 领域校验与状态迁移
+→ 保存 Task Snapshot
+→ 保存 WorkItem / Dispatch 变化
+→ 追加 TaskEvent
+→ 写入幂等结果
+→ 提交
+```
+
+MVP 使用同一 SQLite 数据库完成原子提交，不引入外部消息总线。Browser Host 和 Worker 通过轮询公开 Application Interface 获取待处理对象，因此不存在“数据库已更新但消息总线未发布”的双写问题。
+
+未来引入跨进程事件发布时，再增加 Transactional Outbox；Outbox 只能发布已经提交的领域事实，不能成为 Task 真源。
+
+### 19.5 进程恢复
+
+Task Control 启动后执行一次恢复扫描：
+
+```text
+查找非终止 Task
+→ 标记过期 Claim
+→ 对账未完成 WorkItem 和 Dispatch
+→ 对 READY_FOR_CONTROLLER Task 补建缺失的 Controller Dispatch
+→ 对等待角色结果的 Task 保持等待，不伪造失败
+→ 对状态与 Plan 不一致的记录标记为内部一致性错误并停止自动推进
+```
+
+恢复必须幂等。重复启动、重复扫描或进程中途退出不能重复创建 WorkItem、Dispatch 或业务 Event。
+
+### 19.6 本领域落地顺序
+
+```text
+1. 冻结并导入总控治理的公共 Contract Fixture
+2. 实现 Domain Model 与 Transition Policy
+3. 实现 SQLite Schema、Repository 和 TransactionManager
+4. 实现 Controller Claim 与 Controller Command
+5. 实现 WorkItem、Dispatch 和三类 Claim
+6. 实现 TaskReconciler
+7. 实现 Decision Context、Timeline 和 Role Attention Read Model
+8. 接入 Fake Worker / Fake Browser Host 完成单 Task 闭环
+9. 接入真实 Local Control Result
+10. 与 SOL-CTL-001、SOL-BHR-001 做跨领域 Contract Test
+11. 由总控执行最终端到端串联验收
+```
+
+
+## 二十、测试场景
+
+### 20.1 带前置 Plan 的 Task
+
+导入规划角色生成的 Plan，总控读取后直接推进当前节点。
+
+### 20.2 总控生成 Plan
+
+Task 无 Plan：
+
+```text
+查询 Context
+→ Claim
+→ CREATE_PLAN
+→ Task / Plan / Event 一致
+```
+
+### 20.3 失败后修订 Plan
+
+执行失败后插入补救 Node，并创建新 Work Item。
+
+### 20.4 同角色接管
+
+原 Claim 过期，另一个 controller Profile 重新查询、Claim 并继续。
+
+### 20.5 角色不匹配
+
+reporter 尝试 Claim controller Task，必须拒绝。
+
+### 20.6 版本冲突
+
+使用旧 Task 或 Plan Version 提交命令，必须无业务副作用。
+
+### 20.7 幂等
+
+重复 `REQUEST_ROLE_WORK` 只生成一个 Work Item 和一组 Event。
+
+### 20.8 非法 Plan 操作
+
+重复 Node、非法跳过和错误完成必须拒绝。
+
+### 20.9 Host 投递失败
+
+Signal 失败，Task 与 Plan 业务状态不被污染。
+
+### 20.10 Event 回放
+
+从 Event 顺序重建的关键 Task / Plan 状态与当前 Snapshot 一致。
+
+### 20.11 直接数据库写入防线
+
+正式 API 外写入的不完整记录不能被当成合法 Task；测试 Fixture 与正式数据必须隔离。
+
+### 20.12 调和器幂等
+
+对同一 Task 连续执行多次 Reconcile：
+
+- 不重复创建 Controller Dispatch；
+- 不重复创建 WorkItem；
+- 不重复追加同一业务 Event；
+- 不改变已完成 Node；
+- 返回相同或等价的稳定结果。
+
+### 20.13 Claim 到期恢复
+
+分别验证 Controller Claim、Work Item Claim 和 Dispatch Claim 到期：
+
+- 到期 Claim 不能继续提交受保护写入；
+- 调和器能够释放或标记到期占用；
+- 可以生成新的合法 Claim；
+- 旧 Claim 的迟到结果不能覆盖新版本。
+
+### 20.14 任务消息投影重建
+
+清空 Timeline / Role Attention 的投影表后，从 Task Snapshot、WorkItem、Dispatch 和 TaskEvent 重建：
+
+- 待总控事项不丢失；
+- 待角色工作不丢失；
+- 阻塞和暂停事项可见；
+- 重建过程不修改 Task 业务状态。
+
+### 20.15 公共合同兼容
+
+使用总控冻结的跨领域 Fixture 验证：
+
+- Decision Context 可被 SOL-CTL-001 消费；
+- Local Result Ref 不依赖 Local Control 私有字段；
+- Host Command 可被 SOL-BHR-001 消费；
+- 旧次版本请求在兼容窗口内仍可处理；
+- 未经治理的新枚举或字段语义不会被静默接受。
+
+
+## 二十一、交付物
 
 ```text
 Task Control Application Service
-Workflow Definition Fixture
-Transition Rule Fixture
+Task Aggregate Schema
+Plan / PlanNode Schema
+Task Decision Context Schema
+Controller Claim Service
+Controller Command Handler
+Task Transition Policy
 Task Store
-Work Item Store
 Task Event Store
+Work Item Store
 Dispatch Signal Store
-Controller API
-Local Control API
-Browser Host API
-Version / Idempotency Tests
-Task Timeline Read Model
+
+Task Reconciler / Scheduler
+Role Attention Read Model
+Contract Compatibility Tests
+Recovery / Reconcile Tests
+Version / Idempotency / Claim Tests
+Timeline Read Model
 Single-Task Integration Test
+Runbook
 ```
 
-存储技术在实现时选择。MVP 可使用 SQLite 或现有受控数据库，但领域接口不得绑定具体表结构。
+## 二十二、验收标准
 
-## 十六、验收标准
-
-- 单任务完整流转通过；
-- Task Snapshot 可查询；
-- Event 不可变且可回放；
-- Work Item 与 Signal 分离；
-- 旧版本被拒绝；
+- Task 内存在结构化、版本化 Plan；
+- Plan 可以来自上游，也可以由总控生成；
+- 总控必须先读取 Decision Context，再 Claim；
+- Task 长期归属角色，Claim 只代表短期处理权；
+- 同角色总控可以在 Claim 过期后接管；
+- Task、Plan、PlanNode、Event 和下游请求原子一致；
+- 旧 Task / Plan Version 被拒绝；
 - 重复命令无重复副作用；
-- Local Control 只收到业务工作单；
-- Browser Host 只收到宿主命令；
-- 总控不能直接设置 Task 状态；
-- 任务中心不读取本机资源和聊天历史；
-- Task Timeline 能解释每次流转；
-- 数据可供未来管理后台读取。
+- 同步 Local Query 直接返回，不强制建立 Work Item；
+- 异步 Worker / Execution Adapter 只领取 Work Item；
+- Browser Host 只领取 Dispatch Signal；
+- 总控不能直接 Patch Task / Plan 字段；
+- Task Control 不自行推理计划语义；
+- 领域内部实现可以独立迭代，但不得自行改变公共合同语义；
+- 公共合同变更经过总控版本治理和跨领域兼容审计；
+- Reconciler 重复运行不产生重复 WorkItem、Dispatch 或 Event；
+- Role Attention Inbox 可从正式事实重建，不成为状态真源；
+- Timeline 能解释每次计划和任务变化；
+- 单 Task 完整闭环通过。
 
-## 十七、非目标
+## 二十三、非目标
 
-- 不做多任务；
-- 不做任务依赖图；
-- 不做优先级队列；
-- 不做通用 Workflow DSL；
-- 不做通用多角色编排；
-- 不做正式 Approval / Evidence；
-- 不做生产消息队列；
-- 不做复杂租约、自动恢复和重试；
-- 不做完整后台管理系统；
-- 不让前端直接改表。
+- 不做多 Task 并发；
+- 不做 Task 依赖图；
+- 不做通用 Planning 引擎；
+- 不做任意 DAG / BPMN / Workflow DSL；
+- 不做优先级队列和生产消息总线；
+- 不做动态执行器竞争；
+- 不做复杂租约和自动抢占；
+- 不做正式 Approval / Evidence 领域；
+- 不做完整 Platform Management Console；
+- 不让前端或总控直接修改数据库字段。
 
-## 十八、后续衔接
+## 二十四、与其他 MVP 的合同
 
-MVP-4 只消费 Task Center 的 Host Command，不读取 Task 内部表。
+### 24.1 对 `SOL-CTL-001`
 
-最终串联后，再统一评估：
+提供：
 
-- Event Envelope 是否抽成共享合同；
-- Host Command 是否独立存储；
-- Work Item 是否进入通用 Execution Lane；
-- Approval / Evidence 如何接入；
-- 管理后台 BFF 与读模型；
-- 多任务调度和任务依赖关系。
+```text
+getTaskDecisionContext
+claimControllerTask
+submitControllerCommand
+releaseControllerTask
+```
+
+并保证 Plan / Task / Event 原子推进。
+
+### 24.2 对 `SOL-LCL-001`
+
+同步 `local.*` 查询可以直接经 Gateway 返回，总控在当前回合消费；Task Control 只保存必要的 Canonical Result Ref、摘要和错误码。只有跨回合、长时、需要交接、轮询或副作用的操作，Task Control 才建立 Work Item / Execution 协调状态。双方不得直接读取对方内部数据库。
+
+### 24.3 对 `SOL-BHR-001`
+
+提供 Host Command / Dispatch Signal；Browser Host 不读取 Task 内部表，不自行推进 Task。
+
+### 24.4 对 `SOL-MOB-001`
+
+Task Control 不直接依赖手机模型。推理结果通过 Model Inference Provider 的稳定 Result Ref 进入 Task / Evidence；DeepSeek 和手机模型可以替换，不改变 Task Aggregate。
