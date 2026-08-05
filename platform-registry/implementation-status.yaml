@@ -33,12 +33,14 @@ capabilities:
   - apps/action-gateway/tests/gateway.test.mjs
   - apps/dev-tunnel/openapi/custom-gpt-action.openapi.template.yaml
 - id: CAP-TASK-CONTROL
-  status: designing
-  implemented_by: []
+  status: implemented
+  implemented_by:
+  - PKG-TASK-CONTROL
   evidence:
-  - docs/knowledge/02_基础产品与能力/CAP-008-平台核心能力模型与目标对齐/README.md
-  - docs/knowledge/02_基础产品与能力/CAP-006-从ChatGPT到Codex的平台执行闭环/README.md
-  - docs/knowledge/03_Agent工程架构思想与方法论/THY-004-DDD与Agent系统边界建模/README.md
+  - packages/task-control/tests/task-control.test.mjs
+  - packages/task-control/README.md
+  - packages/task-control/RUNBOOK.md
+  - packages/task-control/IMPLEMENTATION-REPORT.md
 
 - id: CAP-APPROVAL
   status: candidate

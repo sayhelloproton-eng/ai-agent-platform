@@ -1408,3 +1408,6 @@ relations:
 - from: PKG-CONTRACTS
   type: implements
   to: SOL-CTL-001
+- from: PKG-TASK-CONTROL
+  type: implements
+  to: SOL-TSK-001

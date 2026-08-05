@@ -48,3 +48,7 @@ npm run check:local-control
 - [项目宪法](../AGENTS.md)
 - [Gateway 技术方案](../docs/technical/技术方案/Gateway/README.md)
 - [Project Knowledge Governance Skill](../skills/project-knowledge-governance/SKILL.md)
+
+## Task Control
+
+`task-control/` 实现 `SOL-TSK-001` 的 Task Aggregate、版本化 Plan、三类 Claim、WorkItem、DispatchSignal、TaskEvent、Reconciler 和任务消息投影。当前是单进程、本地持久化 MVP，不拥有总控推理、Local Control 或 Browser Host 内部状态。

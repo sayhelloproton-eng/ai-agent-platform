@@ -1417,6 +1417,17 @@ assets:
   canonical_path: packages/policy/
   publication_status: unpublished
   migration_state: complete
+- asset_id: PKG-TASK-CONTROL
+  title: Task Control
+  asset_type: package
+  status: implemented
+  evidence_level: verified
+  materialized: true
+  current_path: packages/task-control/
+  target_path:
+  canonical_path: packages/task-control/
+  publication_status: unpublished
+  migration_state: complete
 - asset_id: SKILL-AI-KNOWLEDGE
   title: AI Knowledge Skill（已被项目知识治理取代）
   asset_type: skill
