@@ -4,7 +4,11 @@ import test from "node:test";
 import {
   CONTRACT_VERSION,
   isJsonValue,
+  validateClaimControllerTaskRequest,
   validateContractError,
+  validateGetTaskDecisionContextRequest,
+  validateReleaseControllerTaskRequest,
+  validateSubmitControllerCommandRequest,
   validateTaskRequest,
   validateTaskResult,
 } from "../dist/index.js";
@@ -208,4 +212,129 @@ test("validators do not mutate input objects", () => {
   const snapshot = structuredClone(task);
   validateTaskRequest(task);
   assert.deepEqual(task, snapshot);
+});
+
+test("accepts valid Controller Action requests", () => {
+  assert.equal(
+    validateGetTaskDecisionContextRequest({ taskId: "task-ctl-001" }).ok,
+    true,
+  );
+  assert.equal(
+    validateClaimControllerTaskRequest({
+      taskId: "task-ctl-001",
+      expectedTaskVersion: 1,
+      idempotencyKey: "claim-001",
+    }).ok,
+    true,
+  );
+  assert.equal(
+    validateSubmitControllerCommandRequest({
+      taskId: "task-ctl-001",
+      claimToken: "token-001",
+      expectedTaskVersion: 2,
+      expectedPlanVersion: null,
+      idempotencyKey: "command-001",
+      command: {
+        type: "CREATE_PLAN",
+        reasonSummary: "Create the minimum executable plan.",
+        payload: {
+          nodes: [
+            {
+              nodeId: "node-01",
+              title: "Inspect current context",
+              kind: "DECISION",
+              requiredRole: "controller",
+            },
+          ],
+        },
+      },
+    }).ok,
+    true,
+  );
+  assert.equal(
+    validateReleaseControllerTaskRequest({
+      taskId: "task-ctl-001",
+      claimToken: "token-001",
+      idempotencyKey: "release-001",
+    }).ok,
+    true,
+  );
+});
+
+test("rejects caller-supplied Controller identity fields", () => {
+  const result = validateClaimControllerTaskRequest({
+    taskId: "task-ctl-001",
+    expectedTaskVersion: 1,
+    idempotencyKey: "claim-001",
+    profileId: "forged-profile",
+    roleId: "controller",
+  });
+  assert.equal(result.ok, false);
+  assert.equal(
+    result.issues.filter((item) => item.code === "SERVER_OWNED_FIELD").length,
+    2,
+  );
+});
+
+test("rejects Controller commands that patch plan runtime state", () => {
+  const result = validateSubmitControllerCommandRequest({
+    taskId: "task-ctl-001",
+    claimToken: "token-001",
+    expectedTaskVersion: 2,
+    expectedPlanVersion: null,
+    idempotencyKey: "command-001",
+    command: {
+      type: "CREATE_PLAN",
+      reasonSummary: "Invalid direct state patch.",
+      payload: {
+        nodes: [
+          {
+            nodeId: "node-01",
+            title: "Invalid node",
+            kind: "DECISION",
+            requiredRole: "controller",
+            status: "COMPLETED",
+          },
+        ],
+      },
+    },
+  });
+  assert.equal(result.ok, false);
+  assert.ok(result.issues.some((item) => item.code === "SERVER_OWNED_FIELD"));
+});
+
+
+
+test("rejects unknown Controller fields instead of silently ignoring them", () => {
+  const result = validateSubmitControllerCommandRequest({
+    taskId: "task-001",
+    claimToken: "claim-token",
+    expectedTaskVersion: 2,
+    expectedPlanVersion: null,
+    idempotencyKey: "idem-unknown",
+    command: {
+      type: "CREATE_PLAN",
+      reasonSummary: "Create a plan.",
+      unexpectedCommandField: true,
+      payload: {
+        nodes: [
+          {
+            nodeId: "node-001",
+            title: "Inspect context",
+            kind: "DECISION",
+            requiredRole: "controller",
+            unexpectedNodeField: "forbidden",
+          },
+        ],
+        unexpectedPayloadField: true,
+      },
+    },
+    unexpectedRequestField: true,
+  });
+
+  assert.equal(result.ok, false);
+  assert.ok(result.issues.some((entry) => entry.path === "unexpectedRequestField"));
+  assert.ok(result.issues.some((entry) => entry.path === "command.unexpectedCommandField"));
+  assert.ok(result.issues.some((entry) => entry.path === "command.payload.unexpectedPayloadField"));
+  assert.ok(result.issues.some((entry) => entry.path === "command.payload.nodes[0].unexpectedNodeField"));
 });

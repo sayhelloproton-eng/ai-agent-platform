@@ -102,3 +102,16 @@ Contract v1 只允许：
 - [SOL-006：Task / Result / Error Contract v1](../../docs/technical/技术方案/Gateway/SOL-006-Task-Result-Error-Contract-v1.md)
 - [源码说明](src/README.md)
 - [测试说明](tests/README.md)
+
+## Controller Contract v1
+
+`SOL-CTL-001` 在现有通用 Task Contract 之外新增窄化的 Controller Application Contract：
+
+- `TaskDecisionContext`；
+- `ControllerPlan` / `ControllerPlanNode`；
+- `ControllerClaimSummary`；
+- `ControllerCommand`；
+- 四个 Action Request / Result；
+- Controller 错误代码和运行时校验。
+
+Controller Request 明确拒绝调用方提交 `profileId`、`roleId`、Actor 和 Plan Node 运行状态。身份由 Gateway 认证绑定产生；Task、Plan、Claim 和 Event 的正式所有权仍属于 Task Control。

@@ -78,3 +78,35 @@ Runtime URL、Timeout 与最大并发可省略，默认分别为 `http://127.0.0
 - 并发保护不建立任务队列；
 - 公网开发入口由 `apps/dev-tunnel` 管理，不在 Gateway 内实现 Tunnel；
 - 无 Custom GPT OpenAPI Schema。
+
+## Controller MVP Action
+
+`SOL-CTL-001` 增加四个受保护的 Controller Adapter：
+
+```text
+POST /v1/controller/task-context
+POST /v1/controller/task-claim
+POST /v1/controller/task-command
+POST /v1/controller/task-release
+```
+
+Gateway 根据 Bearer Key 对应的服务端配置绑定：
+
+```text
+profile_id = ACTION_GATEWAY_CONTROLLER_PROFILE_ID
+role_id = controller
+project_scope = ai-agent-platform
+```
+
+模型不能提交或覆盖这些身份字段。当前 `controller-task-control.ts` 是仅用于总控 MVP 的内存 Fixture，验证：
+
+- 收到 `task_id` 后先查询 Decision Context；
+- 查询后才可领取可过期 Claim；
+- Controller Command 使用 Task / Plan 乐观版本；
+- Task、Plan、Node 和 Event 在同一命令语义中更新；
+- 重复命令不产生重复副作用；
+- Claim 过期后同角色 Profile 可以接管。
+
+Fixture 不等于正式 Task Center，不实现数据库、Reconciler、WorkItem、DispatchSignal 或 Browser Host。真实任务中心完成后通过同一 Application Port 替换。
+
+运行说明见 [`docs/controller-mvp-runbook.md`](docs/controller-mvp-runbook.md)。

@@ -20,6 +20,18 @@ capabilities:
   evidence:
   - apps/action-gateway/tests/gateway.test.mjs
   - apps/local-runtime/tests/runtime.test.mjs
+- id: CAP-CONTROLLER-MVP
+  status: partial
+  implemented_by:
+  - AGENT-PROFILE-CONTROLLER
+  - APP-GATEWAY
+  - PKG-CONTRACTS
+  evidence:
+  - agent-profiles/custom-gpts/ai-agent-platform-controller/profile.yaml
+  - packages/contracts/tests/contracts.test.mjs
+  - apps/action-gateway/tests/controller-task-control.test.mjs
+  - apps/action-gateway/tests/gateway.test.mjs
+  - apps/dev-tunnel/openapi/custom-gpt-action.openapi.template.yaml
 - id: CAP-TASK-CONTROL
   status: designing
   implemented_by: []

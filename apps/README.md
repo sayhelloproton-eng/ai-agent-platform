@@ -2,7 +2,7 @@
 
 `apps/` 保存可以独立启动的平台应用。当前应用：
 
-- `action-gateway`：公网 Action 入口与认证、Policy 边界；
+- `action-gateway`：公网 Action 入口与认证、Policy 边界；当前包含总控 MVP 的窄化 Controller Action 和内存 Task Control Fixture；
 - `local-runtime`：本机 Task 校验、Capability 调度和执行结果。
 - `dev-tunnel`：Microsoft Dev Tunnels 官方 CLI、本地进程编排、公网验证与 Custom GPT Action Schema。
 

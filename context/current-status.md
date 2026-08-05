@@ -10,19 +10,17 @@ Current HEAD:
   read from Git at runtime
 
 Current Phase:
-  Phase 2.5 — Homepage Convergence and Feishu Publication Preparation
+  Phase 2 — Core MVP Domain Implementation and Cross-domain Audit
 
-Feishu Publication:
-  not_started
+Phase-2 Feishu Policy:
+  frozen / Git-only
 ```
 
-当前工作继续在 `main` 完成。准确 SHA、远端一致性和 Worktree 状态必须从 Git 实时读取；历史 Commit 只承担追溯，不作为当前状态硬编码。
-
-视觉资产不使用独立分支。正文、PNG、SVG、语义镜像和 Visual Registry 以 Document Bundle 形式在同一分支、同一 Commit 管理。
+准确 SHA、远端一致性和 Worktree 状态必须从 Git 实时读取，不在 Context 中长期硬编码。第二阶段方案只进入 Git，不触发飞书 Mapping、Publisher、覆盖或 Readback。
 
 ## Verified Implementation
 
-### Runtime chain
+### Runtime narrow chain
 
 ```text
 Custom GPT
@@ -34,119 +32,95 @@ Custom GPT
 
 已验证：
 
-* Contracts、Auth、Policy；
-* 双层 API Key 和 Capability Policy；
-* Loopback、Rate、Concurrency、Timeout 和响应大小边界；
-* Custom GPT Builder Action；
-* 真实自然语言到本地 Runtime 的窄 Capability 调用。
+- Contracts、Auth、Policy；
+- 双层 API Key 和 Capability Policy；
+- Loopback、Rate、Concurrency、Timeout 和响应大小边界；
+- Custom GPT Builder Action；
+- 自然语言到本地 Runtime 的窄 Capability 调用。
 
-仍未实现：
+仍未验证：正式持久 Task Store、WorkItem / Dispatch 调和、Execution / Result 持久化、Browser Host 自动续跑、正式 Approval / Evidence、自动恢复、多任务和多执行器调度。
 
-* 动态 Task Store 与 Execution / Result 持久化；
-* Executor Adapter 与完整 Execution Lane；
-* Approval、Evidence 和 Side-effect Ledger；
-* 自动 Health Recovery；
-* 多角色、多任务和多执行器自动调度；
-* 完整 Agent Runtime。
-
-### Knowledge, Context and delivery governance
+### Knowledge and governance
 
 已经形成：
 
-* Git 唯一正式真源；
-* `context/**` 共享启动上下文及 Planner 所有权；
-* `docs/knowledge/**` 正式知识和 Feishu 唯一发布源；
-* Platform Registry、Relations 和 Visual Registry；
-* Document Bundle 与 Human-first、AI-lossless 语义镜像；
-* Planner–Executor Handoff 与冻结 Artifact 交付；
-* 六个活跃 Skill；
-* Git → Feishu 单向覆盖和本地图片 Publisher 规则。
+- Git 唯一正式真源；
+- `context/**` 共享启动上下文及 Planner 所有权；
+- `docs/knowledge/**` 正式知识和 Feishu 发布源；
+- `docs/technical/**` 技术方案与实验；
+- Platform Registry、Relations 和 Visual Registry；
+- Document Bundle 与 Human-first、AI-lossless 规则；
+- Planner–Executor Handoff 与冻结 Artifact；
+- 项目级 Skill 组合与校验脚本。
 
-正式知识当前为十个内容域：
+第二阶段文档不进入 `docs/knowledge/**`，也不改变当前 Feishu 投影状态。
 
-* `00_项目与产品`；
-* `02_基础产品与能力`；
-* `03_Agent工程架构思想与方法论`；
-* `04_平台架构`；
-* `05_上下文与知识系统`；
-* `06_智能体资产体系`；
-* `07_工作流与项目治理`；
-* `08_实验与复盘`；
-* `09_作品集`；
-* `10_术语与来源`。
+## Current Phase-2 Design Baseline
 
-原 `00_项目入口` 与 `01_产品体系` 已合并为 `00_项目与产品`。保留后续目录编号，避免为连续编号制造大规模无价值路径迁移。
-
-### Homepage and product convergence
-
-* `CTX-001` 保留 Stable ID，正文重建为《智能体工程探索录》；
-* `CTX-001` 已转换为资源型 Document Bundle，并拥有正式总揽图；
-* `VIS-011～VIS-014` 已依据冻结后的产品正文重生成；
-* Feishu 投影中，`CTX-001` 是独立根首页；
-* 其余 CTX、DEC、PRD 页面归入“项目与产品”，不重复发布根首页；
-* Git 目录归属和 Feishu 阅读层级由 Projection Policy 分开表达。
-
-### Agent asset boundary
-
-`06_智能体资产体系` 已形成 Role、Agent Profile、Skill、Knowledge Pack、Capability、Tool、Policy、Eval、Host Release 和 Catalog 的正式设计边界。
-
-当前仍未物化：
-
-* 正式 `agents/**`；
-* Agent Profile Schema；
-* 正式 `knowledge-packs/**`；
-* Agent Eval Dataset；
-* Host Release Publisher；
-* released 专业 Agent。
-
-因此只能表述为“智能体资产模型已经形成并被接受”，不能表述为“完整智能体运行能力已经验证”。
-
-## Current Closure State
-
-当前路径：
+核心四个 MVP：
 
 ```text
-Project Knowledge Synthesis
-→ Engineering Document Authoring
-→ Text Freeze
-→ Formal Visual Generation
-→ Frozen Artifact Delivery
-→ Git Closure
-→ Feishu Reset and Pilot
-→ Full Projection and Readback
+SOL-CTL-001 Controller Agent and Dynamic Context
+→ SOL-LCL-001 Local Control / CLI
+→ SOL-TSK-001 Task Control and Single-task Scheduling
+→ SOL-BHR-001 Browser Host Runtime
+→ End-to-end single-task validation
 ```
 
-本轮冻结包完成：
+可选后置扩展：
 
-* `00_项目入口` 与 `01_产品体系` 的 Canonical 合并；
-* `CTX-001《智能体工程探索录》` 的完整重写；
-* 总揽架构图与产品体系四张图的正式更新；
-* Registry、Relations、Visual Manifest、Navigation 和 Projection Policy 同步；
-* Context 与当前目录事实同步。
+```text
+SOL-MOB-001 Mobile Single-model Multi-role Inference Provider
+```
 
-Feishu 尚未发布：
+手机模型不构成核心四项的完成门槛。页面感知和结构化推理先由 DeepSeek Provider 或测试 Fixture 承担；手机 Provider 以后使用同一合同接入。
 
-* Projection Mapping 尚未建立；
-* 所有资产仍保持 `unpublished`；
-* 不存在已验证页面树、页面节点和 Readback；
-* 本轮冻结包不执行 Feishu 写入。
+### Cross-domain decisions frozen at design level
+
+- Custom GPT 配置按 Shared → Role → Profile → Release 分级维护；不使用根级 `agents/`，候选目录为 `agent-profiles/`；
+- 总控收到 `task_id` 后先查询 Controller Decision Context，再领取 Controller Claim；
+- Task 长期归属于 `required_role`，具体 Profile 只持有短期 Claim；
+- Task Aggregate 在 MVP 中内嵌版本化结构化 Plan；
+- 任务推进通过业务命令原子更新 Task、Plan / Node、Event 和必要下游引用；
+- 同步 `local.*` 查询不强制创建 Work Item；异步、长时、可交接或副作用工作才进入 Work Item；
+- Controller Claim、Work Item Claim 和 Browser Dispatch Claim 分离；
+- BHR 不修改 Task，不从聊天正文提取正式 Controller Command；
+- DeepSeek / 手机模型属于可替换 Model Inference Provider，不拥有 Task、Approval 或 Browser Action 权限。
+
+设计合同已经完成跨领域审计。`SOL-CTL-001` 当前形成以下代码候选：
+
+- `agent-profiles/**` 四级总控 Profile 配置；
+- `packages/contracts` 中的 Decision Context、Plan、Claim、Controller Command 与校验；
+- `action-gateway` 中四个窄化 Controller Action；
+- 明确标注为 Fixture 的内存 Task Control Port；
+- 先查后领、服务端身份、乐观版本、幂等、原子 Task / Plan / Event 更新和同角色接管测试；
+- Builder-compatible OpenAPI 候选。
+
+本地代码测试已通过，但真实 Git 应用、Node 20 全量门禁、Custom GPT Builder 配置和 Preview 实调仍待 Executor 完成，因此状态为 **partial implementation**，不得表述为线上总控已验证。
+
+## Current Work
+
+1. 将总控实现 Overlay 应用到真实 `main`；
+2. 使用 Node 20 执行 Controller、Contracts、Gateway、Dev Tunnel 和全仓验证；
+3. 人工把 `agent-profiles` 配置投影到 Controller Custom GPT；
+4. 在 Builder Preview 真实执行 Context → Claim → Command；
+5. 将通过后的公共合同交给 LCL、TSK、BHR 各自实现并接受总控审计。
 
 ## Next Actions
 
-1. 本地 Codex 按冻结 Artifact 在 `main` 机械应用、验证、Commit、Push 和远端回读；
-2. 总控 Chat 基于固定 Commit 复审文档、图片和 Projection 规则；
-3. 保留飞书知识空间与现有根页面，导出旧树并删除全部旧子页面；
-4. 用 `CTX-001` 覆盖根首页，并试发布“平台架构 / ARC-001”带图页面；
-5. 用户人工确认标题、层级、正文、图片和链接；
-6. 确认后全量覆盖正式页面和图片；
-7. 执行 Readback Verification，并以独立 Commit 记录 publication status；
-8. 发布闭环后进入最小可信 Agent 纵向切片。
+1. Executor 机械应用总控实现 Overlay；
+2. 单 Commit、普通 Push、远端回读；
+3. 完成 Builder Parse 和 authenticated Preview；
+4. 把总控 Mock Task Control 替换点冻结为 TSK Application Port；
+5. 按领域分别实施 LCL、TSK、BHR；
+6. 四项完成后执行最终单任务串联；
+7. 第二阶段实现成熟后再独立评估 Feishu 发布。
 
 ## Non-claims
 
-* Host 产品已有的 MCP、Memory、Projects 或视觉能力，不等于平台已实现对应 Runtime；
-* Canonical 文档和正式图片完成不等于代码能力完成；
-* Agent Asset 模型完成不等于已存在 released Agent；
-* Skill 物化不等于完整业务能力生产化；
-* Feishu Projection Policy 存在不等于已经完成发布；
-* 未经真实代码、测试、调用或回读支持的能力不得标记为 verified。
+- 总控代码 Fixture 完成不等于正式 Task Center 或线上 Custom GPT 已实现；
+- DeepSeek 被选为临时 Provider 不等于端侧模型已经验证；
+- 手机模型构想不等于手机 App、模型服务或训练闭环已完成；
+- Agent Profile 已物化为 Git 候选，但 Builder Preview 完成前不等于 released Agent；
+- Task / Plan Schema 设计不等于持久 Task Store 已实现；
+- 未经真实代码、测试、调用或回读支持的能力不得标记为 verified。

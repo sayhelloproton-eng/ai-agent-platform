@@ -1,0 +1,10 @@
+role_id: controller
+operations:
+  - operation_id: getTaskDecisionContext
+    intent: 查询最新 Task、Plan、Event、Result、约束和允许命令
+  - operation_id: claimControllerTask
+    intent: 在查询最新上下文后领取短期 Controller Claim
+  - operation_id: submitControllerCommand
+    intent: 提交受约束业务命令并原子推进 Task、Plan 和 Event
+  - operation_id: releaseControllerTask
+    intent: 主动释放当前 Controller Claim

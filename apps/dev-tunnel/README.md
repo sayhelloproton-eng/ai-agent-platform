@@ -1,6 +1,6 @@
 # Microsoft Dev Tunnels 应用
 
-本目录是 Microsoft Dev Tunnels MVP 的可执行真源，负责官方 CLI 安装、持久 Tunnel 配置、本地 Runtime/Gateway/Tunnel Host 编排、验证和 Custom GPT OpenAPI 生成。
+本目录是 Microsoft Dev Tunnels MVP 的可执行真源，负责官方 CLI 安装、持久 Tunnel 配置、本地 Runtime/Gateway/Tunnel Host 编排、验证和 Custom GPT Controller / Runtime Action OpenAPI 生成。
 
 安全边界：
 

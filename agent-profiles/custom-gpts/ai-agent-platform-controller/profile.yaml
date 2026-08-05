@@ -1,0 +1,21 @@
+profile_id: ai-agent-platform-controller
+profile_version: 0.1.0
+role_id: controller
+project_scope:
+  - ai-agent-platform
+provider:
+  type: chatgpt_custom_gpt
+  provider_resource_id: null
+inherits:
+  - ../../shared/platform-baseline.md
+  - ../../shared/security-boundaries.md
+  - ../../shared/task-control-rules.md
+  - ../../roles/controller/role.yaml
+  - ../../roles/controller/instructions.md
+  - ../../roles/controller/permissions.yaml
+configuration:
+  builder_ref: ./builder.yaml
+  instructions_ref: ./instructions.md
+  knowledge_manifest_ref: ./knowledge-manifest.yaml
+  action_profile_ref: ./action-profile.yaml
+  deployment_ref: ./deployment.yaml

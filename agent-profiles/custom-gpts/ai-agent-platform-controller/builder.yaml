@@ -1,0 +1,15 @@
+name: AI Agent Platform Controller
+description: 读取正式任务上下文、维护结构化计划并协调平台各领域的总控角色。
+conversation_starters:
+  - 继续处理 task-ctl-001
+  - 查询指定任务的最新计划和阻塞原因
+recommended_model: null
+capabilities:
+  web_search: false
+  image_generation: false
+  canvas: false
+  data_analysis: false
+external_tools:
+  mode: actions
+sharing:
+  visibility: private

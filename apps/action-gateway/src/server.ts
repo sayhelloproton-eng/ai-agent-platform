@@ -7,12 +7,14 @@ import {
   DEFAULT_GATEWAY_MAX_CONCURRENT_TASKS,
 } from "./app.js";
 import { createConcurrencyGate } from "./concurrency.js";
+import { createInMemoryControllerTaskControl } from "./controller-task-control.js";
 import { createHttpRuntimeClient } from "./runtime-client.js";
 
 const DEFAULT_HOST = "127.0.0.1";
 const DEFAULT_PORT = 8787;
 const DEFAULT_RUNTIME_URL = "http://127.0.0.1:8790";
 const DEFAULT_RUNTIME_TIMEOUT_MS = 3_000;
+const DEFAULT_CONTROLLER_PROFILE_ID = "ai-agent-platform-controller";
 const LOOPBACK_HOSTS = new Set(["127.0.0.1", "localhost", "::1"]);
 export const GATEWAY_HEADERS_TIMEOUT_MS = 10_000;
 export const GATEWAY_REQUEST_TIMEOUT_MS = 20_000;
@@ -90,6 +92,17 @@ function resolveMaximumConcurrency(input: string | undefined): number {
   return limit;
 }
 
+
+function resolveControllerProfileId(input: string | undefined): string {
+  const value = input ?? DEFAULT_CONTROLLER_PROFILE_ID;
+  if (!/^[a-z0-9][a-z0-9._-]{2,127}$/u.test(value)) {
+    throw new Error(
+      "Controller profile ID must use lowercase letters, digits, dot, underscore, or hyphen.",
+    );
+  }
+  return value;
+}
+
 export interface ActionGatewayConfiguration {
   readonly host: string;
   readonly port: number;
@@ -98,6 +111,7 @@ export interface ActionGatewayConfiguration {
   readonly runtimeApiKey: string;
   readonly runtimeTimeoutMs: number;
   readonly maxConcurrentTasks: number;
+  readonly controllerProfileId: string;
 }
 
 export function resolveActionGatewayConfiguration(
@@ -117,6 +131,9 @@ export function resolveActionGatewayConfiguration(
     ),
     maxConcurrentTasks: resolveMaximumConcurrency(
       environment.ACTION_GATEWAY_MAX_CONCURRENT_TASKS,
+    ),
+    controllerProfileId: resolveControllerProfileId(
+      environment.ACTION_GATEWAY_CONTROLLER_PROFILE_ID,
     ),
   };
 }
@@ -145,6 +162,12 @@ function startActionGateway(): void {
         concurrencyGate: createConcurrencyGate(
           configuration.maxConcurrentTasks,
         ),
+        controllerTaskControl: createInMemoryControllerTaskControl(),
+        controllerIdentity: {
+          profileId: configuration.controllerProfileId,
+          roleId: "controller",
+          projectIds: ["ai-agent-platform"],
+        },
       }),
     );
 

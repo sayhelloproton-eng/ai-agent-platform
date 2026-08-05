@@ -10,7 +10,7 @@
 
 ## Contains
 
-- `contracts/`：Task、Result、Error、Capability 与运行时校验的公共协议包。
+- `contracts/`：Task、Result、Error、Capability、Controller Context / Claim / Command 与运行时校验的公共协议包。
 - `auth/`：Bearer 解析、API Key 校验、安全比较和 Header 脱敏的基础认证包。
 - `policy/`：Capability 级允许与拒绝决策包。
 

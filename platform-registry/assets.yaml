@@ -2016,7 +2016,7 @@ assets:
   publication_status: unpublished
   migration_state: complete
 - asset_id: ADR-004
-  title: 第二阶段四个 MVP 验证与串联
+  title: 第二阶段核心四个 MVP 验证与可选端侧推理扩展
   asset_type: adr
   status: accepted
   evidence_level: decided
@@ -2029,8 +2029,8 @@ assets:
 - asset_id: SOL-CTL-001
   title: 总控 Agent 与动态上下文 MVP
   asset_type: solution
-  status: candidate
-  evidence_level: hypothesis
+  status: partial
+  evidence_level: observed
   materialized: true
   current_path: docs/technical/技术方案/第二阶段/SOL-CTL-001-总控Agent与动态上下文MVP.md
   target_path:
@@ -2068,5 +2068,27 @@ assets:
   current_path: docs/technical/技术方案/第二阶段/SOL-BHR-001-ChatGPT-Browser-Host-Runtime扩展MVP.md
   target_path:
   canonical_path: docs/technical/技术方案/第二阶段/SOL-BHR-001-ChatGPT-Browser-Host-Runtime扩展MVP.md
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: SOL-MOB-001
+  title: 手机端单模型多角色服务 MVP
+  asset_type: solution
+  status: candidate
+  evidence_level: hypothesis
+  materialized: true
+  current_path: docs/technical/技术方案/第二阶段/SOL-MOB-001-手机端单模型多角色服务MVP.md
+  target_path:
+  canonical_path: docs/technical/技术方案/第二阶段/SOL-MOB-001-手机端单模型多角色服务MVP.md
+  publication_status: unpublished
+  migration_state: complete
+- asset_id: AGENT-PROFILE-CONTROLLER
+  title: AI Agent Platform Controller Profile
+  asset_type: agent-profile
+  status: partial
+  evidence_level: observed
+  materialized: true
+  current_path: agent-profiles/custom-gpts/ai-agent-platform-controller/
+  target_path:
+  canonical_path: agent-profiles/custom-gpts/ai-agent-platform-controller/
   publication_status: unpublished
   migration_state: complete

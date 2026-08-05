@@ -1384,3 +1384,27 @@ relations:
 - from: SOL-BHR-001
   type: depends_on
   to: SOL-TSK-001
+- from: SOL-MOB-001
+  type: decided_by
+  to: ADR-004
+- from: SOL-MOB-001
+  type: depends_on
+  to: SOL-BHR-001
+- from: AGENT-PROFILE-CONTROLLER
+  type: configured_by
+  to: SOL-CTL-001
+- from: AGENT-PROFILE-CONTROLLER
+  type: governed_by
+  to: ADR-004
+- from: AGENT-PROFILE-CONTROLLER
+  type: depends_on
+  to: APP-GATEWAY
+- from: AGENT-PROFILE-CONTROLLER
+  type: depends_on
+  to: PKG-CONTRACTS
+- from: APP-GATEWAY
+  type: implements
+  to: SOL-CTL-001
+- from: PKG-CONTRACTS
+  type: implements
+  to: SOL-CTL-001

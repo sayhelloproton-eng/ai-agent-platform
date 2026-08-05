@@ -10,162 +10,126 @@ Current HEAD:
   read from Git at runtime
 
 Current Phase:
-  Phase 2.5 — Homepage Convergence and Feishu Publication Preparation
+  Phase 2 — Core MVP Domain Implementation and Cross-domain Audit
 
 Current Work:
-  Apply frozen project/product convergence and prepare Feishu reset, pilot and full projection
+  Apply and verify the Controller MVP implementation;
+  keep Local Control, Task Control and Browser Host in separate domain iterations.
 ```
 
-正式知识已完成内容 Review。原 `00_项目入口` 与 `01_产品体系` 已通过 Project Knowledge Synthesis 收敛为 `00_项目与产品`；当前不再继续扩写章节，而是应用冻结正文和图片、形成 Git 基线并完成 Feishu 投影闭环。
-
-准确 Commit、远端状态和仓库洁净度必须从 Git 实时读取，不在 Roadmap 中长期硬编码。
-
----
+第二阶段技术方案为 Git-only。Feishu 对这些方案保持冻结，直到实现与串联证据稳定后再独立评估。
 
 ## Phase 1 — Knowledge Foundation
 
-状态：**Completed**
+状态：**Completed at foundation level**
 
-已经形成：
+已形成 Git 真源、Context、正式知识、Registry、Document Bundle、视觉资产规则、Skill、Planner–Executor Handoff 和 Feishu 单向覆盖治理。正式投影状态必须以独立发布记录和 Readback 为准，不从方案文档推断。
 
-* Git 唯一真源；
-* Context 治理；
-* 正式知识与技术资料边界；
-* Platform Registry 和 Engineering Insight Registry；
-* Document Bundle；
-* Human-first、AI-lossless 视觉资产；
-* Git → Feishu 单向覆盖原则；
-* 本地图片上传和语义镜像规则；
-* 六个活跃 Skill；
-* Planner–Executor 冻结 Artifact 交付。
+## Phase 2 — Core Agent Platform MVPs
 
-Feishu 实际全量投影尚未执行。
+状态：**Controller Partial Implementation / Other Domains Pending**
 
----
-
-## Phase 2 — AI Coding Workflow
-
-状态：**MVP Verified / Platform Incomplete**
-
-已经验证：
+### Required core sequence
 
 ```text
-Custom GPT
-→ Dev Tunnels
-→ Action Gateway
-→ Local Runtime
-→ gateway.ping / runtime.status
+MVP-1 Controller Agent and Dynamic Context
+→ MVP-2 Local Control / CLI
+→ MVP-3 Task Control and Single-task Scheduling
+→ MVP-4 Browser Host Runtime
+→ Integrated single-task validation
 ```
 
-已有 Contracts、Auth、Policy、Gateway、Runtime、开发期 Tunnel、Custom GPT Action 和人工 Planner–Executor Git 闭环。
+当前里程碑：
 
-尚未实现：动态 Task Store、持久 Execution / Result、Approval、Evidence、Side-effect Ledger、自动 Recovery、多角色 Runtime、多任务 Lane 和多执行器 Routing。
+- Controller Git Profile、Contracts、Action Adapter 和 Task Control Fixture 已形成实现候选；
+- 本地测试覆盖 Context、Claim、Command、Plan 和 Event；
+- 正式 Builder Preview 与 Node 20 仓库验证待完成；
+- LCL、TSK、BHR 由各领域独立实现，总控负责合同审计。
 
----
+核心目标：
 
-## Phase 2.5 — Knowledge and Feishu Closure
+- Custom GPT 总控可在新会话按 `task_id` 恢复；
+- Task 包含结构化 Plan，总控先查后领并提交业务命令；
+- Local Control 通过唯一 Gateway 和安全 CLI 返回真实本机事实；
+- Task Control 持久化 Task / Plan / Claims / Event / Dispatch；
+- Browser Host 在真实 ChatGPT 页面观察、唤醒和执行授权动作；
+- 失败、冲突、不确定和暂停到达明确状态。
 
-状态：**Homepage and Visuals Frozen / Publication Pending**
-
-### 当前正式内容范围
-
-* `docs/knowledge/00_项目与产品/**`；
-* `docs/knowledge/02_基础产品与能力/**`；
-* `docs/knowledge/03_Agent工程架构思想与方法论/**`；
-* `docs/knowledge/04_平台架构/**`；
-* `docs/knowledge/05_上下文与知识系统/**`；
-* `docs/knowledge/06_智能体资产体系/**`；
-* `docs/knowledge/07_工作流与项目治理/**`；
-* `docs/knowledge/08_实验与复盘/**`；
-* `docs/knowledge/09_作品集/**`；
-* `docs/knowledge/10_术语与来源/**`。
-
-### 本轮冻结内容
-
-1. 合并原 `00_项目入口` 与 `01_产品体系`；
-2. 重建 `CTX-001《智能体工程探索录》`；
-3. 将 `CTX-001` 设为 Feishu 独立根首页来源；
-4. 将其余 CTX、DEC、PRD 页面归入飞书“项目与产品”；
-5. 新增务实总揽架构图；
-6. 重生成 `VIS-011～VIS-014`；
-7. 同步 Registry、Relations、Visual Manifest、Context、Navigation 和 Projection Policy；
-8. 通过 Planner–Executor Handoff 交付冻结 ZIP。
-
-### Git Closure 门槛
-
-* 固定 Base Commit；
-* Worktree、Index、Untracked 干净；
-* 只应用 Manifest 声明的 Overlay / Delete；
-* 每个结果文件与冻结文件逐字节一致；
-* `git diff --check`、Registry、Visual、Document Bundle 和 `npm run verify` 通过；
-* 单 Commit、普通 Push、本地远端 SHA 一致。
-
-### Feishu Closure 顺序
+### Optional extension
 
 ```text
-导出现有节点树
-→ 保留 Space 和根页面
-→ 删除全部旧子页面
-→ 覆盖 CTX-001 根首页
-→ 创建平台架构栏目并试发布 ARC-001
-→ 用户人工确认
-→ 全量覆盖和图片上传
-→ Readback Verification
-→ publication status 独立落库
+MVP-5 Optional — Mobile Single-model Multi-role Inference Provider
 ```
 
-Pilot 和全量发布必须分阶段；Pilot 未经用户确认不得自动继续。
+规则：
 
----
+- 不阻塞核心四项；
+- DeepSeek 先承担页面初判和结果解释；
+- 手机实现同一 Model Inference Contract；
+- 先影子评测，再决定低风险灰度；
+- 未达标或离线时继续使用 DeepSeek。
 
-## Phase 3 — Minimal Trusted Agent Slice
+### Phase-2 exit gate
 
-状态：**Next after Publication Closure**
-
-推荐纵向切片：
+核心四项分别验收并跑通：
 
 ```text
-Minimal Agent Profile
-→ Task Contract 引用稳定 Agent / Role ID
-→ Gateway / Runtime 解析
-→ Scope / Policy
-→ Evidence
-→ 人工 Approval
-→ Result / Checkpoint
+Task with Plan
+→ Controller Decision Context
+→ Controller Claim
+→ Local Result
+→ Controller Command
+→ Atomic Task / Plan / Event update
+→ Work Item or Browser Dispatch
+→ Result report
+→ Controller wake and continuation
 ```
 
-在真实消费者出现前，不批量创建 Agent Profile、Knowledge Pack 或空目录。
+手机 MVP 不属于该 Gate。
 
----
+## Phase 3 — Trusted Execution and Governance
 
-## Phase 4 — Product Workflow
+状态：**Planned after core Phase 2**
+
+在真实核心闭环之后扩展：
+
+- 正式 Approval / Evidence / Side-effect Ledger；
+- Safe Continuation 与 Recovery；
+- Executor Adapter 与 Execution Attempt；
+- 多角色 Handoff；
+- Agent Profile / Knowledge Pack Publisher；
+- 管理后台读写模型。
+
+## Phase 4 — Multi-task and Multi-executor
+
+状态：**Deferred**
+
+- Task 依赖和 DAG；
+- 多任务 Lane；
+- Worktree / Workspace 隔离；
+- 资源锁与冲突检测；
+- 多执行器 Capability Routing；
+- 生产消息与恢复治理。
+
+## Phase 5 — Product Workflow
 
 状态：**Planned**
 
-完成可信任务闭环后，再推进 AI 视频工作流的 Story → JSON 最小切片。不得提前把仓库改造成根级多产品总仓。
+完成可信任务闭环后，再推进 AI 视频工作流等真实产品。不得提前把仓库改成根级多产品总仓。
 
----
+## Phase 6 — Portfolio Release
 
-## Phase 5 — Portfolio Release
+状态：**In preparation**
 
-状态：**In Preparation**
-
-作品集必须连接真实代码、自动测试、调用证据、实验、架构决策、Registry、固定 Commit、Feishu Readback 和当前限制。
-
-对外表述统一使用：已实现并测试、真实链路已验证、正式设计已接受、计划中、历史归档。
-
----
+作品集只引用真实代码、测试、调用证据、评估、ADR、Registry、固定 Commit 和当前限制。
 
 ## Deferred
 
-* 批量 Agent Profile；
-* 正式 `agents/**`；
-* 正式 `knowledge-packs/**`；
-* Agent Profile / Knowledge Pack Publisher；
-* Agent Eval Release；
-* 外部 Knowledge Service / RAG；
-* 自动 Memory 晋升；
-* 完整多执行器调度；
-* 生产级公网入口；
-* 通用 Agent SaaS；
-* 根级 `products/`。
+- 根级 `agents/`；
+- 批量 Agent Profile；
+- 正式 `knowledge-packs/**`；
+- 完整 RAG / Memory 晋升；
+- 通用 Agent SaaS；
+- 根级 `products/`；
+- 手机模型生产级接管；
+- 无人监督任意网页自动化。

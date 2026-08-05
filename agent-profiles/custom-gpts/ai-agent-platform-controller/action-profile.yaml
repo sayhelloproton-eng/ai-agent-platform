@@ -1,0 +1,13 @@
+profile_id: ai-agent-platform-controller
+authentication:
+  mode: bearer
+  secret_location: builder_only
+openapi_template: ../../../apps/dev-tunnel/openapi/custom-gpt-action.openapi.template.yaml
+operations:
+  - getTaskDecisionContext
+  - claimControllerTask
+  - submitControllerCommand
+  - releaseControllerTask
+security:
+  identity_source: gateway_binding
+  model_supplied_identity: forbidden

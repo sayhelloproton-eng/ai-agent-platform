@@ -1,0 +1,15 @@
+role_id: controller
+allow:
+  - task.decision_context.read
+  - task.controller_claim.acquire
+  - task.controller_claim.release
+  - task.controller_command.submit
+  - local.fact.read
+  - approval.request
+forbid:
+  - database.raw_write
+  - task.field_patch
+  - shell.raw_execute
+  - browser.raw_script
+  - secret.read
+  - approval.grant

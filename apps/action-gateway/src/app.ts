@@ -3,6 +3,10 @@ import {
 } from "@ai-agent-platform/auth";
 import {
   CONTRACT_VERSION,
+  validateClaimControllerTaskRequest,
+  validateGetTaskDecisionContextRequest,
+  validateReleaseControllerTaskRequest,
+  validateSubmitControllerCommandRequest,
   validateTaskRequest,
   type TaskRequest,
   type TaskResult,
@@ -29,6 +33,11 @@ import {
   type ConcurrencyGate,
 } from "./concurrency.js";
 import {
+  ControllerTaskControlError,
+  type ControllerIdentity,
+  type ControllerTaskControl,
+} from "./controller-task-control.js";
+import {
   createFixedWindowRateLimiter,
   type RateLimiter,
 } from "./rate-limit.js";
@@ -44,8 +53,25 @@ const PUBLIC_ROUTES = new Set(["/health", "/ready"]);
 const CAPABILITIES_ROUTE = "/v1/capabilities";
 const TASKS_ROUTE = "/v1/tasks";
 const RUNTIME_STATUS_ROUTE = "/v1/runtime/status";
+const CONTROLLER_CONTEXT_ROUTE = "/v1/controller/task-context";
+const CONTROLLER_CLAIM_ROUTE = "/v1/controller/task-claim";
+const CONTROLLER_COMMAND_ROUTE = "/v1/controller/task-command";
+const CONTROLLER_RELEASE_ROUTE = "/v1/controller/task-release";
+const CONTROLLER_ROUTES = new Set([
+  CONTROLLER_CONTEXT_ROUTE,
+  CONTROLLER_CLAIM_ROUTE,
+  CONTROLLER_COMMAND_ROUTE,
+  CONTROLLER_RELEASE_ROUTE,
+]);
+const PROTECTED_ROUTES = new Set([
+  CAPABILITIES_ROUTE,
+  TASKS_ROUTE,
+  RUNTIME_STATUS_ROUTE,
+  ...CONTROLLER_ROUTES,
+]);
 const MAX_BODY_BYTES = 65_536;
 const TASK_RATE_LIMIT_KEY = "authenticated:/v1/tasks";
+const CONTROLLER_RATE_LIMIT_KEY = "authenticated:/v1/controller";
 const CAPABILITIES_RATE_LIMIT_KEY = "authenticated:/v1/capabilities";
 export const DEFAULT_TASK_RATE_LIMIT = 30;
 export const DEFAULT_CAPABILITIES_RATE_LIMIT = 60;
@@ -63,6 +89,8 @@ export interface GatewayOptions {
   readonly taskRateLimiter?: RateLimiter;
   readonly capabilitiesRateLimiter?: RateLimiter;
   readonly concurrencyGate?: ConcurrencyGate;
+  readonly controllerTaskControl?: ControllerTaskControl;
+  readonly controllerIdentity?: ControllerIdentity;
   readonly auditLog?: (entry: string) => void;
 }
 
@@ -309,12 +337,7 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
         "http://action-gateway.local",
       ).pathname;
 
-      if (
-        !PUBLIC_ROUTES.has(pathname) &&
-        pathname !== CAPABILITIES_ROUTE &&
-        pathname !== TASKS_ROUTE &&
-        pathname !== RUNTIME_STATUS_ROUTE
-      ) {
+      if (!PUBLIC_ROUTES.has(pathname) && !PROTECTED_ROUTES.has(pathname)) {
         discardUnreadRequestBody(request);
         writeError(
           response,
@@ -326,11 +349,7 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
         return;
       }
 
-      if (
-        pathname === CAPABILITIES_ROUTE ||
-        pathname === TASKS_ROUTE ||
-        pathname === RUNTIME_STATUS_ROUTE
-      ) {
+      if (PROTECTED_ROUTES.has(pathname)) {
         const verification = verifyBearerAuthorization(
           request.headers.authorization,
           options.apiKey,
@@ -351,7 +370,9 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
       }
 
       const allowedMethod =
-        pathname === TASKS_ROUTE || pathname === RUNTIME_STATUS_ROUTE
+        pathname === TASKS_ROUTE ||
+        pathname === RUNTIME_STATUS_ROUTE ||
+        CONTROLLER_ROUTES.has(pathname)
           ? "POST"
           : "GET";
       if (request.method !== allowedMethod) {
@@ -367,15 +388,13 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
         return;
       }
 
-      if (
-        pathname === TASKS_ROUTE ||
-        pathname === RUNTIME_STATUS_ROUTE ||
-        pathname === CAPABILITIES_ROUTE
-      ) {
+      if (PROTECTED_ROUTES.has(pathname)) {
         const rateLimitDecision =
-          pathname === TASKS_ROUTE || pathname === RUNTIME_STATUS_ROUTE
-            ? taskRateLimiter.consume(TASK_RATE_LIMIT_KEY)
-            : capabilitiesRateLimiter.consume(CAPABILITIES_RATE_LIMIT_KEY);
+          pathname === CAPABILITIES_ROUTE
+            ? capabilitiesRateLimiter.consume(CAPABILITIES_RATE_LIMIT_KEY)
+            : CONTROLLER_ROUTES.has(pathname)
+              ? taskRateLimiter.consume(CONTROLLER_RATE_LIMIT_KEY)
+              : taskRateLimiter.consume(TASK_RATE_LIMIT_KEY);
 
         if (!rateLimitDecision.allowed) {
           discardUnreadRequestBody(request);
@@ -391,6 +410,132 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
           );
           return;
         }
+      }
+
+      if (CONTROLLER_ROUTES.has(pathname)) {
+        if (!hasJsonContentType(request)) {
+          discardUnreadRequestBody(request);
+          writeError(
+            response,
+            415,
+            requestId,
+            "UNSUPPORTED_MEDIA_TYPE",
+            "Content-Type must be application/json.",
+          );
+          return;
+        }
+
+        if (contentLengthExceedsLimit(request)) {
+          discardUnreadRequestBody(request);
+          writeError(
+            response,
+            413,
+            requestId,
+            "PAYLOAD_TOO_LARGE",
+            "Request body is too large.",
+          );
+          return;
+        }
+
+        const bodyResult = await readRequestBody(request);
+        if (bodyResult.tooLarge) {
+          writeError(
+            response,
+            413,
+            requestId,
+            "PAYLOAD_TOO_LARGE",
+            "Request body is too large.",
+          );
+          return;
+        }
+
+        let parsedBody: unknown;
+        try {
+          parsedBody = JSON.parse(bodyResult.body ?? "");
+        } catch {
+          writeError(
+            response,
+            400,
+            requestId,
+            "CONTROLLER_INVALID_REQUEST",
+            "Controller request is invalid.",
+          );
+          return;
+        }
+
+        const taskControl = options.controllerTaskControl;
+        const identity = options.controllerIdentity;
+        if (taskControl === undefined || identity === undefined) {
+          writeError(
+            response,
+            503,
+            requestId,
+            "CONTROLLER_UNAVAILABLE",
+            "Controller Task Control fixture is unavailable.",
+          );
+          return;
+        }
+
+        try {
+          let result: unknown;
+          if (pathname === CONTROLLER_CONTEXT_ROUTE) {
+            const validation = validateGetTaskDecisionContextRequest(parsedBody);
+            if (!validation.ok) {
+              writeError(response, 400, requestId, "CONTROLLER_INVALID_REQUEST", "Controller request is invalid.");
+              return;
+            }
+            result = taskControl.getDecisionContext(validation.value, identity);
+          } else if (pathname === CONTROLLER_CLAIM_ROUTE) {
+            const validation = validateClaimControllerTaskRequest(parsedBody);
+            if (!validation.ok) {
+              writeError(response, 400, requestId, "CONTROLLER_INVALID_REQUEST", "Controller request is invalid.");
+              return;
+            }
+            result = taskControl.claimTask(validation.value, identity);
+          } else if (pathname === CONTROLLER_COMMAND_ROUTE) {
+            const validation = validateSubmitControllerCommandRequest(parsedBody);
+            if (!validation.ok) {
+              writeError(response, 400, requestId, "CONTROLLER_INVALID_REQUEST", "Controller request is invalid.");
+              return;
+            }
+            result = taskControl.submitCommand(validation.value, identity);
+          } else {
+            const validation = validateReleaseControllerTaskRequest(parsedBody);
+            if (!validation.ok) {
+              writeError(response, 400, requestId, "CONTROLLER_INVALID_REQUEST", "Controller request is invalid.");
+              return;
+            }
+            result = taskControl.releaseTask(validation.value, identity);
+          }
+          options.auditLog?.(
+            JSON.stringify({
+              event: "gateway.controller.accepted",
+              route: pathname,
+              taskId:
+                typeof parsedBody === "object" &&
+                parsedBody !== null &&
+                "taskId" in parsedBody &&
+                typeof parsedBody.taskId === "string"
+                  ? parsedBody.taskId
+                  : "[unknown]",
+              profileId: identity.profileId,
+            }),
+          );
+          writeSuccess(response, 200, requestId, result);
+        } catch (error: unknown) {
+          if (error instanceof ControllerTaskControlError) {
+            writeError(
+              response,
+              error.httpStatus,
+              requestId,
+              error.code,
+              error.message,
+            );
+            return;
+          }
+          throw error;
+        }
+        return;
       }
 
       if (pathname === TASKS_ROUTE) {

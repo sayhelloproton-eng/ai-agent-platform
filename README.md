@@ -42,6 +42,7 @@ Custom GPT
 
 已经具备：
 
+- `SOL-CTL-001` 总控代码 MVP：版本化 Agent Profile、Decision Context、先查后领 Controller Claim、受约束 Controller Command 和 Task / Plan / Event 内存 Fixture；
 - npm workspaces 工程基线；
 - `contracts`、`auth`、`policy` 三个共享包；
 - `action-gateway`、`local-runtime`、`dev-tunnel` 三个应用；
@@ -78,16 +79,20 @@ Custom GPT
 当前处于：
 
 ```text
-Phase 2.5 — Homepage Convergence and Feishu Publication Preparation
+Phase 2 — 四个核心 MVP 分领域实现与跨领域审计
 ```
 
-正式知识与视觉资产已在 `main` 完成应用并形成 Git 基线；原 `00_项目入口` 与 `01_产品体系` 已收敛为 `00_项目与产品`，`CTX-001《智能体工程探索录》` 成为总览正文和 Feishu 根首页来源。当前工作进入 Feishu 清空、Pilot 和全量覆盖前的复审与准备。
+第二阶段方案已收敛为 Controller、Local Control、Task Control 和 Browser Host 四个核心 MVP；手机模型是后置可选 Provider。当前总控 MVP 已形成代码候选和本地 HTTP Fixture 闭环：
 
-内容完成不等于 Agent Runtime 完成。Agent Profile、Knowledge Pack、Task Store、Approval、Evidence 等目标能力仍未实现。
+```text
+Agent Profile
+→ Decision Context
+→ Controller Claim
+→ Controller Command
+→ Task + Plan + Event 一致推进
+```
 
-Git → Feishu 规则和 Publisher 逻辑已经存在，但 Feishu 最终覆盖发布尚未执行。实际 Projection Mapping、图片上传、发布回读和 publication status 必须在 Git Closure 完成后获得独立授权。
-
-精确状态与当前工作见：
+这不表示正式 Task Center 已实现。当前 Task Control 仍是 `action-gateway` 内的明确 Fixture；Custom GPT Builder 人工配置和 Preview 实调仍待完成。精确状态与当前工作见：
 
 - [`context/current-status.md`](context/current-status.md)
 - [`context/roadmap.md`](context/roadmap.md)
@@ -97,6 +102,7 @@ Git → Feishu 规则和 Publisher 逻辑已经存在，但 Feishu 最终覆盖�
 ```text
 apps/                可运行应用
 packages/            共享代码与领域能力
+agent-profiles/      Custom GPT 公共基线、角色、具体 Profile 与发布记录
 skills/              程序性 Agent 能力
 platform-registry/   跨资产身份、关系、状态和投影
 context/             短、小、当前、可信的 Agent 启动上下文
@@ -107,7 +113,7 @@ docs/adr/            正式架构决策
 scripts/             工程和验证脚本
 ```
 
-`agents/` 与 `knowledge-packs/` 只在首批真实角色和知识包准备好时建立，不创建空壳。当前不创建根级 `products/`。
+`agent-profiles/` 已保存首个真实总控 Profile；禁止创建根级 `agents/`，避免与 Codex、OpenCode 等宿主约定冲突。`knowledge-packs/` 只在首个稳定知识包真实物化时建立。当前不创建根级 `products/`。
 
 ## 协作与 Context 所有权
 
@@ -160,8 +166,9 @@ Git 是唯一真源。Feishu 只做面向人的覆盖式投影。
 - Health & Recovery；
 - 多执行器和多 Agent 自动调度；
 - 平台自有 MCP Server、Adapter 与统一治理；
-- Agent Profile 与 Knowledge Pack；
-- Custom GPT Builder 配置的 Git 资产化与确定性发布；
+- Knowledge Pack；
+- Custom GPT Builder 配置的自动发布；
+- 总控 Profile 的 Builder 人工配置与 Preview 实调；
 - AI 视频工作流；
 - Portfolio Release；
 - Feishu 最终发布、发布回读与最终整仓验收；
@@ -178,7 +185,8 @@ Git 是唯一真源。Feishu 只做面向人的覆盖式投影。
 5. [`docs/knowledge/README.md`](docs/knowledge/README.md)：正式知识导航；
 6. [`docs/technical/README.md`](docs/technical/README.md)：工程执行资料；
 7. [`platform-registry/README.md`](platform-registry/README.md)：资产关系、状态与 Feishu 映射；
-8. [`skills/README.md`](skills/README.md)：六个活跃 Skill 与退役映射。
+8. [`agent-profiles/README.md`](agent-profiles/README.md)：总控 Profile 配置入口；
+9. [`skills/README.md`](skills/README.md)：六个活跃 Skill 与退役映射。
 
 ## 验证
 
@@ -189,6 +197,7 @@ npm run check:knowledge
 npm run check:authoring
 npm run check:insights
 npm run check:synthesis
+npm run check:controller-mvp
 npm run verify
 ```
 

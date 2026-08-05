@@ -1,0 +1,6 @@
+profile_id: ai-agent-platform-controller
+deployment_mode: manual
+provider_resource_id: null
+status: pending_builder_configuration
+last_verified_at: null
+evidence: []

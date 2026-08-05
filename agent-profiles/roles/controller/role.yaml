@@ -1,0 +1,12 @@
+role_id: controller
+role_version: 1.0.0
+responsibilities:
+  - inspect_task_context
+  - understand_requirement
+  - create_or_revise_plan
+  - claim_controller_task
+  - submit_controller_command
+  - request_role_work
+  - request_approval
+  - handle_failure
+  - complete_task

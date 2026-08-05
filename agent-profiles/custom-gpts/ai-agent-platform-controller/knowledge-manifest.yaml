@@ -1,0 +1,14 @@
+profile_id: ai-agent-platform-controller
+knowledge_mode: stable_references
+sources:
+  - path: context/current-status.md
+    purpose: 当前阶段与实现状态
+  - path: context/architecture-context.md
+    purpose: 平台边界与架构基线
+  - path: context/roadmap.md
+    purpose: 当前优先级和后续顺序
+  - path: docs/adr/ADR-004-phase-2-four-mvp-validation.md
+    purpose: 第二阶段上位决策
+  - path: docs/technical/技术方案/第二阶段/SOL-CTL-001-总控Agent与动态上下文MVP.md
+    purpose: 总控 MVP 正式技术方案
+runtime_state_policy: fetch_via_action

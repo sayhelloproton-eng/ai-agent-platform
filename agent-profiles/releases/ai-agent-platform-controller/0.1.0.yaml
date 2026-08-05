@@ -1,0 +1,11 @@
+release_id: ai-agent-platform-controller@0.1.0
+profile_id: ai-agent-platform-controller
+profile_version: 0.1.0
+source_commit: pending
+configuration_hash: pending
+deployment_mode: manual
+provider_resource_id: null
+status: candidate
+verification:
+  builder_parse: pending
+  preview_authenticated_call: pending

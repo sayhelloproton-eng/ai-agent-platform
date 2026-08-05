@@ -8,6 +8,9 @@ import { createCapabilityPolicy } from "@ai-agent-platform/policy";
 import { createGatewayServer } from "../dist/app.js";
 import { createConcurrencyGate } from "../dist/concurrency.js";
 import {
+  createInMemoryControllerTaskControl,
+} from "../dist/controller-task-control.js";
+import {
   createFixedWindowRateLimiter,
 } from "../dist/rate-limit.js";
 import { createHttpRuntimeClient } from "../dist/runtime-client.js";
@@ -124,6 +127,32 @@ async function submitRuntimeStatus(baseUrl, options = {}) {
         ? undefined
         : JSON.stringify(options.body),
   });
+}
+
+
+
+async function submitController(baseUrl, route, body, options = {}) {
+  const headers = {
+    authorization: `Bearer ${API_KEY}`,
+    "content-type": "application/json",
+    ...options.headers,
+  };
+  return fetch(`${baseUrl}${route}`, {
+    method: "POST",
+    headers,
+    body: options.rawBody ?? JSON.stringify(body),
+  });
+}
+
+function controllerGatewayOptions() {
+  return {
+    controllerTaskControl: createInMemoryControllerTaskControl(),
+    controllerIdentity: {
+      profileId: "ai-agent-platform-controller",
+      roleId: "controller",
+      projectIds: ["ai-agent-platform"],
+    },
+  };
 }
 
 async function sendDeclaredOversizedTask(port) {
@@ -1561,3 +1590,186 @@ test("Gateway concurrency Server configuration is bounded and safe", () => {
     );
   }
 });
+
+test("Controller Action enforces query-before-claim and server-derived identity", async () => {
+  await withGateway(async (baseUrl) => {
+    const earlyClaim = await submitController(
+      baseUrl,
+      "/v1/controller/task-claim",
+      {
+        taskId: "task-ctl-001",
+        expectedTaskVersion: 1,
+        idempotencyKey: "early-claim",
+      },
+    );
+    assert.equal(earlyClaim.status, 409);
+    assert.equal(
+      (await earlyClaim.json()).error.code,
+      "CONTROLLER_CONTEXT_REQUIRED",
+    );
+
+    const forgedContext = await submitController(
+      baseUrl,
+      "/v1/controller/task-context",
+      {
+        taskId: "task-ctl-001",
+        profileId: "forged-profile",
+      },
+    );
+    assert.equal(forgedContext.status, 400);
+    assert.equal(
+      (await forgedContext.json()).error.code,
+      "CONTROLLER_INVALID_REQUEST",
+    );
+  }, controllerGatewayOptions());
+});
+
+test("Controller Action runs context, claim, plan, advance, and completion loop", async () => {
+  await withGateway(async (baseUrl) => {
+    const contextResponse = await submitController(
+      baseUrl,
+      "/v1/controller/task-context",
+      { taskId: "task-ctl-001" },
+    );
+    assert.equal(contextResponse.status, 200);
+    const context = (await contextResponse.json()).data;
+    assert.equal(context.task.plan, null);
+    assert.ok(context.allowedControllerCommands.includes("CREATE_PLAN"));
+
+    const claimResponse = await submitController(
+      baseUrl,
+      "/v1/controller/task-claim",
+      {
+        taskId: "task-ctl-001",
+        expectedTaskVersion: context.task.taskVersion,
+        idempotencyKey: "http-claim-001",
+      },
+    );
+    assert.equal(claimResponse.status, 200);
+    const claim = (await claimResponse.json()).data;
+    assert.equal(claim.claim.claimedByProfile, "ai-agent-platform-controller");
+
+    const createPlanBody = {
+      taskId: "task-ctl-001",
+      claimToken: claim.claimToken,
+      expectedTaskVersion: claim.taskVersion,
+      expectedPlanVersion: null,
+      idempotencyKey: "http-create-plan-001",
+      command: {
+        type: "CREATE_PLAN",
+        reasonSummary: "Create the Controller MVP plan.",
+        payload: {
+          nodes: [
+            {
+              nodeId: "inspect-context",
+              title: "Inspect the decision context",
+              kind: "DECISION",
+              requiredRole: "controller",
+            },
+            {
+              nodeId: "finalize",
+              title: "Finalize the Controller MVP",
+              kind: "FINALIZE",
+              requiredRole: "controller",
+            },
+          ],
+        },
+      },
+    };
+    const createResponse = await submitController(
+      baseUrl,
+      "/v1/controller/task-command",
+      createPlanBody,
+    );
+    assert.equal(createResponse.status, 200);
+    const created = (await createResponse.json()).data;
+    assert.equal(created.task.plan.planVersion, 1);
+    assert.equal(created.event.eventType, "task.plan.created");
+
+    const replayResponse = await submitController(
+      baseUrl,
+      "/v1/controller/task-command",
+      createPlanBody,
+    );
+    const replay = (await replayResponse.json()).data;
+    assert.equal(replay.commandId, created.commandId);
+    assert.equal(replay.idempotentReplay, true);
+
+    const advanceFirstResponse = await submitController(
+      baseUrl,
+      "/v1/controller/task-command",
+      {
+        taskId: "task-ctl-001",
+        claimToken: claim.claimToken,
+        expectedTaskVersion: created.task.taskVersion,
+        expectedPlanVersion: created.task.plan.planVersion,
+        idempotencyKey: "http-advance-001",
+        command: {
+          type: "ADVANCE_PLAN_NODE",
+          reasonSummary: "Decision context has been inspected.",
+          payload: {
+            nodeId: "inspect-context",
+            resultRefs: ["result-fixture-context-001"],
+          },
+        },
+      },
+    );
+    assert.equal(advanceFirstResponse.status, 200);
+    const advancedFirst = (await advanceFirstResponse.json()).data;
+    assert.equal(advancedFirst.task.plan.currentNodeId, "finalize");
+
+    const advanceFinalResponse = await submitController(
+      baseUrl,
+      "/v1/controller/task-command",
+      {
+        taskId: "task-ctl-001",
+        claimToken: claim.claimToken,
+        expectedTaskVersion: advancedFirst.task.taskVersion,
+        expectedPlanVersion: advancedFirst.task.plan.planVersion,
+        idempotencyKey: "http-advance-002",
+        command: {
+          type: "ADVANCE_PLAN_NODE",
+          reasonSummary: "Controller MVP acceptance is satisfied.",
+          payload: { nodeId: "finalize" },
+        },
+      },
+    );
+    assert.equal(advanceFinalResponse.status, 200);
+    const advancedFinal = (await advanceFinalResponse.json()).data;
+    assert.equal(advancedFinal.task.plan.currentNodeId, null);
+
+    const completeResponse = await submitController(
+      baseUrl,
+      "/v1/controller/task-command",
+      {
+        taskId: "task-ctl-001",
+        claimToken: claim.claimToken,
+        expectedTaskVersion: advancedFinal.task.taskVersion,
+        expectedPlanVersion: advancedFinal.task.plan.planVersion,
+        idempotencyKey: "http-complete-001",
+        command: {
+          type: "COMPLETE_TASK",
+          reasonSummary: "All required Controller MVP nodes are complete.",
+          payload: { summary: "Controller MVP fixture completed." },
+        },
+      },
+    );
+    assert.equal(completeResponse.status, 200);
+    const completed = (await completeResponse.json()).data;
+    assert.equal(completed.task.lifecycleStatus, "COMPLETED");
+    assert.equal(completed.task.plan.status, "COMPLETED");
+    assert.equal(completed.task.claim, null);
+  }, controllerGatewayOptions());
+});
+
+test("Controller routes require Bearer authentication", async () => {
+  await withGateway(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/v1/controller/task-context`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ taskId: "task-ctl-001" }),
+    });
+    assert.equal(response.status, 401);
+  }, controllerGatewayOptions());
+});
+

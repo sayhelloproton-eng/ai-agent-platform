@@ -44,7 +44,8 @@
     "check:handoff": "node skills/planner-executor-handoff/tests/self-test.mjs",
     "check:synthesis": "node skills/project-knowledge-synthesis/tests/self-test.mjs",
     "check:authoring": "node skills/engineering-document-authoring/tests/self-test.mjs",
-    "check:skills": "node scripts/skill-portfolio-check.mjs"
+    "check:skills": "node scripts/skill-portfolio-check.mjs",
+    "check:controller-mvp": "npm run build --workspace @ai-agent-platform/contracts && npm run build --workspace @ai-agent-platform/auth && npm run build --workspace @ai-agent-platform/policy && npm run build --workspace @ai-agent-platform/action-gateway && node --test apps/action-gateway/tests/controller-task-control.test.mjs apps/action-gateway/tests/gateway.test.mjs"
   },
   "devDependencies": {
     "@types/node": "^20.19.43",

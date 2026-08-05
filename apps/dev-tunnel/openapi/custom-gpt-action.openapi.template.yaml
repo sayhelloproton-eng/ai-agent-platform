@@ -1,11 +1,105 @@
 openapi: 3.1.0
 info:
-  title: AI Agent Platform Runtime Status
+  title: AI Agent Platform Controller Actions
   version: 1.0.0
-  description: Query the authenticated local Runtime status through the Action Gateway.
+  description: Query authenticated task context, claim Controller work, submit constrained Controller commands, release claims, and query Runtime status through the Action Gateway.
 servers:
   - url: ${DEV_TUNNEL_PUBLIC_BASE_URL}
 paths:
+  /v1/controller/task-context:
+    post:
+      operationId: getTaskDecisionContext
+      summary: Query the latest decision context before claiming a task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskContextRequest"
+      responses:
+        "200":
+          description: Current task decision context
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ControllerSuccessEnvelope"
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /v1/controller/task-claim:
+    post:
+      operationId: claimControllerTask
+      summary: Claim short-lived Controller processing rights after reading context
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ControllerClaimRequest"
+      responses:
+        "200":
+          description: Controller claim and opaque claim token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ControllerSuccessEnvelope"
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /v1/controller/task-command:
+    post:
+      operationId: submitControllerCommand
+      summary: Submit a constrained Controller business command
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ControllerCommandRequest"
+      responses:
+        "200":
+          description: Updated Task, Plan, and immutable Event result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ControllerSuccessEnvelope"
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /v1/controller/task-release:
+    post:
+      operationId: releaseControllerTask
+      summary: Release the current Controller claim
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ControllerReleaseRequest"
+      responses:
+        "200":
+          description: Claim release result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ControllerSuccessEnvelope"
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "409":
+          $ref: "#/components/responses/Conflict"
   /v1/runtime/status:
     post:
       operationId: getRuntimeStatus
@@ -16,41 +110,322 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  contractVersion:
-                    type: string
-                  taskId:
-                    type: string
-                  status:
-                    type: string
-                    enum:
-                      - succeeded
-                      - failed
-                      - rejected
-                      - timed_out
-                  output:
-                    type: object
-                    properties:
-                      runtime:
-                        type: string
-                      status:
-                        type: string
-                      capabilities:
-                        type: array
-                        items:
-                          type: string
-                required:
-                  - contractVersion
-                  - taskId
-                  - status
-                  - output
+                $ref: "#/components/schemas/RuntimeStatusResult"
         "401":
-          description: Bearer authentication failed
+          $ref: "#/components/responses/Unauthenticated"
         "503":
           description: Local Runtime is unavailable
 components:
-  schemas: {}
+  schemas:
+    TaskContextRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        taskId:
+          type: string
+          minLength: 1
+        eventCursor:
+          type: integer
+          minimum: 0
+      required:
+        - taskId
+    ControllerClaimRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        taskId:
+          type: string
+          minLength: 1
+        expectedTaskVersion:
+          type: integer
+          minimum: 1
+        idempotencyKey:
+          type: string
+          minLength: 1
+      required:
+        - taskId
+        - expectedTaskVersion
+        - idempotencyKey
+    ControllerCommandRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        taskId:
+          type: string
+          minLength: 1
+        claimToken:
+          type: string
+          minLength: 1
+        expectedTaskVersion:
+          type: integer
+          minimum: 1
+        expectedPlanVersion:
+          type: integer
+          minimum: 1
+          nullable: true
+        idempotencyKey:
+          type: string
+          minLength: 1
+        command:
+          $ref: "#/components/schemas/ControllerCommand"
+      required:
+        - taskId
+        - claimToken
+        - expectedTaskVersion
+        - expectedPlanVersion
+        - idempotencyKey
+        - command
+    ControllerReleaseRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        taskId:
+          type: string
+          minLength: 1
+        claimToken:
+          type: string
+          minLength: 1
+        idempotencyKey:
+          type: string
+          minLength: 1
+      required:
+        - taskId
+        - claimToken
+        - idempotencyKey
+    ControllerCommand:
+      type: object
+      additionalProperties: false
+      properties:
+        type:
+          type: string
+          enum:
+            - CREATE_PLAN
+            - REVISE_PLAN
+            - ADVANCE_PLAN_NODE
+            - REQUEST_ROLE_WORK
+            - REQUEST_APPROVAL
+            - BLOCK_TASK
+            - COMPLETE_TASK
+        reasonSummary:
+          type: string
+          minLength: 1
+        payload:
+          $ref: "#/components/schemas/ControllerCommandPayload"
+      required:
+        - type
+        - reasonSummary
+        - payload
+    ControllerCommandPayload:
+      type: object
+      properties:
+        nodes:
+          type: array
+          items:
+            $ref: "#/components/schemas/PlanNodeDraft"
+        operations:
+          type: array
+          items:
+            $ref: "#/components/schemas/PlanRevisionOperation"
+        nodeId:
+          type: string
+        requiredRole:
+          type: string
+        objective:
+          type: string
+        expectedOutputContract:
+          type: string
+        summary:
+          type: string
+        reason:
+          type: string
+        resultRefs:
+          type: array
+          items:
+            type: string
+    PlanNodeDraft:
+      type: object
+      additionalProperties: false
+      properties:
+        nodeId:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        kind:
+          type: string
+          enum:
+            - DECISION
+            - WORK
+            - REVIEW
+            - WAIT
+            - APPROVAL
+            - FINALIZE
+        requiredRole:
+          type: string
+          minLength: 1
+        dependsOn:
+          type: array
+          items:
+            type: string
+        acceptanceCriteria:
+          type: array
+          items:
+            type: string
+      required:
+        - nodeId
+        - title
+        - kind
+        - requiredRole
+    PlanRevisionOperation:
+      type: object
+      properties:
+        operation:
+          type: string
+          enum:
+            - INSERT_NODE_AFTER
+            - CANCEL_NODE
+            - SKIP_NODE
+        afterNodeId:
+          type: string
+        nodeId:
+          type: string
+        reasonSummary:
+          type: string
+        node:
+          $ref: "#/components/schemas/PlanNodeDraft"
+      required:
+        - operation
+    ControllerSuccessEnvelope:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          const: true
+        requestId:
+          type: string
+        data:
+          type: object
+          properties:
+            contractVersion:
+              type: string
+            taskId:
+              type: string
+            taskVersion:
+              type: integer
+            claimToken:
+              type: string
+            commandId:
+              type: string
+            idempotentReplay:
+              type: boolean
+            task:
+              type: object
+              properties:
+                taskId:
+                  type: string
+                taskVersion:
+                  type: integer
+                lifecycleStatus:
+                  type: string
+                requiredRole:
+                  type: string
+                plan:
+                  type:
+                    - object
+                    - "null"
+              required:
+                - taskId
+                - taskVersion
+                - lifecycleStatus
+                - requiredRole
+      required:
+        - ok
+        - requestId
+        - data
+    RuntimeStatusResult:
+      type: object
+      properties:
+        contractVersion:
+          type: string
+        taskId:
+          type: string
+        status:
+          type: string
+          enum:
+            - succeeded
+            - failed
+            - rejected
+            - timed_out
+        output:
+          type: object
+          properties:
+            runtime:
+              type: string
+            status:
+              type: string
+            capabilities:
+              type: array
+              items:
+                type: string
+      required:
+        - contractVersion
+        - taskId
+        - status
+        - output
+    ErrorEnvelope:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          const: false
+        requestId:
+          type: string
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+          required:
+            - code
+            - message
+      required:
+        - ok
+        - requestId
+        - error
+  responses:
+    InvalidRequest:
+      description: Request validation failed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+    Unauthenticated:
+      description: Bearer authentication failed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+    Forbidden:
+      description: Controller role or project scope is not allowed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+    NotFound:
+      description: Task was not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+    Conflict:
+      description: Context, version, claim, plan, or idempotency conflict
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
   securitySchemes:
     bearerAuth:
       type: http

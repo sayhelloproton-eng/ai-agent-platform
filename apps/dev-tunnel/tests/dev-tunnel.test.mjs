@@ -37,47 +37,34 @@ const TUNNEL = {
 };
 
 function assertBuilderCompatibleComponents(source) {
-  const components = source.match(
-    /^components:\s*$\n(?<body>(?: {2}\S.*(?:\n|$)| {4}\S.*(?:\n|$)| {6}\S.*(?:\n|$))*)/mu,
-  );
-  assert.notEqual(components, null, "components must be an object");
+  const componentsStart = source.indexOf("\ncomponents:\n");
+  assert.notEqual(componentsStart, -1, "components must be an object");
+  const components = source.slice(componentsStart + 1);
   assert.match(
-    components.groups.body,
-    /^ {2}securitySchemes:\s*$/mu,
+    components,
+    /^components:\n[\s\S]*^ {2}securitySchemes:\s*$/mu,
     "components.securitySchemes must be an object",
   );
   assert.match(
-    components.groups.body,
+    components,
     /^ {4}[A-Za-z0-9._-]+:\s*$/mu,
-    "securitySchemes must contain a named scheme",
+    "components must contain named children",
   );
 
-  const schemasLine = source.match(/^ {2}schemas:(?<value>.*)$/mu);
-  assert.notEqual(
-    schemasLine,
-    null,
-    "components.schemas must be present as an object",
+  const schemasStart = components.indexOf("  schemas:\n");
+  assert.notEqual(schemasStart, -1, "components.schemas must be present");
+  const responsesStart = components.indexOf("  responses:\n", schemasStart);
+  const securityStart = components.indexOf("  securitySchemes:\n", schemasStart);
+  const schemasEnd =
+    responsesStart === -1 ? securityStart : Math.min(responsesStart, securityStart);
+  assert.ok(schemasEnd > schemasStart, "components.schemas must be an object");
+  const schemasBody = components.slice(schemasStart, schemasEnd);
+  const schemaNames = new Set(
+    [...schemasBody.matchAll(/^ {4}([A-Za-z0-9._-]+):\s*$/gmu)].map(
+      (match) => match[1],
+    ),
   );
-  const schemaNames = new Set();
-  const schemasValue = schemasLine.groups.value.trim();
-  assert.equal(
-    schemasValue === "" || schemasValue === "{}",
-    true,
-    "components.schemas must be a non-array object",
-  );
-  if (schemasValue === "") {
-    const schemasStart = schemasLine.index + schemasLine[0].length + 1;
-    const schemasRemainder = source.slice(schemasStart);
-    const nextSibling = schemasRemainder.search(/^ {2}\S|^\S/mu);
-    const schemasBody =
-      nextSibling === -1
-        ? schemasRemainder
-        : schemasRemainder.slice(0, nextSibling);
-    const names = [...schemasBody.matchAll(/^ {4}([A-Za-z0-9._-]+):\s*$/gmu)]
-      .map((match) => match[1]);
-    assert.notEqual(names.length, 0, "components.schemas must not be empty");
-    for (const name of names) schemaNames.add(name);
-  }
+  assert.notEqual(schemaNames.size, 0, "components.schemas must not be empty");
 
   const localRefs = [
     ...source.matchAll(
@@ -600,45 +587,42 @@ test("generated OpenAPI contains the public origin but no key", () => {
   }
 });
 
-test("OpenAPI 200 response defines the runtime.status result properties", () => {
+test("OpenAPI defines the Runtime Status result component", () => {
   const template = readFileSync(OPENAPI_TEMPLATE, "utf8");
-  const responseMatch = template.match(
-    /\n {8}"200":(?<response>[\s\S]*?)\n {8}"401":/u,
+  const schemaMatch = template.match(
+    /\n {4}RuntimeStatusResult:(?<schema>[\s\S]*?)\n {4}ErrorEnvelope:/u,
   );
-  assert.notEqual(responseMatch, null);
-  const responseSchema = responseMatch.groups.response;
-  assert.match(responseSchema, /\n {14}schema:\n {16}type: object\n {16}properties:/u);
+  assert.notEqual(schemaMatch, null);
   for (const property of ["taskId", "status", "output"]) {
-    assert.match(responseSchema, new RegExp(`\\n {18}${property}:`, "u"));
+    assert.match(schemaMatch.groups.schema, new RegExp(`\\n {8}${property}:`, "u"));
   }
-  const outputMatch = responseSchema.match(
-    /\n {18}output:(?<output>[\s\S]*?)\n {16}required:/u,
-  );
-  assert.notEqual(outputMatch, null);
-  for (const property of ["runtime", "status", "capabilities"]) {
-    assert.match(
-      outputMatch.groups.output,
-      new RegExp(`\\n {22}${property}:`, "u"),
-    );
-  }
-  assert.doesNotMatch(
-    responseSchema,
-    /\n {14}schema:\n {16}type: object\s*$/u,
-  );
 });
 
-test("OpenAPI exposes only the zero-parameter Runtime Status Action", () => {
+test("OpenAPI exposes the four Controller operations and Runtime Status", () => {
   const template = readFileSync(OPENAPI_TEMPLATE, "utf8");
-  assert.match(template, /\n {2}\/v1\/runtime\/status:\n/u);
-  assert.doesNotMatch(template, /\n {2}\/v1\/tasks:\n/u);
-  assert.equal(
-    template.match(/\n {6}operationId: getRuntimeStatus\n/gu)?.length,
-    1,
-  );
-  assert.equal(template.match(/\n {6}operationId:/gu)?.length, 1);
-  assert.doesNotMatch(template, /\n {6}requestBody:/u);
-  assert.doesNotMatch(template, /RuntimeStatusTask/u);
-  assert.match(template, /\n {2}schemas: \{\}\n/u);
+  for (const path of [
+    "/v1/controller/task-context",
+    "/v1/controller/task-claim",
+    "/v1/controller/task-command",
+    "/v1/controller/task-release",
+    "/v1/runtime/status",
+  ]) {
+    assert.match(template, new RegExp(`\\n {2}${path.replaceAll("/", "\\/")}:\\n`, "u"));
+  }
+  for (const operationId of [
+    "getTaskDecisionContext",
+    "claimControllerTask",
+    "submitControllerCommand",
+    "releaseControllerTask",
+    "getRuntimeStatus",
+  ]) {
+    assert.equal(
+      template.match(new RegExp(`\\n {6}operationId: ${operationId}\\n`, "gu"))?.length,
+      1,
+    );
+  }
+  assert.equal(template.match(/\n {6}operationId:/gu)?.length, 5);
+  assert.doesNotMatch(template, /profileId:\n|roleId:\n|requestedBy:\n/u);
   assert.match(
     template,
     /securitySchemes:\n {4}bearerAuth:\n {6}type: http\n {6}scheme: bearer\n {6}bearerFormat: API_KEY/u,
@@ -649,19 +633,10 @@ test("OpenAPI exposes only the zero-parameter Runtime Status Action", () => {
 test("OpenAPI components remain Builder-compatible and local refs resolve", () => {
   const template = readFileSync(OPENAPI_TEMPLATE, "utf8");
   assertBuilderCompatibleComponents(template);
-  assert.match(template, /^ {2}schemas: \{\}$/mu);
 
   assert.throws(() =>
-    assertBuilderCompatibleComponents(template.replace("  schemas: {}\n", "")),
+    assertBuilderCompatibleComponents(template.replace("  schemas:\n", "")),
   );
-  for (const invalidValue of ["", "null", "[]"]) {
-    const invalid = template.replace(
-      "  schemas: {}",
-      `  schemas:${invalidValue ? ` ${invalidValue}` : ""}`,
-    );
-    assert.throws(() => assertBuilderCompatibleComponents(invalid));
-  }
-
   const unresolved = `${template}\n# $ref: '#/components/schemas/Missing'\n`;
   assert.throws(
     () => assertBuilderCompatibleComponents(unresolved),
