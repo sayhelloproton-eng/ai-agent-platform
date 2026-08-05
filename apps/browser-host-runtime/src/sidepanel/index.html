@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Browser Host Runtime</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header><h1>Browser Host Runtime</h1><span id="host-state" class="badge">加载中</span></header>
+  <section class="controls">
+    <label>绑定角色 <input id="role-ref" value="controller"></label>
+    <button id="bind">绑定当前 ChatGPT</button>
+    <button id="observe">立即观察</button>
+    <button id="prepare-fixture">准备 Fixture Wake</button>
+    <button id="approve-fixture">审核通过并入队</button>
+    <button id="process">处理一条 Dispatch</button>
+  </section>
+  <section class="controls horizontal">
+    <button id="pause">暂停</button>
+    <button id="resume">恢复</button>
+    <button id="stop" class="danger">紧急停止</button>
+    <button id="options">设置</button>
+  </section>
+  <section><h2>Bindings</h2><div id="bindings"></div></section>
+  <section><h2>最近结果</h2><pre id="output">等待操作</pre></section>
+  <script type="module" src="./panel.js"></script>
+</body>
+</html>

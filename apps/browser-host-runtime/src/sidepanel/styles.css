@@ -1,0 +1,15 @@
+:root { font-family: system-ui, sans-serif; color-scheme: light dark; }
+body { margin: 0; padding: 12px; min-width: 320px; }
+header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+h1 { font-size: 17px; margin: 0 0 10px; }
+h2 { font-size: 14px; margin: 16px 0 8px; }
+.controls { display: grid; gap: 8px; margin: 10px 0; }
+.horizontal { grid-template-columns: repeat(2, 1fr); }
+label { display: grid; gap: 4px; font-size: 12px; }
+input, button { font: inherit; padding: 8px; }
+button { cursor: pointer; }
+.danger { border-color: #b00020; }
+.badge { font-size: 11px; border: 1px solid currentColor; border-radius: 999px; padding: 3px 7px; }
+.binding { border: 1px solid #8886; border-radius: 8px; padding: 8px; margin-bottom: 8px; font-size: 12px; }
+.binding .actions { display: flex; gap: 6px; margin-top: 6px; }
+pre { white-space: pre-wrap; word-break: break-word; max-height: 320px; overflow: auto; background: #7771; padding: 8px; border-radius: 8px; font-size: 11px; }

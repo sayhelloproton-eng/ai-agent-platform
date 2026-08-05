@@ -1,0 +1,16 @@
+{
+  "name": "@ai-agent-platform/browser-host-runtime",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Chrome Manifest V3 Browser Host Runtime MVP for ChatGPT web sessions.",
+  "engines": {
+    "node": ">=20 <21",
+    "npm": ">=10 <11"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "verify:static": "node scripts/verify.mjs",
+    "verify": "npm run verify:static && npm test"
+  }
+}

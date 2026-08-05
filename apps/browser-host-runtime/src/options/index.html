@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BHR 设置</title><link rel="stylesheet" href="./styles.css"></head>
+<body>
+  <main>
+    <h1>Browser Host Runtime 设置</h1>
+    <form id="config">
+      <label>Transport Mode<select id="transport_mode"><option value="fixture">fixture</option><option value="gateway">gateway</option></select></label>
+      <label>Gateway Endpoint<input id="gateway_endpoint" type="url"></label>
+      <label>Model Mode<select id="model_mode"><option value="fixture">fixture</option><option value="http">http / DeepSeek Adapter</option></select></label>
+      <label>Model Endpoint<input id="model_endpoint" type="url"></label>
+      <label>Dispatch Poll Seconds<input id="dispatch_poll_seconds" type="number" min="30" max="3600"></label>
+      <label>Observation Seconds<input id="observation_seconds" type="number" min="30" max="3600"></label>
+      <button type="submit">保存持久设置</button>
+    </form>
+    <form id="secrets">
+      <h2>仅当前浏览器 Session 的凭据</h2>
+      <p>凭据只写入 <code>chrome.storage.session</code>，浏览器重启后需要重新填写。</p>
+      <label>Gateway API Key<input id="gateway_api_key" type="password" autocomplete="off"></label>
+      <label>Model API Key<input id="model_api_key" type="password" autocomplete="off"></label>
+      <button type="submit">设置 Session 凭据</button>
+    </form>
+    <pre id="status"></pre>
+  </main>
+  <script type="module" src="./options.js"></script>
+</body>
+</html>

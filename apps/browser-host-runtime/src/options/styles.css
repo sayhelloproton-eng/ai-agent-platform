@@ -1,0 +1,6 @@
+:root { font-family: system-ui, sans-serif; color-scheme: light dark; }
+main { max-width: 720px; margin: 32px auto; padding: 0 16px; }
+form { display: grid; gap: 12px; border: 1px solid #8885; padding: 16px; border-radius: 10px; margin: 16px 0; }
+label { display: grid; gap: 4px; }
+input, select, button { font: inherit; padding: 8px; }
+pre { white-space: pre-wrap; }
