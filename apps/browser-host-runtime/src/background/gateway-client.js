@@ -40,6 +40,7 @@ export class FixtureGatewayClient {
   constructor(storage) {
     this.storage = storage;
     this.key = "bhr.fixture.gateway_state";
+    this.testOnly = true;
   }
 
   async state() {
@@ -88,12 +89,17 @@ export class FixtureGatewayClient {
         await this.save(state);
         return { status: "CONSUMED", consumed_at: grant.consumed_at };
       }
+      case "browser.dispatch.ack":
+      case "browser.dispatch.fail":
       case "browser.dispatch.report": {
         const item = state.dispatches.find((candidate) => candidate.dispatch_ref === payload.dispatch_ref);
-        if (item) item.status = "REPORTED";
-        state.reports.push(payload);
+        if (!item || item.claim_token !== payload.claim_token) throw new BhrError("CLAIM_TOKEN_INVALID", "Fixture claim token is invalid during report.");
+        const duplicate = state.reports.find((entry) => entry.result?.result_id === payload.result?.result_id);
+        if (duplicate) return { status: "ALREADY_RECORDED", result_id: payload.result.result_id };
+        item.status = operation === "browser.dispatch.fail" ? "FAILED" : "REPORTED";
+        state.reports.push({ ...payload, operation, recorded_at: new Date().toISOString() });
         await this.save(state);
-        return { status: "RECORDED" };
+        return { status: "RECORDED", result_id: payload.result?.result_id };
       }
       default:
         throw new BhrError("FIXTURE_OPERATION_UNSUPPORTED", `Fixture operation is not supported: ${operation}`);

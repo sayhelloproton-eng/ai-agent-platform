@@ -6,7 +6,9 @@ export const APPLICATION_OPERATIONS = Object.freeze({
   DISPATCH_LIST_PENDING: "browser.dispatch.listPending",
   DISPATCH_CLAIM: "browser.dispatch.claim",
   DISPATCH_GET: "browser.dispatch.get",
-  DISPATCH_REPORT: "browser.dispatch.report",
+  DISPATCH_ACK: "browser.dispatch.ack",
+  DISPATCH_FAIL: "browser.dispatch.fail",
+  DISPATCH_REPORT_LEGACY: "browser.dispatch.report",
   PAYLOAD_RESOLVE: "browser.payload.resolve",
   APPROVAL_GRANT_GET: "approval.grant.get",
   APPROVAL_GRANT_CONSUME: "approval.grant.consume"
@@ -31,6 +33,11 @@ export const HIGH_RISK_ACTIONS = new Set([
   ACTION_TYPES.CLICK_REGISTERED_UI
 ]);
 
+export const APPROVAL_POLICY_MODE = Object.freeze({
+  STRICT: "strict",
+  PLATFORM_WAKE_PROPOSAL: "platform_wake_proposal"
+});
+
 export const HOST_RESULT_STATUS = Object.freeze({
   DELIVERED: "DELIVERED",
   ACTION_SUCCEEDED: "ACTION_SUCCEEDED",
@@ -44,15 +51,20 @@ export const HOST_RESULT_STATUS = Object.freeze({
 export const JOURNAL_STATE = Object.freeze({
   RECEIVED: "RECEIVED",
   CLAIMED: "CLAIMED",
-  PRECHECKED: "PRECHECKED",
-  SIDE_EFFECT_STARTED: "SIDE_EFFECT_STARTED",
-  SIDE_EFFECT_CONFIRMED: "SIDE_EFFECT_CONFIRMED",
+  PREPARED: "PREPARED",
+  EXECUTING: "EXECUTING",
+  EXECUTED: "EXECUTED",
   REPORTED: "REPORTED",
   FAILED: "FAILED",
-  UNCERTAIN: "UNCERTAIN"
+  UNCERTAIN: "UNCERTAIN",
+  // Legacy names are retained only for migration of already persisted MVP journals.
+  PRECHECKED: "PRECHECKED",
+  SIDE_EFFECT_STARTED: "SIDE_EFFECT_STARTED",
+  SIDE_EFFECT_CONFIRMED: "SIDE_EFFECT_CONFIRMED"
 });
 
 export const BINDING_STATE = Object.freeze({
+  PROVISIONING: "PROVISIONING",
   READY: "READY",
   STALE: "STALE",
   PAUSED: "PAUSED",

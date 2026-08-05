@@ -90,6 +90,10 @@ export function assertObservation(value) {
   requireString(input.host_id, "observation.host_id", { max: 128 });
   requireString(input.binding_id, "observation.binding_id", { max: 256 });
   requireString(input.provider, "observation.provider", { max: 64 });
+  requireString(input.gpt_ref, "observation.gpt_ref", { max: 256 });
+  optionalString(input.conversation_ref, "observation.conversation_ref", { max: 256 });
+  requireString(input.page_url, "observation.page_url", { max: 2048 });
+  requireString(input.page_fingerprint, "observation.page_fingerprint", { max: 128 });
   requireString(input.page_state, "observation.page_state", { max: 64 });
   requireString(input.generation_state, "observation.generation_state", { max: 64 });
   requireBoolean(input.follow_latest, "observation.follow_latest");

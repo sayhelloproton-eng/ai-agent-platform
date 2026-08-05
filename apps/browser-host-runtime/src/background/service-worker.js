@@ -4,6 +4,7 @@ import { asSafeError } from "../shared/errors.js";
 import { buildWakeEnvelope } from "../shared/contracts.js";
 import { computeActionFingerprint, computePagePreconditionHash } from "../shared/fingerprints.js";
 import { randomId } from "../shared/crypto.js";
+import { computePageIdentityFingerprint, parseChatGptIdentity } from "../shared/page-identity.js";
 
 const ALARMS = { HEARTBEAT: "bhr-heartbeat", POLL: "bhr-dispatch-poll", OBSERVE: "bhr-observation" };
 const PENDING_REVIEW_KEY = "bhr.pending_reviews";
@@ -19,7 +20,7 @@ async function ensureAlarms() {
 
 async function registerAndRecover() {
   const runtime = await createRuntime();
-  await runtime.journal?.recoverUncertain?.();
+  await runtime.journal?.recoverAfterRestart?.();
   try { await runtime.hostRegistry.register(); } catch (error) { console.warn("BHR host registration deferred", asSafeError(error)); }
   await ensureAlarms();
 }
@@ -49,6 +50,7 @@ async function observeReadyBindings({ tabId = null } = {}) {
   for (const binding of bindings) {
     try {
       const observed = await runtime.observationCoordinator.observe(binding, { includeScreenshot: true });
+      await runtime.bindingRegistry.validateObservation(binding, observed.observation);
       const evidence = { page: observed.local };
       if (observed.observation.screenshot_ref) evidence.screenshot = await runtime.evidenceStore.get(observed.observation.screenshot_ref);
       const assessment = await runtime.modelProvider.analyze({ observation: observed.observation, evidence });
@@ -78,6 +80,7 @@ async function bindActiveTab(role_ref = "controller") {
   const page = await sendTabMessage(tab.id, { type: "BHR_PING" });
   if (!page?.ok) throw Object.assign(new Error("ChatGPT content adapter is unavailable."), { code: "CONTENT_SCRIPT_UNAVAILABLE" });
   const runtime = await createRuntime();
+  const page_fingerprint = await computePageIdentityFingerprint(page.data);
   const binding = await runtime.bindingRegistry.bind({
     host_id: runtime.host.host_id,
     chrome_tab_id: tab.id,
@@ -85,6 +88,7 @@ async function bindActiveTab(role_ref = "controller") {
     role_ref,
     gpt_ref: page.data.gpt_ref,
     conversation_ref: page.data.conversation_ref,
+    page_fingerprint,
     url: tab.url
   });
   await sendTabMessage(tab.id, { type: "BHR_SET_FOLLOW_LATEST", enabled: true });
@@ -164,7 +168,9 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   createRuntime().then(async (runtime) => {
     const binding = await runtime.bindingRegistry.findByTabId(tabId);
     if (!binding) return;
-    if (!tab.url?.startsWith("https://chatgpt.com/")) await runtime.bindingRegistry.markTabStale(tabId, "NAVIGATED_OUTSIDE_PROVIDER");
+    let identity = null;
+    try { identity = parseChatGptIdentity(tab.url ?? changeInfo.url); } catch { /* invalid navigation is stale */ }
+    await runtime.bindingRegistry.reconcileNavigation(tabId, identity);
   }).catch(console.warn);
 });
 
@@ -178,6 +184,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         const binding = (await runtime.bindingRegistry.list()).find((item) => item.binding_id === message.binding_id);
         if (!binding) throw Object.assign(new Error("Binding not found."), { code: "BINDING_NOT_FOUND" });
         const observed = await runtime.observationCoordinator.observe(binding, { includeScreenshot: true });
+        await runtime.bindingRegistry.validateObservation(binding, observed.observation);
         const assessment = await runtime.modelProvider.analyze({ observation: observed.observation, evidence: { page: observed.local } });
         return { ok: true, data: { observation: observed.observation, assessment } };
       }

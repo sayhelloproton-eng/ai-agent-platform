@@ -1,8 +1,23 @@
 import { JOURNAL_STATE } from "../shared/constants.js";
+import { sha256Ref } from "../shared/crypto.js";
 import { BhrError } from "../shared/errors.js";
 
 const KEY = "bhr.command_journal";
 const terminal = new Set([JOURNAL_STATE.REPORTED, JOURNAL_STATE.FAILED, JOURNAL_STATE.UNCERTAIN]);
+
+async function commandFingerprint(command) {
+  return sha256Ref({
+    command_id: command.command_id,
+    dispatch_ref: command.dispatch_ref,
+    task_id: command.task_id,
+    target: command.target,
+    action: command.action,
+    preconditions: command.preconditions,
+    approval_ref: command.approval_ref ?? null,
+    expires_at: command.expires_at,
+    idempotency_key: command.idempotency_key
+  });
+}
 
 export class CommandJournal {
   constructor(storage, { maxEntries = 100 } = {}) {
@@ -15,18 +30,25 @@ export class CommandJournal {
   async begin(command) {
     const entries = await this.entries();
     const existing = entries[command.command_id];
+    const fingerprint = await commandFingerprint(command);
     if (existing) {
-      if (existing.idempotency_key !== command.idempotency_key) throw new BhrError("COMMAND_ID_REUSED", "Command ID was reused with a different idempotency key.");
+      if (existing.idempotency_key !== command.idempotency_key || existing.command_fingerprint !== fingerprint) {
+        throw new BhrError("COMMAND_ID_REUSED", "Command ID or idempotency key was reused with a different request fingerprint.");
+      }
       return { entry: existing, duplicate: true, terminal: terminal.has(existing.state) };
     }
+    const now = new Date().toISOString();
     const entry = {
       command_id: command.command_id,
       dispatch_ref: command.dispatch_ref,
       idempotency_key: command.idempotency_key,
+      command_fingerprint: fingerprint,
+      command,
       state: JOURNAL_STATE.RECEIVED,
-      history: [{ state: JOURNAL_STATE.RECEIVED, at: new Date().toISOString() }],
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      result: null,
+      history: [{ state: JOURNAL_STATE.RECEIVED, at: now }],
+      created_at: now,
+      updated_at: now
     };
     entries[command.command_id] = entry;
     await this.pruneAndSave(entries);
@@ -40,26 +62,50 @@ export class CommandJournal {
     if (!entry) throw new BhrError("JOURNAL_ENTRY_NOT_FOUND", `No journal entry for ${command_id}`);
     entry.state = state;
     entry.details = details;
+    if (details?.result) entry.result = details.result;
+    if (details?.claim_token) entry.claim_token = details.claim_token;
+    if (details?.binding_id) entry.binding_id = details.binding_id;
     entry.updated_at = new Date().toISOString();
     entry.history.push({ state, at: entry.updated_at, details });
     await this.pruneAndSave(entries);
     return entry;
   }
 
-  async recoverUncertain() {
+  async markExecuted(command_id, { result, binding_id, execution = null }) {
+    return this.mark(command_id, JOURNAL_STATE.EXECUTED, { result, binding_id, execution });
+  }
+
+  async recoverAfterRestart() {
     const entries = await this.entries();
-    const recovered = [];
+    const recovered = { uncertain: [], reportable: [] };
     for (const entry of Object.values(entries)) {
-      if (entry.state === JOURNAL_STATE.SIDE_EFFECT_STARTED) {
+      if (entry.state === JOURNAL_STATE.EXECUTING || entry.state === JOURNAL_STATE.SIDE_EFFECT_STARTED) {
         entry.state = JOURNAL_STATE.UNCERTAIN;
         entry.updated_at = new Date().toISOString();
-        entry.history.push({ state: JOURNAL_STATE.UNCERTAIN, at: entry.updated_at, details: { reason: "SERVICE_WORKER_RESTART_AFTER_SIDE_EFFECT_START" } });
-        recovered.push(entry.command_id);
+        entry.history.push({ state: JOURNAL_STATE.UNCERTAIN, at: entry.updated_at, details: { reason: "SERVICE_WORKER_RESTART_DURING_EXECUTION" } });
+        recovered.uncertain.push(entry.command_id);
+      } else if (entry.state === JOURNAL_STATE.SIDE_EFFECT_CONFIRMED) {
+        if (entry.result || entry.details?.result) {
+          entry.state = JOURNAL_STATE.EXECUTED;
+          entry.result = entry.result ?? entry.details.result;
+          entry.updated_at = new Date().toISOString();
+          entry.history.push({ state: JOURNAL_STATE.EXECUTED, at: entry.updated_at, details: { reason: "MIGRATED_CONFIRMED_SIDE_EFFECT" } });
+          recovered.reportable.push(entry.command_id);
+        } else {
+          entry.state = JOURNAL_STATE.UNCERTAIN;
+          entry.updated_at = new Date().toISOString();
+          entry.history.push({ state: JOURNAL_STATE.UNCERTAIN, at: entry.updated_at, details: { reason: "CONFIRMED_WITHOUT_PERSISTED_RESULT" } });
+          recovered.uncertain.push(entry.command_id);
+        }
+      } else if (entry.state === JOURNAL_STATE.EXECUTED && entry.result) {
+        recovered.reportable.push(entry.command_id);
       }
     }
     await this.pruneAndSave(entries);
     return recovered;
   }
+
+  async recoverUncertain() { return this.recoverAfterRestart(); }
 
   async pruneAndSave(entries) {
     const sorted = Object.values(entries).sort((a, b) => b.updated_at.localeCompare(a.updated_at));

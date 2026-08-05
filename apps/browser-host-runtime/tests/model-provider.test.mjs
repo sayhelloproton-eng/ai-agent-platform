@@ -4,7 +4,7 @@ import { FixtureModelProvider } from "../src/background/model-inference.js";
 
 const observation = {
   observation_version: "0.1.0", observation_id: "obs", host_id: "host", binding_id: "binding",
-  provider: "chatgpt-web", page_state: "READY", generation_state: "IDLE", follow_latest: true,
+  provider: "chatgpt-web", gpt_ref: "g-test", conversation_ref: "conv", page_url: "https://chatgpt.com/g/g-test/c/conv", page_fingerprint: "sha256:page", page_state: "READY", generation_state: "IDLE", follow_latest: true,
   screenshot_ref: null, visible_text_ref: "text", dom_summary_ref: "dom", interactive_elements: [], blocking_ui: [],
   observed_at: new Date().toISOString()
 };

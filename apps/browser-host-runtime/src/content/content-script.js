@@ -19,6 +19,7 @@
 
   function safeError(code, message) { return { ok: false, error: { code, message } }; }
   function normalizeText(value) { return String(value ?? "").replace(/\s+/g, " ").trim(); }
+  function sleep(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
   function visible(element) {
     if (!(element instanceof Element)) return false;
     const style = getComputedStyle(element);
@@ -43,11 +44,21 @@
       title: document.title
     };
   }
+  function ensureExpectedIdentity(expected) {
+    if (!expected) return;
+    const current = identifyPage();
+    if (expected.gpt_ref && expected.gpt_ref !== current.gpt_ref) {
+      throw Object.assign(new Error("The page switched to a different GPT before the action completed."), { code: "PAGE_IDENTITY_CHANGED" });
+    }
+    if (expected.conversation_ref && expected.conversation_ref !== current.conversation_ref) {
+      throw Object.assign(new Error("The page switched to a different conversation before the action completed."), { code: "PAGE_IDENTITY_CHANGED" });
+    }
+  }
   function composer() {
     const candidates = [
       document.querySelector("#prompt-textarea"),
       document.querySelector('textarea[data-id="root"]'),
-      document.querySelector('textarea[placeholder]'),
+      document.querySelector("textarea[placeholder]"),
       document.querySelector('[contenteditable="true"][role="textbox"]'),
       document.querySelector('[contenteditable="true"]')
     ];
@@ -132,13 +143,30 @@
       landmarks: landmarks.map((element) => ({ role: roleOf(element), name: accessibleName(element) })).slice(0, 20)
     };
   }
+  function collectAccessibilitySummary() {
+    return [...document.querySelectorAll('[aria-label],[role],button,a,input,textarea')]
+      .filter(visible)
+      .slice(0, 120)
+      .map((element) => ({ role: roleOf(element), name: accessibleName(element), disabled: element.disabled === true || element.getAttribute("aria-disabled") === "true" }));
+  }
   function collectMessageSummary() {
-    const nodes = [...document.querySelectorAll('[data-message-author-role],article')].filter(visible).slice(-8);
+    const nodes = [...document.querySelectorAll('[data-message-author-role],article')].filter(visible).slice(-12);
     return nodes.map((node, index) => ({
       index,
       role: node.getAttribute("data-message-author-role") || "unknown",
-      text: normalizeText(node.innerText || node.textContent).slice(0, 2000)
+      text: normalizeText(node.innerText || node.textContent).slice(0, 4000)
     }));
+  }
+  function responseSnapshot() {
+    const messages = collectMessageSummary();
+    const assistant = messages.filter((item) => item.role === "assistant" || item.role === "unknown");
+    return {
+      message_count: messages.length,
+      assistant_count: assistant.length,
+      last_assistant_text: assistant.at(-1)?.text ?? "",
+      generation_state: generationState(),
+      identity: identifyPage()
+    };
   }
   function observe(observationId) {
     if (state.followLatest && !state.userReviewing) scrollToBottom();
@@ -153,6 +181,7 @@
       user_active: Date.now() < state.userActiveUntil,
       visible_text: String(document.body?.innerText ?? "").slice(0, 20000),
       dom_summary: collectDomSummary(),
+      accessibility_summary: collectAccessibilitySummary(),
       message_summary: collectMessageSummary(),
       interactive_elements: collectInteractive(observationId),
       blocking_ui: blockingUi(),
@@ -162,8 +191,9 @@
   function ensureNoUserConflict() {
     if (Date.now() < state.userActiveUntil || state.userReviewing) throw Object.assign(new Error("User is currently controlling or reviewing the page."), { code: "USER_CONTROL_ACTIVE" });
   }
-  function setComposerText(text) {
+  function setComposerText(text, expectedIdentity = null) {
     ensureNoUserConflict();
+    ensureExpectedIdentity(expectedIdentity);
     const target = composer();
     if (!target) throw Object.assign(new Error("ChatGPT composer was not found."), { code: "COMPOSER_NOT_FOUND" });
     target.focus();
@@ -182,20 +212,43 @@
     }
     target.dispatchEvent(new InputEvent("input", { bubbles: true, inputType: "insertText", data: text }));
     target.dispatchEvent(new Event("change", { bubbles: true }));
+    ensureExpectedIdentity(expectedIdentity);
     return { composer_text: normalizeText(target.value ?? target.innerText ?? target.textContent) };
   }
-  function submitMessage(text) {
-    const set = setComposerText(text);
+
+  async function waitForCompleteResponse(payload, baseline) {
+    return globalThis.BhrResponseLifecycle.waitForCompleteResponse({
+      payload,
+      baseline,
+      snapshot: responseSnapshot,
+      ensureIdentity: ensureExpectedIdentity,
+      isInterrupted: () => state.userReviewing || Date.now() < state.userActiveUntil
+    });
+  }
+
+  async function submitMessage(payload) {
+    const baseline = responseSnapshot();
+    const set = setComposerText(payload.text, payload.expected_identity);
+    ensureExpectedIdentity(payload.expected_identity);
     const send = findButton([/send message/i, /^send$/i, /发送消息/, /^发送$/]);
     if (!send || send.disabled || send.getAttribute("aria-disabled") === "true") {
       throw Object.assign(new Error("Enabled ChatGPT send button was not found."), { code: "SEND_BUTTON_NOT_READY" });
     }
-    const before = collectMessageSummary().length;
     send.click();
-    return { status: "ACTION_SUCCEEDED", details: { submitted_text: set.composer_text, message_count_before: before } };
+    const submittedAt = new Date().toISOString();
+    if (payload.wait_for_response === false) {
+      return { status: "ACTION_SUCCEEDED", details: { message_submitted: true, submitted_at: submittedAt, submitted_text: set.composer_text } };
+    }
+    const completed = await waitForCompleteResponse(payload, baseline);
+    return {
+      ...completed,
+      details: { ...completed.details, submitted_at: submittedAt, submitted_text: set.composer_text, message_count_before: baseline.message_count }
+    };
   }
+
   function clickRegistered(payload) {
     ensureNoUserConflict();
+    ensureExpectedIdentity(payload.expected_identity);
     if (payload.observation_id !== state.currentObservationId) throw Object.assign(new Error("Element reference belongs to a stale observation."), { code: "ELEMENT_REFERENCE_STALE" });
     const element = state.elementCatalog.get(payload.element_ref);
     if (!element || !visible(element)) throw Object.assign(new Error("Registered element is no longer available."), { code: "ELEMENT_NOT_AVAILABLE" });
@@ -205,27 +258,21 @@
     element.click();
     return { status: "ACTION_SUCCEEDED", details: { element_ref: payload.element_ref, accessible_name: accessibleName(element) } };
   }
+
   async function waitForResponse(payload) {
-    const timeoutMs = Math.min(Math.max(Number(payload.timeout_ms ?? 60000), 1000), 120000);
-    const initial = generationState();
-    const started = Date.now();
-    while (Date.now() - started < timeoutMs) {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      const current = generationState();
-      if (initial === "RUNNING" && current === "IDLE") return { status: "ACTION_SUCCEEDED", details: { response_completed: true } };
-      if (initial === "IDLE" && current === "RUNNING") return { status: "ACTION_SUCCEEDED", details: { response_started: true } };
-    }
-    return { status: "UNCERTAIN", details: { reason: "WAIT_TIMEOUT" } };
+    return waitForCompleteResponse(payload, responseSnapshot());
   }
+
   async function execute(actionType, payload) {
     if (!ACTIONS.has(actionType)) throw Object.assign(new Error(`Unsupported action: ${actionType}`), { code: "ACTION_NOT_REGISTERED" });
     switch (actionType) {
       case "OBSERVE_PAGE": return { status: "ACTION_SUCCEEDED", details: {} };
       case "FOLLOW_LATEST": state.followLatest = payload.enabled !== false; state.userReviewing = false; if (state.followLatest) scrollToBottom(); return { status: "ACTION_SUCCEEDED", details: { follow_latest: state.followLatest } };
-      case "SET_COMPOSER_TEXT": return { status: "ACTION_SUCCEEDED", details: setComposerText(payload.text) };
-      case "SUBMIT_MESSAGE": return submitMessage(payload.text);
+      case "SET_COMPOSER_TEXT": return { status: "ACTION_SUCCEEDED", details: setComposerText(payload.text, payload.expected_identity) };
+      case "SUBMIT_MESSAGE": return submitMessage(payload);
       case "STOP_GENERATION": {
         ensureNoUserConflict();
+        ensureExpectedIdentity(payload.expected_identity);
         const stop = findButton([/stop generating/i, /停止生成/, /停止回答/, /^停止$/]);
         if (!stop) throw Object.assign(new Error("Stop generation button was not found."), { code: "STOP_BUTTON_NOT_FOUND" });
         stop.click();
@@ -248,7 +295,8 @@
   function schedulePageSignal() {
     clearTimeout(state.signalTimer);
     state.signalTimer = setTimeout(() => {
-      const signal = JSON.stringify({ page_state: pageState(), generation_state: generationState(), blocking_types: blockingUi().map((item) => item.type) });
+      const identity = identifyPage();
+      const signal = JSON.stringify({ page_state: pageState(), generation_state: generationState(), blocking_types: blockingUi().map((item) => item.type), gpt_ref: identity.gpt_ref, conversation_ref: identity.conversation_ref, url: identity.url });
       if (signal === state.lastPageSignal) return;
       state.lastPageSignal = signal;
       chrome.runtime.sendMessage({ type: "BHR_PAGE_SIGNAL", signal: JSON.parse(signal) }).catch(() => {});

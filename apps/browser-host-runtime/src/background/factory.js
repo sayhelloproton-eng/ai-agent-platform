@@ -9,16 +9,23 @@ import { ObservationCoordinator } from "./observation-coordinator.js";
 import { FixtureModelProvider, HttpDeepSeekProvider } from "./model-inference.js";
 import { CommandJournal } from "./command-journal.js";
 import { BrowserActionExecutor } from "./action-executor.js";
+import { RoleSessionManager } from "./role-session-manager.js";
 import { RuntimeCoordinator } from "./runtime-coordinator.js";
+import { BhrError } from "../shared/errors.js";
 
 export async function createRuntime() {
   const localStorage = new ChromeStorageArea(chrome.storage.local);
   const sessionStorage = new ChromeStorageArea(chrome.storage.session);
   const config = await readConfig();
   const secrets = await readSessionSecrets();
-  const gateway = config.transport_mode === "gateway"
-    ? new HttpGatewayClient({ endpoint: config.gateway_endpoint, apiKey: secrets.gateway_api_key, timeoutMs: config.gateway_timeout_ms })
-    : new FixtureGatewayClient(localStorage);
+  let gateway;
+  if (config.transport_mode === "gateway") {
+    gateway = new HttpGatewayClient({ endpoint: config.gateway_endpoint, apiKey: secrets.gateway_api_key, timeoutMs: config.gateway_timeout_ms });
+  } else if (config.transport_mode === "fixture" && config.fixture_test_mode) {
+    gateway = new FixtureGatewayClient(localStorage);
+  } else {
+    throw new BhrError("FIXTURE_TRANSPORT_DISABLED", "Fixture Gateway is test-only. Enable fixture_test_mode explicitly or configure the real Gateway transport.");
+  }
   const hostRegistry = new HostRegistry(localStorage, gateway);
   const host = await hostRegistry.getOrCreate();
   const bindingRegistry = new BindingRegistry(localStorage);
@@ -28,6 +35,8 @@ export async function createRuntime() {
     ? new HttpDeepSeekProvider({ endpoint: config.model_endpoint, apiKey: secrets.model_api_key, timeoutMs: config.model_timeout_ms })
     : new FixtureModelProvider();
   const journal = new CommandJournal(localStorage);
+  const roleSessionManager = new RoleSessionManager({ host_id: host.host_id, bindingRegistry });
+  const actionExecutor = new BrowserActionExecutor({ roleSessionManager });
   const coordinator = new RuntimeCoordinator({
     host_id: host.host_id,
     dispatchClient: new DispatchClient(gateway),
@@ -35,10 +44,25 @@ export async function createRuntime() {
     bindingRegistry,
     journal,
     observationCoordinator,
-    actionExecutor: new BrowserActionExecutor(),
+    actionExecutor,
     modelProvider,
     evidenceStore,
     configProvider: readConfig
   });
-  return { config, gateway, host, hostRegistry, bindingRegistry, evidenceStore, observationCoordinator, modelProvider, journal, coordinator, localStorage, sessionStorage };
+  return {
+    config,
+    gateway,
+    host,
+    hostRegistry,
+    bindingRegistry,
+    evidenceStore,
+    observationCoordinator,
+    modelProvider,
+    journal,
+    roleSessionManager,
+    actionExecutor,
+    coordinator,
+    localStorage,
+    sessionStorage
+  };
 }

@@ -1,8 +1,10 @@
+import { APPROVAL_POLICY_MODE } from "../shared/constants.js";
+
 const LOCAL_KEY = "bhr.config";
 const SESSION_SECRET_KEY = "bhr.session_secrets";
 
 export const DEFAULT_CONFIG = Object.freeze({
-  transport_mode: "fixture",
+  transport_mode: "gateway",
   gateway_endpoint: "http://127.0.0.1:8787/v1/browser-host/invoke",
   gateway_timeout_ms: 5000,
   dispatch_poll_seconds: 30,
@@ -13,6 +15,8 @@ export const DEFAULT_CONFIG = Object.freeze({
   model_timeout_ms: 20000,
   screenshot_quality: 75,
   observe_visible_text_max_chars: 20000,
+  approval_policy_mode: APPROVAL_POLICY_MODE.STRICT,
+  fixture_test_mode: false,
   paused: false,
   emergency_stopped: false
 });

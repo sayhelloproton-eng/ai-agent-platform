@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "AI Agent Platform Browser Host Runtime",
-  "version": "0.1.0",
-  "description": "Observe and execute approved ChatGPT browser-host actions for ai-agent-platform.",
+  "version": "0.2.0",
+  "description": "Observe, open and drive approved ChatGPT role sessions for ai-agent-platform.",
   "minimum_chrome_version": "120",
   "permissions": [
     "activeTab",
@@ -22,8 +22,13 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://chatgpt.com/*"],
-      "js": ["src/content/content-script.js"],
+      "matches": [
+        "https://chatgpt.com/*"
+      ],
+      "js": [
+        "src/content/response-lifecycle.js",
+        "src/content/content-script.js"
+      ],
       "run_at": "document_idle"
     }
   ],

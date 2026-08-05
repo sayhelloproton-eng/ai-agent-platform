@@ -15,3 +15,13 @@ test("message payload is bounded", () => {
 test("navigation is limited to ChatGPT", () => {
   assert.throws(() => validateResolvedPayload("OPEN_OR_RESUME_SESSION", { url: "https://example.com" }), /chatgpt/i);
 });
+
+test("platform wake approval proposal is opt-in and strict remains default", () => {
+  const command = {
+    action: { type: "SUBMIT_MESSAGE" },
+    preconditions: { authorization_class: "PLATFORM_WAKE", authorization_ref: "dispatch-auth-1" }
+  };
+  assert.equal(requiresApproval(command), true);
+  assert.equal(requiresApproval(command, { mode: "platform_wake_proposal" }), false);
+  assert.equal(requiresApproval({ ...command, action: { type: "CLICK_REGISTERED_UI" } }, { mode: "platform_wake_proposal" }), true);
+});
