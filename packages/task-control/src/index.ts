@@ -6,11 +6,25 @@ export {
   type DecisionContextPlanNodeContractV1,
 } from "./contracts.js";
 export {
+  TASK_CONTROL_INTEGRATION_PROPOSAL_VERSION,
+  toBrowserDispatchProposal,
+  toControllerInputProposal,
+  toLocalWorkRequestProposal,
+  type BrowserDispatchProposal,
+  type BrowserHostResultProposal,
+  type ControllerClaimProposal,
+  type ControllerDecisionProposal,
+  type ControllerInputProposal,
+  type LocalWorkCompletionProposal,
+  type LocalWorkRequestProposal,
+} from "./integration-proposals.js";
+export {
   TASK_CONTROL_ERROR_CODES,
   TaskControlError,
   type TaskControlErrorCode,
 } from "./error.js";
 export {
+  APPROVAL_RESOLUTIONS,
   ATTENTION_TYPES,
   DISPATCH_STATUSES,
   HOST_COMMAND_TYPES,
@@ -21,6 +35,7 @@ export {
   TASK_EVENT_TYPES,
   TASK_STATUSES,
   WORK_ITEM_STATUSES,
+  type ApprovalResolution,
   type AttentionType,
   type ClaimControllerInput,
   type ClaimDispatchInput,
@@ -47,6 +62,7 @@ export {
   type ReportDispatchInput,
   type ReportWorkFailureInput,
   type ReportWorkResultInput,
+  type ResolveApprovalInput,
   type RoleAttentionEntry,
   type SubmitControllerCommandInput,
   type TaskAggregate,
@@ -63,6 +79,7 @@ export {
 export {
   RandomIdGenerator,
   SystemClock,
+  type ApprovalResolutionPort,
   type Clock,
   type IdGenerator,
   type TaskControlStore,

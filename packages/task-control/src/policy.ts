@@ -39,6 +39,14 @@ export function isTerminalTaskStatus(status: TaskStatus): boolean {
   return status === "COMPLETED" || status === "FAILED" || status === "CANCELLED";
 }
 
+export function isTerminalPlanNodeStatus(status: PlanNodeStatus): boolean {
+  return status === "COMPLETED" || status === "SKIPPED" || status === "CANCELLED";
+}
+
+export function isPlanComplete(plan: TaskPlan): boolean {
+  return plan.currentNodeId === null && plan.nodes.every((node) => isTerminalPlanNodeStatus(node.status));
+}
+
 export function isClaimExpired(expiresAt: string, now: Date): boolean {
   return Date.parse(expiresAt) <= now.getTime();
 }
@@ -166,7 +174,14 @@ export function dependenciesSatisfied(plan: TaskPlan, node: PlanNode): boolean {
 }
 
 export function controllerClaimable(status: TaskStatus): boolean {
-  return status === "PLAN_REQUIRED" || status === "READY_FOR_CONTROLLER" || status === "BLOCKED";
+  return [
+    "PLAN_REQUIRED",
+    "READY_FOR_CONTROLLER",
+    "WAITING_FOR_ROLE_WORK",
+    "WAITING_FOR_APPROVAL",
+    "BLOCKED",
+    "PAUSED",
+  ].includes(status);
 }
 
 export function allowedControllerCommands(task: TaskAggregate): readonly ControllerCommand["type"][] {
@@ -191,7 +206,7 @@ export function allowedControllerCommands(task: TaskAggregate): readonly Control
     case "WAITING_FOR_APPROVAL":
       return ["PAUSE_TASK", "FAIL_TASK", "RELEASE_CLAIM"];
     case "PAUSED":
-      return ["RELEASE_CLAIM"];
+      return ["RESUME_TASK", "FAIL_TASK", "RELEASE_CLAIM"];
     case "CREATED":
       return ["CREATE_PLAN", "FAIL_TASK", "RELEASE_CLAIM"];
     default:
@@ -211,12 +226,36 @@ export function assertCommandAllowed(task: TaskAggregate, command: ControllerCom
 export function assertTaskConsistency(task: TaskAggregate): void {
   if (task.plan !== null) {
     validatePlanNodes(task.plan.nodes, task.plan.currentNodeId);
+    if (task.plan.status === "COMPLETED") {
+      invariant(
+        isPlanComplete(task.plan),
+        "INTERNAL_CONSISTENCY_ERROR",
+        "Completed Plan must have no current node and all nodes must be terminal.",
+      );
+    }
   }
   if (task.status === "PLAN_REQUIRED") {
     invariant(task.plan === null, "INTERNAL_CONSISTENCY_ERROR", "PLAN_REQUIRED task must not have a plan.");
   }
   if (task.status === "COMPLETED") {
-    invariant(task.plan?.status === "COMPLETED", "INTERNAL_CONSISTENCY_ERROR", "Completed task must have a completed plan.");
+    invariant(
+      task.plan !== null && task.plan.status === "COMPLETED" && isPlanComplete(task.plan),
+      "INTERNAL_CONSISTENCY_ERROR",
+      "Completed task must have a fully completed plan.",
+    );
+  }
+  if (task.status === "PAUSED") {
+    invariant(
+      task.resumeStatus !== null && task.resumeStatus !== "PAUSED" && !isTerminalTaskStatus(task.resumeStatus),
+      "INTERNAL_CONSISTENCY_ERROR",
+      "Paused task must preserve a non-terminal resume status.",
+    );
+  } else {
+    invariant(
+      task.resumeStatus === null,
+      "INTERNAL_CONSISTENCY_ERROR",
+      "Only paused tasks may preserve a resume status.",
+    );
   }
 }
 

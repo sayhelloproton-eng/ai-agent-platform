@@ -46,6 +46,15 @@ function validateTaskRecord(key: string, value: unknown): TaskAggregate {
   if (!TASK_STATUSES.includes(value.status as (typeof TASK_STATUSES)[number])) {
     throw new TypeError(`tasks.${key}.status is unsupported.`);
   }
+  if (value.resumeStatus === undefined) {
+    value.resumeStatus = value.status === "PAUSED" ? "READY_FOR_CONTROLLER" : null;
+  }
+  if (
+    value.resumeStatus !== null &&
+    !TASK_STATUSES.includes(value.resumeStatus as (typeof TASK_STATUSES)[number])
+  ) {
+    throw new TypeError(`tasks.${key}.resumeStatus is unsupported.`);
+  }
   requiredString(value.title, `tasks.${key}.title`);
   requiredString(value.objective, `tasks.${key}.objective`);
   requiredString(value.requiredRole, `tasks.${key}.requiredRole`);
@@ -113,6 +122,20 @@ function validateStateShape(value: unknown): TaskControlState {
     if (!Number.isSafeInteger(signal.claimEpoch) || Number(signal.claimEpoch) < 0) {
       throw new TypeError(`dispatchSignals.${key}.claimEpoch must be a non-negative safe integer.`);
     }
+  }
+
+  const idempotencyRecords = value.idempotencyRecords as Record<string, unknown>;
+  for (const [key, record] of Object.entries(idempotencyRecords)) {
+    if (!isRecord(record)) throw new TypeError(`idempotencyRecords.${key} must be an object.`);
+    requiredString(record.scope, `idempotencyRecords.${key}.scope`);
+    requiredString(record.key, `idempotencyRecords.${key}.key`);
+    if (record.requestFingerprint === undefined) {
+      record.requestFingerprint = `legacy:${record.scope}:${record.key}`;
+    }
+    requiredString(
+      record.requestFingerprint,
+      `idempotencyRecords.${key}.requestFingerprint`,
+    );
   }
 
   return value as unknown as TaskControlState;

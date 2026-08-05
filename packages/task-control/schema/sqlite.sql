@@ -50,6 +50,7 @@ CREATE INDEX IF NOT EXISTS idx_dispatch_pending ON dispatch_signals(status, crea
 CREATE TABLE IF NOT EXISTS idempotency_records (
   scope TEXT NOT NULL,
   idempotency_key TEXT NOT NULL,
+  request_fingerprint TEXT NOT NULL,
   result_json TEXT NOT NULL,
   created_at TEXT NOT NULL,
   PRIMARY KEY (scope, idempotency_key)

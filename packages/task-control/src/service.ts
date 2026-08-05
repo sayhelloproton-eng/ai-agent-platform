@@ -17,12 +17,14 @@ import {
   type ReportDispatchInput,
   type ReportWorkFailureInput,
   type ReportWorkResultInput,
+  type ResolveApprovalInput,
   type RoleAttentionEntry,
   type SubmitControllerCommandInput,
   type TaskAggregate,
   type TaskControlState,
   type TaskEvent,
   type TaskPlan,
+  type TaskStatus,
   type WorkItem,
 } from "./model.js";
 import type { Clock, IdGenerator, TaskControlStore } from "./ports.js";
@@ -36,8 +38,10 @@ import {
   assertTaskConsistency,
   controllerClaimable,
   createPlan,
+  dependenciesSatisfied,
   getPlanNode,
   isClaimExpired,
+  isPlanComplete,
   isTerminalTaskStatus,
   normalizeNode,
   validatePlanNodes,
@@ -50,6 +54,7 @@ import {
   workItemsForTask,
 } from "./projections.js";
 import { TaskReconciler } from "./reconciler.js";
+import { requestFingerprint } from "./request-fingerprint.js";
 
 interface ControllerClaimResult {
   readonly claim: ControllerClaim;
@@ -82,20 +87,35 @@ function idempotencyGet<T>(
   state: Readonly<TaskControlState>,
   scope: string,
   key: string,
+  fingerprint: string,
 ): T | undefined {
   const record = state.idempotencyRecords[idempotencyComposite(scope, key)];
-  return record === undefined ? undefined : (structuredClone(record.result) as T);
+  if (record === undefined) return undefined;
+  invariant(
+    record.requestFingerprint === fingerprint,
+    "IDEMPOTENCY_KEY_CONFLICT",
+    "Idempotency key was already used for a different request.",
+    { scope, key },
+  );
+  return structuredClone(record.result) as T;
 }
 
 function idempotencyPut(
   state: TaskControlState,
   scope: string,
   key: string,
+  fingerprint: string,
   result: JsonValue,
   now: string,
 ): void {
   const composite = idempotencyComposite(scope, key);
-  const record: IdempotencyRecord = { scope, key, result, createdAt: now };
+  const record: IdempotencyRecord = {
+    scope,
+    key,
+    requestFingerprint: fingerprint,
+    result,
+    createdAt: now,
+  };
   state.idempotencyRecords[composite] = record;
 }
 
@@ -185,6 +205,59 @@ function withPlanVersion(plan: TaskPlan, now: string): TaskPlan {
 
 function addUnique(values: readonly string[], additions: readonly string[]): readonly string[] {
   return [...new Set([...values, ...additions])];
+}
+
+function removeValue(values: readonly string[], value: string): readonly string[] {
+  return values.filter((item) => item !== value);
+}
+
+function activeWorkForNode(
+  state: Readonly<TaskControlState>,
+  taskId: string,
+  nodeId: string,
+): WorkItem | undefined {
+  return Object.values(state.workItems).find(
+    (item) =>
+      item.taskId === taskId &&
+      item.planNodeId === nodeId &&
+      (item.status === "PENDING" || item.status === "CLAIMED"),
+  );
+}
+
+function setOperationalStatus(task: TaskAggregate, nextStatus: TaskStatus): TaskAggregate {
+  if (task.status === "PAUSED") {
+    return { ...task, resumeStatus: nextStatus };
+  }
+  return { ...task, status: nextStatus };
+}
+
+function deriveResumeStatus(
+  state: Readonly<TaskControlState>,
+  task: TaskAggregate,
+): TaskStatus {
+  if (task.plan === null) return "PLAN_REQUIRED";
+  const currentNode =
+    task.plan.currentNodeId === null
+      ? undefined
+      : task.plan.nodes.find((node) => node.nodeId === task.plan!.currentNodeId);
+  if (
+    task.approvalRefs.length > 0 ||
+    currentNode?.status === "WAITING_APPROVAL"
+  ) {
+    return "WAITING_FOR_APPROVAL";
+  }
+  if (
+    currentNode?.status === "WAITING_RESULT" ||
+    Object.values(state.workItems).some(
+      (item) =>
+        item.taskId === task.taskId &&
+        (item.status === "PENDING" || item.status === "CLAIMED"),
+    )
+  ) {
+    return "WAITING_FOR_ROLE_WORK";
+  }
+  if (task.blockedReason !== null || currentNode?.status === "BLOCKED") return "BLOCKED";
+  return task.resumeStatus ?? "READY_FOR_CONTROLLER";
 }
 
 function applyPlanOperations(
@@ -284,8 +357,14 @@ export class TaskControlService {
     assertNonEmpty(input.producerRef, "producerRef");
 
     const scope = `task.create:${input.taskId}`;
+    const fingerprint = requestFingerprint(input);
     const created = await this.store.transact((state) => {
-      const duplicate = idempotencyGet<{ taskId: string }>(state, scope, input.idempotencyKey);
+      const duplicate = idempotencyGet<{ taskId: string }>(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+      );
       if (duplicate !== undefined) return duplicate.taskId;
       invariant(state.tasks[input.taskId] === undefined, "TASK_ALREADY_EXISTS", "Task already exists.", {
         taskId: input.taskId,
@@ -309,6 +388,7 @@ export class TaskControlService {
         conversationRef: input.conversationRef ?? null,
         blockedReason: null,
         pausedReason: null,
+        resumeStatus: null,
         terminalSummary: null,
         createdAt: now,
         updatedAt: now,
@@ -340,7 +420,14 @@ export class TaskControlService {
       }
       task = { ...task, latestEventId: latest.eventId };
       state.tasks[task.taskId] = task;
-      idempotencyPut(state, scope, input.idempotencyKey, { taskId: task.taskId }, now);
+      idempotencyPut(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+        { taskId: task.taskId },
+        now,
+      );
       return task.taskId;
     });
 
@@ -400,8 +487,14 @@ export class TaskControlService {
     assertContractVersion(input.contractVersion);
     assertPositiveInteger(input.leaseMs, "leaseMs");
     const scope = `controller.claim:${input.taskId}:${input.profileId}`;
+    const fingerprint = requestFingerprint(input);
     return this.store.transact((state) => {
-      const duplicate = idempotencyGet<ControllerClaimResult>(state, scope, input.idempotencyKey);
+      const duplicate = idempotencyGet<ControllerClaimResult>(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+      );
       if (duplicate !== undefined) return duplicate;
       const current = state.tasks[input.taskId];
       invariant(current !== undefined, "TASK_NOT_FOUND", "Task was not found.", { taskId: input.taskId });
@@ -440,6 +533,7 @@ export class TaskControlService {
         expiresAt: baseLease.expiresAt,
       };
       const now = nowDate.toISOString();
+      const replacedClaim = current.controllerClaim;
       let task: TaskAggregate = {
         ...current,
         taskVersion: current.taskVersion + 1,
@@ -453,16 +547,40 @@ export class TaskControlService {
           claim: null,
         };
       }
+      let causationId = current.latestEventId;
+      if (replacedClaim !== null) {
+        const releasedEvent = appendEvent(
+          state,
+          task,
+          "CONTROLLER_CLAIM_RELEASED",
+          input.profileId,
+          {
+            claimId: replacedClaim.claimId,
+            claimEpoch: replacedClaim.claimEpoch,
+            reason: "expired-replaced",
+          },
+          now,
+          this.ids,
+          input.correlationId ?? null,
+          causationId,
+        );
+        causationId = releasedEvent.eventId;
+      }
       const claimedEvent = appendEvent(
         state,
         task,
         "CONTROLLER_CLAIMED",
         input.profileId,
-        { claimId: claim.claimId, roleId: claim.roleId, claimEpoch: claim.claimEpoch },
+        {
+          claimId: claim.claimId,
+          roleId: claim.roleId,
+          claimEpoch: claim.claimEpoch,
+          reclaimed: replacedClaim !== null,
+        },
         now,
         this.ids,
         input.correlationId ?? null,
-        current.latestEventId,
+        causationId,
       );
       task = { ...task, latestEventId: claimedEvent.eventId };
       state.tasks[task.taskId] = task;
@@ -471,7 +589,14 @@ export class TaskControlService {
         taskVersion: task.taskVersion,
         planVersion: task.plan?.planVersion ?? null,
       };
-      idempotencyPut(state, scope, input.idempotencyKey, result as unknown as JsonValue, now);
+      idempotencyPut(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+        result as unknown as JsonValue,
+        now,
+      );
       return result;
     });
   }
@@ -483,8 +608,14 @@ export class TaskControlService {
     idempotencyKey: string,
   ): Promise<TaskAggregate> {
     const scope = `controller.release:${taskId}`;
+    const fingerprint = requestFingerprint({ taskId, claimToken, producerRef });
     await this.store.transact((state) => {
-      const duplicate = idempotencyGet<{ taskId: string }>(state, scope, idempotencyKey);
+      const duplicate = idempotencyGet<{ taskId: string }>(
+        state,
+        scope,
+        idempotencyKey,
+        fingerprint,
+      );
       if (duplicate !== undefined) return;
       const current = state.tasks[taskId];
       invariant(current !== undefined, "TASK_NOT_FOUND", "Task was not found.", { taskId });
@@ -509,7 +640,7 @@ export class TaskControlService {
       );
       task = { ...task, latestEventId: released.eventId };
       state.tasks[taskId] = task;
-      idempotencyPut(state, scope, idempotencyKey, { taskId }, now);
+      idempotencyPut(state, scope, idempotencyKey, fingerprint, { taskId }, now);
     });
     await this.reconciler.reconcile(taskId);
     return this.getTask(taskId);
@@ -519,8 +650,14 @@ export class TaskControlService {
     assertContractVersion(input.commandContractVersion);
     assertNonEmpty(input.idempotencyKey, "idempotencyKey");
     const scope = `controller.command:${input.taskId}`;
+    const fingerprint = requestFingerprint(input);
     const result = await this.store.transact((state) => {
-      const duplicate = idempotencyGet<CommandResult>(state, scope, input.idempotencyKey);
+      const duplicate = idempotencyGet<CommandResult>(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+      );
       if (duplicate !== undefined) return duplicate;
       const current = state.tasks[input.taskId];
       invariant(current !== undefined, "TASK_NOT_FOUND", "Task was not found.", { taskId: input.taskId });
@@ -558,6 +695,15 @@ export class TaskControlService {
         case "ADVANCE_PLAN_NODE": {
           invariant(plan !== null, "INVALID_PLAN", "Task has no plan.");
           const command = input.command;
+          invariant(
+            plan.currentNodeId === command.payload.nodeId,
+            "COMMAND_NOT_ALLOWED",
+            "Only the current Plan Node can be advanced.",
+            {
+              currentNodeId: plan.currentNodeId,
+              requestedNodeId: command.payload.nodeId,
+            },
+          );
           getPlanNode(task, command.payload.nodeId);
           let nextPlan = updateNode(
             plan,
@@ -571,6 +717,24 @@ export class TaskControlService {
             now,
           );
           if (command.payload.nextNodeId !== undefined) {
+            const nextNode = nextPlan.nodes.find(
+              (node) => node.nodeId === command.payload.nextNodeId,
+            );
+            invariant(nextNode !== undefined, "PLAN_NODE_NOT_FOUND", "Next Plan Node was not found.", {
+              nextNodeId: command.payload.nextNodeId,
+            });
+            invariant(
+              !["COMPLETED", "SKIPPED", "CANCELLED", "FAILED"].includes(nextNode.status),
+              "COMMAND_NOT_ALLOWED",
+              "Next Plan Node must not already be terminal.",
+              { nextNodeId: nextNode.nodeId, nodeStatus: nextNode.status },
+            );
+            invariant(
+              dependenciesSatisfied(nextPlan, nextNode),
+              "COMMAND_NOT_ALLOWED",
+              "Next Plan Node dependencies are not satisfied.",
+              { nextNodeId: nextNode.nodeId },
+            );
             nextPlan = updateNode(
               nextPlan,
               command.payload.nextNodeId,
@@ -579,10 +743,21 @@ export class TaskControlService {
             );
             nextPlan = { ...nextPlan, currentNodeId: command.payload.nextNodeId };
           } else {
-            nextPlan = { ...nextPlan, currentNodeId: null, status: "COMPLETED" };
+            const candidate = { ...nextPlan, currentNodeId: null } as TaskPlan;
+            invariant(
+              isPlanComplete(candidate),
+              "COMMAND_NOT_ALLOWED",
+              "Plan cannot be completed while unfinished nodes remain.",
+              {
+                unfinishedNodeIds: candidate.nodes
+                  .filter((node) => !["COMPLETED", "SKIPPED", "CANCELLED"].includes(node.status))
+                  .map((node) => node.nodeId),
+              },
+            );
+            nextPlan = { ...candidate, status: "COMPLETED" };
           }
           plan = withPlanVersion(nextPlan, now);
-          task = { ...task, plan, status: "READY_FOR_CONTROLLER" };
+          task = { ...task, plan, status: "READY_FOR_CONTROLLER", blockedReason: null };
           eventSpecs.push({
             type: "TASK_PLAN_REVISED",
             payload: { planVersion: plan.planVersion, advancedNodeId: command.payload.nodeId },
@@ -594,10 +769,22 @@ export class TaskControlService {
           const command = input.command;
           const node = getPlanNode(task, command.payload.nodeId);
           invariant(
-            ["READY", "IN_PROGRESS", "BLOCKED"].includes(node.status),
+            plan.currentNodeId === node.nodeId,
             "COMMAND_NOT_ALLOWED",
-            "Plan Node cannot request role work in its current state.",
+            "Only the current Plan Node can create a Work Item.",
+            { currentNodeId: plan.currentNodeId, requestedNodeId: node.nodeId },
+          );
+          invariant(
+            ["READY", "IN_PROGRESS"].includes(node.status) && dependenciesSatisfied(plan, node),
+            "COMMAND_NOT_ALLOWED",
+            "Current Plan Node is not executable.",
             { nodeId: node.nodeId, nodeStatus: node.status },
+          );
+          invariant(
+            activeWorkForNode(state, task.taskId, node.nodeId) === undefined,
+            "COMMAND_NOT_ALLOWED",
+            "Current Plan Node already has an active Work Item.",
+            { nodeId: node.nodeId },
           );
           const workItemId = this.ids.next("work");
           const workItem: WorkItem = {
@@ -647,7 +834,20 @@ export class TaskControlService {
         case "REQUEST_APPROVAL": {
           invariant(plan !== null, "INVALID_PLAN", "Task has no plan.");
           const command = input.command;
-          getPlanNode(task, command.payload.nodeId);
+          const approvalNode = getPlanNode(task, command.payload.nodeId);
+          invariant(
+            plan.currentNodeId === approvalNode.nodeId,
+            "COMMAND_NOT_ALLOWED",
+            "Only the current Plan Node can request approval.",
+            { currentNodeId: plan.currentNodeId, requestedNodeId: approvalNode.nodeId },
+          );
+          invariant(
+            ["READY", "IN_PROGRESS"].includes(approvalNode.status) &&
+              dependenciesSatisfied(plan, approvalNode),
+            "COMMAND_NOT_ALLOWED",
+            "Current Plan Node cannot request approval before it is executable.",
+            { nodeId: approvalNode.nodeId, nodeStatus: approvalNode.status },
+          );
           plan = withPlanVersion(
             updateNode(
               plan,
@@ -681,22 +881,52 @@ export class TaskControlService {
           break;
         }
         case "PAUSE_TASK": {
-          task = { ...task, status: "PAUSED", pausedReason: input.command.payload.reason };
+          task = {
+            ...task,
+            status: "PAUSED",
+            pausedReason: input.command.payload.reason,
+            resumeStatus: task.status,
+          };
           releaseClaim = true;
-          eventSpecs.push({ type: "TASK_PAUSED", payload: { reason: input.command.payload.reason } });
+          eventSpecs.push({
+            type: "TASK_PAUSED",
+            payload: {
+              reason: input.command.payload.reason,
+              resumeStatus: task.resumeStatus!,
+            },
+          });
+          break;
+        }
+        case "RESUME_TASK": {
+          invariant(task.status === "PAUSED", "COMMAND_NOT_ALLOWED", "Only a paused Task can resume.");
+          const resumeStatus = deriveResumeStatus(state, task);
+          task = {
+            ...task,
+            status: resumeStatus,
+            pausedReason: null,
+            resumeStatus: null,
+          };
+          releaseClaim = true;
+          eventSpecs.push({
+            type: "TASK_RESUMED",
+            payload: {
+              reason: input.command.payload.reason ?? "resume-requested",
+              resumedTo: resumeStatus,
+            },
+          });
           break;
         }
         case "COMPLETE_TASK": {
           invariant(plan !== null, "INVALID_PLAN", "Task has no plan.");
           invariant(
-            plan.status === "COMPLETED" &&
-              plan.nodes.every((node) => ["COMPLETED", "SKIPPED", "CANCELLED"].includes(node.status)),
+            plan.status === "COMPLETED" && isPlanComplete(plan),
             "COMMAND_NOT_ALLOWED",
             "Task cannot complete before its Plan is complete.",
           );
           task = {
             ...task,
             status: "COMPLETED",
+            resumeStatus: null,
             terminalSummary: input.command.payload.summary,
           };
           releaseClaim = true;
@@ -712,6 +942,7 @@ export class TaskControlService {
             ...task,
             plan,
             status: "FAILED",
+            resumeStatus: null,
             terminalSummary: input.command.payload.reason,
           };
           releaseClaim = true;
@@ -777,6 +1008,7 @@ export class TaskControlService {
         state,
         scope,
         input.idempotencyKey,
+        fingerprint,
         commandResult as unknown as JsonValue,
         now,
       );
@@ -810,8 +1042,14 @@ export class TaskControlService {
   async claimWorkItem(input: ClaimWorkItemInput): Promise<WorkClaimResult> {
     assertContractVersion(input.contractVersion);
     const scope = `work.claim:${input.workItemId}:${input.claimantId}`;
+    const fingerprint = requestFingerprint(input);
     return this.store.transact((state) => {
-      const duplicate = idempotencyGet<WorkClaimResult>(state, scope, input.idempotencyKey);
+      const duplicate = idempotencyGet<WorkClaimResult>(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+      );
       if (duplicate !== undefined) return duplicate;
       const item = state.workItems[input.workItemId];
       invariant(item !== undefined, "WORK_ITEM_NOT_FOUND", "Work Item was not found.", {
@@ -833,24 +1071,76 @@ export class TaskControlService {
         throw new TaskControlError("WORK_ALREADY_CLAIMED", "Work Item is already claimed.");
       }
       invariant(item.status === "PENDING" || item.status === "CLAIMED", "COMMAND_NOT_ALLOWED", "Work Item is not claimable.");
+      const replacedClaim = item.claim;
       const claim = lease(
         this.ids,
         "work",
         input.claimantId,
-        (item.claimEpoch ?? item.claim?.claimEpoch ?? 0) + 1,
+        item.claimEpoch + 1,
         nowDate,
         input.leaseMs,
       );
+      const now = nowDate.toISOString();
       const claimed: WorkItem = {
         ...item,
         status: "CLAIMED",
         claimEpoch: claim.claimEpoch,
         claim,
-        claimedAt: nowDate.toISOString(),
+        claimedAt: now,
       };
       state.workItems[item.workItemId] = claimed;
+      let task: TaskAggregate = {
+        ...parentTask,
+        taskVersion: parentTask.taskVersion + 1,
+        updatedAt: now,
+      };
+      let causationId = parentTask.latestEventId;
+      if (replacedClaim !== null) {
+        const releasedEvent = appendEvent(
+          state,
+          task,
+          "WORK_ITEM_CLAIM_RELEASED",
+          input.claimantId,
+          {
+            workItemId: item.workItemId,
+            claimId: replacedClaim.claimId,
+            claimEpoch: replacedClaim.claimEpoch,
+            reason: "expired-replaced",
+          },
+          now,
+          this.ids,
+          null,
+          causationId,
+        );
+        causationId = releasedEvent.eventId;
+      }
+      const claimedEvent = appendEvent(
+        state,
+        task,
+        "WORK_ITEM_CLAIMED",
+        input.claimantId,
+        {
+          workItemId: item.workItemId,
+          claimId: claim.claimId,
+          claimEpoch: claim.claimEpoch,
+          reclaimed: item.claimEpoch > 0,
+        },
+        now,
+        this.ids,
+        null,
+        causationId,
+      );
+      task = { ...task, latestEventId: claimedEvent.eventId };
+      state.tasks[task.taskId] = task;
       const result: WorkClaimResult = { workItem: claimed };
-      idempotencyPut(state, scope, input.idempotencyKey, result as unknown as JsonValue, nowDate.toISOString());
+      idempotencyPut(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+        result as unknown as JsonValue,
+        now,
+      );
       return result;
     });
   }
@@ -870,8 +1160,14 @@ export class TaskControlService {
     succeeded: boolean,
   ): Promise<TaskAggregate> {
     const scope = `work.report:${input.workItemId}`;
+    const fingerprint = requestFingerprint({ ...input, succeeded });
     const taskId = await this.store.transact((state) => {
-      const duplicate = idempotencyGet<{ taskId: string }>(state, scope, input.idempotencyKey);
+      const duplicate = idempotencyGet<{ taskId: string }>(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+      );
       if (duplicate !== undefined) return duplicate.taskId;
       const item = state.workItems[input.workItemId];
       invariant(item !== undefined, "WORK_ITEM_NOT_FOUND", "Work Item was not found.", {
@@ -907,15 +1203,17 @@ export class TaskControlService {
         now,
       );
       plan = withPlanVersion(plan, now);
-      let task: TaskAggregate = {
-        ...current,
-        taskVersion: current.taskVersion + 1,
-        status: "READY_FOR_CONTROLLER",
-        plan,
-        latestResultRefs:
-          resultRef === null ? current.latestResultRefs : addUnique(current.latestResultRefs, [resultRef]),
-        updatedAt: now,
-      };
+      let task = setOperationalStatus(
+        {
+          ...current,
+          taskVersion: current.taskVersion + 1,
+          plan,
+          latestResultRefs:
+            resultRef === null ? current.latestResultRefs : addUnique(current.latestResultRefs, [resultRef]),
+          updatedAt: now,
+        },
+        "READY_FOR_CONTROLLER",
+      );
       const itemEvent = appendEvent(
         state,
         task,
@@ -933,9 +1231,158 @@ export class TaskControlService {
         input.correlationId ?? null,
         current.latestEventId,
       );
-      task = { ...task, latestEventId: itemEvent.eventId };
+      let latestEventId = itemEvent.eventId;
+      if (current.controllerClaim !== null) {
+        task = { ...task, controllerClaim: null };
+        const released = appendEvent(
+          state,
+          task,
+          "CONTROLLER_CLAIM_RELEASED",
+          input.producerRef,
+          {
+            claimId: current.controllerClaim.claimId,
+            reason: "external-work-result",
+          },
+          now,
+          this.ids,
+          input.correlationId ?? null,
+          latestEventId,
+        );
+        latestEventId = released.eventId;
+      }
+      task = { ...task, latestEventId };
       state.tasks[task.taskId] = task;
-      idempotencyPut(state, scope, input.idempotencyKey, { taskId: task.taskId }, now);
+      idempotencyPut(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+        { taskId: task.taskId },
+        now,
+      );
+      return task.taskId;
+    });
+    await this.reconciler.reconcile(taskId);
+    return this.getTask(taskId);
+  }
+
+  async resolveApproval(input: ResolveApprovalInput): Promise<TaskAggregate> {
+    assertContractVersion(input.contractVersion);
+    assertNonEmpty(input.approvalRef, "approvalRef");
+    assertNonEmpty(input.producerRef, "producerRef");
+    assertNonEmpty(input.idempotencyKey, "idempotencyKey");
+    const scope = `approval.resolve:${input.taskId}:${input.approvalRef}`;
+    const fingerprint = requestFingerprint(input);
+    const taskId = await this.store.transact((state) => {
+      const duplicate = idempotencyGet<{ taskId: string }>(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+      );
+      if (duplicate !== undefined) return duplicate.taskId;
+      const current = state.tasks[input.taskId];
+      invariant(current !== undefined, "TASK_NOT_FOUND", "Task was not found.", {
+        taskId: input.taskId,
+      });
+      invariant(
+        !isTerminalTaskStatus(current.status),
+        "COMMAND_NOT_ALLOWED",
+        "Terminal Task cannot accept Approval resolution.",
+      );
+      assertExpectedVersions(current, input.expectedTaskVersion, input.expectedPlanVersion);
+      invariant(current.plan !== null, "INVALID_PLAN", "Task has no plan.");
+      const node = current.plan.nodes.find((item) => item.approvalRef === input.approvalRef);
+      invariant(
+        node !== undefined &&
+          node.status === "WAITING_APPROVAL" &&
+          current.approvalRefs.includes(input.approvalRef),
+        "COMMAND_NOT_ALLOWED",
+        "Approval is not pending for this Task.",
+        { approvalRef: input.approvalRef },
+      );
+
+      const now = this.clock.now().toISOString();
+      const approved = input.resolution === "APPROVED";
+      let plan = updateNode(
+        current.plan,
+        node.nodeId,
+        (item) => ({
+          ...item,
+          status: approved ? "IN_PROGRESS" : "BLOCKED",
+          approvalRef: null,
+          resultRefs:
+            input.resultRef === undefined
+              ? item.resultRefs
+              : addUnique(item.resultRefs, [input.resultRef]),
+          summary: input.summary ?? item.summary,
+        }),
+        now,
+      );
+      plan = withPlanVersion(plan, now);
+      let task = setOperationalStatus(
+        {
+          ...current,
+          taskVersion: current.taskVersion + 1,
+          plan,
+          approvalRefs: removeValue(current.approvalRefs, input.approvalRef),
+          latestResultRefs:
+            input.resultRef === undefined
+              ? current.latestResultRefs
+              : addUnique(current.latestResultRefs, [input.resultRef]),
+          blockedReason: approved ? null : input.summary ?? `approval-${input.resolution.toLowerCase()}`,
+          updatedAt: now,
+        },
+        "READY_FOR_CONTROLLER",
+      );
+
+      const resolved = appendEvent(
+        state,
+        task,
+        "APPROVAL_RESOLVED",
+        input.producerRef,
+        {
+          approvalRef: input.approvalRef,
+          nodeId: node.nodeId,
+          resolution: input.resolution,
+          resultRef: input.resultRef ?? null,
+          summary: input.summary ?? "",
+        },
+        now,
+        this.ids,
+        input.correlationId ?? null,
+        current.latestEventId,
+      );
+      let latestEventId = resolved.eventId;
+      if (current.controllerClaim !== null) {
+        task = { ...task, controllerClaim: null };
+        const released = appendEvent(
+          state,
+          task,
+          "CONTROLLER_CLAIM_RELEASED",
+          input.producerRef,
+          {
+            claimId: current.controllerClaim.claimId,
+            reason: "approval-resolved",
+          },
+          now,
+          this.ids,
+          input.correlationId ?? null,
+          latestEventId,
+        );
+        latestEventId = released.eventId;
+      }
+      task = { ...task, latestEventId };
+      assertTaskConsistency(task);
+      state.tasks[task.taskId] = task;
+      idempotencyPut(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+        { taskId: task.taskId },
+        now,
+      );
       return task.taskId;
     });
     await this.reconciler.reconcile(taskId);
@@ -949,8 +1396,14 @@ export class TaskControlService {
   async claimDispatch(input: ClaimDispatchInput): Promise<DispatchClaimResult> {
     assertContractVersion(input.contractVersion);
     const scope = `dispatch.claim:${input.signalId}:${input.hostId}`;
+    const fingerprint = requestFingerprint(input);
     return this.store.transact((state) => {
-      const duplicate = idempotencyGet<DispatchClaimResult>(state, scope, input.idempotencyKey);
+      const duplicate = idempotencyGet<DispatchClaimResult>(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+      );
       if (duplicate !== undefined) return duplicate;
       const signal = state.dispatchSignals[input.signalId];
       invariant(signal !== undefined, "DISPATCH_NOT_FOUND", "Dispatch Signal was not found.", {
@@ -968,14 +1421,16 @@ export class TaskControlService {
         throw new TaskControlError("DISPATCH_ALREADY_CLAIMED", "Dispatch Signal is already claimed.");
       }
       invariant(signal.status === "PENDING" || signal.status === "CLAIMED", "COMMAND_NOT_ALLOWED", "Dispatch is not claimable.");
+      const replacedClaim = signal.claim;
       const claim = lease(
         this.ids,
         "dispatch",
         input.hostId,
-        (signal.claimEpoch ?? signal.claim?.claimEpoch ?? 0) + 1,
+        signal.claimEpoch + 1,
         nowDate,
         input.leaseMs,
       );
+      const now = nowDate.toISOString();
       const claimed: DispatchSignal = {
         ...signal,
         status: "CLAIMED",
@@ -984,8 +1439,58 @@ export class TaskControlService {
         attemptCount: signal.attemptCount + 1,
       };
       state.dispatchSignals[signal.signalId] = claimed;
+      let task: TaskAggregate = {
+        ...parentTask,
+        taskVersion: parentTask.taskVersion + 1,
+        updatedAt: now,
+      };
+      let causationId = parentTask.latestEventId;
+      if (replacedClaim !== null) {
+        const releasedEvent = appendEvent(
+          state,
+          task,
+          "DISPATCH_CLAIM_RELEASED",
+          input.hostId,
+          {
+            signalId: signal.signalId,
+            claimId: replacedClaim.claimId,
+            claimEpoch: replacedClaim.claimEpoch,
+            reason: "expired-replaced",
+          },
+          now,
+          this.ids,
+          null,
+          causationId,
+        );
+        causationId = releasedEvent.eventId;
+      }
+      const claimedEvent = appendEvent(
+        state,
+        task,
+        "DISPATCH_CLAIMED",
+        input.hostId,
+        {
+          signalId: signal.signalId,
+          claimId: claim.claimId,
+          claimEpoch: claim.claimEpoch,
+          reclaimed: signal.claimEpoch > 0,
+        },
+        now,
+        this.ids,
+        null,
+        causationId,
+      );
+      task = { ...task, latestEventId: claimedEvent.eventId };
+      state.tasks[task.taskId] = task;
       const result: DispatchClaimResult = { dispatch: claimed };
-      idempotencyPut(state, scope, input.idempotencyKey, result as unknown as JsonValue, nowDate.toISOString());
+      idempotencyPut(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+        result as unknown as JsonValue,
+        now,
+      );
       return result;
     });
   }
@@ -1002,8 +1507,14 @@ export class TaskControlService {
 
   private async reportDispatch(input: ReportDispatchInput, delivered: boolean): Promise<DispatchSignal> {
     const scope = `dispatch.report:${input.signalId}:${delivered ? "delivered" : "failed"}`;
+    const fingerprint = requestFingerprint({ ...input, delivered });
     const result = await this.store.transact((state) => {
-      const duplicate = idempotencyGet<{ signalId: string }>(state, scope, input.idempotencyKey);
+      const duplicate = idempotencyGet<{ signalId: string }>(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+      );
       if (duplicate !== undefined) {
         const existing = state.dispatchSignals[duplicate.signalId];
         invariant(existing !== undefined, "DISPATCH_NOT_FOUND", "Dispatch Signal was not found.");
@@ -1046,7 +1557,14 @@ export class TaskControlService {
       );
       task = { ...task, latestEventId: hostEvent.eventId };
       state.tasks[task.taskId] = task;
-      idempotencyPut(state, scope, input.idempotencyKey, { signalId: signal.signalId }, now);
+      idempotencyPut(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+        { signalId: signal.signalId },
+        now,
+      );
       return updatedSignal;
     });
     if (!delivered) await this.reconciler.reconcile(result.taskId);

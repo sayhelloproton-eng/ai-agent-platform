@@ -109,6 +109,7 @@ export interface TaskAggregate {
   readonly conversationRef: string | null;
   readonly blockedReason: string | null;
   readonly pausedReason: string | null;
+  readonly resumeStatus: TaskStatus | null;
   readonly terminalSummary: string | null;
   readonly createdAt: string;
   readonly updatedAt: string;
@@ -200,6 +201,10 @@ export const TASK_EVENT_TYPES = [
   "TASK_PLAN_REVISED",
   "CONTROLLER_CLAIMED",
   "CONTROLLER_CLAIM_RELEASED",
+  "WORK_ITEM_CLAIMED",
+  "WORK_ITEM_CLAIM_RELEASED",
+  "DISPATCH_CLAIMED",
+  "DISPATCH_CLAIM_RELEASED",
   "ROLE_WORK_REQUESTED",
   "ROLE_WORK_SUCCEEDED",
   "ROLE_WORK_FAILED",
@@ -207,6 +212,7 @@ export const TASK_EVENT_TYPES = [
   "APPROVAL_RESOLVED",
   "TASK_BLOCKED",
   "TASK_PAUSED",
+  "TASK_RESUMED",
   "TASK_COMPLETED",
   "TASK_FAILED",
   "TASK_CANCELLED",
@@ -246,6 +252,7 @@ export interface TaskEvent {
 export interface IdempotencyRecord {
   readonly scope: string;
   readonly key: string;
+  readonly requestFingerprint: string;
   readonly result: JsonValue;
   readonly createdAt: string;
 }
@@ -335,6 +342,7 @@ export type ControllerCommand =
     }
   | { readonly type: "BLOCK_TASK"; readonly payload: { readonly reason: string } }
   | { readonly type: "PAUSE_TASK"; readonly payload: { readonly reason: string } }
+  | { readonly type: "RESUME_TASK"; readonly payload: { readonly reason?: string } }
   | {
       readonly type: "COMPLETE_TASK";
       readonly payload: { readonly summary: string };
@@ -412,6 +420,23 @@ export interface ReportDispatchInput {
   readonly producerRef: string;
   readonly correlationId?: string;
   readonly errorSummary?: string;
+}
+
+export const APPROVAL_RESOLUTIONS = ["APPROVED", "REJECTED", "CANCELLED"] as const;
+export type ApprovalResolution = (typeof APPROVAL_RESOLUTIONS)[number];
+
+export interface ResolveApprovalInput {
+  readonly contractVersion: typeof TASK_CONTROL_CONTRACT_VERSION;
+  readonly taskId: string;
+  readonly approvalRef: string;
+  readonly resolution: ApprovalResolution;
+  readonly expectedTaskVersion: number;
+  readonly expectedPlanVersion: number;
+  readonly idempotencyKey: string;
+  readonly producerRef: string;
+  readonly correlationId?: string;
+  readonly resultRef?: string;
+  readonly summary?: string;
 }
 
 export interface DecisionContext {

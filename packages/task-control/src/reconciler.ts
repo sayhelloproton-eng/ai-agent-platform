@@ -1,6 +1,7 @@
 import { invariant } from "./error.js";
 import type {
   DispatchSignal,
+  JsonObject,
   ReconcileResult,
   TaskAggregate,
   TaskControlState,
@@ -8,16 +9,22 @@ import type {
   WorkItem,
 } from "./model.js";
 import type { Clock, IdGenerator, TaskControlStore } from "./ports.js";
-import { dependenciesSatisfied, isClaimExpired, isTerminalTaskStatus } from "./policy.js";
+import {
+  assertTaskConsistency,
+  dependenciesSatisfied,
+  isClaimExpired,
+  isTerminalTaskStatus,
+} from "./policy.js";
 
-function event(
+function appendEvent(
   state: TaskControlState,
   task: TaskAggregate,
   eventType: TaskEvent["eventType"],
   producerRef: string,
   now: string,
   ids: IdGenerator,
-  payload: TaskEvent["payload"] = {},
+  payload: JsonObject,
+  causationId: string | null,
 ): TaskEvent {
   const item: TaskEvent = {
     eventId: ids.next("event"),
@@ -33,7 +40,7 @@ function event(
     producerRef,
     payload,
     correlationId: null,
-    causationId: task.latestEventId,
+    causationId,
     createdAt: now,
   };
   state.events[task.taskId] = [...(state.events[task.taskId] ?? []), item];
@@ -112,6 +119,11 @@ function cancelCoordination(
   return { workItems, dispatches };
 }
 
+interface PendingEvent {
+  readonly eventType: TaskEvent["eventType"];
+  readonly payload: JsonObject;
+}
+
 export class TaskReconciler {
   constructor(
     private readonly store: TaskControlStore,
@@ -132,27 +144,66 @@ export class TaskReconciler {
       const expiredClaimIds: string[] = [];
       const cancelledWorkItemIds: string[] = [];
       const cancelledDispatchIds: string[] = [];
-      const newEvents: TaskEvent[] = [];
-      let controllerClaimExpired = false;
+      const pendingEvents: PendingEvent[] = [];
 
       if (task.controllerClaim !== null && isClaimExpired(task.controllerClaim.expiresAt, nowDate)) {
-        expiredClaimIds.push(task.controllerClaim.claimId);
-        controllerClaimExpired = true;
+        const claim = task.controllerClaim;
+        expiredClaimIds.push(claim.claimId);
         task = { ...task, controllerClaim: null, updatedAt: now };
+        pendingEvents.push({
+          eventType: "CONTROLLER_CLAIM_RELEASED",
+          payload: {
+            claimId: claim.claimId,
+            claimEpoch: claim.claimEpoch,
+            reason: "expired",
+          },
+        });
         changed = true;
       }
 
       for (const [id, item] of Object.entries(state.workItems)) {
-        if (item.taskId !== taskId || item.claim === null || !isClaimExpired(item.claim.expiresAt, nowDate)) continue;
-        expiredClaimIds.push(item.claim.claimId);
+        if (
+          item.taskId !== taskId ||
+          item.claim === null ||
+          !isClaimExpired(item.claim.expiresAt, nowDate)
+        ) {
+          continue;
+        }
+        const claim = item.claim;
+        expiredClaimIds.push(claim.claimId);
         state.workItems[id] = { ...item, status: "PENDING", claim: null, claimedAt: null };
+        pendingEvents.push({
+          eventType: "WORK_ITEM_CLAIM_RELEASED",
+          payload: {
+            workItemId: item.workItemId,
+            claimId: claim.claimId,
+            claimEpoch: claim.claimEpoch,
+            reason: "expired",
+          },
+        });
         changed = true;
       }
 
       for (const [id, signal] of Object.entries(state.dispatchSignals)) {
-        if (signal.taskId !== taskId || signal.claim === null || !isClaimExpired(signal.claim.expiresAt, nowDate)) continue;
-        expiredClaimIds.push(signal.claim.claimId);
+        if (
+          signal.taskId !== taskId ||
+          signal.claim === null ||
+          !isClaimExpired(signal.claim.expiresAt, nowDate)
+        ) {
+          continue;
+        }
+        const claim = signal.claim;
+        expiredClaimIds.push(claim.claimId);
         state.dispatchSignals[id] = { ...signal, status: "PENDING", claim: null };
+        pendingEvents.push({
+          eventType: "DISPATCH_CLAIM_RELEASED",
+          payload: {
+            signalId: signal.signalId,
+            claimId: claim.claimId,
+            claimEpoch: claim.claimEpoch,
+            reason: "expired",
+          },
+        });
         changed = true;
       }
 
@@ -161,52 +212,75 @@ export class TaskReconciler {
         cancelledWorkItemIds.push(...cancelled.workItems);
         cancelledDispatchIds.push(...cancelled.dispatches);
         changed ||= cancelled.workItems.length > 0 || cancelled.dispatches.length > 0;
-      } else if (task.plan !== null) {
-        const promotedNodes = task.plan.nodes.map((node) => {
-          if (node.status !== "PENDING" || !dependenciesSatisfied(task.plan!, node)) return node;
-          changed = true;
-          return { ...node, status: "READY" as const };
-        });
-        if (changed && promotedNodes.some((node, index) => node !== task.plan!.nodes[index])) {
+      } else if (task.plan !== null && task.plan.currentNodeId !== null) {
+        const currentIndex = task.plan.nodes.findIndex(
+          (node) => node.nodeId === task.plan!.currentNodeId,
+        );
+        const currentNode = task.plan.nodes[currentIndex];
+        if (
+          currentNode !== undefined &&
+          currentNode.status === "PENDING" &&
+          dependenciesSatisfied(task.plan, currentNode)
+        ) {
+          const nodes = [...task.plan.nodes];
+          nodes[currentIndex] = { ...currentNode, status: "READY" };
           task = {
             ...task,
-            plan: { ...task.plan, nodes: promotedNodes, updatedAt: now },
+            plan: {
+              ...task.plan,
+              planVersion: task.plan.planVersion + 1,
+              nodes,
+              updatedAt: now,
+            },
             updatedAt: now,
           };
+          pendingEvents.push({
+            eventType: "TASK_PLAN_REVISED",
+            payload: {
+              planVersion: task.plan!.planVersion,
+              promotedNodeId: currentNode.nodeId,
+              reason: "current-node-ready",
+            },
+          });
+          changed = true;
         }
       }
 
-      if (
+      const shouldCreateControllerDispatch =
         !isTerminalTaskStatus(task.status) &&
         task.status !== "PAUSED" &&
         task.controllerClaim === null &&
         ["PLAN_REQUIRED", "READY_FOR_CONTROLLER", "BLOCKED"].includes(task.status) &&
-        activeControllerDispatch(state, taskId) === undefined
-      ) {
-        const signal = createControllerDispatch(state, task, now, this.ids);
-        createdDispatchIds.push(signal.signalId);
-        changed = true;
-      }
+        activeControllerDispatch(state, taskId) === undefined;
 
-      if (changed) {
-        const nextVersion = task.taskVersion + 1;
-        task = { ...task, taskVersion: nextVersion, updatedAt: now };
-        if (controllerClaimExpired) {
-          newEvents.push(
-            event(state, task, "CONTROLLER_CLAIM_RELEASED", "task-reconciler", now, this.ids, {
-              reason: "expired",
-              claimIds: expiredClaimIds,
-            }),
-          );
+      if (changed || shouldCreateControllerDispatch) {
+        task = { ...task, taskVersion: task.taskVersion + 1, updatedAt: now };
+        if (shouldCreateControllerDispatch) {
+          const signal = createControllerDispatch(state, task, now, this.ids);
+          createdDispatchIds.push(signal.signalId);
+          pendingEvents.push({
+            eventType: "HOST_DISPATCH_CREATED",
+            payload: { dispatchIds: [signal.signalId] },
+          });
+          changed = true;
         }
-        if (createdDispatchIds.length > 0) {
-          newEvents.push(
-            event(state, task, "HOST_DISPATCH_CREATED", "task-reconciler", now, this.ids, {
-              dispatchIds: createdDispatchIds,
-            }),
+
+        let causationId = task.latestEventId;
+        for (const spec of pendingEvents) {
+          const item = appendEvent(
+            state,
+            task,
+            spec.eventType,
+            "task-reconciler",
+            now,
+            this.ids,
+            spec.payload,
+            causationId,
           );
+          causationId = item.eventId;
         }
-        task = { ...task, latestEventId: newEvents.at(-1)?.eventId ?? task.latestEventId };
+        task = { ...task, latestEventId: causationId };
+        assertTaskConsistency(task);
         state.tasks[taskId] = task;
       }
 

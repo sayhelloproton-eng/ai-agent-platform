@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import type { TaskControlState } from "./model.js";
+import type { ResolveApprovalInput, TaskAggregate, TaskControlState } from "./model.js";
 
 export interface Clock {
   now(): Date;
@@ -9,6 +9,10 @@ export interface Clock {
 export interface IdGenerator {
   next(prefix: string): string;
   token(prefix: string): string;
+}
+
+export interface ApprovalResolutionPort {
+  resolveApproval(input: ResolveApprovalInput): Promise<TaskAggregate>;
 }
 
 export interface TaskControlStore {

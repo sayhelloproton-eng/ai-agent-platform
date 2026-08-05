@@ -476,7 +476,7 @@ test("completes one Task through Controller, Work and Controller review", async 
 });
 
 
-test("Decision Context public adapter matches the frozen snake_case contract and hides Claim tokens", async () => {
+test("Decision Context compatibility adapter matches the current snake_case candidate and hides Claim tokens", async () => {
   const { service } = harness();
   let task = await createTask(service);
   await deliverPendingControllerDispatch(service);

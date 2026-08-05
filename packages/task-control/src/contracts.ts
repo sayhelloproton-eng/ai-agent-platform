@@ -135,9 +135,10 @@ function mapClaim(claim: Omit<ControllerClaim, "claimToken"> | null): DecisionCo
 }
 
 /**
- * Public adapter for the Controller Decision Context contract frozen by
- * SOL-CTL-001 / SOL-TSK-001. Domain internals remain camelCase; this mapper
- * prevents internal refactors from silently changing the cross-domain schema.
+ * TSK-owned compatibility candidate for the Controller Decision Context.
+ * It remains a proposal until the total-control audit freezes one shared
+ * contract in packages/contracts. Domain internals stay camelCase so a future
+ * adapter can converge without rewriting the Task aggregate.
  */
 export function toDecisionContextContractV1(
   context: DecisionContext,
