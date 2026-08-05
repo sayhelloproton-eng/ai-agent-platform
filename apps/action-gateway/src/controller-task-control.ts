@@ -6,7 +6,6 @@ import {
   type ControllerClaimSummary,
   type ControllerCommandResult,
   type ControllerCommandType,
-  type ControllerErrorCode,
   type ControllerPlan,
   type ControllerPlanNode,
   type ControllerPlanNodeDraft,
@@ -20,42 +19,17 @@ import {
 } from "@ai-agent-platform/contracts";
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 
-export interface ControllerIdentity {
-  readonly profileId: string;
-  readonly roleId: string;
-  readonly projectIds: readonly string[];
-}
+import { ControllerTaskControlError } from "./controller-task-control-error.js";
+import type {
+  ControllerIdentity,
+  ControllerTaskControl,
+} from "./controller-task-control-port.js";
 
-export interface ControllerTaskControl {
-  getDecisionContext(
-    request: GetTaskDecisionContextRequest,
-    identity: ControllerIdentity,
-  ): TaskDecisionContext;
-  claimTask(
-    request: ClaimControllerTaskRequest,
-    identity: ControllerIdentity,
-  ): ClaimControllerTaskResult;
-  submitCommand(
-    request: SubmitControllerCommandRequest,
-    identity: ControllerIdentity,
-  ): ControllerCommandResult;
-  releaseTask(
-    request: ReleaseControllerTaskRequest,
-    identity: ControllerIdentity,
-  ): ReleaseControllerTaskResult;
-}
-
-export class ControllerTaskControlError extends Error {
-  readonly code: ControllerErrorCode;
-  readonly httpStatus: number;
-
-  constructor(code: ControllerErrorCode, message: string, httpStatus: number) {
-    super(message);
-    this.name = "ControllerTaskControlError";
-    this.code = code;
-    this.httpStatus = httpStatus;
-  }
-}
+export { ControllerTaskControlError } from "./controller-task-control-error.js";
+export type {
+  ControllerIdentity,
+  ControllerTaskControl,
+} from "./controller-task-control-port.js";
 
 interface InternalPlanNode {
   nodeId: string;

@@ -32,11 +32,11 @@ import {
   createConcurrencyGate,
   type ConcurrencyGate,
 } from "./concurrency.js";
-import {
-  ControllerTaskControlError,
-  type ControllerIdentity,
-  type ControllerTaskControl,
-} from "./controller-task-control.js";
+import { ControllerTaskControlError } from "./controller-task-control-error.js";
+import type {
+  ControllerIdentity,
+  ControllerTaskControl,
+} from "./controller-task-control-port.js";
 import {
   createFixedWindowRateLimiter,
   type RateLimiter,
@@ -471,7 +471,7 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
             503,
             requestId,
             "CONTROLLER_UNAVAILABLE",
-            "Controller Task Control fixture is unavailable.",
+            "Controller Task Control is unavailable.",
           );
           return;
         }
@@ -484,28 +484,28 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
               writeError(response, 400, requestId, "CONTROLLER_INVALID_REQUEST", "Controller request is invalid.");
               return;
             }
-            result = taskControl.getDecisionContext(validation.value, identity);
+            result = await taskControl.getDecisionContext(validation.value, identity);
           } else if (pathname === CONTROLLER_CLAIM_ROUTE) {
             const validation = validateClaimControllerTaskRequest(parsedBody);
             if (!validation.ok) {
               writeError(response, 400, requestId, "CONTROLLER_INVALID_REQUEST", "Controller request is invalid.");
               return;
             }
-            result = taskControl.claimTask(validation.value, identity);
+            result = await taskControl.claimTask(validation.value, identity);
           } else if (pathname === CONTROLLER_COMMAND_ROUTE) {
             const validation = validateSubmitControllerCommandRequest(parsedBody);
             if (!validation.ok) {
               writeError(response, 400, requestId, "CONTROLLER_INVALID_REQUEST", "Controller request is invalid.");
               return;
             }
-            result = taskControl.submitCommand(validation.value, identity);
+            result = await taskControl.submitCommand(validation.value, identity);
           } else {
             const validation = validateReleaseControllerTaskRequest(parsedBody);
             if (!validation.ok) {
               writeError(response, 400, requestId, "CONTROLLER_INVALID_REQUEST", "Controller request is invalid.");
               return;
             }
-            result = taskControl.releaseTask(validation.value, identity);
+            result = await taskControl.releaseTask(validation.value, identity);
           }
           options.auditLog?.(
             JSON.stringify({
