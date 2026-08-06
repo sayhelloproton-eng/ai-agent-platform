@@ -59,17 +59,30 @@ export {
   LocalControlTransportError,
   createLocalControlProcessClient,
   type LocalControlClient,
+  type LocalControlExecutionOptions,
   type LocalControlProcessClientOptions,
   type LocalControlTransportErrorCode,
 } from "./gateway-process-adapter.js";
 export {
   createLocalWorkConsumer,
   summarizeLocalResult,
-  type LocalResultPersistencePort,
+  LocalWorkConsumerError,
+  type LocalEvidenceSinkPort,
+  type LocalResultSinkPort,
+  type LocalWorkBoundaryError,
+  type LocalWorkBoundaryErrorCode,
   type LocalWorkConsumerOptions,
   type LocalWorkConsumerReport,
-  type PersistedLocalResultReferences,
+  type LocalWorkReportPort,
+  type LocalWorkRunOptions,
+  type StoredLocalWorkResult,
 } from "./work-consumer-adapter.js";
+export {
+  LOCAL_WORK_V1_PROPOSAL_VERSION,
+  fingerprintLocalRequest,
+  mapWorkClaimToLocalRequest,
+  type LocalWorkClaimInput,
+} from "./local-work-v1.js";
 export {
   validateLocalResult,
   type ExpectedLocalResultIdentity,

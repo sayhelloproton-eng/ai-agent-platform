@@ -15,7 +15,8 @@ stdin 只接收一个 `LocalRequest` JSON，stdout 只返回一个 `LocalResult`
 综合审计整改后，本包还正式导出：
 
 - `createLocalControlProcessClient()`：供唯一 Gateway 以安全子进程调用固定 CLI；
-- `createLocalWorkConsumer()`：供 Task Worker 在已转换为 `LocalRequest` 后执行并回报；
+- `mapWorkClaimToLocalRequest()`：把已授权的 Local Work 候选输入纯映射为 `LocalRequest`；
+- `createLocalWorkConsumer()`：通过 Result/Evidence Sink 执行并只回报摘要与引用；
 - `validateLocalResult()`：校验 stdout Canonical Local Result 及请求身份一致性。
 
 ## Boundary
@@ -81,6 +82,8 @@ npm run pack:check --workspace @ai-agent-platform/local-control
 - `docs/GATEWAY-INTEGRATION.md`
 - `docs/WORK-CONSUMER-INTEGRATION.md`
 - `docs/AUDIT-REMEDIATION-2026-08-05.md`
+- `docs/AUDIT-REMEDIATION-ROUND2-2026-08-06.md`
+- `docs/LOCAL-WORK-V1-PROPOSAL.md`
 - `docs/RUNBOOK.md`
 - `docs/MVP-VERIFICATION.md`
 - `AGENTS.md`

@@ -45,6 +45,64 @@ function request(capability, parameters = {}, overrides = {}) {
   };
 }
 
+function workClaim(capability, parameters = {}, overrides = {}) {
+  return {
+    local_work_version: "0.1.0-candidate",
+    request_id: "request-integration-001",
+    capability_ref: capability,
+    actor: {
+      actor_type: "gateway",
+      actor_id: "action-gateway-primary",
+    },
+    correlation_id: "correlation-001",
+    scope: { project_id: "ai-agent-platform" },
+    parameters,
+    budget: {
+      timeout_ms: 5_000,
+      max_stdout_bytes: 65_536,
+      max_result_chars: 50_000,
+    },
+    idempotency_key: "idempotency-001",
+    ...overrides,
+  };
+}
+
+function memorySinks() {
+  const results = new Map();
+  const evidence = new Map();
+  let resultWrites = 0;
+  let evidenceWrites = 0;
+  return {
+    results,
+    get resultWrites() { return resultWrites; },
+    get evidenceWrites() { return evidenceWrites; },
+    resultSink: {
+      async load({ idempotency_key }) {
+        return results.get(idempotency_key) ?? null;
+      },
+      async persist(input) {
+        resultWrites += 1;
+        const stored = {
+          ...input,
+          result_ref: `result://local/${input.idempotency_key}`,
+        };
+        results.set(input.idempotency_key, stored);
+        return stored;
+      },
+    },
+    evidenceSink: {
+      async persist(input) {
+        evidenceWrites += 1;
+        const refs = input.local_result === null
+          ? []
+          : [`evidence://local/${input.idempotency_key}`];
+        evidence.set(input.idempotency_key, refs);
+        return { evidence_refs: refs };
+      },
+    },
+  };
+}
+
 async function git(cwd, ...args) {
   return execFileAsync("git", args, { cwd });
 }
@@ -194,6 +252,61 @@ test("Gateway process adapter enforces timeout and output budgets", async () => 
   }
 });
 
+test("Gateway process adapter cancels a real shell:false child process", async () => {
+  const root = await createFixture();
+  const hanging = await createScript("setTimeout(() => {}, 10_000);\n");
+  try {
+    const client = createLocalControlProcessClient({
+      executable: process.execPath,
+      trustedPrefixArgs: [hanging.script],
+      cwd: root,
+      timeoutMs: 5_000,
+    });
+    const controller = new AbortController();
+    const pending = client.execute(request("local.health.read"), {
+      signal: controller.signal,
+    });
+    controller.abort();
+    await assert.rejects(
+      pending,
+      (error) =>
+        error instanceof LocalControlTransportError &&
+        error.code === "LOCAL_CLI_CANCELLED" &&
+        !error.retryable,
+    );
+  } finally {
+    await fs.rm(root, { recursive: true, force: true });
+    await fs.rm(hanging.directory, { recursive: true, force: true });
+  }
+});
+
+test("Work Consumer converts a real non-zero child exit without leaking process output", async () => {
+  const root = await createFixture();
+  const failing = await createScript(
+    "process.stderr.write('private diagnostic'); process.exit(7);\n",
+  );
+  try {
+    const sinks = memorySinks();
+    const consumer = createLocalWorkConsumer({
+      client: createLocalControlProcessClient({
+        executable: process.execPath,
+        trustedPrefixArgs: [failing.script],
+        cwd: root,
+      }),
+      resultSink: sinks.resultSink,
+      evidenceSink: sinks.evidenceSink,
+    });
+    const report = await consumer.run(workClaim("local.health.read"));
+    assert.equal(report.status, "FAILED");
+    assert.equal(report.error.code, "LOCAL_CLI_PROCESS_FAILED");
+    assert.equal(JSON.stringify(report).includes("private diagnostic"), false);
+    assert.equal(Object.hasOwn(report, "local_result"), false);
+  } finally {
+    await fs.rm(root, { recursive: true, force: true });
+    await fs.rm(failing.directory, { recursive: true, force: true });
+  }
+});
+
 test("Gateway process adapter rejects extra stdout and mismatched canonical results", async () => {
   const root = await createFixture();
   const extra = await createScript("console.log('{}'); console.log('{}');\n");
@@ -254,34 +367,22 @@ test("Gateway process adapter only accepts trusted absolute configuration", asyn
 test("Work Consumer adapter persists results through an injected Result Ref port", async () => {
   const root = await createFixture();
   try {
-    const persisted = [];
+    const sinks = memorySinks();
     const consumer = createLocalWorkConsumer({
       client: processClient(root),
-      resultPersistence: {
-        async persist(input) {
-          persisted.push(input);
-          return {
-            result_ref: "result://task-control/result-001",
-            evidence_refs: ["evidence://local/001"],
-          };
-        },
-      },
+      resultSink: sinks.resultSink,
+      evidenceSink: sinks.evidenceSink,
     });
-    const input = request("local.project.describe", {}, {
-      idempotency_key: "idempotency-001",
-    });
+    const input = workClaim("local.project.describe");
     const report = await consumer.run(input);
-    assert.equal(report.capability_ref, input.capability);
-    assert.equal(report.request_id, input.request_id);
     assert.equal(report.correlation_id, "correlation-001");
     assert.equal(report.idempotency_key, "idempotency-001");
-    assert.equal(report.result_ref, "result://task-control/result-001");
-    assert.deepEqual(report.evidence_refs, ["evidence://local/001"]);
+    assert.equal(report.result_ref, "result://local/idempotency-001");
+    assert.deepEqual(report.evidence_refs, ["evidence://local/idempotency-001"]);
     assert.equal(report.status, "SUCCEEDED");
-    assert.equal(report.retryable, false);
-    assert.equal(persisted.length, 1);
-    assert.equal(persisted[0].request, input);
-    assert.equal(persisted[0].result, report.local_result);
+    assert.equal(report.error, null);
+    assert.equal(sinks.resultWrites, 1);
+    assert.equal(Object.hasOwn(report, "local_result"), false);
   } finally {
     await fs.rm(root, { recursive: true, force: true });
   }
@@ -291,22 +392,20 @@ test("Work Consumer adapter reports canonical retryability without changing work
   const root = await createFixture();
   try {
     await fs.writeFile(path.join(root, ".env"), "SECRET=value\n");
+    const sinks = memorySinks();
     const consumer = createLocalWorkConsumer({
       client: processClient(root),
-      resultPersistence: {
-        async persist() {
-          return { result_ref: "result://task-control/failure-001" };
-        },
-      },
+      resultSink: sinks.resultSink,
+      evidenceSink: sinks.evidenceSink,
     });
     const report = await consumer.run(
-      request("local.repository.file.read", { path: ".env" }),
+      workClaim("local.repository.file.read", { path: ".env" }),
     );
     assert.equal(report.status, "FAILED");
-    assert.equal(report.error_code, "SENSITIVE_RESOURCE_DENIED");
-    assert.equal(report.retryable, false);
+    assert.equal(report.error.code, "SENSITIVE_RESOURCE_DENIED");
+    assert.equal(report.error.retryable, false);
     assert.match(report.summary, /failed/u);
-    assert.equal(report.local_result.error.code, "SENSITIVE_RESOURCE_DENIED");
+    assert.equal(Object.hasOwn(report, "local_result"), false);
   } finally {
     await fs.rm(root, { recursive: true, force: true });
   }

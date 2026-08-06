@@ -62,6 +62,7 @@ Adapter 强制：
   - `LOCAL_GATEWAY_HEALTH_URL`；
   - `LOCAL_CONTROL_ALLOW_SERVICE_START`；
 - Timeout 取 Adapter 上限与 `LocalRequest.budget.timeout_ms` 的较小值；
+- 调用方 `AbortSignal` 取消会终止子进程并返回 `LOCAL_CLI_CANCELLED`；
 - stdout 上限取 Adapter 上限与 `LocalRequest.budget.max_stdout_bytes` 的较小值；
 - stderr 独立限额，内容不进入 Action Response；
 - stdout 必须只有一个 JSON Value；
@@ -84,6 +85,7 @@ CLI 未启动 / 超时 / 输出过大 / 非法 stdout
 
 ```text
 LOCAL_CLI_NOT_AVAILABLE
+LOCAL_CLI_CANCELLED
 LOCAL_CLI_TIMEOUT
 LOCAL_CLI_OUTPUT_TOO_LARGE
 LOCAL_CLI_PROCESS_FAILED

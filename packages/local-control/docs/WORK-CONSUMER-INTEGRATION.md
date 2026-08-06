@@ -1,105 +1,60 @@
-# Task Work Consumer → Local Control Adapter
+# Unified Worker → Local Control Adapter
 
 ## Purpose
 
-本包正式导出：
+本包导出：
 
 ```ts
+mapWorkClaimToLocalRequest(input)
 createLocalWorkConsumer(options)
 ```
 
-它只接收已经由 Task Control / Worker 转换好的 `LocalRequest`，调用 `LocalControlClient`，再通过调用方注入的 Result Persistence Port 保存结果引用。
+Consumer 只接收已经授权的 `LocalWorkClaimInput`，不读取或解释 Task、Plan、PlanNode、Claim、WorkItem 状态、Retry Policy 或下一处理者。
 
-它不读取 Task Control 内部表，也不解释：
+## Pure mapping
 
-- Task；
-- Plan；
-- PlanNode；
-- Claim；
-- WorkItem 状态；
-- Retry Policy；
-- 下一处理者。
+`mapWorkClaimToLocalRequest()` 只处理 Local Work v1 候选字段，并从 Local Capability Catalog 得到固定执行模式。任何额外 Task/Plan/WorkItem 字段都会被拒绝。
 
-## Invocation
+## Ports
 
-```ts
-const consumer = createLocalWorkConsumer({
-  client: localControlClient,
-  resultPersistence: {
-    async persist({ request, result, summary }) {
-      // 由 Task / Evidence 集成层持久化并生成公共引用。
-      return {
-        result_ref: "...",
-        evidence_refs: ["..."],
-      };
-    },
-  },
-});
+调用方必须注入：
 
-const report = await consumer.run(localRequest);
-```
+- `LocalResultSinkPort`：按幂等键和请求指纹保存/读取完整 Local Result，返回不可变 `result_ref`；
+- `LocalEvidenceSinkPort`：保存观察证据并返回稳定 `evidence_refs`；
+- 可选 `LocalWorkReportPort`：把安全报告交回统一 Worker 或 Gateway。
 
-## Report contract
+这些 Port 不代表 LCL 拥有平台 Result/Evidence Store，只定义调用边界。
 
-Runner 返回候选集成报告：
+## Cross-domain report
+
+报告严格只有：
 
 ```text
-capability_ref
-request_id
-correlation_id?
-idempotency_key?
-result_ref
-evidence_refs[]
 status
-error_code?
-retryable
 summary
-local_result
+result_ref
+evidence_refs
+error
+correlation_id
+idempotency_key
 ```
 
-规则：
+完整 `local_result` 只进入 Result Sink，绝不进入跨域完成 Envelope。
 
-- `capability_ref` 来自 `LocalRequest.capability`；
-- `request_id` 原样保留；
-- `correlation_id` 原样透传；
-- `idempotency_key` 原样透传；
-- `error_code` 和 `retryable` 只来自 Canonical Local Result；
-- `summary` 是确定性摘要，不替代完整结果；
-- `result_ref` 和 `evidence_refs` 由注入的 Persistence Port 生成；
-- Local Control 不规定公共 Result Ref 的 URI、数据库或生命周期。
+## Retry and recovery
 
-## Duplicate requests
+- 同一 Key + 同一规范化请求返回同一引用；
+- 同一 Key + 不同请求返回 `LOCAL_WORK_IDEMPOTENCY_CONFLICT`；
+- Result Sink 已成功但 Report 失败时，重试不重新执行，复用原引用；
+- 新 Consumer 先回读 Result Sink，存在同指纹结果时不重新执行；
+- Sink/Report Port 失败由统一 Worker 决定重试，LCL 不修改 WorkItem 状态。
 
-Work Consumer 是无状态 Runner，不建立自己的幂等表。
+## Transport behavior
 
-- 同步读取可以安全重放；
-- 副作用能力必须携带 `idempotency_key`；
-- WorkItem 去重、请求指纹冲突和重试次数由 Task Control / Worker 层负责；
-- Local Control 不把相同 Key 与不同 WorkItem 语义自行合并。
+- Timeout：`LOCAL_CLI_TIMEOUT`；
+- 取消：`LOCAL_CLI_CANCELLED`；
+- 进程异常：`LOCAL_CLI_PROCESS_FAILED`；
+- stdout/stderr 超限：`LOCAL_CLI_OUTPUT_TOO_LARGE`；
+- CLI 返回领域失败：保存 Canonical Local Result，并只回报安全 Error 字段。
 
-## Failure ownership
-
-```text
-LocalResult.status = FAILED
-→ 领域执行失败
-→ Report 保留 error_code / retryable / summary
-
-LocalControlTransportError
-→ CLI 传输或进程失败
-→ Worker 决定如何记录 Execution 和重试
-
-Result Persistence 失败
-→ Runner Promise 失败
-→ 不能伪造 result_ref
-```
-
-## Cross-domain fields pending total-control freeze
-
-以下公共语义不能由 LCL 单方面冻结：
-
-- `result_ref` 格式和生成者；
-- `evidence_refs` 类型；
-- Work Consumer 成功/失败回报 Envelope；
-- TSK WorkItem Payload 到 LocalRequest 的映射；
-- Transport Error 的公共错误名；
-- 是否把完整 `local_result` 内联回报或只保存引用。
+正式候选字段与待总控冻结项见 `LOCAL-WORK-V1-PROPOSAL.md`。

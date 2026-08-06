@@ -15,6 +15,7 @@ export const LOCAL_CONTROL_FIXED_ARGS = [
 
 export type LocalControlTransportErrorCode =
   | "LOCAL_CLI_NOT_AVAILABLE"
+  | "LOCAL_CLI_CANCELLED"
   | "LOCAL_CLI_TIMEOUT"
   | "LOCAL_CLI_OUTPUT_TOO_LARGE"
   | "LOCAL_CLI_PROCESS_FAILED"
@@ -38,7 +39,14 @@ export class LocalControlTransportError extends Error {
 }
 
 export interface LocalControlClient {
-  execute(request: LocalRequest): Promise<LocalResult>;
+  execute(
+    request: LocalRequest,
+    options?: LocalControlExecutionOptions,
+  ): Promise<LocalResult>;
+}
+
+export interface LocalControlExecutionOptions {
+  readonly signal?: AbortSignal;
 }
 
 export interface LocalControlProcessClientOptions {
@@ -94,8 +102,18 @@ export function createLocalControlProcessClient(
   const environment = buildEnvironment(options.environment);
 
   return Object.freeze({
-    async execute(input: LocalRequest): Promise<LocalResult> {
+    async execute(
+      input: LocalRequest,
+      executionOptions: LocalControlExecutionOptions = {},
+    ): Promise<LocalResult> {
       const request = validateLocalRequest(input);
+      if (executionOptions.signal?.aborted === true) {
+        throw new LocalControlTransportError(
+          "LOCAL_CLI_CANCELLED",
+          "Local Control CLI invocation was cancelled before start.",
+          false,
+        );
+      }
       return new Promise<LocalResult>((resolve, reject) => {
         const effectiveTimeoutMs = Math.min(timeoutMs, request.budget.timeout_ms);
         const effectiveMaxStdoutBytes = Math.min(
@@ -130,14 +148,31 @@ export function createLocalControlProcessClient(
         let stdoutBytes = 0;
         let stderrBytes = 0;
         let settled = false;
-        let timer: NodeJS.Timeout;
+        let timer: NodeJS.Timeout | undefined;
+
+        const cleanup = (): void => {
+          if (timer !== undefined) {
+            clearTimeout(timer);
+          }
+          executionOptions.signal?.removeEventListener("abort", cancel);
+        };
+
+        const cancel = (): void => {
+          finishReject(
+            new LocalControlTransportError(
+              "LOCAL_CLI_CANCELLED",
+              "Local Control CLI invocation was cancelled.",
+              false,
+            ),
+          );
+        };
 
         const finishReject = (error: LocalControlTransportError): void => {
           if (settled) {
             return;
           }
           settled = true;
-          clearTimeout(timer);
+          cleanup();
           child.kill("SIGKILL");
           reject(error);
         };
@@ -189,7 +224,7 @@ export function createLocalControlProcessClient(
             return;
           }
           settled = true;
-          clearTimeout(timer);
+          cleanup();
           if (code !== 0) {
             reject(
               new LocalControlTransportError(
@@ -255,6 +290,12 @@ export function createLocalControlProcessClient(
           );
         }, effectiveTimeoutMs);
         timer.unref();
+        executionOptions.signal?.addEventListener("abort", cancel, {
+          once: true,
+        });
+        if (executionOptions.signal?.aborted === true) {
+          cancel();
+        }
 
         child.stdin.once("error", (error) => {
           finishReject(

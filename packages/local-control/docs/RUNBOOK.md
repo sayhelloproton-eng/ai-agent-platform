@@ -64,13 +64,15 @@ import { createLocalWorkConsumer } from "@ai-agent-platform/local-control";
 
 const consumer = createLocalWorkConsumer({
   client,
-  resultPersistence,
+  resultSink,
+  evidenceSink,
+  reportPort,
 });
 
-const report = await consumer.run(localRequest);
+const report = await consumer.run(localWorkClaimInput, { signal });
 ```
 
-Task Control / Worker 必须自己处理 WorkItem Claim、状态、去重、重试和 Result Ref 持久化。
+统一 Worker 必须自己处理 WorkItem Claim、状态和重试；LCL 只映射已授权的 Local Work，完整 Local Result 进入注入的 Sink，跨域报告只包含摘要与引用。
 
 ## Service start
 
@@ -85,6 +87,7 @@ export LOCAL_CONTROL_ALLOW_SERVICE_START=true
 ## Troubleshooting
 
 - `LOCAL_CLI_NOT_AVAILABLE`：检查固定 npm 包和 Binary Path；
+- `LOCAL_CLI_CANCELLED`：调用方已取消，确认是否仍需重新领取 Work；
 - `LOCAL_CLI_TIMEOUT`：检查 Gateway 上限和 Local Request Budget；
 - `LOCAL_CLI_OUTPUT_TOO_LARGE`：缩小读取范围；
 - `LOCAL_CLI_INVALID_RESULT`：停止接入，检查包版本或 stdout 污染；

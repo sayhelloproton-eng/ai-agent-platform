@@ -17,3 +17,5 @@
 ## 综合审计整改测试
 
 `integration-adapters.test.mjs` 验证 Gateway 固定进程调用、CLI/直接结果一致、重复请求、Timeout、输出预算、非法 stdout、路径与敏感资源拒绝、Work Consumer Result Ref 注入，以及 Error / Retryable / Summary / Evidence Ref 回报。
+
+`local-work-v1.test.mjs` 验证 Work Claim 纯映射、取消/超时/进程异常、Result/Evidence Sink、报告失败恢复、请求指纹冲突、大结果引用隔离，以及跨域报告不存在完整 `local_result`。
