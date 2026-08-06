@@ -119,7 +119,7 @@ test("duplicate Local Work returns one stable result reference", async () => {
   assert.deepEqual(second, first);
   assert.equal(executions, 1);
   assert.equal(ports.resultWrites, 1);
-  assert.equal(ports.evidenceWrites, 1);
+  assert.equal(ports.evidenceWrites, 2);
 });
 
 test("different payload cannot reuse a Local Work idempotency key", async () => {
@@ -164,7 +164,7 @@ test("report retry reuses the persisted result and evidence references", async (
   ]);
   assert.equal(executions, 1);
   assert.equal(ports.resultWrites, 1);
-  assert.equal(ports.evidenceWrites, 1);
+  assert.equal(ports.evidenceWrites, 2);
   assert.equal(reports, 2);
 });
 

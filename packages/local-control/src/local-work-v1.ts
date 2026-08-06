@@ -15,6 +15,13 @@ import { validateLocalRequest } from "./request-validator.js";
 
 export const LOCAL_WORK_V1_PROPOSAL_VERSION = "0.1.0-candidate" as const;
 
+/**
+ * request_id identifies one transport attempt. It is intentionally excluded
+ * from the business request fingerprint so a retried delivery can use a new
+ * request_id while the same idempotency key still resolves to the same result.
+ */
+export const LOCAL_REQUEST_ID_SEMANTICS = "transport-attempt-id" as const;
+
 export interface LocalWorkClaimInput {
   readonly local_work_version: typeof LOCAL_WORK_V1_PROPOSAL_VERSION;
   readonly request_id: string;
@@ -111,7 +118,6 @@ export function mapWorkClaimToLocalRequest(
       "Local Work idempotency_key must be a non-empty string no longer than 128 characters.",
     );
   }
-
   const descriptor = getCapabilityDescriptor(input.capability_ref);
   return validateLocalRequest({
     local_request_version: LOCAL_REQUEST_VERSION,
@@ -127,8 +133,14 @@ export function mapWorkClaimToLocalRequest(
   });
 }
 
+/**
+ * Returns the stable business request fingerprint used with idempotency_key.
+ * request_id is excluded because it is a transport-attempt identifier.
+ * idempotency_key is excluded because it is the lookup key bound to this hash.
+ */
 export function fingerprintLocalRequest(request: LocalRequest): string {
   const fingerprintInput: JsonObject = {
+    local_request_version: request.local_request_version,
     capability: request.capability,
     execution_mode: request.execution_mode,
     actor: {

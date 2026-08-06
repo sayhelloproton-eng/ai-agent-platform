@@ -1,73 +1,43 @@
-# SOL-LCL-001 Integration Readiness Verification
+# SOL-LCL-001 Final Domain Verification
 
-## Baseline
-
-```text
-Audited repository baseline:
-main@353a9ff39af6582e33f0ea8078af75f40c64380c
-
-Audit date:
-2026-08-06
-```
-
-## Implemented scope
-
-在既有 Local Control MVP 和第一轮 Adapter 上增量增加：
-
-- Canonical Local Result 运行时验证；
-- Gateway 安全 CLI Process Adapter；
-- Local Work v1 候选纯映射；
-- Result Sink、Evidence Sink 和 Report Port；
-- 请求指纹冲突与持久引用恢复；
-- Process Adapter `AbortSignal` 取消；
-- Transport Error；
-- Gateway / Work Consumer 正式接入文档；
-- 审计整改测试。
-
-没有修改 Task、Plan、Claim、WorkItem 或 Controller 语义。
-
-## Local Control verification
-
-当前领域测试：
+## Reference and scope
 
 ```text
-34 passed
-0 failed
+Deep-audit reference:
+main@6988b4b3711836c96706a5e79b195cd346d80fb3
+
+Allowed scope:
+packages/local-control/**
 ```
 
-新增测试覆盖：
+本轮不修改 Task、Plan、Claim、WorkItem、Controller、Gateway Route、Browser Host 或公共 Contracts。
 
-- 真实 CLI 子进程调用；
-- CLI 与直接调用结果一致；
-- 重复只读请求；
-- Timeout；
-- Cancellation；
-- 非零进程退出；
-- stdout / stderr 预算；
-- 非单一 JSON；
-- Result 身份不一致；
-- Invalid Path；
-- Sensitive File；
-- 受信任绝对路径和环境白名单；
-- Work Consumer Result/Evidence Ref 注入；
-- 报告失败后稳定引用复用；
-- duplicate request 与 fingerprint conflict；
-- 大结果和完整 `local_result` 的跨域隔离；
-- Error、Retryable、Summary 和 Evidence Ref 回报。
+## Final remediation coverage
 
-原有测试继续覆盖：
+- `request_id` 传输身份和统一业务指纹；
+- 同进程与重启后的幂等回放；
+- 同 Key 不同 Payload 冲突；
+- 有界 `inFlight` 容量、TTL、并发合并和完成清理；
+- `ACCEPTED / PARTIAL / SUCCEEDED / FAILED` 候选语义；
+- Result/Evidence Sink 稳定引用；
+- Sink 成功但 Report 失败后的恢复；
+- 大结果和 Partial 结果只通过引用跨域；
+- 子进程超时、取消、异常退出和输出超限；
+- Contract Test Fixture；
+- 跨域 WorkReport 不存在完整 `local_result`。
 
-- 10 个 Capability；
-- Git / File / Runtime / Executor / Service；
-- 路径穿越和软链逃逸；
-- Batch；
-- `ensure_running`；
-- npm pack；
-- 离线安装和 `aap-local` Binary。
+## Isolated cumulative-overlay verification
 
-## Environment note
+本次累计 Overlay 在交付环境中执行：
 
-本轮在真实仓库使用 Node 20 / npm 10 执行：
+```text
+TypeScript build: passed
+Local Control tests: 27 passed / 0 failed
+npm pack: passed
+npm tgz offline install / binary / export verification: passed
+```
+
+交付环境为 Node 22 / npm 10。项目正式门禁仍是 Node 20 / npm 10，必须在本机最新仓库应用后重跑：
 
 ```bash
 npm ci
@@ -76,14 +46,17 @@ npm run pack:check --workspace @ai-agent-platform/local-control
 npm run verify
 ```
 
-## Integration status
+最终报告必须以本机 Node 20 结果为准，不得把交付环境验证替代正式仓库验收。
+
+## Integration readiness
 
 ```text
-Local Control implementation: ready
-Gateway Process Adapter: implemented
-Work Consumer Adapter and Ports: implemented
-Gateway HTTP local.* route: not implemented by LCL
-Unified Worker WorkItem mapping: pending outside LCL
-Public Result Ref: pending total-control freeze
+Local Control core: ready for total-control integration
+Gateway Process Adapter: ready
+Local Work Consumer and Ports: ready
+Contract Test Fixture: ready
+Gateway HTTP local.* route: total-control/Gateway integration
+TSK → LCL Worker: total-control integration
+Public WorkResult / ResultRef: pending total-control freeze
 Four-domain E2E: pending total-control integration
 ```

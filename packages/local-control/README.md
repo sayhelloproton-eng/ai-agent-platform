@@ -17,7 +17,10 @@ stdin 只接收一个 `LocalRequest` JSON，stdout 只返回一个 `LocalResult`
 - `createLocalControlProcessClient()`：供唯一 Gateway 以安全子进程调用固定 CLI；
 - `mapWorkClaimToLocalRequest()`：把已授权的 Local Work 候选输入纯映射为 `LocalRequest`；
 - `createLocalWorkConsumer()`：通过 Result/Evidence Sink 执行并只回报摘要与引用；
-- `validateLocalResult()`：校验 stdout Canonical Local Result 及请求身份一致性。
+- `validateLocalResult()`：校验 stdout Canonical Local Result 及请求身份一致性；
+- `fingerprintLocalRequest()`：生成不含传输 `request_id` 的稳定业务指纹；
+- `classifyLocalResult()`：给出四种 Local Result 的候选终态/轮询/重试语义；
+- `createLocalWorkContractTestFixture()`：供总控和统一 Worker 复用的稳定 Contract Fixture。
 
 ## Boundary
 
@@ -74,7 +77,7 @@ npm run check:local-control
 npm run pack:check --workspace @ai-agent-platform/local-control
 ```
 
-测试覆盖 npm 打包、stdin/stdout 协议、真实 Git 仓库读取、分页 Tree、文件范围、路径逃逸、敏感资源、Runtime、Executor、Batch 和受控 Service 启动。
+测试覆盖 npm 打包、stdin/stdout 协议、真实 Git 仓库读取、分页 Tree、文件范围、路径逃逸、敏感资源、Runtime、Executor、Batch、受控 Service 启动、传输取消、幂等恢复、有界 inFlight、Result/Evidence Sink 和引用式 WorkReport。
 
 ## Related
 
@@ -83,6 +86,7 @@ npm run pack:check --workspace @ai-agent-platform/local-control
 - `docs/WORK-CONSUMER-INTEGRATION.md`
 - `docs/AUDIT-REMEDIATION-2026-08-05.md`
 - `docs/AUDIT-REMEDIATION-ROUND2-2026-08-06.md`
+- `docs/FINAL-DOMAIN-REMEDIATION-2026-08-06.md`
 - `docs/LOCAL-WORK-V1-PROPOSAL.md`
 - `docs/RUNBOOK.md`
 - `docs/MVP-VERIFICATION.md`

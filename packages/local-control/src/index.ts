@@ -53,7 +53,6 @@ export {
   type ProcessRunner,
 } from "./process.js";
 export { validateLocalRequest } from "./request-validator.js";
-
 export {
   LOCAL_CONTROL_FIXED_ARGS,
   LocalControlTransportError,
@@ -64,25 +63,36 @@ export {
   type LocalControlTransportErrorCode,
 } from "./gateway-process-adapter.js";
 export {
-  createLocalWorkConsumer,
-  summarizeLocalResult,
-  LocalWorkConsumerError,
-  type LocalEvidenceSinkPort,
-  type LocalResultSinkPort,
-  type LocalWorkBoundaryError,
-  type LocalWorkBoundaryErrorCode,
-  type LocalWorkConsumerOptions,
-  type LocalWorkConsumerReport,
-  type LocalWorkReportPort,
-  type LocalWorkRunOptions,
-  type StoredLocalWorkResult,
-} from "./work-consumer-adapter.js";
-export {
+  LOCAL_REQUEST_ID_SEMANTICS,
   LOCAL_WORK_V1_PROPOSAL_VERSION,
   fingerprintLocalRequest,
   mapWorkClaimToLocalRequest,
   type LocalWorkClaimInput,
 } from "./local-work-v1.js";
+export {
+  LocalWorkConsumerError,
+  classifyLocalResult,
+  createLocalWorkConsumer,
+  summarizeLocalResult,
+  type LocalEvidenceSinkPort,
+  type LocalResultDisposition,
+  type LocalResultSinkPort,
+  type LocalWorkBoundaryError,
+  type LocalWorkBoundaryErrorCode,
+  type LocalWorkConsumerErrorCode,
+  type LocalWorkConsumerOptions,
+  type LocalWorkConsumerReport,
+  type LocalWorkInFlightOptions,
+  type LocalWorkReportPort,
+  type LocalWorkRunOptions,
+  type StoredLocalEvidenceReferences,
+  type StoredLocalWorkResult,
+} from "./work-consumer-adapter.js";
+export {
+  createLocalWorkContractTestFixture,
+  type LocalWorkContractTestFixture,
+  type LocalWorkContractTestFixtureOptions,
+} from "./local-work-contract-test-fixture.js";
 export {
   validateLocalResult,
   type ExpectedLocalResultIdentity,

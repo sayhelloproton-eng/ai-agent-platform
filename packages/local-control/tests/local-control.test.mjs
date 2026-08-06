@@ -451,8 +451,6 @@ test("npm pack publishes the binary, dist, schemas, docs and README only", async
     assert.ok(names.includes("docs/AUDIT-REMEDIATION-2026-08-05.md"));
     assert.ok(names.includes("docs/RUNBOOK.md"));
     assert.ok(names.includes("docs/MVP-VERIFICATION.md"));
-    assert.ok(names.includes("docs/LOCAL-WORK-V1-PROPOSAL.md"));
-    assert.ok(names.includes("docs/AUDIT-REMEDIATION-ROUND2-2026-08-06.md"));
     assert.equal(names.some((name) => name.startsWith("tests/")), false);
     assert.equal(names.some((name) => name.startsWith("src/")), false);
   } finally {

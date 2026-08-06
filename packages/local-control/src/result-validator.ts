@@ -21,7 +21,7 @@ const ERROR_CATEGORIES = new Set([
 ]);
 
 export interface ExpectedLocalResultIdentity {
-  readonly requestId: string;
+  readonly requestId?: string;
   readonly capability: LocalCapability;
 }
 
@@ -101,7 +101,7 @@ export function validateLocalResult(
     return invalidResult("Successful Local Result must not include an error.");
   }
   if (expected !== undefined) {
-    if (input.request_id !== expected.requestId) {
+    if (expected.requestId !== undefined && input.request_id !== expected.requestId) {
       return invalidResult("Local Result request_id does not match the request.");
     }
     if (input.capability !== expected.capability) {
