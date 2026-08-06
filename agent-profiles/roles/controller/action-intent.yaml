@@ -1,10 +1,14 @@
 role_id: controller
 operations:
   - operation_id: getTaskDecisionContext
-    intent: 查询最新 Task、Plan、Event、Result、约束和允许命令
+    intent: 查询最新 Task、Plan、Event、Result、约束和当前实际允许命令
   - operation_id: claimControllerTask
     intent: 在查询最新上下文后领取短期 Controller Claim
   - operation_id: submitControllerCommand
-    intent: 提交受约束业务命令并原子推进 Task、Plan 和 Event
+    intent: 只提交 Decision Context 当前允许的受约束业务命令；计划插入通过 REVISE_PLAN 的 INSERT_NODE_AFTER 表达
   - operation_id: releaseControllerTask
     intent: 主动释放当前 Controller Claim
+capability_boundaries:
+  - REQUEST_ROLE_WORK 与 REQUEST_APPROVAL 在公共引用合同冻结前不得提交
+  - WAIT 节点在等待状态合同冻结前不得创建
+  - PAUSE、RESUME、FAIL 尚未进入 Controller Command v1，不得伪造调用

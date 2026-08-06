@@ -530,7 +530,7 @@ test("unsupported Controller capabilities fail explicitly without Task side effe
   );
 });
 
-test("INSERT_NODE_AFTER is rejected instead of producing an incorrect sequence", async () => {
+test("INSERT_NODE_AFTER delegates real successor rewiring to Task Control", async () => {
   const { adapter, service } = await harness({
     taskId: "task-insert-node-001",
   });
@@ -547,46 +547,49 @@ test("INSERT_NODE_AFTER is rejected instead of producing an incorrect sequence",
     identityA,
   );
   const created = await adapter.submitCommand(createPlanRequest(claim), identityA);
-  const taskBefore = await service.getTask(context.task.taskId);
-  await assert.rejects(
-    adapter.submitCommand(
-      {
-        taskId: context.task.taskId,
-        claimToken: claim.claimToken,
-        expectedTaskVersion: created.task.taskVersion,
-        expectedPlanVersion: created.task.plan.planVersion,
-        idempotencyKey: "insert-node-after",
-        command: {
-          type: "REVISE_PLAN",
-          reasonSummary: "Do not fake graph insertion.",
-          payload: {
-            operations: [
-              {
-                operation: "INSERT_NODE_AFTER",
-                afterNodeId: "inspect-context",
-                node: {
-                  nodeId: "inserted-node",
-                  title: "Inserted",
-                  kind: "DECISION",
-                  requiredRole: "controller",
-                },
+  const revised = await adapter.submitCommand(
+    {
+      taskId: context.task.taskId,
+      claimToken: claim.claimToken,
+      expectedTaskVersion: created.task.taskVersion,
+      expectedPlanVersion: created.task.plan.planVersion,
+      idempotencyKey: "insert-node-after",
+      command: {
+        type: "REVISE_PLAN",
+        reasonSummary: "Insert validation before finalization.",
+        payload: {
+          operations: [
+            {
+              operation: "INSERT_NODE_AFTER",
+              afterNodeId: "inspect-context",
+              node: {
+                nodeId: "inserted-node",
+                title: "Validate context",
+                kind: "REVIEW",
+                requiredRole: "controller",
               },
-            ],
-          },
+            },
+          ],
         },
       },
-      identityA,
-    ),
-    (error) =>
-      error instanceof ControllerTaskControlError &&
-      error.code === "CONTROLLER_COMMAND_NOT_ALLOWED",
+    },
+    identityA,
   );
-  const taskAfter = await service.getTask(context.task.taskId);
-  assert.equal(taskAfter.taskVersion, taskBefore.taskVersion);
   assert.deepEqual(
-    taskAfter.plan.nodes.map((node) => node.nodeId),
-    ["inspect-context", "finish-task"],
+    revised.task.plan.nodes.map((node) => node.nodeId),
+    ["inspect-context", "inserted-node", "finish-task"],
   );
+  assert.deepEqual(
+    revised.task.plan.nodes.find((node) => node.nodeId === "inserted-node")
+      .dependsOn,
+    ["inspect-context"],
+  );
+  assert.deepEqual(
+    revised.task.plan.nodes.find((node) => node.nodeId === "finish-task")
+      .dependsOn,
+    ["inserted-node"],
+  );
+  assert.equal((await service.getTask(context.task.taskId)).taskVersion, revised.task.taskVersion);
 });
 
 test("externally created Task can immediately enter Controller Claim and Decision", async () => {

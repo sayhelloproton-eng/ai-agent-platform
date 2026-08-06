@@ -82,6 +82,29 @@ interface TaskControlClaimResult {
   readonly planVersion: number | null;
 }
 
+export interface ControllerCommandReceiptLookup {
+  readonly taskId: string;
+  readonly producerRef: string;
+  readonly idempotencyKey: string;
+  readonly requestFingerprint: string;
+}
+
+/**
+ * Immutable Task Control receipt projection consumed by CTL.
+ *
+ * The receipt is owned and persisted by the Task Control application adapter.
+ * CTL may cache the projected public response, but that cache is never the
+ * authority for whether the command committed.
+ */
+export interface ControllerCommandReceipt {
+  readonly requestFingerprint: string;
+  readonly commandResult: TaskControlCommandResult;
+  readonly taskSnapshot: TaskAggregate;
+  readonly event: TaskEvent;
+  readonly eventSequence: number;
+  readonly eventCount: number;
+}
+
 /** Narrow formal Task Control application interface consumed by the CTL adapter. */
 export interface ControllerTaskControlService {
   getDecisionContext(
@@ -94,6 +117,13 @@ export interface ControllerTaskControlService {
   submitControllerCommand(
     input: SubmitControllerCommandInput,
   ): Promise<TaskControlCommandResult>;
+  submitControllerCommandWithReceipt?(
+    input: SubmitControllerCommandInput,
+    lookup: ControllerCommandReceiptLookup,
+  ): Promise<ControllerCommandReceipt>;
+  readControllerCommandReceipt?(
+    lookup: ControllerCommandReceiptLookup,
+  ): Promise<ControllerCommandReceipt | null>;
   releaseControllerClaim(
     taskId: string,
     claimToken: string,
@@ -541,8 +571,8 @@ export function createTaskControlControllerAdapter(
           "REQUEST_ROLE_WORK is unavailable until target domain, capability, input reference, and result reference semantics are frozen.",
           "REQUEST_APPROVAL is unavailable until a formal approval_ref producer and resolution contract are frozen.",
           "WAIT Plan Nodes are unavailable until the public waiting-state contract is frozen.",
-          "INSERT_NODE_AFTER is unavailable because Task Control v1 has no atomic dependency-rewiring operation.",
-          "PAUSE, RESUME, and FAIL are not exposed by Controller Command v1 and require a public contract decision.",
+          "INSERT_NODE_AFTER is supported through REVISE_PLAN and delegates dependency rewiring to formal Task Control.",
+          "PAUSE, RESUME, and FAIL exist in Task Control but are not exposed by Controller Command v1; they require a public contract decision.",
         ])],
         pendingApprovals: [...context.pendingApprovals],
         availableContextRefs: [...context.availableContextRefs],
@@ -691,11 +721,11 @@ export function createTaskControlControllerAdapter(
                 404,
               );
             }
-            throw new ControllerTaskControlError(
-              "CONTROLLER_COMMAND_NOT_ALLOWED",
-              "INSERT_NODE_AFTER is unsupported because Task Control v1 cannot atomically rewire the anchor successor dependencies.",
-              409,
-            );
+            operations.push({
+              type: "INSERT_NODE_AFTER",
+              anchorNodeId: operation.afterNodeId,
+              node: toTaskControlNode(operation.node, "PENDING"),
+            });
           } else {
             operations.push({
               type: "SET_NODE_STATUS",
@@ -767,13 +797,13 @@ export function createTaskControlControllerAdapter(
       case "REQUEST_ROLE_WORK":
         throw new ControllerTaskControlError(
           "CONTROLLER_COMMAND_NOT_ALLOWED",
-          "REQUEST_ROLE_WORK requires the cross-domain Work Input Ref contract to be frozen first.",
+          "CONTRACT_NOT_FROZEN: REQUEST_ROLE_WORK requires capabilityRef, inputRef, expectedResultType, and Result Ref ownership that Controller Command v1 does not provide.",
           409,
         );
       case "REQUEST_APPROVAL":
         throw new ControllerTaskControlError(
           "CONTROLLER_COMMAND_NOT_ALLOWED",
-          "REQUEST_APPROVAL requires a formal Approval Ref producer and is not synthesized by CTL.",
+          "CONTRACT_NOT_FROZEN: REQUEST_APPROVAL requires an Approval Ref producer and resolution lifecycle that Controller Command v1 does not provide.",
           409,
         );
       default:
@@ -783,6 +813,85 @@ export function createTaskControlControllerAdapter(
           409,
         );
     }
+  }
+
+  function projectCommandReceipt(
+    receipt: ControllerCommandReceipt,
+    identity: ControllerIdentity,
+    request: SubmitControllerCommandRequest,
+    idempotentReplay: boolean,
+  ): ControllerCommandResult {
+    return {
+      contractVersion: CONTROLLER_CONTRACT_VERSION,
+      commandId: deterministicId(
+        "controller-command",
+        identity.profileId,
+        request.taskId,
+        request.idempotencyKey,
+      ),
+      task: mapTaskSnapshot(
+        receipt.taskSnapshot,
+        projectId,
+        receipt.eventCount,
+      ),
+      event: mapEvent(receipt.event, receipt.eventSequence),
+      createdRefs: [
+        ...receipt.commandResult.workItemIds,
+        ...receipt.commandResult.dispatchIds,
+      ],
+      idempotentReplay,
+    };
+  }
+
+  async function readPersistedCommandReceipt(
+    lookup: ControllerCommandReceiptLookup,
+    identity: ControllerIdentity,
+    request: SubmitControllerCommandRequest,
+  ): Promise<ControllerCommandResult | null> {
+    if (service.readControllerCommandReceipt === undefined) return null;
+    const receipt = await taskControlCall(() =>
+      service.readControllerCommandReceipt!(lookup),
+    );
+    if (receipt === null) return null;
+    if (receipt.requestFingerprint !== lookup.requestFingerprint) {
+      throw new ControllerTaskControlError(
+        "CONTROLLER_IDEMPOTENCY_CONFLICT",
+        "The Task Control receipt belongs to a different request fingerprint.",
+        409,
+      );
+    }
+    return projectCommandReceipt(receipt, identity, request, true);
+  }
+
+  async function fallbackCommandReceipt(
+    input: SubmitControllerCommandInput,
+    requestFingerprint: string,
+  ): Promise<ControllerCommandReceipt> {
+    const commandResult = await service.submitControllerCommand(input);
+    const [taskSnapshot, events] = await Promise.all([
+      service.getTask(input.taskId),
+      service.listEvents(input.taskId),
+    ]);
+    const resultEventIds = new Set(commandResult.eventIds);
+    const event = [...events]
+      .reverse()
+      .find((candidate) => resultEventIds.has(candidate.eventId));
+    if (event === undefined) {
+      throw new ControllerTaskControlError(
+        "CONTROLLER_INVALID_REQUEST",
+        "Formal Task Control did not return an auditable command Event.",
+        500,
+      );
+    }
+    return {
+      requestFingerprint,
+      commandResult,
+      taskSnapshot,
+      event,
+      eventSequence:
+        events.findIndex((candidate) => candidate.eventId === event.eventId) + 1,
+      eventCount: events.length,
+    };
   }
 
   async function submitCommand(
@@ -800,52 +909,47 @@ export function createTaskControlControllerAdapter(
     const duplicate = await replay<ControllerCommandResult>(scope, inputFingerprint);
     if (duplicate !== null) return duplicate;
 
-    const mappedCommand = await taskControlCall(() => mapCommand(request, identity));
-    const result = await taskControlCall(() =>
-      service.submitControllerCommand({
-        commandContractVersion: TASK_CONTROL_CONTRACT_VERSION,
-        taskId: request.taskId,
-        claimToken: request.claimToken,
-        expectedTaskVersion: request.expectedTaskVersion,
-        ...(request.expectedPlanVersion === null
-          ? {}
-          : { expectedPlanVersion: request.expectedPlanVersion }),
-        idempotencyKey: request.idempotencyKey,
-        producerRef: identity.profileId,
-        command: mappedCommand,
-      }),
+    const receiptLookup: ControllerCommandReceiptLookup = {
+      taskId: request.taskId,
+      producerRef: identity.profileId,
+      idempotencyKey: request.idempotencyKey,
+      requestFingerprint: inputFingerprint,
+    };
+    const recovered = await readPersistedCommandReceipt(
+      receiptLookup,
+      identity,
+      request,
     );
-    const [task, events] = await Promise.all([
-      service.getTask(request.taskId),
-      service.listEvents(request.taskId),
-    ]);
-    const resultEventIds = new Set(result.eventIds);
-    const selectedEvent = [...events]
-      .reverse()
-      .find((event) => resultEventIds.has(event.eventId));
-    if (selectedEvent === undefined) {
+    if (recovered !== null) {
+      return remember(scope, inputFingerprint, recovered);
+    }
+
+    const mappedCommand = await taskControlCall(() => mapCommand(request, identity));
+    const input: SubmitControllerCommandInput = {
+      commandContractVersion: TASK_CONTROL_CONTRACT_VERSION,
+      taskId: request.taskId,
+      claimToken: request.claimToken,
+      expectedTaskVersion: request.expectedTaskVersion,
+      ...(request.expectedPlanVersion === null
+        ? {}
+        : { expectedPlanVersion: request.expectedPlanVersion }),
+      idempotencyKey: request.idempotencyKey,
+      producerRef: identity.profileId,
+      command: mappedCommand,
+    };
+    const receipt = await taskControlCall(() =>
+      service.submitControllerCommandWithReceipt === undefined
+        ? fallbackCommandReceipt(input, inputFingerprint)
+        : service.submitControllerCommandWithReceipt(input, receiptLookup),
+    );
+    if (receipt.requestFingerprint !== inputFingerprint) {
       throw new ControllerTaskControlError(
-        "CONTROLLER_INVALID_REQUEST",
-        "Formal Task Control did not return an auditable command Event.",
-        500,
+        "CONTROLLER_IDEMPOTENCY_CONFLICT",
+        "Formal Task Control returned a receipt for a different request fingerprint.",
+        409,
       );
     }
-    const sequence = events.findIndex(
-      (event) => event.eventId === selectedEvent.eventId,
-    ) + 1;
-    const response: ControllerCommandResult = {
-      contractVersion: CONTROLLER_CONTRACT_VERSION,
-      commandId: deterministicId(
-        "controller-command",
-        identity.profileId,
-        request.taskId,
-        request.idempotencyKey,
-      ),
-      task: mapTaskSnapshot(task, projectId, events.length),
-      event: mapEvent(selectedEvent, sequence),
-      createdRefs: [...result.workItemIds, ...result.dispatchIds],
-      idempotentReplay: false,
-    };
+    const response = projectCommandReceipt(receipt, identity, request, false);
     return remember(scope, inputFingerprint, response);
   }
 
