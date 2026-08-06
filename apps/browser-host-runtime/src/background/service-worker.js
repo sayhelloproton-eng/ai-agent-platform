@@ -5,11 +5,12 @@ import { buildWakeEnvelope } from "../shared/contracts.js";
 import { computeActionFingerprint, computePagePreconditionHash } from "../shared/fingerprints.js";
 import { randomId } from "../shared/crypto.js";
 import { computePageIdentityFingerprint, parseChatGptIdentity } from "../shared/page-identity.js";
+import { ExecutionGate } from "./execution-gate.js";
 
 const ALARMS = { HEARTBEAT: "bhr-heartbeat", POLL: "bhr-dispatch-poll", OBSERVE: "bhr-observation" };
 const PENDING_REVIEW_KEY = "bhr.pending_reviews";
 const FIXTURE_DRAFT_KEY = "bhr.fixture.pending_wake";
-let processing = false;
+const executionGate = new ExecutionGate();
 
 async function ensureAlarms() {
   const config = await readConfig();
@@ -19,11 +20,13 @@ async function ensureAlarms() {
 }
 
 async function registerAndRecover() {
-  const runtime = await createRuntime();
-  await runtime.journal?.recoverAfterRestart?.();
-  try { await runtime.hostRegistry.register(); } catch (error) { console.warn("BHR host registration deferred", asSafeError(error)); }
-  try { await runtime.coordinator.processOne(); } catch (error) { console.warn("BHR recovery report/observation deferred", asSafeError(error)); }
-  await ensureAlarms();
+  return executionGate.run("register-and-recover", async () => {
+    const runtime = await createRuntime();
+    await runtime.journal?.recoverAfterRestart?.();
+    try { await runtime.hostRegistry.register(); } catch (error) { console.warn("BHR host registration deferred", asSafeError(error)); }
+    try { await runtime.coordinator.processOne(); } catch (error) { console.warn("BHR recovery report/observation deferred", asSafeError(error)); }
+    await ensureAlarms();
+  });
 }
 
 async function heartbeat() {
@@ -38,10 +41,7 @@ async function heartbeat() {
 }
 
 async function pollOnce() {
-  if (processing) return { processed: false, reason: "PROCESSING" };
-  processing = true;
-  try { return await (await createRuntime()).coordinator.processOne(); }
-  finally { processing = false; }
+  return executionGate.run("dispatch-poll", async () => (await createRuntime()).coordinator.processOne());
 }
 async function observeReadyBindings({ tabId = null } = {}) {
   const runtime = await createRuntime();

@@ -1,147 +1,60 @@
-# Gateway / Dispatch Adapter｜第二轮接线合同
+# Browser Host Gateway Server Adapter 接线说明
 
-## 1. 正式 HTTP 模式
-
-默认运行模式：
+## 1. 传输
 
 ```text
-transport_mode = gateway
 POST /v1/browser-host/invoke
 ```
 
-Fixture 只允许显式测试：
-
-```text
-transport_mode = fixture
-fixture_test_mode = true
-```
-
-正式 HTTP 无服务端时返回 `GATEWAY_UNAVAILABLE`，不会静默切换 Fixture。
-
-## 2. 统一 HTTP Envelope
-
-请求候选格式：
+请求：
 
 ```json
-{
-  "requestId": "bhr-request-...",
-  "operation": "browser.dispatch.listPending",
-  "payload": {}
-}
+{"requestId":"bhr-request-...","operation":"browser.dispatch.claim","payload":{}}
 ```
 
-成功响应必须是：
+成功：
 
 ```json
-{
-  "ok": true,
-  "requestId": "bhr-request-...",
-  "data": {}
-}
+{"ok":true,"requestId":"bhr-request-...","data":{}}
 ```
 
-客户端不再读取 `body.result`。以下响应会确定失败：
+错误：
 
-- `ok !== true`：Gateway Error Envelope；
-- 缺少 `requestId`：`GATEWAY_REQUEST_ID_MISSING`；
-- 缺少或为空的 `data`：`GATEWAY_DATA_MISSING`；
-- 可选 `gatewayEnvelopeVersion` 不兼容：`GATEWAY_ENVELOPE_VERSION_UNSUPPORTED`；
-- 非 JSON：`GATEWAY_RESPONSE_INVALID_JSON`。
+```json
+{"ok":false,"requestId":"...","error":{"code":"...","message":"...","details":{}}}
+```
 
-`gatewayEnvelopeVersion` 是 BHR 客户端兼容检查字段候选，不代表公共合同已由本领域冻结。
+BHR 对空 `data`、错误 Envelope、缺失 Request ID、非法 JSON 和版本不兼容给出确定错误；不会静默切换 Fixture。
 
-## 3. Operation 客户端形态
-
-### list
+## 2. 双阶段与不确定阶段
 
 ```text
-browser.dispatch.listPending
-request:  { host_id, limit }
-response: DispatchSummary[]
+Claim Host Command
+→ 浏览器执行
+→ Delivery Ack（claim_token）
+→ 回答/页面观察
+→ Host Result（report_token）
 ```
 
-### claim
+如果 Service Worker 在 `EXECUTING` 或副作用开始后重启：
 
 ```text
-browser.dispatch.claim
-request:  { dispatch_ref, host_id }
-response: { claim_token, expires_at? }
+→ browser.dispatch.uncertain
+→ 不调用 browser.dispatch.fail
+→ 不重新提交消息
+→ 等待总控/TSK 复核或人工接管
 ```
 
-### get
+## 3. 服务端最低要求
 
-```text
-browser.dispatch.get
-request:  { dispatch_ref, claim_token }
-response: HostCommand v0.1.0
-```
+- 每个 Operation 按其业务 ID 幂等；
+- Delivery Ack 签发独立 `report_token`；
+- Controller Claim 不得使有效 Report Credential 失效；
+- Uncertain Receipt 必须阻止自动重发；
+- Fail 只接受确认未发生网页副作用的情况；
+- 同 `idempotency_key + fingerprint` 的新 Command ID 不得产生第二个逻辑动作；
+- Claim、Report 和 Approval 凭证的有效期、保留期和吊销语义由总纲统一冻结。
 
-### payload resolve
+## 4. 可执行 Contract Fixture
 
-```text
-browser.payload.resolve
-request:  { payload_ref }
-response: non-null resolved payload
-```
-
-### delivery Ack
-
-```text
-browser.dispatch.deliveryAck
-request:  { dispatch_ref, claim_token, delivery }
-response: { delivery_receipt, report_token, status? }
-```
-
-Delivery Ack 只确认页面投递或宿主动作已经发生。成功后，原 Dispatch Claim 可以结束；后续回答观察通过 `report_token` 回报，不再依赖原 `claim_token`。
-
-### Host Result
-
-```text
-browser.dispatch.hostResult
-request:  { dispatch_ref, report_token, result }
-response: { status, result_id? }
-```
-
-这允许 Controller 在网页回答中 Claim Task 后，BHR 仍能合法上报回答观察结果。
-
-### pre-delivery fail
-
-```text
-browser.dispatch.fail
-request:  { dispatch_ref, claim_token, result }
-response: { status, result_id? }
-```
-
-只有页面投递尚未确认时使用。投递已经发生后，不得把 Ack 网络失败误报成页面执行失败。
-
-## 4. 双阶段幂等与恢复
-
-```text
-页面动作执行
-→ Journal: DELIVERY_CONFIRMED
-→ delivery Ack
-→ Journal: DELIVERY_ACKED + report_token
-→ 回答 started/completed 观察
-→ Journal: EXECUTED + Host Result
-→ hostResult report
-→ Journal: REPORTED
-```
-
-恢复规则：
-
-- `DELIVERY_CONFIRMED`：只重试 delivery Ack，不重复提交消息；
-- `DELIVERY_ACKED`：只恢复回答观察并上报 Host Result；
-- `EXECUTED`：只补报原 `result_id`；
-- `EXECUTING`：动作是否发生无法确认，转 `UNCERTAIN`，绝不自动重做。
-
-Delivery Ack、Host Result 和 Dispatch Fail 都必须由服务端按其 ID 幂等记录。
-
-## 5. 等待总控冻结
-
-本领域没有单方面冻结：
-
-- TSK DispatchSignal → HostCommand 的物化位置；
-- `delivery_receipt` / `report_token` 最终名称与签发规则；
-- Dispatch Claim 与 Controller Claim 的正式子生命周期；
-- Host Result 写入 TSK Event、Evidence 与 Result Ref 的映射；
-- Approval 正式服务端 Operation。
+`tests/gateway-server-adapter-contract.test.mjs` 使用真实 Node HTTP Server 覆盖全部十个 Operation，并验证请求字段。总控实现 Server Adapter 时可以直接复用该测试形态。

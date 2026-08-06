@@ -36,3 +36,33 @@ test("Dispatch client rejects a delivery Ack without report token", async () => 
   const client = new DispatchClient({ invoke: async () => ({ delivery_receipt: "receipt" }) });
   await assert.rejects(() => client.deliveryAck("d1", "claim", { delivery_id: "delivery" }), (error) => error.code === "REPORT_TOKEN_MISSING");
 });
+
+test("Dispatch client exposes independent Uncertain Side Effect operation", async () => {
+  const calls = [];
+  const client = new DispatchClient({
+    invoke: async (operation, payload) => {
+      calls.push({ operation, payload });
+      return { status: "RECORDED", uncertain_id: payload.uncertain.uncertain_id };
+    }
+  });
+  const uncertain = {
+    uncertain_version: "0.1.0",
+    uncertain_id: "cmd:uncertain",
+    command_id: "cmd",
+    dispatch_ref: "dispatch",
+    task_id: "task",
+    idempotency_key: "idem",
+    command_fingerprint: "sha256:fingerprint",
+    binding_id: "binding",
+    page_identity: { gpt_ref: "g-test", conversation_ref: "conv" },
+    last_stage: "EXECUTING",
+    reason: "SERVICE_WORKER_RESTART_DURING_EXECUTION",
+    evidence_refs: ["obs-1"],
+    error: null,
+    observed_at: new Date().toISOString()
+  };
+  const receipt = await client.uncertain("dispatch", { claim_token: "claim" }, uncertain);
+  assert.equal(receipt.status, "RECORDED");
+  assert.equal(calls[0].operation, "browser.dispatch.uncertain");
+  assert.equal(calls[0].payload.credential.claim_token, "claim");
+});

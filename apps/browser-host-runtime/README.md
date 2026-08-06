@@ -1,61 +1,40 @@
 # Browser Host Runtime
 
-`@ai-agent-platform/browser-host-runtime` 是仓库内正式维护、由 Chrome 直接加载的 Manifest V3 Browser Host Runtime。
+`@ai-agent-platform/browser-host-runtime` 是仓库内正式维护、由 Chrome 直接加载的 Manifest V3 扩展。当前领域版本：`0.3.0`。
 
-## 当前版本
+## 最终领域整改完成项
 
-```text
-0.2.1
-```
+- 正式 HTTP Gateway Client；Fixture 仅显式测试；
+- `list / claim / get / payload resolve / delivery ack / host result / uncertain / fail / approval get / consume` 客户端；
+- 无 Binding 新建或恢复 Custom GPT 会话；
+- GPT、Conversation、URL 与 Page Fingerprint 硬校验；
+- Delivery Ack 与 Host Result 双阶段回报；
+- 独立 `UNCERTAIN_SIDE_EFFECT` 候选回报，绝不降级为普通 Fail；
+- Journal 共享单写队列，所有写入和恢复串行化；
+- `idempotency_key + logical fingerprint` 跨 Command ID 唯一；
+- 非终态与隔离记录永不因容量裁剪；容量满时停止 Claim；
+- 恢复记录具备重试次数、最后错误、下次重试和隔离；
+- 单条坏恢复记录不阻塞后续安全补报；
+- 预投递 Fail、Delivery Ack、Host Result 和 Uncertain 均可在重启后按原 Operation 补报；
+- 指定 Conversation 在 Wake 前后完整复核；
+- Service Worker 启动、Alarm Poll 和手动处理共用执行门禁。
 
-第二轮综合审计整改重点：
+## 领域边界
 
-- 正式 HTTP Client 解析 Gateway `{ ok, requestId, data }` Envelope；
-- 正式 HTTP 不可用时明确失败，Fixture 仅显式测试；
-- Platform Wake Candidate 成为默认候选策略；
-- 敏感 UI Action 继续使用一次性 Approval；
-- Browser Dispatch 使用 Delivery Ack + Host Result 双阶段回报；
-- Controller Claim 后，BHR 使用独立 `report_token` 回报回答观察；
-- Journal 可恢复 Delivery Ack、回答观察与 Host Result 补报，禁止重复发送；
-- 无 Binding 新开角色、会话身份校验、后台截图和完整响应生命周期继续保留。
+BHR 不拥有或修改 Task、Plan、WorkItem、Approval 决策和业务完成状态；不调用 Local Control；不从 Chat 正文解析正式 Controller Command；不执行任意 JavaScript 或坐标点击。
 
-## 它做什么
+公共 `HostCommandV1 / DeliveryAckV1 / HostResultV1 / UncertainSideEffectV1 / ClaimCredentialV1 / ReportCredentialV1` 仍由第二阶段总纲冻结。本包只提供 BHR 候选客户端与兼容性证据。
 
-- 注册 Browser Host 并发送 Heartbeat；
-- 绑定、创建或恢复 ChatGPT / Custom GPT 标签页；
-- 采集 Screenshot、Visible Text、DOM、Accessibility 和 Blocking UI；
-- 调用可替换的本地视觉模型 Port；
-- 从正式 Gateway 领取 Host Command；
-- 校验 Binding、Page Identity、Expiry、Idempotency 和授权；
-- 执行预注册网页动作；
-- 分阶段回报 Delivery Ack 与 Host Result；
-- 提供 Pause、Resume、解绑和 Emergency Stop。
-
-## 它不做什么
-
-- 不拥有或修改 Task、Plan、WorkItem；
-- 不解释聊天正文为正式 Controller Command；
-- 不判断业务任务是否成功；
-- 不决定审批；
-- 不调用 Local Control；
-- 不执行任意 JavaScript 或坐标点击；
-- 不扩展成通用无人监督浏览器 Agent。
-
-## 开发验证
+## 验证
 
 ```bash
 npm run verify --workspace @ai-agent-platform/browser-host-runtime
 ```
 
-该命令同时运行静态检查和全部测试。
+## Chrome 加载
 
-## 加载扩展
+打开 `chrome://extensions`，启用开发者模式，选择仓库内：
 
-1. 打开 `chrome://extensions`；
-2. 开启开发者模式；
-3. 选择“加载已解压的扩展程序”；
-4. 选择仓库内 `apps/browser-host-runtime`；
-5. 在 Options 中配置正式 Gateway；
-6. 打开 Side Panel 查看 Host、Binding、Journal 和 Observation。
-
-公共 Dispatch、Approval 和 Platform Wake 语义仍由总控最终冻结。
+```text
+apps/browser-host-runtime
+```

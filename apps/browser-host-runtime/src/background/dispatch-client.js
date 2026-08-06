@@ -1,5 +1,5 @@
 import { APPLICATION_OPERATIONS } from "../shared/constants.js";
-import { assertHostCommand } from "../shared/contracts.js";
+import { assertHostCommand, assertUncertainSideEffect } from "../shared/contracts.js";
 import { BhrError } from "../shared/errors.js";
 
 function requireObject(value, code, message) {
@@ -54,6 +54,15 @@ export class DispatchClient {
 
   async hostResult(dispatch_ref, report_token, result) {
     return this.gateway.invoke(APPLICATION_OPERATIONS.DISPATCH_HOST_RESULT, { dispatch_ref, report_token, result });
+  }
+
+  async uncertain(dispatch_ref, credential, uncertain) {
+    const checked = assertUncertainSideEffect(uncertain);
+    const value = requireObject(credential, "UNCERTAIN_CREDENTIAL_INVALID", "Uncertain report credential must be an object.");
+    if (!value.claim_token && !value.report_token) {
+      throw new BhrError("UNCERTAIN_CREDENTIAL_MISSING", "Uncertain report requires claim_token or report_token.");
+    }
+    return this.gateway.invoke(APPLICATION_OPERATIONS.DISPATCH_UNCERTAIN, { dispatch_ref, credential: value, uncertain: checked });
   }
 
   async fail(dispatch_ref, claim_token, result) {

@@ -157,3 +157,50 @@ export function buildDeliveryFact({ command, binding_id, execution }) {
   };
 }
 
+
+export function buildUncertainSideEffect({
+  command,
+  command_fingerprint,
+  binding_id = null,
+  page_identity = null,
+  last_stage,
+  reason,
+  evidence_refs = [],
+  error = null
+}) {
+  return {
+    uncertain_version: CONTRACT_VERSION,
+    uncertain_id: `${command.command_id}:uncertain`,
+    command_id: command.command_id,
+    dispatch_ref: command.dispatch_ref,
+    task_id: command.task_id,
+    idempotency_key: command.idempotency_key,
+    command_fingerprint,
+    binding_id,
+    page_identity,
+    last_stage,
+    reason,
+    evidence_refs: [...new Set(evidence_refs.filter(Boolean))],
+    error,
+    observed_at: new Date().toISOString()
+  };
+}
+
+export function assertUncertainSideEffect(value) {
+  const input = requireObject(value, "uncertain_side_effect");
+  if (input.uncertain_version !== CONTRACT_VERSION) throw new BhrError("CONTRACT_VERSION_UNSUPPORTED", "Unsupported uncertain_version.");
+  requireString(input.uncertain_id, "uncertain_side_effect.uncertain_id", { max: 256 });
+  requireString(input.command_id, "uncertain_side_effect.command_id", { max: 128 });
+  requireString(input.dispatch_ref, "uncertain_side_effect.dispatch_ref", { max: 128 });
+  requireString(input.task_id, "uncertain_side_effect.task_id", { max: 128 });
+  requireString(input.idempotency_key, "uncertain_side_effect.idempotency_key", { max: 256 });
+  requireString(input.command_fingerprint, "uncertain_side_effect.command_fingerprint", { max: 128 });
+  optionalString(input.binding_id, "uncertain_side_effect.binding_id", { max: 256 });
+  if (input.page_identity !== null && input.page_identity !== undefined) requireObject(input.page_identity, "uncertain_side_effect.page_identity");
+  requireString(input.last_stage, "uncertain_side_effect.last_stage", { max: 64 });
+  requireString(input.reason, "uncertain_side_effect.reason", { max: 256 });
+  requireArray(input.evidence_refs ?? [], "uncertain_side_effect.evidence_refs", { max: 64 });
+  if (input.error !== null && input.error !== undefined) requireObject(input.error, "uncertain_side_effect.error");
+  requireIsoDate(input.observed_at, "uncertain_side_effect.observed_at");
+  return input;
+}

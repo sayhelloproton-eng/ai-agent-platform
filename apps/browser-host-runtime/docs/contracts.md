@@ -1,123 +1,74 @@
-# BHR 领域合同说明｜第二轮候选
+# BHR 最终客户端合同候选
 
-本文只描述 BHR 客户端和领域内实现需要的候选形态。公共 Dispatch、Claim、Approval、Result 语义仍由总控冻结。
+> 本文是 BHR 客户端候选和总控接线说明，不代表本领域冻结平台公共语义。
 
-## Host Command
+## Operation
 
-```json
-{
-  "host_command_version": "0.1.0",
-  "command_id": "host-command-001",
-  "dispatch_ref": "browser-dispatch-001",
-  "task_id": "task-001",
-  "target": {
-    "role_ref": "controller",
-    "gpt_ref": "g-...",
-    "conversation_ref": null
-  },
-  "action": {
-    "type": "OPEN_OR_RESUME_SESSION",
-    "payload_ref": "payload-001"
-  },
-  "preconditions": {},
-  "approval_ref": null,
-  "idempotency_key": "idem-001",
-  "expires_at": "2026-08-06T10:00:00.000Z"
-}
-```
+| Operation | 请求 | 成功 `data` | 凭证用途 |
+|---|---|---|---|
+| `browser.dispatch.listPending` | `{host_id, limit}` | `DispatchSummary[]` | 无 |
+| `browser.dispatch.claim` | `{dispatch_ref, host_id}` | `{claim_token, expires_at?}` | 领取投递阶段 |
+| `browser.dispatch.get` | `{dispatch_ref, claim_token}` | `HostCommand` | 读取命令 |
+| `browser.payload.resolve` | `{payload_ref}` | 非空 Payload | 解析最小 Wake/动作数据 |
+| `browser.dispatch.deliveryAck` | `{dispatch_ref, claim_token, delivery}` | `{delivery_receipt, report_token}` | 确认网页副作用已经发生 |
+| `browser.dispatch.hostResult` | `{dispatch_ref, report_token, result}` | Receipt | 回报回答观察/动作结果 |
+| `browser.dispatch.uncertain` | `{dispatch_ref, credential, uncertain}` | Receipt | 副作用可能发生，进入复核 |
+| `browser.dispatch.fail` | `{dispatch_ref, claim_token, result}` | Receipt | 仅投递前确定失败 |
+| `approval.grant.get` | `{approval_ref}` | Approval Grant | 获取授权 |
+| `approval.grant.consume` | `{approval_ref, grant_id, command_id}` | Receipt | 一次性消费授权 |
 
-BHR 支持的语义动作包括：
-
-- `OPEN_OR_RESUME_SESSION`；
-- `CONTINUE_ROLE_SESSION`；
-- `SUBMIT_MESSAGE`；
-- `SET_COMPOSER_TEXT`；
-- `WAIT_FOR_RESPONSE`；
-- `OBSERVE_PAGE`；
-- `FOLLOW_LATEST`；
-- `CLICK_REGISTERED_UI`；
-- `STOP_GENERATION`。
-
-## Platform Wake Authorization 候选
-
-候选字段位于：
-
-```text
-host_command.preconditions.platform_wake_authorization
-```
-
-BHR 校验签名已验证声明、Task、Role、GPT、Idempotency、Expiry、Action Allowlist 和 Wake Envelope 一致性。字段最终名称等待总控冻结。
-
-## Delivery Fact
+所有 HTTP 成功响应使用：
 
 ```json
-{
-  "delivery_version": "0.1.0",
-  "delivery_id": "host-command-001:delivery",
-  "command_id": "host-command-001",
-  "dispatch_ref": "browser-dispatch-001",
-  "task_id": "task-001",
-  "binding_id": "binding-001",
-  "action_type": "SUBMIT_MESSAGE",
-  "status": "DELIVERED",
-  "submitted_at": "...",
-  "response_expected": true,
-  "details": {}
-}
+{"ok":true,"requestId":"...","data":{}}
 ```
 
-Delivery Fact 只表示浏览器侧投递已经发生，不表示 Controller 已完成业务处理。
+正式 HTTP 模式失败时不得回退 Fixture。
 
-## Delivery Ack
-
-Gateway 返回：
-
-```json
-{
-  "delivery_receipt": "delivery-receipt-001",
-  "report_token": "report-token-001",
-  "status": "RECORDED"
-}
-```
-
-`report_token` 允许 Dispatch Delivery Claim 结束后继续回报回答观察。
-
-## Host Result
-
-```json
-{
-  "host_result_version": "0.1.0",
-  "result_id": "host-result-001",
-  "command_id": "host-command-001",
-  "dispatch_ref": "browser-dispatch-001",
-  "task_id": "task-001",
-  "binding_id": "binding-001",
-  "status": "ACTION_SUCCEEDED",
-  "pre_observation_ref": "observation-before",
-  "post_observation_ref": "observation-after",
-  "error": null,
-  "details": {
-    "delivery": {},
-    "response_lifecycle": {},
-    "assessment": {}
-  },
-  "completed_at": "..."
-}
-```
-
-Host Result 只陈述浏览器事实，不修改 Task、Plan，不判断业务完成。
-
-## Journal
+## Journal 状态
 
 ```text
 RECEIVED
 → CLAIMED
 → PREPARED
 → EXECUTING
-→ DELIVERY_CONFIRMED
-→ DELIVERY_ACKED
-→ EXECUTED
-→ REPORTED
+
+投递前确定失败：
+→ PRE_DELIVERY_FAILURE_PENDING → REPORTED
+
+网页副作用已经确认：
+→ DELIVERY_ACK_PENDING → DELIVERY_ACKED
+→ HOST_RESULT_PENDING → REPORTED
+
+副作用是否发生不确定：
+→ UNCERTAIN → REPORTED（服务端进入复核/人工接管）
+
+记录结构损坏或持续不可恢复：
+→ QUARANTINED（保留，不自动重试、不容量裁剪）
 ```
 
-`DELIVERY_CONFIRMED` 后禁止重复提交；`EXECUTED` 后只允许补报原结果。
+`UNCERTAIN`、全部 `*_PENDING`、`DELIVERY_ACKED` 和 `QUARANTINED` 均属于受保护非终态。只有超过保留期的 `REPORTED/FAILED` 可以清理。
+
+## 幂等
+
+BHR 同时约束：
+
+```text
+command_id
+idempotency_key + logical_command_fingerprint
+```
+
+逻辑指纹不包含 `command_id` 和 `dispatch_ref`，因此服务端更换传输 ID 也不能造成重复网页副作用。同键不同指纹确定冲突；同键同指纹只接受一个逻辑命令。
+
+## Uncertain Side Effect 候选
+
+候选数据保留：
+
+- `command_id / dispatch_ref / task_id`；
+- `idempotency_key / command_fingerprint`；
+- `binding_id / page_identity`；
+- 最后执行阶段；
+- 原因、错误和 Evidence 引用；
+- 观察时间。
+
+它不得映射为普通 Delivery Fail，不得触发自动重发。正式状态名称、凭证和服务端状态由总纲冻结。

@@ -78,7 +78,7 @@ export class HttpGatewayClient {
 }
 
 function fixtureState() {
-  return { host: null, dispatches: [], grants: {}, payloads: {}, deliveryAcks: [], hostResults: [], failures: [] };
+  return { host: null, dispatches: [], grants: {}, payloads: {}, deliveryAcks: [], hostResults: [], uncertainReports: [], failures: [] };
 }
 
 export class FixtureGatewayClient {
@@ -95,6 +95,7 @@ export class FixtureGatewayClient {
     const state = await this.state();
     state.deliveryAcks ??= [];
     state.hostResults ??= [];
+    state.uncertainReports ??= [];
     state.failures ??= [];
     switch (operation) {
       case "browser.host.register":
@@ -163,6 +164,20 @@ export class FixtureGatewayClient {
         state.hostResults.push({ ...payload, recorded_at: new Date().toISOString() });
         await this.save(state);
         return { status: "RECORDED", result_id: payload.result?.result_id };
+      }
+      case "browser.dispatch.uncertain": {
+        const item = state.dispatches.find((candidate) => candidate.dispatch_ref === payload.dispatch_ref);
+        const duplicate = state.uncertainReports.find((entry) => entry.uncertain?.uncertain_id === payload.uncertain?.uncertain_id);
+        if (duplicate) return { status: "ALREADY_RECORDED", uncertain_id: payload.uncertain.uncertain_id };
+        const credentialValid = Boolean(item) && (
+          (payload.credential?.claim_token && item.claim_token === payload.credential.claim_token) ||
+          (payload.credential?.report_token && item.report_token === payload.credential.report_token)
+        );
+        if (!credentialValid) throw new BhrError("UNCERTAIN_CREDENTIAL_INVALID", "Fixture uncertain report credential is invalid.");
+        item.status = "UNCERTAIN_REVIEW";
+        state.uncertainReports.push({ ...payload, recorded_at: new Date().toISOString() });
+        await this.save(state);
+        return { status: "RECORDED", uncertain_id: payload.uncertain?.uncertain_id };
       }
       case "browser.dispatch.fail": {
         const item = state.dispatches.find((candidate) => candidate.dispatch_ref === payload.dispatch_ref);

@@ -1,5 +1,5 @@
 import { ACTION_TYPES, HOST_RESULT_STATUS, JOURNAL_STATE } from "../shared/constants.js";
-import { assertHostCommand, buildDeliveryFact, buildHostResult } from "../shared/contracts.js";
+import { assertHostCommand, buildDeliveryFact, buildHostResult, buildUncertainSideEffect } from "../shared/contracts.js";
 import { requiresApproval, validateResolvedPayload } from "../shared/action-policy.js";
 import { BhrError, asSafeError } from "../shared/errors.js";
 import { validateApprovalGrant } from "./approval-validator.js";
@@ -10,12 +10,31 @@ const executionStartedStates = new Set([
   JOURNAL_STATE.UNCERTAIN
 ]);
 
+const structuralRecoveryErrors = new Set([
+  "RECOVERY_RECORD_INVALID",
+  "RECOVERY_REPORT_CREDENTIAL_MISSING",
+  "JOURNAL_ENTRY_NOT_FOUND",
+  "CONTRACT_VERSION_UNSUPPORTED"
+]);
+
 function responseWaitOptions(payload = {}) {
   return {
     timeout_ms: payload.timeout_ms,
     start_timeout_ms: payload.start_timeout_ms,
     stable_ms: payload.stable_ms,
     poll_ms: payload.poll_ms
+  };
+}
+
+function pageIdentity(observation) {
+  if (!observation) return null;
+  return {
+    provider: observation.provider,
+    gpt_ref: observation.gpt_ref,
+    conversation_ref: observation.conversation_ref ?? null,
+    page_url: observation.page_url,
+    page_fingerprint: observation.page_fingerprint,
+    observed_at: observation.observed_at
   };
 }
 
@@ -34,25 +53,92 @@ export class RuntimeCoordinator {
     return this.modelProvider.analyze({ observation: post.observation, evidence });
   }
 
+  async _sendPendingReport(entry) {
+    const pending = entry.pending_report;
+    if (!pending?.kind || !pending.operation || !pending.payload) {
+      throw new BhrError("RECOVERY_RECORD_INVALID", "Recoverable Journal entry is missing a typed pending report.");
+    }
+    const command = assertHostCommand(entry.command);
+    let receipt;
+    if (pending.kind === "FAIL") {
+      if (!pending.credential) throw new BhrError("RECOVERY_REPORT_CREDENTIAL_MISSING", "Pending dispatch failure has no claim credential.");
+      receipt = await this.dispatchClient.fail(command.dispatch_ref, pending.credential, pending.payload.result);
+    } else if (pending.kind === "HOST_RESULT") {
+      if (!pending.credential) throw new BhrError("RECOVERY_REPORT_CREDENTIAL_MISSING", "Pending Host Result has no report credential.");
+      receipt = await this.dispatchClient.hostResult(command.dispatch_ref, pending.credential, pending.payload.result);
+    } else if (pending.kind === "UNCERTAIN") {
+      if (!pending.credential) throw new BhrError("RECOVERY_REPORT_CREDENTIAL_MISSING", "Pending Uncertain report has no claim/report credential.");
+      const credential = pending.credential_type === "REPORT_TOKEN"
+        ? { report_token: pending.credential }
+        : { claim_token: pending.credential };
+      receipt = await this.dispatchClient.uncertain(command.dispatch_ref, credential, pending.payload.uncertain);
+    } else {
+      throw new BhrError("RECOVERY_RECORD_INVALID", `Unsupported pending report kind: ${pending.kind}`);
+    }
+    await this.journal.markReported(command.command_id, {
+      result_id: entry.result?.result_id ?? null,
+      result: entry.result ?? null,
+      report_kind: pending.kind,
+      report_receipt: receipt
+    });
+    await this.journal.clearRecoveryFailure(command.command_id);
+    return receipt;
+  }
+
   async reportHostResult({ command, report_token, result, binding_id = null, execution = null }) {
-    await this.journal.markExecuted(command.command_id, { result, binding_id, execution });
+    await this.journal.markHostResultPending(command.command_id, { result, report_token, binding_id, execution });
     try {
-      const receipt = await this.dispatchClient.hostResult(command.dispatch_ref, report_token, result);
-      await this.journal.mark(command.command_id, JOURNAL_STATE.REPORTED, { result_id: result.result_id, result, host_result_receipt: receipt });
+      const entry = await this.journal.get(command.command_id);
+      const receipt = await this._sendPendingReport(entry);
       return { reported: true, receipt };
     } catch (error) {
+      await this.journal.recordRecoveryFailure(command.command_id, asSafeError(error), { retryable: true });
       return { reported: false, error: asSafeError(error) };
     }
   }
 
   async reportPreDeliveryFailure({ command, claim_token, result, binding_id = null, execution = null }) {
-    await this.journal.markExecuted(command.command_id, { result, binding_id, execution });
+    await this.journal.markPreDeliveryFailurePending(command.command_id, { result, claim_token, binding_id, execution });
     try {
-      const receipt = await this.dispatchClient.fail(command.dispatch_ref, claim_token, result);
-      await this.journal.mark(command.command_id, JOURNAL_STATE.REPORTED, { result_id: result.result_id, result, failure_receipt: receipt });
+      const entry = await this.journal.get(command.command_id);
+      const receipt = await this._sendPendingReport(entry);
       return { reported: true, receipt };
     } catch (error) {
+      await this.journal.recordRecoveryFailure(command.command_id, asSafeError(error), { retryable: true });
       return { reported: false, error: asSafeError(error) };
+    }
+  }
+
+  async reportUncertainSideEffect({ command, entry = null, claim_token = null, report_token = null, result = null, binding_id = null, execution = null, reason, error = null }) {
+    const journalEntry = entry ?? await this.journal.get(command.command_id);
+    if (!journalEntry) throw new BhrError("JOURNAL_ENTRY_NOT_FOUND", `No Journal entry exists for uncertain command ${command.command_id}.`);
+    const details = journalEntry.details ?? {};
+    const uncertain = buildUncertainSideEffect({
+      command,
+      command_fingerprint: journalEntry.command_fingerprint,
+      binding_id: binding_id ?? journalEntry.binding_id ?? null,
+      page_identity: details.page_identity ?? details.observed_identity ?? null,
+      last_stage: journalEntry.state,
+      reason,
+      evidence_refs: [details.pre_observation_ref, details.post_observation_ref, ...(details.evidence_refs ?? [])],
+      error
+    });
+    await this.journal.markUncertain(command.command_id, {
+      uncertain,
+      claim_token: claim_token ?? journalEntry.claim_token ?? null,
+      report_token: report_token ?? journalEntry.report_token ?? null,
+      result,
+      binding_id: binding_id ?? journalEntry.binding_id ?? null,
+      execution
+    });
+    try {
+      const pending = await this.journal.get(command.command_id);
+      const receipt = await this._sendPendingReport(pending);
+      return { reported: true, receipt, uncertain };
+    } catch (reportError) {
+      const safe = asSafeError(reportError);
+      await this.journal.recordRecoveryFailure(command.command_id, safe, { retryable: !structuralRecoveryErrors.has(safe.code) });
+      return { reported: false, error: safe, uncertain };
     }
   }
 
@@ -60,7 +146,12 @@ export class RuntimeCoordinator {
     const delivery = buildDeliveryFact({ command, binding_id: binding.binding_id, execution });
     delivery.response_wait = responseWaitOptions(resolvedPayload);
     if (execution?.delivery?.response_baseline) delivery.response_baseline = execution.delivery.response_baseline;
-    await this.journal.markDeliveryConfirmed(command.command_id, { delivery, binding_id: binding.binding_id, execution });
+    await this.journal.markDeliveryAckPending(command.command_id, {
+      delivery,
+      binding_id: binding.binding_id,
+      execution,
+      claim_token
+    });
     const delivery_ack = await this.dispatchClient.deliveryAck(command.dispatch_ref, claim_token, delivery);
     await this.journal.markDeliveryAcked(command.command_id, {
       delivery_ack,
@@ -108,51 +199,51 @@ export class RuntimeCoordinator {
     return { processed: true, result, report, delivery_acknowledged: true };
   }
 
-  async resumeRecoverable() {
-    const entries = await this.journal.recoverableEntries();
-    if (entries.length === 0) return null;
-    const entry = entries[0];
+  async _resumeEntry(entry) {
     const command = assertHostCommand(entry.command);
 
-    if (entry.state === JOURNAL_STATE.EXECUTED && entry.result) {
-      if (!entry.report_token) {
-        return { processed: false, reason: "RECOVERY_REPORT_TOKEN_MISSING", command_id: command.command_id };
-      }
-      const report = await this.reportHostResult({
-        command,
-        report_token: entry.report_token,
-        result: entry.result,
-        binding_id: entry.binding_id ?? entry.result.binding_id,
-        execution: entry.details?.execution ?? null
-      });
-      return { processed: true, recovered_report_only: true, result: entry.result, report };
+    if ([JOURNAL_STATE.PRE_DELIVERY_FAILURE_PENDING, JOURNAL_STATE.HOST_RESULT_PENDING, JOURNAL_STATE.UNCERTAIN].includes(entry.state)) {
+      const receipt = await this._sendPendingReport(entry);
+      return {
+        processed: true,
+        recovered_report_only: true,
+        report_kind: entry.pending_report.kind,
+        result: entry.result ?? null,
+        report: { reported: true, receipt }
+      };
     }
 
     let delivery = entry.delivery;
     let reportToken = entry.report_token;
-    if (entry.state === JOURNAL_STATE.DELIVERY_CONFIRMED) {
-      if (!entry.claim_token || !delivery) return { processed: false, reason: "RECOVERY_DELIVERY_STATE_INCOMPLETE", command_id: command.command_id };
-      let deliveryAck;
-      try {
-        deliveryAck = await this.dispatchClient.deliveryAck(command.dispatch_ref, entry.claim_token, delivery);
-      } catch (error) {
-        return {
-          processed: true,
-          recovered_delivery_ack_only: true,
-          delivery_ack_pending: true,
-          command_id: command.command_id,
-          error: asSafeError(error)
-        };
-      }
+    if ([JOURNAL_STATE.DELIVERY_ACK_PENDING, JOURNAL_STATE.DELIVERY_CONFIRMED].includes(entry.state)) {
+      const claimToken = entry.pending_report?.credential ?? entry.claim_token;
+      if (!claimToken || !delivery) throw new BhrError("RECOVERY_RECORD_INVALID", "Delivery Ack recovery requires persisted claim token and delivery fact.");
+      const deliveryAck = await this.dispatchClient.deliveryAck(command.dispatch_ref, claimToken, delivery);
       reportToken = deliveryAck.report_token;
       await this.journal.markDeliveryAcked(command.command_id, {
         delivery_ack: deliveryAck,
         report_token: reportToken,
         binding_id: entry.binding_id
       });
+      entry = await this.journal.get(command.command_id);
     }
 
-    if (!delivery || !reportToken) return { processed: false, reason: "RECOVERY_OBSERVATION_STATE_INCOMPLETE", command_id: command.command_id };
+    if (entry.state === JOURNAL_STATE.EXECUTED && entry.result) {
+      if (!entry.report_token) throw new BhrError("RECOVERY_REPORT_CREDENTIAL_MISSING", "Legacy executed record has no report token.");
+      await this.journal.markHostResultPending(command.command_id, {
+        result: entry.result,
+        report_token: entry.report_token,
+        binding_id: entry.binding_id ?? entry.result.binding_id,
+        execution: entry.details?.execution ?? null
+      });
+      const pending = await this.journal.get(command.command_id);
+      const receipt = await this._sendPendingReport(pending);
+      return { processed: true, recovered_report_only: true, result: pending.result, report: { reported: true, receipt } };
+    }
+
+    delivery = entry.delivery ?? delivery;
+    reportToken = entry.report_token ?? reportToken;
+    if (!delivery || !reportToken) throw new BhrError("RECOVERY_RECORD_INVALID", "Response observation recovery requires delivery and report token.");
     const binding = await this.bindingRegistry.get(entry.binding_id);
     if (!binding) {
       const result = buildHostResult({
@@ -164,17 +255,63 @@ export class RuntimeCoordinator {
       const report = await this.reportHostResult({ command, report_token: reportToken, result, binding_id: entry.binding_id });
       return { processed: true, recovered_observation: true, result, report };
     }
-    return {
-      ...(await this.completeObservedResult({
+    try {
+      return {
+        ...(await this.completeObservedResult({
+          command,
+          binding,
+          delivery,
+          report_token: reportToken,
+          pre_observation_ref: entry.details?.pre_observation_ref ?? null,
+          execution: entry.details?.execution ?? null
+        })),
+        recovered_observation: true
+      };
+    } catch (error) {
+      const safe = asSafeError(error);
+      const result = buildHostResult({
         command,
-        binding,
-        delivery,
-        report_token: reportToken,
+        status: HOST_RESULT_STATUS.UNCERTAIN,
+        binding_id: binding.binding_id,
         pre_observation_ref: entry.details?.pre_observation_ref ?? null,
-        execution: entry.details?.execution ?? null
-      })),
-      recovered_observation: true
-    };
+        error: safe,
+        details: { recovery_stage: "RESPONSE_OBSERVATION" }
+      });
+      const report = await this.reportHostResult({ command, report_token: reportToken, result, binding_id: binding.binding_id, execution: entry.details?.execution ?? null });
+      return { processed: true, recovered_observation: true, result, report };
+    }
+  }
+
+  async resumeRecoverable() {
+    const entries = await this.journal.recoverableEntries();
+    if (entries.length === 0) return null;
+    const failures = [];
+    for (const entry of entries) {
+      try {
+        const result = await this._resumeEntry(entry);
+        if (result?.report?.reported === false) {
+          const current = await this.journal.get(entry.command_id);
+          failures.push({
+            command_id: entry.command_id,
+            error: result.report.error,
+            state: current?.state ?? entry.state,
+            retry: current?.recovery ?? null
+          });
+          continue;
+        }
+        await this.journal.clearRecoveryFailure(entry.command_id);
+        return result;
+      } catch (error) {
+        const safe = asSafeError(error);
+        const updated = await this.journal.recordRecoveryFailure(entry.command_id, safe, {
+          retryable: !structuralRecoveryErrors.has(safe.code)
+        });
+        failures.push({ command_id: entry.command_id, error: safe, state: updated.state, retry: updated.recovery });
+        // Continue. One malformed or temporarily failing record must never block a
+        // later safe report-only recovery item.
+      }
+    }
+    return { processed: false, reason: "RECOVERY_DEFERRED", recovery_failures: failures };
   }
 
   async processOne() {
@@ -182,6 +319,11 @@ export class RuntimeCoordinator {
     const recoverable = await this.resumeRecoverable();
     if (recoverable) return recoverable;
     if (config.paused || config.emergency_stopped) return { processed: false, reason: config.emergency_stopped ? "EMERGENCY_STOPPED" : "PAUSED" };
+
+    const capacity = await this.journal.capacityStatus();
+    if (!capacity.accepting_new_commands) {
+      return { processed: false, reason: "JOURNAL_CAPACITY_EXHAUSTED", capacity };
+    }
 
     const pending = await this.dispatchClient.listPending(this.host_id);
     if (pending.length === 0) return { processed: false, reason: "NO_DISPATCH" };
@@ -191,17 +333,36 @@ export class RuntimeCoordinator {
     const started = await this.journal.begin(command);
 
     if (started.duplicate) {
+      if (started.duplicate_by === "IDEMPOTENCY_KEY" && started.entry.command_id !== command.command_id) {
+        return {
+          processed: false,
+          reason: "LOGICAL_COMMAND_DUPLICATE_SUPPRESSED",
+          canonical_command_id: started.entry.command_id,
+          received_command_id: command.command_id,
+          idempotency_key: command.idempotency_key
+        };
+      }
       if (started.entry.state === JOURNAL_STATE.REPORTED) return { processed: false, reason: "ALREADY_REPORTED", command_id: command.command_id };
       if (executionStartedStates.has(started.entry.state)) {
+        const canonicalCommand = assertHostCommand(started.entry.command);
         const result = started.entry.result ?? buildHostResult({
-          command,
+          command: canonicalCommand,
           status: HOST_RESULT_STATUS.UNCERTAIN,
           binding_id: started.entry.binding_id ?? "unknown",
-          error: { code: "DUPLICATE_AFTER_EXECUTION_START", message: "The command was seen after execution may have started; it will not be executed again." }
+          error: { code: "DUPLICATE_AFTER_EXECUTION_START", message: "The command was seen after browser execution may have started; it will not be executed again." }
         });
-        const report = await this.reportPreDeliveryFailure({ command, claim_token: claim.claim_token, result, binding_id: result.binding_id });
+        const report = await this.reportUncertainSideEffect({
+          command: canonicalCommand,
+          entry: started.entry,
+          claim_token: claim.claim_token,
+          result,
+          binding_id: result.binding_id,
+          reason: "DUPLICATE_AFTER_EXECUTION_START",
+          error: result.error
+        });
         return { processed: true, result, report };
       }
+      return { processed: false, reason: "DUPLICATE_COMMAND_IN_PROGRESS", command_id: started.entry.command_id, state: started.entry.state };
     }
 
     await this.journal.mark(command.command_id, JOURNAL_STATE.CLAIMED, { claim_token: claim.claim_token });
@@ -240,6 +401,13 @@ export class RuntimeCoordinator {
         mode: config.approval_policy_mode,
         resolvedPayload
       });
+      const preparedDetails = {
+        binding_id: binding?.binding_id ?? null,
+        pre_observation_ref: pre?.observation?.observation_id ?? null,
+        page_identity: pageIdentity(pre?.observation),
+        approval_required: approvalRequired,
+        approval_policy_mode: config.approval_policy_mode
+      };
       if (approvalRequired) {
         if (!command.approval_ref) throw new BhrError("APPROVAL_REQUIRED", "This browser action requires approval_ref under the active approval policy.");
         if (!binding || !pre) throw new BhrError("APPROVAL_BINDING_UNAVAILABLE", "Approval requires a confirmed Binding and page precondition.");
@@ -247,23 +415,16 @@ export class RuntimeCoordinator {
         if (!grant) throw new BhrError("APPROVAL_NOT_FOUND", "Approval grant could not be resolved.");
         const validated = await validateApprovalGrant({ grant, command, binding, resolved_payload: resolvedPayload, observation: pre.observation });
         await this.journal.mark(command.command_id, JOURNAL_STATE.PREPARED, {
-          binding_id: binding.binding_id,
-          pre_observation_ref: pre.observation.observation_id,
+          ...preparedDetails,
           action_fingerprint: validated.action_fingerprint,
-          page_precondition_hash: validated.page_precondition_hash,
-          approval_required: true
+          page_precondition_hash: validated.page_precondition_hash
         });
-        await this.journal.mark(command.command_id, JOURNAL_STATE.EXECUTING, { binding_id: binding.binding_id });
+        await this.journal.mark(command.command_id, JOURNAL_STATE.EXECUTING, { binding_id: binding.binding_id, page_identity: pageIdentity(pre.observation) });
         actionStarted = true;
         await this.approvalClient.consume(grant.approval_ref, grant.grant_id, command.command_id);
       } else {
-        await this.journal.mark(command.command_id, JOURNAL_STATE.PREPARED, {
-          binding_id: binding?.binding_id ?? null,
-          pre_observation_ref: pre?.observation?.observation_id ?? null,
-          approval_required: false,
-          approval_policy_mode: config.approval_policy_mode
-        });
-        await this.journal.mark(command.command_id, JOURNAL_STATE.EXECUTING, { binding_id: binding?.binding_id ?? null });
+        await this.journal.mark(command.command_id, JOURNAL_STATE.PREPARED, preparedDetails);
+        await this.journal.mark(command.command_id, JOURNAL_STATE.EXECUTING, { binding_id: binding?.binding_id ?? null, page_identity: pageIdentity(pre?.observation) });
         actionStarted = true;
       }
 
@@ -274,8 +435,6 @@ export class RuntimeCoordinator {
       try {
         deliveryState = await this.acknowledgeDelivery({ command, claim_token: claim.claim_token, binding, execution, resolvedPayload });
       } catch (error) {
-        // The browser side effect is already confirmed in the Journal. Do not fail the
-        // dispatch and do not submit again. A later poll retries only the delivery Ack.
         return {
           processed: true,
           delivery_ack_pending: true,
@@ -299,7 +458,8 @@ export class RuntimeCoordinator {
         "PAGE_ACTION_UNCERTAIN",
         "RESPONSE_START_TIMEOUT",
         "RESPONSE_COMPLETION_TIMEOUT",
-        "RESPONSE_INTERRUPTED_BY_USER"
+        "RESPONSE_INTERRUPTED_BY_USER",
+        "PAGE_IDENTITY_CHANGED"
       ]);
       const status = actionStarted || uncertainCodes.has(safe.code) ? HOST_RESULT_STATUS.UNCERTAIN : HOST_RESULT_STATUS.BLOCKED;
       const result = buildHostResult({
@@ -310,9 +470,22 @@ export class RuntimeCoordinator {
         error: safe,
         details: execution ? { execution: { ...execution, binding: undefined } } : {}
       });
-      const report = deliveryState?.report_token
-        ? await this.reportHostResult({ command, report_token: deliveryState.report_token, result, binding_id: binding?.binding_id ?? null, execution })
-        : await this.reportPreDeliveryFailure({ command, claim_token: claim.claim_token, result, binding_id: binding?.binding_id ?? null, execution });
+      let report;
+      if (deliveryState?.report_token) {
+        report = await this.reportHostResult({ command, report_token: deliveryState.report_token, result, binding_id: binding?.binding_id ?? null, execution });
+      } else if (status === HOST_RESULT_STATUS.UNCERTAIN) {
+        report = await this.reportUncertainSideEffect({
+          command,
+          claim_token: claim.claim_token,
+          result,
+          binding_id: binding?.binding_id ?? null,
+          execution,
+          reason: safe.code,
+          error: safe
+        });
+      } else {
+        report = await this.reportPreDeliveryFailure({ command, claim_token: claim.claim_token, result, binding_id: binding?.binding_id ?? null, execution });
+      }
       return { processed: true, result, report };
     }
   }

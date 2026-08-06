@@ -1,117 +1,58 @@
-# 真实 Chrome + ChatGPT 手工验收 Runbook
+# 最终真实 Chrome + ChatGPT 验收 Runbook
 
-## 1. 不能由 Mock 代替的验证
+以下必须使用真实 Chrome、真实 ChatGPT 和正式 Gateway/TSK Adapter，Mock 不能标记为通过。
 
-以下结果必须在真实 Chrome、真实 Manifest V3 Service Worker 和真实 ChatGPT 页面验证，自动测试不能冒充通过：
+## A. 新角色与 Binding
 
-- Chrome 创建、激活、恢复标签页；
-- Content Script 在当前 ChatGPT DOM 上识别 Composer、Send、Generation；
-- Custom GPT URL、GPT ID、Conversation ID 的真实变化；
-- `captureVisibleTab` 权限、短暂聚焦和原 Tab 恢复；
-- 页面提交后 response started / completed；
-- 用户输入、滚动、切换会话对自动流程的中断；
-- Service Worker 被 Chrome 回收后的实际恢复；
-- 与真实 Gateway / TSK Adapter 的 HTTP Envelope 和双阶段回报。
+1. 无 READY Binding 下发 `OPEN_OR_RESUME_SESSION`；
+2. 创建 Tab 和 `PROVISIONING` Binding；
+3. 校验 GPT 后进入 `READY`；
+4. 首条 Wake 只发送一次；
+5. 新 Conversation 创建后仅在目标原为空时提升并持久化。
 
-## 2. 前置
+## B. 指定 Conversation 防误发
 
-1. 使用仓库内 `apps/browser-host-runtime` 加载未打包扩展；
-2. 登录 ChatGPT；
-3. Options 配置真实 Gateway；
-4. 保持 `transport_mode = gateway`；
-5. 配置 Session Gateway API Key；
-6. `approval_policy_mode = platform_wake_candidate`；
-7. Gateway 准备一个签名已验证、字段匹配、未过期的 Platform Wake Host Command；
-8. 打开 Side Panel 和 Service Worker Console；
-9. 保存 Gateway、TSK、Chrome 和 BHR Journal 日志。
+1. Host Command 指定已有 Conversation；
+2. Wake 前确认 GPT、Conversation、URL 和 Fingerprint；
+3. Wake 后再次读取页面身份；
+4. 人工或页面跳到同 GPT 另一 Conversation 时，Binding 必须 `STALE`，停止后续动作和等待；
+5. 错误页面不得收到第二条消息。
 
-## 3. 场景 A｜无 Binding 新开角色 GPT
+## C. 双阶段报告
 
-1. 删除目标 Role 的 READY Binding；
-2. 下发 `OPEN_OR_RESUME_SESSION`；
-3. 确认创建新 Tab；
-4. 确认产生 `PROVISIONING` Binding；
-5. 页面适配器识别指定 GPT；
-6. Binding 进入 `READY`；
-7. 若带 Wake Text，只提交一次；
-8. 新 Conversation 生成后持久化 `conversation_ref`；
-9. Delivery Ack 已发送；
-10. Host Result 在回答完成后发送。
+1. 提交 Wake；
+2. Delivery Ack 使用 Claim Credential；
+3. Controller 可在回答中 Claim Task；
+4. BHR 使用 Report Credential 等待 `started/completed` 并上报 Host Result；
+5. Ack、Result 重复请求返回同一稳定 Receipt。
 
-失败条件：错误 GPT、错误 Conversation、重复发送或默认要求人工 Approval。
+## D. Service Worker 安全恢复
 
-## 4. 场景 B｜Binding 与错误会话保护
+分别在以下时点强制终止 Service Worker：
 
-1. 绑定固定 GPT Conversation；
-2. 确认 Binding 保存 GPT、Conversation、URL、Page Fingerprint；
-3. 人工切换到另一 Conversation；
-4. 旧 Binding 必须变为 `STALE`；
-5. 后续发送必须返回 `BINDING_PAGE_IDENTITY_MISMATCH`；
-6. 页面不得收到消息。
+- `EXECUTING`：恢复后只发 Uncertain，不 Fail、不重发；
+- `DELIVERY_ACK_PENDING`：只重发 Ack；
+- `DELIVERY_ACKED`：只继续观察；
+- `HOST_RESULT_PENDING`：只补报原 Result；
+- `PRE_DELIVERY_FAILURE_PENDING`：只重发原 Fail。
 
-## 5. 场景 C｜完整回答生命周期
+核对页面消息提交次数始终为一次。
 
-1. 下发普通 Wake；
-2. 记录 `message_submitted`；
-3. Delivery Ack 成功；
-4. ChatGPT 开始生成，记录 `response_started`；
-5. 等待生成停止且内容稳定，记录 `response_completed`；
-6. Host Result 包含 Post Observation；
-7. 验证 Start Timeout、Completion Timeout 和用户中断。
+## E. Journal 压力与隔离
 
-## 6. 场景 D｜Controller Claim 后仍可回报
+1. 并发触发启动、Alarm Poll 和手工处理；
+2. Journal 不丢 Command、Credential、Delivery 或 Result；
+3. 注入一条损坏恢复记录和一条有效记录；
+4. 损坏项进入 `QUARANTINED`，有效项仍成功补报；
+5. 填满受保护非终态后，不再 Claim 新命令并产生可见告警；
+6. 只有超过保留期的终态可以清理。
 
-1. BHR 提交 Wake；
-2. Gateway 接收 Delivery Ack，并签发 `report_token`；
-3. Controller 在回答中通过 Action Claim Task；
-4. 原 Browser Dispatch Claim 可以结束；
-5. 回答完成后 BHR 使用 `report_token` 上报 Host Result；
-6. 不得返回 `CLAIM_TOKEN_INVALID`。
+## F. Approval
 
-## 7. 场景 E｜Service Worker 重启恢复
+- Platform Wake 候选只允许签名、目标、任务、角色、期限、幂等和白名单全部匹配的最小动作；
+- 发布、删除、付款、授权确认等敏感动作必须消费一次性 Grant；
+- 页面变化后旧 Grant 失效；视觉模型不得替代授权。
 
-### E1：投递已发生、Ack 未成功
+## 验收记录
 
-1. 消息已经提交；
-2. Journal 为 `DELIVERY_CONFIRMED`；
-3. 使 Gateway 暂时不可用并重启 Service Worker；
-4. 恢复 Gateway；
-5. 只重试 Delivery Ack；
-6. 页面消息提交次数仍为一次。
-
-### E2：Delivery Ack 已成功、回答未完成
-
-1. Journal 为 `DELIVERY_ACKED`；
-2. 重启 Service Worker；
-3. 只恢复回答观察；
-4. 不重复提交消息；
-5. 最终只上报一个 Host Result。
-
-### E3：Host Result 已持久化、上报未成功
-
-1. Journal 为 `EXECUTED`；
-2. 重启 Service Worker；
-3. 只补报原 `result_id`；
-4. 不重新执行任何页面动作。
-
-## 8. 场景 F｜后台标签页截图
-
-1. 目标 Binding Tab 非活动；
-2. 触发 Observation；
-3. 目标 Tab 短暂激活；
-4. 截图成功；
-5. 原活动 Tab 恢复；
-6. Evidence 标记 `temporarily_activated = true`。
-
-## 9. 场景 G｜敏感动作一次性 Approval
-
-1. 下发 `CLICK_REGISTERED_UI` 或 `STOP_GENERATION`；
-2. 无 Approval 必须停止；
-3. 获取一次性 Grant 后执行一次；
-4. 相同 Grant 再次使用失败；
-5. 页面前置条件变化后原 Grant 失效；
-6. 视觉模型输出不得替代 Approval。
-
-## 10. 验收记录
-
-必须记录：Chrome 版本、扩展 Commit、Gateway Commit、TSK Commit、目标 GPT、测试时间、Command/Dispatch/Delivery/Result ID、Journal 摘要、截图 Evidence、通过/失败与真实错误。
+记录 Chrome 版本、扩展 Commit、Gateway/TSK Commit、Command/Dispatch/Delivery/Result/Uncertain ID、Journal 阶段、页面身份、真实截图证据和结果。

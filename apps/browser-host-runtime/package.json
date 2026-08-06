@@ -1,9 +1,9 @@
 {
   "name": "@ai-agent-platform/browser-host-runtime",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
-  "description": "Chrome Manifest V3 Browser Host Runtime with HTTP Envelope, platform Wake candidate policy, dual-stage dispatch reporting and recovery.",
+  "description": "Chrome Manifest V3 Browser Host Runtime with final domain-safe Journal, uncertain-side-effect reporting, strict page identity and recoverable dispatch reporting.",
   "engines": {
     "node": ">=20 <21",
     "npm": ">=10 <11"

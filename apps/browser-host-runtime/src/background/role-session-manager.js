@@ -80,10 +80,21 @@ export class RoleSessionManager {
       wake_execution = response.data;
       const refreshed = await this.waitForPageIdentity(binding.chrome_tab_id);
       const refreshedIdentity = { ...refreshed, page_fingerprint: await computePageIdentityFingerprint(refreshed) };
-      if (command.target.gpt_ref !== refreshedIdentity.gpt_ref) {
-        await this.bindingRegistry.update(binding.binding_id, { state: BINDING_STATE.STALE, stale_reason: "POST_WAKE_GPT_CHANGED", observed_identity: refreshedIdentity });
-        throw new BhrError("ROLE_SESSION_TARGET_MISMATCH", "The role session changed to a different GPT after wake submission.");
+      if (!targetMatchesIdentity(command.target, refreshedIdentity)) {
+        await this.bindingRegistry.update(binding.binding_id, {
+          state: BINDING_STATE.STALE,
+          stale_reason: command.target.conversation_ref ? "POST_WAKE_CONVERSATION_CHANGED" : "POST_WAKE_GPT_CHANGED",
+          observed_identity: refreshedIdentity
+        });
+        throw new BhrError(
+          "ROLE_SESSION_TARGET_MISMATCH",
+          command.target.conversation_ref
+            ? "The role session changed to a different GPT or Conversation after wake submission."
+            : "The role session changed to a different GPT after wake submission."
+        );
       }
+      // A null target conversation is the only case where the controlled first
+      // message may promote the provisioning Binding to the newly created Chat.
       binding = await this.bindingRegistry.confirmPageIdentity(binding.binding_id, refreshedIdentity);
     }
 
