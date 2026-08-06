@@ -84,6 +84,11 @@ function createControllerDispatch(
     idempotencyKey: `controller-wake:${task.taskId}:${task.taskVersion}`,
     createdAt: now,
     deliveredAt: null,
+    hostResultStatus: "PENDING",
+    hostResultRef: null,
+    hostResultSummary: null,
+    hostEvidenceRefs: [],
+    reportedAt: null,
     lastError: null,
   };
   state.dispatchSignals[signalId] = signal;
@@ -98,7 +103,7 @@ function cancelCoordination(
   const workItems: string[] = [];
   const dispatches: string[] = [];
   for (const [id, item] of Object.entries(state.workItems)) {
-    if (item.taskId !== taskId || !["PENDING", "CLAIMED"].includes(item.status)) continue;
+    if (item.taskId !== taskId || !["PENDING", "CLAIMED", "RUNNING"].includes(item.status)) continue;
     state.workItems[id] = {
       ...item,
       status: "CANCELLED",
@@ -108,7 +113,11 @@ function cancelCoordination(
     workItems.push(id);
   }
   for (const [id, signal] of Object.entries(state.dispatchSignals)) {
-    if (signal.taskId !== taskId || !["PENDING", "CLAIMED"].includes(signal.status)) continue;
+    if (
+      signal.taskId !== taskId ||
+      !["PENDING", "CLAIMED", "DELIVERED", "CONSUMED"].includes(signal.status) ||
+      signal.hostResultStatus !== "PENDING"
+    ) continue;
     state.dispatchSignals[id] = {
       ...signal,
       status: "CANCELLED",
@@ -194,14 +203,23 @@ export class TaskReconciler {
         }
         const claim = signal.claim;
         expiredClaimIds.push(claim.claimId);
-        state.dispatchSignals[id] = { ...signal, status: "PENDING", claim: null };
+        const preserveDelivery =
+          signal.deliveredAt !== null &&
+          (signal.status === "DELIVERED" || signal.status === "CONSUMED") &&
+          signal.hostResultStatus === "PENDING";
+        state.dispatchSignals[id] = {
+          ...signal,
+          status: preserveDelivery ? signal.status : "PENDING",
+          claim: null,
+        };
         pendingEvents.push({
           eventType: "DISPATCH_CLAIM_RELEASED",
           payload: {
             signalId: signal.signalId,
             claimId: claim.claimId,
             claimEpoch: claim.claimEpoch,
-            reason: "expired",
+            reason: preserveDelivery ? "host-result-timeout" : "expired",
+            phase: preserveDelivery ? "host-result" : "delivery",
           },
         });
         changed = true;

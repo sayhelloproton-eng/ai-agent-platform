@@ -383,13 +383,15 @@ test("JsonFileTaskControlStore persists and recovers Task facts", async () => {
     const created = await createTask(first);
     const raw = JSON.parse(await readFile(file, "utf8"));
     assert.ok(raw.tasks[created.taskId]);
+    await firstStore.close();
 
     const secondStore = await JsonFileTaskControlStore.open(file);
     const second = new TaskControlService(secondStore, clock, ids);
     await second.recoverAll();
     const restored = await second.getTask(created.taskId);
     assert.equal(restored.title, created.title);
-    assert.deepEqual(await second.listEvents(created.taskId), await first.listEvents(created.taskId));
+    assert.deepEqual(await second.listEvents(created.taskId), raw.events[created.taskId]);
+    await secondStore.close();
   } finally {
     await rm(directory, { recursive: true, force: true });
   }

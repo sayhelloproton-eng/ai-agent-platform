@@ -118,8 +118,10 @@ export interface TaskAggregate {
 export const WORK_ITEM_STATUSES = [
   "PENDING",
   "CLAIMED",
+  "RUNNING",
   "SUCCEEDED",
   "FAILED",
+  "EXPIRED",
   "CANCELLED",
 ] as const;
 export type WorkItemStatus = (typeof WORK_ITEM_STATUSES)[number];
@@ -148,10 +150,14 @@ export interface WorkItem {
   readonly claimEpoch: number;
   readonly claim: LeaseClaim | null;
   readonly resultRef: string | null;
+  readonly resultSummary: string | null;
+  readonly evidenceRefs: readonly string[];
   readonly errorCode: string | null;
   readonly errorSummary: string | null;
+  readonly retryable: boolean | null;
   readonly createdAt: string;
   readonly claimedAt: string | null;
+  readonly startedAt: string | null;
   readonly completedAt: string | null;
 }
 
@@ -164,6 +170,9 @@ export const DISPATCH_STATUSES = [
   "CANCELLED",
 ] as const;
 export type DispatchStatus = (typeof DISPATCH_STATUSES)[number];
+
+export const HOST_RESULT_STATUSES = ["PENDING", "SUCCEEDED", "FAILED"] as const;
+export type HostResultStatus = (typeof HOST_RESULT_STATUSES)[number];
 
 export const HOST_COMMAND_TYPES = [
   "CONTINUE_SESSION",
@@ -192,6 +201,11 @@ export interface DispatchSignal {
   readonly idempotencyKey: string;
   readonly createdAt: string;
   readonly deliveredAt: string | null;
+  readonly hostResultStatus: HostResultStatus;
+  readonly hostResultRef: string | null;
+  readonly hostResultSummary: string | null;
+  readonly hostEvidenceRefs: readonly string[];
+  readonly reportedAt: string | null;
   readonly lastError: string | null;
 }
 
@@ -202,6 +216,9 @@ export const TASK_EVENT_TYPES = [
   "CONTROLLER_CLAIMED",
   "CONTROLLER_CLAIM_RELEASED",
   "WORK_ITEM_CLAIMED",
+  "WORK_ITEM_STARTED",
+  "WORK_ITEM_RETRIED",
+  "WORK_ITEM_EXPIRED",
   "WORK_ITEM_CLAIM_RELEASED",
   "DISPATCH_CLAIMED",
   "DISPATCH_CLAIM_RELEASED",
@@ -218,6 +235,9 @@ export const TASK_EVENT_TYPES = [
   "TASK_CANCELLED",
   "HOST_DISPATCH_CREATED",
   "HOST_DISPATCH_DELIVERED",
+  "HOST_DISPATCH_CONSUMED",
+  "HOST_RESULT_REPORTED",
+  "HOST_RESULT_FAILED",
   "HOST_DISPATCH_FAILED",
   "COMMAND_REJECTED",
 ] as const;
@@ -265,6 +285,12 @@ export interface TaskControlState {
   readonly idempotencyRecords: Record<string, IdempotencyRecord>;
 }
 
+export interface TaskIntakeResult {
+  readonly taskId: string;
+  readonly taskVersionAtCreation: number;
+  readonly initialEventIds: readonly string[];
+}
+
 export interface CreateTaskInput {
   readonly contractVersion: typeof TASK_CONTROL_CONTRACT_VERSION;
   readonly taskId: string;
@@ -300,6 +326,11 @@ export interface CreatePlanPayload {
 
 export type PlanOperation =
   | { readonly type: "ADD_NODE"; readonly node: CreatePlanNodeInput }
+  | {
+      readonly type: "INSERT_NODE_AFTER";
+      readonly anchorNodeId: string;
+      readonly node: CreatePlanNodeInput;
+    }
   | {
       readonly type: "SET_NODE_STATUS";
       readonly nodeId: string;
@@ -380,28 +411,79 @@ export interface ClaimWorkItemInput {
   readonly roleId: string;
   readonly claimantId: string;
   readonly leaseMs: number;
+  readonly expectedTaskVersion?: number;
   readonly idempotencyKey: string;
 }
 
-export interface ReportWorkResultInput {
+export interface ClaimWorkItemApplicationInput extends ClaimWorkItemInput {
+  readonly expectedTaskVersion: number;
+}
+
+export interface StartWorkItemInput {
   readonly contractVersion: typeof TASK_CONTROL_CONTRACT_VERSION;
   readonly workItemId: string;
   readonly claimToken: string;
-  readonly resultRef: string;
+  readonly expectedTaskVersion: number;
   readonly idempotencyKey: string;
   readonly producerRef: string;
   readonly correlationId?: string;
 }
 
-export interface ReportWorkFailureInput {
+export interface CompleteWorkItemInput {
   readonly contractVersion: typeof TASK_CONTROL_CONTRACT_VERSION;
   readonly workItemId: string;
   readonly claimToken: string;
+  readonly expectedTaskVersion: number;
+  readonly resultRef: string;
+  readonly summary?: string;
+  readonly evidenceRefs?: readonly string[];
+  readonly idempotencyKey: string;
+  readonly producerRef: string;
+  readonly correlationId?: string;
+}
+
+export interface FailWorkItemInput {
+  readonly contractVersion: typeof TASK_CONTROL_CONTRACT_VERSION;
+  readonly workItemId: string;
+  readonly claimToken: string;
+  readonly expectedTaskVersion: number;
   readonly errorCode: string;
   readonly errorSummary: string;
+  readonly retryable: boolean;
+  readonly evidenceRefs?: readonly string[];
   readonly idempotencyKey: string;
   readonly producerRef: string;
   readonly correlationId?: string;
+}
+
+export interface RetryWorkItemInput {
+  readonly contractVersion: typeof TASK_CONTROL_CONTRACT_VERSION;
+  readonly workItemId: string;
+  readonly expectedTaskVersion: number;
+  readonly idempotencyKey: string;
+  readonly producerRef: string;
+  readonly correlationId?: string;
+}
+
+export interface ExpireWorkItemInput {
+  readonly contractVersion: typeof TASK_CONTROL_CONTRACT_VERSION;
+  readonly workItemId: string;
+  readonly expectedTaskVersion: number;
+  readonly reason: string;
+  readonly idempotencyKey: string;
+  readonly producerRef: string;
+  readonly correlationId?: string;
+}
+
+/** @deprecated use CompleteWorkItemInput. */
+export interface ReportWorkResultInput extends Omit<CompleteWorkItemInput, "expectedTaskVersion"> {
+  readonly expectedTaskVersion?: number;
+}
+
+/** @deprecated use FailWorkItemInput. */
+export interface ReportWorkFailureInput extends Omit<FailWorkItemInput, "expectedTaskVersion" | "retryable"> {
+  readonly expectedTaskVersion?: number;
+  readonly retryable?: boolean;
 }
 
 export interface ClaimDispatchInput {
@@ -420,6 +502,43 @@ export interface ReportDispatchInput {
   readonly producerRef: string;
   readonly correlationId?: string;
   readonly errorSummary?: string;
+}
+
+export interface HostCommandMaterialization {
+  readonly dispatchId: string;
+  readonly taskId: string;
+  readonly createdFromTaskVersion: number;
+  readonly workItemId: string | null;
+  readonly targetRole: string;
+  readonly targetProfileRef: string | null;
+  readonly conversationRef: string | null;
+  readonly commandType: HostCommandType;
+  readonly commandRef: string;
+  readonly idempotencyKey: string;
+}
+
+export interface ReportHostResultInput {
+  readonly contractVersion: typeof TASK_CONTROL_CONTRACT_VERSION;
+  readonly signalId: string;
+  readonly claimToken: string;
+  readonly hostResultRef: string;
+  readonly summary?: string;
+  readonly evidenceRefs?: readonly string[];
+  readonly idempotencyKey: string;
+  readonly producerRef: string;
+  readonly correlationId?: string;
+}
+
+export interface FailHostResultInput {
+  readonly contractVersion: typeof TASK_CONTROL_CONTRACT_VERSION;
+  readonly signalId: string;
+  readonly claimToken: string;
+  readonly errorCode: string;
+  readonly errorSummary: string;
+  readonly evidenceRefs?: readonly string[];
+  readonly idempotencyKey: string;
+  readonly producerRef: string;
+  readonly correlationId?: string;
 }
 
 export const APPROVAL_RESOLUTIONS = ["APPROVED", "REJECTED", "CANCELLED"] as const;

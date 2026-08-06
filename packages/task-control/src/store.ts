@@ -1,5 +1,5 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
-import { dirname } from "node:path";
+import { dirname, resolve } from "node:path";
 
 import {
   DISPATCH_STATUSES,
@@ -9,6 +9,7 @@ import {
   type TaskAggregate,
   type TaskControlState,
 } from "./model.js";
+import { TaskControlError } from "./error.js";
 import { assertTaskConsistency } from "./policy.js";
 import type { TaskControlStore } from "./ports.js";
 
@@ -108,6 +109,11 @@ function validateStateShape(value: unknown): TaskControlState {
     if (!Number.isSafeInteger(item.claimEpoch) || Number(item.claimEpoch) < 0) {
       throw new TypeError(`workItems.${key}.claimEpoch must be a non-negative safe integer.`);
     }
+    if (item.resultSummary === undefined) item.resultSummary = null;
+    if (item.evidenceRefs === undefined) item.evidenceRefs = [];
+    if (!Array.isArray(item.evidenceRefs)) throw new TypeError(`workItems.${key}.evidenceRefs must be an array.`);
+    if (item.retryable === undefined) item.retryable = null;
+    if (item.startedAt === undefined) item.startedAt = null;
   }
 
   const dispatchSignals = value.dispatchSignals as Record<string, unknown>;
@@ -122,6 +128,14 @@ function validateStateShape(value: unknown): TaskControlState {
     if (!Number.isSafeInteger(signal.claimEpoch) || Number(signal.claimEpoch) < 0) {
       throw new TypeError(`dispatchSignals.${key}.claimEpoch must be a non-negative safe integer.`);
     }
+    if (signal.hostResultStatus === undefined) signal.hostResultStatus = "PENDING";
+    if (signal.hostResultRef === undefined) signal.hostResultRef = null;
+    if (signal.hostResultSummary === undefined) signal.hostResultSummary = null;
+    if (signal.hostEvidenceRefs === undefined) signal.hostEvidenceRefs = [];
+    if (!Array.isArray(signal.hostEvidenceRefs)) {
+      throw new TypeError(`dispatchSignals.${key}.hostEvidenceRefs must be an array.`);
+    }
+    if (signal.reportedAt === undefined) signal.reportedAt = null;
   }
 
   const idempotencyRecords = value.idempotencyRecords as Record<string, unknown>;
@@ -186,7 +200,10 @@ export class InMemoryTaskControlStore implements TaskControlStore {
 }
 
 export class JsonFileTaskControlStore extends InMemoryTaskControlStore {
+  private static readonly activeWriterPaths = new Set<string>();
+
   readonly filePath: string;
+  private closed = false;
 
   private constructor(filePath: string, initialState: TaskControlState) {
     super(initialState);
@@ -194,19 +211,42 @@ export class JsonFileTaskControlStore extends InMemoryTaskControlStore {
   }
 
   static async open(filePath: string): Promise<JsonFileTaskControlStore> {
+    const resolvedPath = resolve(filePath);
+    if (JsonFileTaskControlStore.activeWriterPaths.has(resolvedPath)) {
+      throw new TaskControlError(
+        "STORE_SINGLE_WRITER_REQUIRED",
+        "JSON Task Control Store permits exactly one writer instance per file path.",
+        { filePath: resolvedPath },
+      );
+    }
     let state = emptyTaskControlState();
     try {
-      const raw = await readFile(filePath, "utf8");
+      const raw = await readFile(resolvedPath, "utf8");
       state = validateStateShape(JSON.parse(raw));
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
         throw error;
       }
     }
-    return new JsonFileTaskControlStore(filePath, state);
+    JsonFileTaskControlStore.activeWriterPaths.add(resolvedPath);
+    return new JsonFileTaskControlStore(resolvedPath, state);
+  }
+
+  async close(): Promise<void> {
+    if (this.closed) return;
+    await this.snapshot();
+    this.closed = true;
+    JsonFileTaskControlStore.activeWriterPaths.delete(this.filePath);
   }
 
   protected override async beforeCommit(draft: TaskControlState): Promise<void> {
+    if (this.closed) {
+      throw new TaskControlError(
+        "STORE_SINGLE_WRITER_REQUIRED",
+        "JSON Task Control Store writer is closed.",
+        { filePath: this.filePath },
+      );
+    }
     await mkdir(dirname(this.filePath), { recursive: true });
     const tempPath = `${this.filePath}.tmp-${process.pid}-${Date.now()}`;
     await writeFile(tempPath, `${JSON.stringify(draft, null, 2)}\n`, {

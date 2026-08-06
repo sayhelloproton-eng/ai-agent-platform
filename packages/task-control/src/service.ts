@@ -3,31 +3,47 @@ import {
   type ClaimControllerInput,
   type ClaimDispatchInput,
   type ClaimWorkItemInput,
+  type CompleteWorkItemInput,
   type ControllerClaim,
   type ControllerCommand,
   type CreateTaskInput,
   type DecisionContext,
+  type ExpireWorkItemInput,
+  type FailHostResultInput,
+  type FailWorkItemInput,
   type DispatchSignal,
   type IdempotencyRecord,
   type JsonObject,
   type JsonValue,
+  type HostCommandMaterialization,
   type LeaseClaim,
   type PlanNode,
   type PlanOperation,
   type ReportDispatchInput,
+  type ReportHostResultInput,
   type ReportWorkFailureInput,
   type ReportWorkResultInput,
+  type RetryWorkItemInput,
+  type StartWorkItemInput,
   type ResolveApprovalInput,
   type RoleAttentionEntry,
   type SubmitControllerCommandInput,
   type TaskAggregate,
   type TaskControlState,
   type TaskEvent,
+  type TaskIntakeResult,
   type TaskPlan,
   type TaskStatus,
   type WorkItem,
 } from "./model.js";
-import type { Clock, IdGenerator, TaskControlStore } from "./ports.js";
+import type {
+  Clock,
+  HostDispatchApplicationPort,
+  IdGenerator,
+  TaskControlStore,
+  TaskIntakeApplicationPort,
+  WorkItemApplicationPort,
+} from "./ports.js";
 import {
   allowedControllerCommands,
   assertCommandAllowed,
@@ -211,6 +227,52 @@ function removeValue(values: readonly string[], value: string): readonly string[
   return values.filter((item) => item !== value);
 }
 
+function assertReference(value: string, path: string): void {
+  assertNonEmpty(value, path);
+  invariant(
+    value.length <= 2048 && !value.includes("\n") && !value.includes("\r"),
+    "INVALID_ARGUMENT",
+    `${path} must be a bounded reference, not inline result content.`,
+    { path },
+  );
+}
+
+function assertEvidenceRefs(values: readonly string[] | undefined, path: string): readonly string[] {
+  const refs = [...(values ?? [])];
+  invariant(refs.length <= 32, "INVALID_ARGUMENT", `${path} exceeds the evidence reference limit.`, {
+    path,
+    count: refs.length,
+  });
+  for (const [index, value] of refs.entries()) assertReference(value, `${path}[${index}]`);
+  return refs;
+}
+
+function assertNoInlineResultBody(input: object, path: string): void {
+  const forbidden = [
+    "localResult",
+    "local_result",
+    "resultBody",
+    "result_body",
+    "result",
+    "payload",
+    "body",
+    "content",
+    "output",
+    "dom",
+    "screenshot",
+    "binding",
+    "observation",
+  ];
+  for (const key of forbidden) {
+    invariant(
+      !(key in input),
+      "INVALID_ARGUMENT",
+      `${path}.${key} is not accepted; submit stable references and summaries only.`,
+      { path, key },
+    );
+  }
+}
+
 function activeWorkForNode(
   state: Readonly<TaskControlState>,
   taskId: string,
@@ -279,6 +341,44 @@ function applyPlanOperations(
         next = { ...next, nodes: [...next.nodes, normalizeNode(operation.node)], updatedAt: now };
         break;
       }
+      case "INSERT_NODE_AFTER": {
+        invariant(
+          !next.nodes.some((node) => node.nodeId === operation.node.nodeId),
+          "INVALID_PLAN",
+          "Cannot insert a duplicate Plan Node.",
+          { nodeId: operation.node.nodeId },
+        );
+        const anchorIndex = next.nodes.findIndex((node) => node.nodeId === operation.anchorNodeId);
+        invariant(anchorIndex >= 0, "PLAN_NODE_NOT_FOUND", "Insert anchor Plan Node was not found.", {
+          anchorNodeId: operation.anchorNodeId,
+        });
+        const inserted = {
+          ...normalizeNode(operation.node),
+          dependsOn: addUnique(
+            [operation.anchorNodeId],
+            (operation.node.dependsOn ?? []).filter((item) => item !== operation.anchorNodeId),
+          ),
+        };
+        const rewired = next.nodes.map((node) => {
+          if (!node.dependsOn.includes(operation.anchorNodeId)) return node;
+          return {
+            ...node,
+            dependsOn: node.dependsOn.map((dependency) =>
+              dependency === operation.anchorNodeId ? inserted.nodeId : dependency,
+            ),
+          };
+        });
+        next = {
+          ...next,
+          nodes: [
+            ...rewired.slice(0, anchorIndex + 1),
+            inserted,
+            ...rewired.slice(anchorIndex + 1),
+          ],
+          updatedAt: now,
+        };
+        break;
+      }
       case "SET_NODE_STATUS": {
         next = updateNode(
           next,
@@ -336,7 +436,7 @@ function activeControllerDispatches(state: TaskControlState, taskId: string): Di
   );
 }
 
-export class TaskControlService {
+export class TaskControlService implements TaskIntakeApplicationPort, WorkItemApplicationPort, HostDispatchApplicationPort {
   readonly reconciler: TaskReconciler;
 
   constructor(
@@ -347,7 +447,7 @@ export class TaskControlService {
     this.reconciler = new TaskReconciler(store, clock, ids);
   }
 
-  async createTask(input: CreateTaskInput): Promise<TaskAggregate> {
+  async intakeTask(input: CreateTaskInput): Promise<TaskIntakeResult> {
     assertContractVersion(input.contractVersion);
     assertNonEmpty(input.taskId, "taskId");
     assertNonEmpty(input.title, "title");
@@ -356,16 +456,51 @@ export class TaskControlService {
     assertNonEmpty(input.idempotencyKey, "idempotencyKey");
     assertNonEmpty(input.producerRef, "producerRef");
 
-    const scope = `task.create:${input.taskId}`;
+    const scope = `task.intake:${input.taskId}`;
     const fingerprint = requestFingerprint(input);
-    const created = await this.store.transact((state) => {
-      const duplicate = idempotencyGet<{ taskId: string }>(
+    const result = await this.store.transact((state) => {
+      const duplicate = idempotencyGet<TaskIntakeResult>(
         state,
         scope,
         input.idempotencyKey,
         fingerprint,
       );
-      if (duplicate !== undefined) return duplicate.taskId;
+      if (duplicate !== undefined) return duplicate;
+
+      // Continuous-upgrade compatibility: the first implementation used the
+      // task.create scope and stored only taskId. Convert that durable record
+      // into the formal intake result instead of treating a safe replay as a
+      // new Task creation attempt.
+      const legacy = idempotencyGet<{ taskId: string }>(
+        state,
+        `task.create:${input.taskId}`,
+        input.idempotencyKey,
+        fingerprint,
+      );
+      if (legacy !== undefined) {
+        const existing = state.tasks[legacy.taskId];
+        invariant(existing !== undefined, "TASK_NOT_FOUND", "Legacy Task Intake record references a missing Task.", {
+          taskId: legacy.taskId,
+        });
+        const initialEventIds = (state.events[legacy.taskId] ?? [])
+          .filter((event) => event.eventType === "TASK_CREATED" || event.eventType === "TASK_PLAN_CREATED")
+          .slice(0, existing.plan === null ? 1 : 2)
+          .map((event) => event.eventId);
+        const converted: TaskIntakeResult = {
+          taskId: legacy.taskId,
+          taskVersionAtCreation: 1,
+          initialEventIds,
+        };
+        idempotencyPut(
+          state,
+          scope,
+          input.idempotencyKey,
+          fingerprint,
+          converted as unknown as JsonValue,
+          this.clock.now().toISOString(),
+        );
+        return converted;
+      }
       invariant(state.tasks[input.taskId] === undefined, "TASK_ALREADY_EXISTS", "Task already exists.", {
         taskId: input.taskId,
       });
@@ -393,6 +528,7 @@ export class TaskControlService {
         createdAt: now,
         updatedAt: now,
       };
+      const initialEventIds: string[] = [];
       const createdEvent = appendEvent(
         state,
         task,
@@ -404,6 +540,7 @@ export class TaskControlService {
         input.correlationId ?? null,
         null,
       );
+      initialEventIds.push(createdEvent.eventId);
       let latest = createdEvent;
       if (plan !== null) {
         latest = appendEvent(
@@ -417,22 +554,34 @@ export class TaskControlService {
           input.correlationId ?? null,
           createdEvent.eventId,
         );
+        initialEventIds.push(latest.eventId);
       }
       task = { ...task, latestEventId: latest.eventId };
       state.tasks[task.taskId] = task;
+      const intakeResult: TaskIntakeResult = {
+        taskId: task.taskId,
+        taskVersionAtCreation: task.taskVersion,
+        initialEventIds,
+      };
       idempotencyPut(
         state,
         scope,
         input.idempotencyKey,
         fingerprint,
-        { taskId: task.taskId },
+        intakeResult as unknown as JsonValue,
         now,
       );
-      return task.taskId;
+      return intakeResult;
     });
 
-    await this.reconciler.reconcile(created);
-    return this.getTask(created);
+    await this.reconciler.reconcile(result.taskId);
+    return result;
+  }
+
+  /** Compatibility helper for existing in-domain callers. New adapters use intakeTask(). */
+  async createTask(input: CreateTaskInput): Promise<TaskAggregate> {
+    const result = await this.intakeTask(input);
+    return this.getTask(result.taskId);
   }
 
   async getTask(taskId: string): Promise<TaskAggregate> {
@@ -540,12 +689,16 @@ export class TaskControlService {
         controllerClaim: claim,
         updatedAt: now,
       };
+      const consumedDispatchIds: string[] = [];
       for (const dispatch of activeControllerDispatches(state, task.taskId)) {
         state.dispatchSignals[dispatch.signalId] = {
           ...dispatch,
           status: "CONSUMED",
-          claim: null,
+          // Delivery and Host Result are independent. Keep the BHR report
+          // credential until the Host Result reaches a terminal state.
+          claim: dispatch.hostResultStatus === "PENDING" ? dispatch.claim : null,
         };
+        consumedDispatchIds.push(dispatch.signalId);
       }
       let causationId = current.latestEventId;
       if (replacedClaim !== null) {
@@ -582,7 +735,22 @@ export class TaskControlService {
         input.correlationId ?? null,
         causationId,
       );
-      task = { ...task, latestEventId: claimedEvent.eventId };
+      causationId = claimedEvent.eventId;
+      if (consumedDispatchIds.length > 0) {
+        const consumedEvent = appendEvent(
+          state,
+          task,
+          "HOST_DISPATCH_CONSUMED",
+          input.profileId,
+          { dispatchIds: consumedDispatchIds },
+          now,
+          this.ids,
+          input.correlationId ?? null,
+          causationId,
+        );
+        causationId = consumedEvent.eventId;
+      }
+      task = { ...task, latestEventId: causationId };
       state.tasks[task.taskId] = task;
       const result: ControllerClaimResult = {
         claim,
@@ -802,10 +970,14 @@ export class TaskControlService {
             claimEpoch: 0,
             claim: null,
             resultRef: null,
+            resultSummary: null,
+            evidenceRefs: [],
             errorCode: null,
             errorSummary: null,
+            retryable: null,
             createdAt: now,
             claimedAt: null,
+            startedAt: null,
             completedAt: null,
           };
           state.workItems[workItemId] = workItem;
@@ -1057,6 +1229,15 @@ export class TaskControlService {
       });
       const parentTask = state.tasks[item.taskId];
       invariant(parentTask !== undefined, "TASK_NOT_FOUND", "Task was not found.", { taskId: item.taskId });
+      if (input.expectedTaskVersion !== undefined) {
+        assertExpectedVersions(parentTask, input.expectedTaskVersion);
+      }
+      invariant(
+        parentTask.plan?.currentNodeId === item.planNodeId,
+        "COMMAND_NOT_ALLOWED",
+        "Work Item no longer belongs to the current Plan Node.",
+        { currentNodeId: parentTask.plan?.currentNodeId ?? null, planNodeId: item.planNodeId },
+      );
       invariant(
         !["PAUSED", "COMPLETED", "FAILED", "CANCELLED"].includes(parentTask.status),
         "COMMAND_NOT_ALLOWED",
@@ -1145,21 +1326,103 @@ export class TaskControlService {
     });
   }
 
-  async reportWorkResult(input: ReportWorkResultInput): Promise<TaskAggregate> {
+  async startWorkItem(input: StartWorkItemInput): Promise<WorkItem> {
     assertContractVersion(input.contractVersion);
+    const scope = `work.start:${input.workItemId}`;
+    const fingerprint = requestFingerprint(input);
+    return this.store.transact((state) => {
+      const duplicate = idempotencyGet<{ workItemId: string }>(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+      );
+      if (duplicate !== undefined) {
+        const existing = state.workItems[duplicate.workItemId];
+        invariant(existing !== undefined, "WORK_ITEM_NOT_FOUND", "Work Item was not found.");
+        return existing;
+      }
+      const item = state.workItems[input.workItemId];
+      invariant(item !== undefined, "WORK_ITEM_NOT_FOUND", "Work Item was not found.", {
+        workItemId: input.workItemId,
+      });
+      this.assertActiveLease(item.claim, input.claimToken);
+      invariant(item.status === "CLAIMED", "COMMAND_NOT_ALLOWED", "Only a claimed Work Item can start.");
+      const current = state.tasks[item.taskId];
+      invariant(current !== undefined, "TASK_NOT_FOUND", "Task was not found.", { taskId: item.taskId });
+      assertExpectedVersions(current, input.expectedTaskVersion);
+      invariant(
+        current.plan?.currentNodeId === item.planNodeId,
+        "COMMAND_NOT_ALLOWED",
+        "Work Item no longer belongs to the current Plan Node.",
+        { currentNodeId: current.plan?.currentNodeId ?? null, planNodeId: item.planNodeId },
+      );
+      const now = this.clock.now().toISOString();
+      const started: WorkItem = { ...item, status: "RUNNING", startedAt: now };
+      state.workItems[item.workItemId] = started;
+      let task: TaskAggregate = {
+        ...current,
+        taskVersion: current.taskVersion + 1,
+        updatedAt: now,
+      };
+      const event = appendEvent(
+        state,
+        task,
+        "WORK_ITEM_STARTED",
+        input.producerRef,
+        { workItemId: item.workItemId, attempt: item.attempt },
+        now,
+        this.ids,
+        input.correlationId ?? null,
+        current.latestEventId,
+      );
+      task = { ...task, latestEventId: event.eventId };
+      state.tasks[task.taskId] = task;
+      idempotencyPut(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+        { workItemId: item.workItemId },
+        now,
+      );
+      return started;
+    });
+  }
+
+  async completeWorkItem(input: CompleteWorkItemInput): Promise<TaskAggregate> {
+    assertContractVersion(input.contractVersion);
+    assertNoInlineResultBody(input, "work.complete");
+    assertReference(input.resultRef, "resultRef");
     return this.reportWork(input, true);
   }
 
+  async failWorkItem(input: FailWorkItemInput): Promise<TaskAggregate> {
+    assertContractVersion(input.contractVersion);
+    assertNoInlineResultBody(input, "work.fail");
+    return this.reportWork(input, false);
+  }
+
+  /** Compatibility alias retained for the first-round internal API. */
+  async reportWorkResult(input: ReportWorkResultInput): Promise<TaskAggregate> {
+    assertContractVersion(input.contractVersion);
+    assertNoInlineResultBody(input, "work.complete");
+    assertReference(input.resultRef, "resultRef");
+    return this.reportWork(input, true);
+  }
+
+  /** Compatibility alias retained for the first-round internal API. */
   async reportWorkFailure(input: ReportWorkFailureInput): Promise<TaskAggregate> {
     assertContractVersion(input.contractVersion);
+    assertNoInlineResultBody(input, "work.fail");
     return this.reportWork(input, false);
   }
 
   private async reportWork(
-    input: ReportWorkResultInput | ReportWorkFailureInput,
+    input: CompleteWorkItemInput | FailWorkItemInput | ReportWorkResultInput | ReportWorkFailureInput,
     succeeded: boolean,
   ): Promise<TaskAggregate> {
-    const scope = `work.report:${input.workItemId}`;
+    const scope = `work.report:${input.workItemId}:${succeeded ? "success" : "failure"}`;
     const fingerprint = requestFingerprint({ ...input, succeeded });
     const taskId = await this.store.transact((state) => {
       const duplicate = idempotencyGet<{ taskId: string }>(
@@ -1174,21 +1437,39 @@ export class TaskControlService {
         workItemId: input.workItemId,
       });
       this.assertActiveLease(item.claim, input.claimToken);
-      invariant(item.status === "CLAIMED", "COMMAND_NOT_ALLOWED", "Work Item is not in CLAIMED state.");
+      invariant(
+        item.status === "CLAIMED" || item.status === "RUNNING",
+        "COMMAND_NOT_ALLOWED",
+        "Work Item is not active.",
+      );
       const current = state.tasks[item.taskId];
       invariant(current !== undefined, "TASK_NOT_FOUND", "Task was not found.", { taskId: item.taskId });
+      if (input.expectedTaskVersion !== undefined) {
+        assertExpectedVersions(current, input.expectedTaskVersion);
+      }
       invariant(!isTerminalTaskStatus(current.status), "COMMAND_NOT_ALLOWED", "Terminal Task cannot accept Work result.");
       invariant(current.plan !== null, "INVALID_PLAN", "Task has no plan.");
+      invariant(
+        current.plan.currentNodeId === item.planNodeId,
+        "COMMAND_NOT_ALLOWED",
+        "Work result does not belong to the current Plan Node.",
+        { currentNodeId: current.plan.currentNodeId, planNodeId: item.planNodeId },
+      );
       const now = this.clock.now().toISOString();
-      const resultRef = succeeded ? (input as ReportWorkResultInput).resultRef : null;
-      const failedInput = succeeded ? null : (input as ReportWorkFailureInput);
+      const resultRef = succeeded ? (input as CompleteWorkItemInput).resultRef : null;
+      const resultSummary = succeeded ? (input as CompleteWorkItemInput).summary ?? "" : null;
+      const failedInput = succeeded ? null : (input as FailWorkItemInput);
+      const evidenceRefs = assertEvidenceRefs(input.evidenceRefs, "evidenceRefs");
       state.workItems[item.workItemId] = {
         ...item,
         status: succeeded ? "SUCCEEDED" : "FAILED",
         claim: null,
         resultRef,
+        resultSummary,
+        evidenceRefs,
         errorCode: failedInput?.errorCode ?? null,
         errorSummary: failedInput?.errorSummary ?? null,
+        retryable: failedInput?.retryable ?? null,
         completedAt: now,
       };
       let plan = updateNode(
@@ -1198,7 +1479,9 @@ export class TaskControlService {
           ...node,
           status: succeeded ? "IN_PROGRESS" : "BLOCKED",
           resultRefs: resultRef === null ? node.resultRefs : addUnique(node.resultRefs, [resultRef]),
-          summary: succeeded ? node.summary : failedInput!.errorSummary,
+          summary: succeeded
+            ? resultSummary || node.summary
+            : failedInput!.errorSummary,
         }),
         now,
       );
@@ -1220,11 +1503,18 @@ export class TaskControlService {
         succeeded ? "ROLE_WORK_SUCCEEDED" : "ROLE_WORK_FAILED",
         input.producerRef,
         succeeded
-          ? { workItemId: item.workItemId, resultRef: resultRef! }
+          ? {
+              workItemId: item.workItemId,
+              resultRef: resultRef!,
+              summary: resultSummary ?? "",
+              evidenceRefs,
+            }
           : {
               workItemId: item.workItemId,
               errorCode: failedInput!.errorCode,
               errorSummary: failedInput!.errorSummary,
+              retryable: failedInput!.retryable ?? false,
+              evidenceRefs,
             },
         now,
         this.ids,
@@ -1264,6 +1554,210 @@ export class TaskControlService {
     });
     await this.reconciler.reconcile(taskId);
     return this.getTask(taskId);
+  }
+
+  async retryWorkItem(input: RetryWorkItemInput): Promise<WorkItem> {
+    assertContractVersion(input.contractVersion);
+    const scope = `work.retry:${input.workItemId}`;
+    const fingerprint = requestFingerprint(input);
+    return this.store.transact((state) => {
+      const duplicate = idempotencyGet<{ workItemId: string }>(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+      );
+      if (duplicate !== undefined) {
+        const existing = state.workItems[duplicate.workItemId];
+        invariant(existing !== undefined, "WORK_ITEM_NOT_FOUND", "Work Item was not found.");
+        return existing;
+      }
+      const item = state.workItems[input.workItemId];
+      invariant(item !== undefined, "WORK_ITEM_NOT_FOUND", "Work Item was not found.", {
+        workItemId: input.workItemId,
+      });
+      const current = state.tasks[item.taskId];
+      invariant(current !== undefined, "TASK_NOT_FOUND", "Task was not found.", { taskId: item.taskId });
+      assertExpectedVersions(current, input.expectedTaskVersion);
+      invariant(
+        item.status === "EXPIRED" || (item.status === "FAILED" && item.retryable === true),
+        "COMMAND_NOT_ALLOWED",
+        "Only expired or retryable failed Work Items can retry.",
+      );
+      invariant(
+        current.plan?.currentNodeId === item.planNodeId,
+        "COMMAND_NOT_ALLOWED",
+        "Work Item no longer belongs to the current Plan Node.",
+      );
+      const now = this.clock.now().toISOString();
+      const retried: WorkItem = {
+        ...item,
+        status: "PENDING",
+        attempt: item.attempt + 1,
+        claim: null,
+        resultRef: null,
+        resultSummary: null,
+        evidenceRefs: [],
+        errorCode: null,
+        errorSummary: null,
+        retryable: null,
+        claimedAt: null,
+        startedAt: null,
+        completedAt: null,
+      };
+      state.workItems[item.workItemId] = retried;
+      let plan = current.plan;
+      if (plan !== null && plan.currentNodeId === item.planNodeId) {
+        plan = withPlanVersion(
+          updateNode(
+            plan,
+            item.planNodeId,
+            (node) => ({ ...node, status: "WAITING_RESULT", summary: "" }),
+            now,
+          ),
+          now,
+        );
+      }
+      let task = setOperationalStatus(
+        {
+          ...current,
+          taskVersion: current.taskVersion + 1,
+          plan,
+          blockedReason: null,
+          updatedAt: now,
+        },
+        "WAITING_FOR_ROLE_WORK",
+      );
+      const event = appendEvent(
+        state,
+        task,
+        "WORK_ITEM_RETRIED",
+        input.producerRef,
+        { workItemId: item.workItemId, attempt: retried.attempt },
+        now,
+        this.ids,
+        input.correlationId ?? null,
+        current.latestEventId,
+      );
+      task = { ...task, latestEventId: event.eventId };
+      state.tasks[task.taskId] = task;
+      idempotencyPut(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+        { workItemId: item.workItemId },
+        now,
+      );
+      return retried;
+    });
+  }
+
+  async expireWorkItem(input: ExpireWorkItemInput): Promise<WorkItem> {
+    assertContractVersion(input.contractVersion);
+    assertNonEmpty(input.reason, "reason");
+    const scope = `work.expire:${input.workItemId}`;
+    const fingerprint = requestFingerprint(input);
+    return this.store.transact((state) => {
+      const duplicate = idempotencyGet<{ workItemId: string }>(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+      );
+      if (duplicate !== undefined) {
+        const existing = state.workItems[duplicate.workItemId];
+        invariant(existing !== undefined, "WORK_ITEM_NOT_FOUND", "Work Item was not found.");
+        return existing;
+      }
+      const item = state.workItems[input.workItemId];
+      invariant(item !== undefined, "WORK_ITEM_NOT_FOUND", "Work Item was not found.", {
+        workItemId: input.workItemId,
+      });
+      invariant(
+        ["PENDING", "CLAIMED", "RUNNING"].includes(item.status),
+        "COMMAND_NOT_ALLOWED",
+        "Work Item is not expirable.",
+      );
+      const current = state.tasks[item.taskId];
+      invariant(current !== undefined, "TASK_NOT_FOUND", "Task was not found.", { taskId: item.taskId });
+      assertExpectedVersions(current, input.expectedTaskVersion);
+      const now = this.clock.now().toISOString();
+      const expired: WorkItem = {
+        ...item,
+        status: "EXPIRED",
+        claim: null,
+        errorCode: "WORK_EXPIRED",
+        errorSummary: input.reason,
+        retryable: true,
+        completedAt: now,
+      };
+      state.workItems[item.workItemId] = expired;
+      let plan = current.plan;
+      if (plan !== null && plan.currentNodeId === item.planNodeId) {
+        plan = withPlanVersion(
+          updateNode(
+            plan,
+            item.planNodeId,
+            (node) => ({ ...node, status: "BLOCKED", summary: input.reason }),
+            now,
+          ),
+          now,
+        );
+      }
+      let task = setOperationalStatus(
+        {
+          ...current,
+          taskVersion: current.taskVersion + 1,
+          plan,
+          blockedReason: input.reason,
+          updatedAt: now,
+        },
+        "READY_FOR_CONTROLLER",
+      );
+      let causationId = current.latestEventId;
+      if (item.claim !== null) {
+        const released = appendEvent(
+          state,
+          task,
+          "WORK_ITEM_CLAIM_RELEASED",
+          input.producerRef,
+          {
+            workItemId: item.workItemId,
+            claimId: item.claim.claimId,
+            claimEpoch: item.claim.claimEpoch,
+            reason: "work-expired",
+          },
+          now,
+          this.ids,
+          input.correlationId ?? null,
+          causationId,
+        );
+        causationId = released.eventId;
+      }
+      const event = appendEvent(
+        state,
+        task,
+        "WORK_ITEM_EXPIRED",
+        input.producerRef,
+        { workItemId: item.workItemId, reason: input.reason },
+        now,
+        this.ids,
+        input.correlationId ?? null,
+        causationId,
+      );
+      task = { ...task, latestEventId: event.eventId };
+      state.tasks[task.taskId] = task;
+      idempotencyPut(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+        { workItemId: item.workItemId },
+        now,
+      );
+      return expired;
+    });
   }
 
   async resolveApproval(input: ResolveApprovalInput): Promise<TaskAggregate> {
@@ -1411,16 +1905,23 @@ export class TaskControlService {
       });
       const parentTask = state.tasks[signal.taskId];
       invariant(parentTask !== undefined, "TASK_NOT_FOUND", "Task was not found.", { taskId: signal.taskId });
+      const reportRecovery =
+        (signal.status === "DELIVERED" || signal.status === "CONSUMED") &&
+        signal.hostResultStatus === "PENDING";
       invariant(
-        !["PAUSED", "COMPLETED", "FAILED", "CANCELLED"].includes(parentTask.status),
+        reportRecovery || !["PAUSED", "COMPLETED", "FAILED", "CANCELLED"].includes(parentTask.status),
         "COMMAND_NOT_ALLOWED",
-        "Dispatch cannot be claimed while Task is paused or terminal.",
+        "New Dispatch delivery cannot be claimed while Task is paused or terminal.",
       );
       const nowDate = this.clock.now();
       if (signal.claim !== null && !isClaimExpired(signal.claim.expiresAt, nowDate)) {
         throw new TaskControlError("DISPATCH_ALREADY_CLAIMED", "Dispatch Signal is already claimed.");
       }
-      invariant(signal.status === "PENDING" || signal.status === "CLAIMED", "COMMAND_NOT_ALLOWED", "Dispatch is not claimable.");
+      invariant(
+        signal.status === "PENDING" || signal.status === "CLAIMED" || reportRecovery,
+        "COMMAND_NOT_ALLOWED",
+        "Dispatch is not claimable.",
+      );
       const replacedClaim = signal.claim;
       const claim = lease(
         this.ids,
@@ -1433,10 +1934,10 @@ export class TaskControlService {
       const now = nowDate.toISOString();
       const claimed: DispatchSignal = {
         ...signal,
-        status: "CLAIMED",
+        status: reportRecovery ? signal.status : "CLAIMED",
         claimEpoch: claim.claimEpoch,
         claim,
-        attemptCount: signal.attemptCount + 1,
+        attemptCount: reportRecovery ? signal.attemptCount : signal.attemptCount + 1,
       };
       state.dispatchSignals[signal.signalId] = claimed;
       let task: TaskAggregate = {
@@ -1474,6 +1975,7 @@ export class TaskControlService {
           claimId: claim.claimId,
           claimEpoch: claim.claimEpoch,
           reclaimed: signal.claimEpoch > 0,
+          phase: reportRecovery ? "host-result-recovery" : "delivery",
         },
         now,
         this.ids,
@@ -1495,19 +1997,111 @@ export class TaskControlService {
     });
   }
 
+  async materializeHostCommand(signalId: string): Promise<HostCommandMaterialization> {
+    return this.store.read((state) => {
+      const signal = state.dispatchSignals[signalId];
+      invariant(signal !== undefined, "DISPATCH_NOT_FOUND", "Dispatch Signal was not found.", {
+        signalId,
+      });
+      return {
+        dispatchId: signal.signalId,
+        taskId: signal.taskId,
+        createdFromTaskVersion: signal.createdFromTaskVersion,
+        workItemId: signal.workItemId,
+        targetRole: signal.targetRole,
+        targetProfileRef: signal.targetProfileRef,
+        conversationRef: signal.conversationRef,
+        commandType: signal.hostCommandType,
+        commandRef: signal.hostCommandRef,
+        idempotencyKey: signal.idempotencyKey,
+      };
+    });
+  }
+
   async acknowledgeDispatch(input: ReportDispatchInput): Promise<DispatchSignal> {
     assertContractVersion(input.contractVersion);
-    return this.reportDispatch(input, true);
+    const scope = `dispatch.delivery:${input.signalId}:ack`;
+    const fingerprint = requestFingerprint({ ...input, outcome: "delivered" });
+    return this.store.transact((state) => {
+      const duplicate = idempotencyGet<{ signalId: string }>(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+      );
+      if (duplicate !== undefined) {
+        const existing = state.dispatchSignals[duplicate.signalId];
+        invariant(existing !== undefined, "DISPATCH_NOT_FOUND", "Dispatch Signal was not found.");
+        return existing;
+      }
+      const signal = state.dispatchSignals[input.signalId];
+      invariant(signal !== undefined, "DISPATCH_NOT_FOUND", "Dispatch Signal was not found.", {
+        signalId: input.signalId,
+      });
+      this.assertActiveLease(signal.claim, input.claimToken);
+      invariant(
+        signal.status === "CLAIMED" || signal.status === "DELIVERED" || signal.status === "CONSUMED",
+        "COMMAND_NOT_ALLOWED",
+        "Dispatch cannot acknowledge delivery in its current state.",
+      );
+      if (signal.deliveredAt !== null) {
+        idempotencyPut(
+          state,
+          scope,
+          input.idempotencyKey,
+          fingerprint,
+          { signalId: signal.signalId },
+          this.clock.now().toISOString(),
+        );
+        return signal;
+      }
+      const current = state.tasks[signal.taskId];
+      invariant(current !== undefined, "TASK_NOT_FOUND", "Task was not found.", { taskId: signal.taskId });
+      const now = this.clock.now().toISOString();
+      const updatedSignal: DispatchSignal = {
+        ...signal,
+        status: signal.status === "CONSUMED" ? "CONSUMED" : "DELIVERED",
+        // Keep the report credential alive. Controller Claim is allowed to
+        // consume the wake without invalidating the later Host Result.
+        claim: signal.claim,
+        deliveredAt: now,
+        lastError: null,
+      };
+      state.dispatchSignals[signal.signalId] = updatedSignal;
+      let task: TaskAggregate = {
+        ...current,
+        taskVersion: current.taskVersion + 1,
+        updatedAt: now,
+      };
+      const event = appendEvent(
+        state,
+        task,
+        "HOST_DISPATCH_DELIVERED",
+        input.producerRef,
+        { signalId: signal.signalId },
+        now,
+        this.ids,
+        input.correlationId ?? null,
+        current.latestEventId,
+      );
+      task = { ...task, latestEventId: event.eventId };
+      state.tasks[task.taskId] = task;
+      idempotencyPut(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+        { signalId: signal.signalId },
+        now,
+      );
+      return updatedSignal;
+    });
   }
 
   async failDispatch(input: ReportDispatchInput): Promise<DispatchSignal> {
     assertContractVersion(input.contractVersion);
-    return this.reportDispatch(input, false);
-  }
-
-  private async reportDispatch(input: ReportDispatchInput, delivered: boolean): Promise<DispatchSignal> {
-    const scope = `dispatch.report:${input.signalId}:${delivered ? "delivered" : "failed"}`;
-    const fingerprint = requestFingerprint({ ...input, delivered });
+    const scope = `dispatch.delivery:${input.signalId}:fail`;
+    const fingerprint = requestFingerprint({ ...input, outcome: "failed" });
     const result = await this.store.transact((state) => {
       const duplicate = idempotencyGet<{ signalId: string }>(
         state,
@@ -1525,16 +2119,21 @@ export class TaskControlService {
         signalId: input.signalId,
       });
       this.assertActiveLease(signal.claim, input.claimToken);
-      invariant(signal.status === "CLAIMED", "COMMAND_NOT_ALLOWED", "Dispatch is not in CLAIMED state.");
+      invariant(
+        signal.status === "CLAIMED",
+        "COMMAND_NOT_ALLOWED",
+        "Only an undelivered claimed Dispatch can fail delivery.",
+      );
       const current = state.tasks[signal.taskId];
       invariant(current !== undefined, "TASK_NOT_FOUND", "Task was not found.", { taskId: signal.taskId });
       const now = this.clock.now().toISOString();
       const updatedSignal: DispatchSignal = {
         ...signal,
-        status: delivered ? "DELIVERED" : "FAILED",
+        status: "FAILED",
         claim: null,
-        deliveredAt: delivered ? now : null,
-        lastError: delivered ? null : input.errorSummary ?? "Host dispatch failed.",
+        hostResultStatus: "FAILED",
+        reportedAt: now,
+        lastError: input.errorSummary ?? "Host dispatch delivery failed.",
       };
       state.dispatchSignals[signal.signalId] = updatedSignal;
       let task: TaskAggregate = {
@@ -1542,20 +2141,18 @@ export class TaskControlService {
         taskVersion: current.taskVersion + 1,
         updatedAt: now,
       };
-      const hostEvent = appendEvent(
+      const event = appendEvent(
         state,
         task,
-        delivered ? "HOST_DISPATCH_DELIVERED" : "HOST_DISPATCH_FAILED",
+        "HOST_DISPATCH_FAILED",
         input.producerRef,
-        delivered
-          ? { signalId: signal.signalId }
-          : { signalId: signal.signalId, errorSummary: updatedSignal.lastError! },
+        { signalId: signal.signalId, errorSummary: updatedSignal.lastError! },
         now,
         this.ids,
         input.correlationId ?? null,
         current.latestEventId,
       );
-      task = { ...task, latestEventId: hostEvent.eventId };
+      task = { ...task, latestEventId: event.eventId };
       state.tasks[task.taskId] = task;
       idempotencyPut(
         state,
@@ -1567,7 +2164,112 @@ export class TaskControlService {
       );
       return updatedSignal;
     });
-    if (!delivered) await this.reconciler.reconcile(result.taskId);
+    await this.reconciler.reconcile(result.taskId);
+    return result;
+  }
+
+  async reportHostResult(input: ReportHostResultInput): Promise<DispatchSignal> {
+    assertContractVersion(input.contractVersion);
+    assertNoInlineResultBody(input, "host.result");
+    assertReference(input.hostResultRef, "hostResultRef");
+    return this.finishHostResult(input, true);
+  }
+
+  async failHostResult(input: FailHostResultInput): Promise<DispatchSignal> {
+    assertContractVersion(input.contractVersion);
+    assertNoInlineResultBody(input, "host.result");
+    return this.finishHostResult(input, false);
+  }
+
+  private async finishHostResult(
+    input: ReportHostResultInput | FailHostResultInput,
+    succeeded: boolean,
+  ): Promise<DispatchSignal> {
+    const scope = `dispatch.host-result:${input.signalId}:${succeeded ? "success" : "failure"}`;
+    const fingerprint = requestFingerprint({ ...input, succeeded });
+    const result = await this.store.transact((state) => {
+      const duplicate = idempotencyGet<{ signalId: string }>(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+      );
+      if (duplicate !== undefined) {
+        const existing = state.dispatchSignals[duplicate.signalId];
+        invariant(existing !== undefined, "DISPATCH_NOT_FOUND", "Dispatch Signal was not found.");
+        return existing;
+      }
+      const signal = state.dispatchSignals[input.signalId];
+      invariant(signal !== undefined, "DISPATCH_NOT_FOUND", "Dispatch Signal was not found.", {
+        signalId: input.signalId,
+      });
+      this.assertActiveLease(signal.claim, input.claimToken);
+      invariant(signal.deliveredAt !== null, "COMMAND_NOT_ALLOWED", "Host Result requires delivery acknowledgement.");
+      invariant(
+        (signal.status === "DELIVERED" || signal.status === "CONSUMED") &&
+          signal.hostResultStatus === "PENDING",
+        "COMMAND_NOT_ALLOWED",
+        "Dispatch cannot accept a Host Result in its current state.",
+      );
+      const current = state.tasks[signal.taskId];
+      invariant(current !== undefined, "TASK_NOT_FOUND", "Task was not found.", { taskId: signal.taskId });
+      const now = this.clock.now().toISOString();
+      const evidenceRefs = assertEvidenceRefs(input.evidenceRefs, "evidenceRefs");
+      const successInput = succeeded ? (input as ReportHostResultInput) : null;
+      const failedInput = succeeded ? null : (input as FailHostResultInput);
+      const updatedSignal: DispatchSignal = {
+        ...signal,
+        status: succeeded ? signal.status : "FAILED",
+        claim: null,
+        hostResultStatus: succeeded ? "SUCCEEDED" : "FAILED",
+        hostResultRef: successInput?.hostResultRef ?? null,
+        hostResultSummary: successInput?.summary ?? null,
+        hostEvidenceRefs: evidenceRefs,
+        reportedAt: now,
+        lastError: failedInput?.errorSummary ?? null,
+      };
+      state.dispatchSignals[signal.signalId] = updatedSignal;
+      let task: TaskAggregate = {
+        ...current,
+        taskVersion: current.taskVersion + 1,
+        updatedAt: now,
+      };
+      const event = appendEvent(
+        state,
+        task,
+        succeeded ? "HOST_RESULT_REPORTED" : "HOST_RESULT_FAILED",
+        input.producerRef,
+        succeeded
+          ? {
+              signalId: signal.signalId,
+              hostResultRef: successInput!.hostResultRef,
+              summary: successInput!.summary ?? "",
+              evidenceRefs,
+            }
+          : {
+              signalId: signal.signalId,
+              errorCode: failedInput!.errorCode,
+              errorSummary: failedInput!.errorSummary,
+              evidenceRefs,
+            },
+        now,
+        this.ids,
+        input.correlationId ?? null,
+        current.latestEventId,
+      );
+      task = { ...task, latestEventId: event.eventId };
+      state.tasks[task.taskId] = task;
+      idempotencyPut(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+        { signalId: signal.signalId },
+        now,
+      );
+      return updatedSignal;
+    });
+    if (!succeeded) await this.reconciler.reconcile(result.taskId);
     return result;
   }
 

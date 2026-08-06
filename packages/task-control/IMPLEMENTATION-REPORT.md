@@ -1,171 +1,203 @@
-# SOL-TSK-001 Audit Remediation Report
+# SOL-TSK-001 Second-Round Remediation Report
 
 ## 1. 基线与范围
 
-- 综合审计基线：`main@eb1444044b50c9a8e00d7da9283d9999e3256d9e`
-- 审计日期：2026-08-05
+- 第二轮审计参考：`main@353a9ff39af6582e33f0ea8078af75f40c64380c`
+- 实际实现原则：在上一轮最新 `SOL-TSK-001-audit-remediation-overlay.zip` 累积结果上连续增量整改
 - 整改领域：Task Control
-- 实施方式：基于与审计包 TSK 文件哈希一致的领域源码制作增量整改
-- 公共合同：未单方面修改 `packages/contracts`
+- 修改范围：`packages/task-control/**`
+- 公共合同：没有修改 `packages/contracts/**`，所有跨域字段仍为 Candidate Proposal
 
-本轮只修改 `packages/task-control/**`。没有修改 CTL、LCL、BHR、Gateway、OpenAPI、Context、Registry 或其他领域实现。
+本轮没有修改 CTL、LCL、BHR、Gateway、OpenAPI、Registry、Context 或其他领域代码。
 
-## 2. 审计问题整改
+## 2. 已关闭问题
 
-### TSK-H01｜Plan 错误完成
+### 2.1 正式 Task Intake Application Port
 
-已修复：
+新增 `TaskIntakeApplicationPort.intakeTask()`：
 
-- `ADVANCE_PLAN_NODE` 只能推进当前节点；
-- 没有 `nextNodeId` 时，必须确认全部节点已处于 `COMPLETED/SKIPPED/CANCELLED`；
-- `assertTaskConsistency()` 拒绝“Plan 已完成但仍有未完成节点”的任何写入或持久化恢复。
+- 校验输入和合同版本；
+- 原子创建 Task、初始不可变 Event 和幂等记录；
+- 返回稳定 `TaskIntakeResult`；
+- 相同请求稳定回放；
+- 不同请求复用 Key 冲突；
+- 保留 `createTask()` 仅用于领域内兼容，正式 Adapter 不再需要直接写 Store 或使用 Fixture。
 
-### TSK-H02｜非当前节点创建 WorkItem
+### 2.2 Dispatch Claim / Controller Claim 生命周期竞态
 
-已修复：
-
-- `REQUEST_ROLE_WORK` 必须指向 `plan.currentNodeId`；
-- 当前节点必须可执行且依赖满足；
-- 同一节点已有活动 WorkItem 时拒绝重复创建；
-- `REQUEST_APPROVAL` 使用相同当前节点门禁。
-
-### TSK-H03｜等待态、暂停、恢复和 Approval 不闭合
-
-已修复：
-
-- `WAITING_FOR_ROLE_WORK`、`WAITING_FOR_APPROVAL` 可被 Controller 重新 Claim；
-- 等待态可执行 `PAUSE_TASK/FAIL_TASK/RELEASE_CLAIM`；
-- 新增 `RESUME_TASK`；
-- Task 保存 `resumeStatus`，暂停期间外部 Work/Approval 结果会更新恢复目标而不解除暂停；
-- 新增 `ApprovalResolutionPort` 与 `resolveApproval()` 最小应用接口；
-- Approval 只以引用进入 TSK。
-
-### TSK-H04｜Claim 过期改变状态但缺 Event
-
-已修复：
-
-- Controller、WorkItem、Dispatch Claim 到期均生成独立 Release Event；
-- 直接替换过期 Claim 时先写 Release，再写 Claimed；
-- Work/Dispatch Claim 和回收都会推进 Task Version；
-- Event causation 链保持连续；
-- Claim Epoch 持久递增，旧 Token 被 fencing 拒绝。
-
-### TSK-H05｜幂等 Key 未绑定请求
-
-已修复：
-
-- 所有幂等入口计算规范化请求 SHA-256；
-- 指纹排除 `idempotencyKey` 本身并稳定排序对象字段；
-- 同 Scope + Key + 相同请求重放原结果；
-- 同 Scope + Key + 不同请求返回 `IDEMPOTENCY_KEY_CONFLICT`；
-- 冲突、旧版本和非法迁移均在事务草稿上失败，无状态副作用。
-
-## 3. Schema 与状态变化
-
-### Task Aggregate
-
-新增内部字段：
+修复链路：
 
 ```text
-resumeStatus: TaskStatus | null
+BHR claim
+→ 浏览器投递 Ack
+→ Controller claim
+→ BHR Host Result report
 ```
 
-仅在 `PAUSED` 状态存在，用于恢复协调状态。
+关键变化：
 
-### Controller Command
+- Delivery Ack 与 Host Result 分离；
+- Controller Claim 可以消费驱动意图，但不会删除合法 Host Result 上报凭证；
+- Dispatch 同时记录 delivery status 与 host result status；
+- Ack、Result、Fail 可独立幂等；
+- 已投递/已消费 Dispatch 在 Host Result 未结束时，Claim 过期后可重领补报；
+- 旧 Epoch Token 继续被 fencing 拒绝；
+- 重启后持久化 Claim 仍可完成合法补报。
 
-新增 TSK 内部命令：
+### 2.3 WorkItem Application Port
+
+新增完整应用 Port：
 
 ```text
-RESUME_TASK
+claim / start / complete / fail / retry / expire
 ```
 
-是否进入平台统一 Controller Command 合同，等待总控裁决。
+- 保留当前节点、版本、角色、Claim 和幂等门禁；
+- Work 完成只接受 Result Ref、摘要、状态、错误和 Evidence Ref；
+- 拒绝完整 Local Result、Payload 和 Body；
+- 每个生命周期变化产生 TaskEvent；
+- Retry 恢复节点等待结果状态并生成新尝试。
 
-### Approval
+### 2.4 Host Command / Host Result Port
 
-新增 TSK 应用 Port：
+新增：
+
+- `materializeHostCommand()`；
+- `acknowledgeDispatch()`；
+- `reportHostResult()`；
+- `failHostResult()`。
+
+TSK 只拥有 Dispatch 状态与稳定引用，不保存 DOM、截图正文或浏览器 Binding。
+
+### 2.5 真实节点插入
+
+`INSERT_NODE_AFTER` 不再等同于数组尾部追加：
+
+- 节点插入到锚点后；
+- 新节点依赖锚点；
+- 原直接 successor 的锚点依赖重连到新节点；
+- 执行顺序和操作名称一致。
+
+### 2.6 存储并发边界
+
+明确 `JsonFileTaskControlStore`：
+
+- 单进程；
+- 单状态文件；
+- 单 Writer；
+- 所有 Adapter 共享同一个 Store；
+- `transact()` 串行化写入；
+- Task/Plan Version 和 Event 顺序继续提供业务并发门禁。
+
+同一路径第二个 Writer 返回 `STORE_SINGLE_WRITER_REQUIRED`。本轮不引入数据库服务、Daemon 或第二控制平面。SQLite/PostgreSQL 迁移等待总控按真实并发需求裁决。
+
+## 3. 模型与事件变化
+
+### WorkItem
+
+新增：
 
 ```text
-ApprovalResolutionPort.resolveApproval(input)
+status: RUNNING / EXPIRED
+startedAt
+resultSummary
+evidenceRefs
+retryable
 ```
 
-Resolution：`APPROVED/REJECTED/CANCELLED`。
+### Dispatch
+
+增加独立 Host Result 维度：
+
+```text
+hostResultStatus
+hostResultRef
+hostResultSummary
+hostEvidenceRefs
+reportedAt
+```
 
 ### Event
 
 新增：
 
 ```text
-WORK_ITEM_CLAIMED
-WORK_ITEM_CLAIM_RELEASED
-DISPATCH_CLAIMED
-DISPATCH_CLAIM_RELEASED
-TASK_RESUMED
+WORK_ITEM_STARTED
+WORK_ITEM_RETRIED
+WORK_ITEM_EXPIRED
+HOST_DISPATCH_CONSUMED
+HOST_RESULT_REPORTED
+HOST_RESULT_FAILED
 ```
 
-### Idempotency
+### Plan Operation
 
-`IdempotencyRecord` 和目标 SQLite Schema 新增：
+新增并实现：
 
 ```text
-request_fingerprint
+INSERT_NODE_AFTER
 ```
 
-旧 JSON 状态安全迁移为 legacy 指纹，不会误重放不同请求。
+## 4. 公共合同提案
 
-## 4. 跨域接口准备
+`src/integration-proposals.ts` 和 `INTEGRATION-CONTRACT-PROPOSALS.md` 更新为第二轮 Candidate：
 
-新增：
+- Task Intake Proposal；
+- WorkItem Application Proposal；
+- Browser Delivery Ack Proposal；
+- Browser Host Result Proposal。
 
-- `src/integration-proposals.ts`；
-- `INTEGRATION-CONTRACT-PROPOSALS.md`；
-- CTL Controller Input / Claim / Decision 候选；
-- LCL Local Work Request / Completion 候选；
-- BHR Browser Dispatch / Host Result 候选；
-- 三组候选 Contract Test。
-
-这些接口没有写入 `packages/contracts`，也没有宣称为冻结公共语义。
+这些类型未写入 `packages/contracts`，不得被描述为已冻结公共合同。
 
 ## 5. 测试结果
 
 ```text
-33 tests passed
+43 tests passed
 0 failed
 ```
 
-新增重点测试：
+第二轮新增重点场景：
 
-- Plan 完成门禁；
-- 当前节点约束；
-- 等待 Work 后重新 Claim；
-- Pause / Resume；
-- Approval wait / resolve；
-- 暂停期间 Approval Resolution；
-- Work/Dispatch Claim expiry Event；
-- 幂等请求指纹冲突；
-- 非法 Resume 无副作用；
-- CTL/LCL/BHR 候选 Contract Test。
+- Task Intake 创建、稳定重放和幂等冲突；
+- BHR Claim → Delivery Ack → Controller Claim → Host Result；
+- Controller Claim 不破坏合法 BHR 回报；
+- Dispatch 过期、重领、旧 Token fencing、重复 Ack、重复 Report；
+- WorkItem claim / start / complete / fail / retry / expire；
+- 完整 Local Result 正文拒绝；
+- Host Result 正文拒绝；
+- `INSERT_NODE_AFTER` successor 重连和真实执行顺序；
+- 多 Application Adapter 共享 Store 时版本和 Event 一致；
+- stale version 无事件副作用；
+- JSON Store 单 Writer；
+- 状态持久化重启后的 Host Result 补报。
 
-## 6. 剩余跨域差异
+## 6. 剩余跨域阻断
 
-### CTL
+### CTL / Gateway
 
-仍需总控冻结唯一字段风格、状态枚举、Node Kind、Command Payload、Plan/Project 标识、Result 摘要、Event Cursor 和 Error Code。Gateway 仍不能直接用候选接口替换 Fixture。
+- 仍需总控冻结唯一 Controller/Task 公共合同；
+- Gateway 仍需正式 Task Intake 和 Controller Adapter；
+- Candidate 字段不能直接替换 `packages/contracts`。
 
 ### LCL
 
-尚未实现 Gateway Local Adapter、WorkItem Worker、LocalRequest 调用和 Result Ref 注册。同步 `local.*` 与异步 WorkItem 的边界仍需总控冻结。
+- 仍需 WorkItem → Local Work Request Adapter；
+- Local Result 到 Result Ref 的注册归属尚待总控裁决；
+- TSK 已具备 Work Application Port，但不执行本机命令。
 
 ### BHR
 
-尚未实现 Dispatch → HostCommand 物化、Wake Payload、正式 Gateway Operation、Host Result/Observation/Evidence 回写。BHR 会话创建、授权模型和响应生命周期属于 BHR/总控整改。
+- 仍需 Dispatch → 正式 HostCommand Adapter；
+- Delivery Ack、Host Result、Observation/Evidence Ref 的公共字段待冻结；
+- 会话创建、Binding、DOM 和响应观察仍属于 BHR。
 
 ## 7. 自审结论
 
-- 8 项 TSK 领域整改要求已实现；
-- TSK 状态机现在满足单任务串行推进和暂停恢复门禁；
-- 版本冲突、非法迁移、幂等冲突均无副作用；
-- 没有复制 Local Result、Context、DOM、Approval 正文或其他领域实体；
-- 没有单方面改变平台公共合同；
-- 当前达到“TSK 领域整改完成、跨域集成就绪提案待总控裁决”，不等同于第二阶段最终串联通过。
+- 第二轮六项必须处理内容均已实现；
+- TSK 现在拥有正式 Task Intake、WorkItem 和 Host Dispatch 应用 Port；
+- Dispatch/Controller Claim 不再互相破坏合法生命周期；
+- 节点插入语义与真实执行顺序一致；
+- JSON Store 的单写者边界已由实现和测试强制；
+- 没有保存 Local Result、Context、DOM、截图、Binding 或其他领域正文；
+- 没有单方面冻结公共合同；
+- 当前达到“TSK 第二轮领域整改完成，具备统一接线所需内部应用能力”，不等同于四领域最终串联通过。

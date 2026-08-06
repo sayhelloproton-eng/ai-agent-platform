@@ -1,8 +1,8 @@
 import type {
   ControllerCommand,
+  CreateTaskInput,
   DecisionContext,
   DispatchSignal,
-  JsonObject,
   WorkItem,
 } from "./model.js";
 
@@ -12,7 +12,13 @@ import type {
  * cross-domain audit accepts a version in packages/contracts.
  */
 export const TASK_CONTROL_INTEGRATION_PROPOSAL_VERSION =
-  "2026-08-05-candidate" as const;
+  "2026-08-06-round2-candidate" as const;
+
+
+export interface TaskIntakeProposal {
+  readonly proposalVersion: typeof TASK_CONTROL_INTEGRATION_PROPOSAL_VERSION;
+  readonly task: CreateTaskInput;
+}
 
 export interface ControllerInputProposal {
   readonly proposalVersion: typeof TASK_CONTROL_INTEGRATION_PROPOSAL_VERSION;
@@ -60,8 +66,12 @@ export interface LocalWorkRequestProposal {
 
 export interface LocalWorkCompletionProposal {
   readonly workItemId: string;
+  readonly expectedTaskVersion: number;
+  readonly claimToken: string;
   readonly outcome: "success" | "failure";
   readonly resultRef: string | null;
+  readonly resultSummary: string | null;
+  readonly evidenceRefs: readonly string[];
   readonly errorCode: string | null;
   readonly errorSummary: string | null;
   readonly retryable: boolean;
@@ -87,15 +97,24 @@ export interface BrowserDispatchProposal {
   readonly idempotencyKey: string;
 }
 
+export interface BrowserDeliveryAckProposal {
+  readonly dispatchId: string;
+  readonly claimToken: string;
+  readonly delivered: boolean;
+  readonly deliverySummary: string | null;
+  readonly errorSummary: string | null;
+  readonly idempotencyKey: string;
+}
+
 export interface BrowserHostResultProposal {
   readonly dispatchId: string;
-  readonly outcome: "acknowledged" | "failed";
+  readonly claimToken: string;
+  readonly outcome: "succeeded" | "failed";
   readonly hostResultRef: string | null;
-  readonly bindingRef: string | null;
-  readonly observationRef: string | null;
+  readonly summary: string | null;
   readonly evidenceRefs: readonly string[];
+  readonly errorCode: string | null;
   readonly errorSummary: string | null;
-  readonly details: JsonObject;
   readonly idempotencyKey: string;
 }
 

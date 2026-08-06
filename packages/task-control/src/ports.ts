@@ -1,6 +1,47 @@
 import { randomUUID } from "node:crypto";
 
-import type { ResolveApprovalInput, TaskAggregate, TaskControlState } from "./model.js";
+import type {
+  ClaimDispatchInput,
+  ClaimWorkItemApplicationInput,
+  CompleteWorkItemInput,
+  CreateTaskInput,
+  DispatchSignal,
+  ExpireWorkItemInput,
+  FailHostResultInput,
+  FailWorkItemInput,
+  HostCommandMaterialization,
+  ReportDispatchInput,
+  ReportHostResultInput,
+  RetryWorkItemInput,
+  StartWorkItemInput,
+  ResolveApprovalInput,
+  TaskAggregate,
+  TaskControlState,
+  TaskIntakeResult,
+  WorkItem,
+} from "./model.js";
+
+
+export interface TaskIntakeApplicationPort {
+  intakeTask(input: CreateTaskInput): Promise<TaskIntakeResult>;
+}
+
+export interface WorkItemApplicationPort {
+  claimWorkItem(input: ClaimWorkItemApplicationInput): Promise<{ readonly workItem: WorkItem }>;
+  startWorkItem(input: StartWorkItemInput): Promise<WorkItem>;
+  completeWorkItem(input: CompleteWorkItemInput): Promise<TaskAggregate>;
+  failWorkItem(input: FailWorkItemInput): Promise<TaskAggregate>;
+  retryWorkItem(input: RetryWorkItemInput): Promise<WorkItem>;
+  expireWorkItem(input: ExpireWorkItemInput): Promise<WorkItem>;
+}
+
+export interface HostDispatchApplicationPort {
+  claimDispatch(input: ClaimDispatchInput): Promise<{ readonly dispatch: DispatchSignal }>;
+  materializeHostCommand(signalId: string): Promise<HostCommandMaterialization>;
+  acknowledgeDispatch(input: ReportDispatchInput): Promise<DispatchSignal>;
+  reportHostResult(input: ReportHostResultInput): Promise<DispatchSignal>;
+  failHostResult(input: FailHostResultInput): Promise<DispatchSignal>;
+}
 
 export interface Clock {
   now(): Date;
