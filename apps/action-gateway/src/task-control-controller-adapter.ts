@@ -37,6 +37,7 @@ import {
 import { createHash } from "node:crypto";
 
 import { ControllerTaskControlError } from "./controller-task-control-error.js";
+import type { ControllerIdempotencySnapshotStore } from "./controller-idempotency-store.js";
 import type {
   ControllerIdentity,
   ControllerTaskControl,
@@ -104,20 +105,27 @@ export interface ControllerTaskControlService {
 export interface TaskControlControllerAdapterOptions {
   readonly projectId?: string;
   readonly claimTtlMs?: number;
-}
-
-interface IdempotencyRecord<T> {
-  readonly fingerprint: string;
-  readonly result: T;
+  readonly idempotencyStore: ControllerIdempotencySnapshotStore;
 }
 
 function clone<T>(value: T): T {
   return structuredClone(value);
 }
 
+function canonicalize(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(canonicalize);
+  if (typeof value !== "object" || value === null) return value;
+  return Object.fromEntries(
+    Object.entries(value as Record<string, unknown>)
+      .filter(([, entry]) => entry !== undefined)
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([key, entry]) => [key, canonicalize(entry)]),
+  );
+}
+
 function fingerprint(value: unknown): string {
   return createHash("sha256")
-    .update(JSON.stringify(value), "utf8")
+    .update(JSON.stringify(canonicalize(value)), "utf8")
     .digest("hex");
 }
 
@@ -286,9 +294,9 @@ function toTaskControlKind(
       return "SUMMARY";
     case "WAIT":
       throw new ControllerTaskControlError(
-        "CONTROLLER_PLAN_INVALID",
-        "WAIT Plan Nodes are not represented by the frozen Task Control v1 model.",
-        422,
+        "CONTROLLER_COMMAND_NOT_ALLOWED",
+        "WAIT Plan Nodes are unavailable until a single public waiting-state contract is frozen.",
+        409,
       );
     default:
       return kind;
@@ -404,12 +412,12 @@ function observationKey(identity: ControllerIdentity, taskId: string): string {
 
 export function createTaskControlControllerAdapter(
   service: ControllerTaskControlService,
-  options: TaskControlControllerAdapterOptions = {},
+  options: TaskControlControllerAdapterOptions,
 ): ControllerTaskControl {
   const projectId = options.projectId ?? "ai-agent-platform";
   const claimTtlMs = options.claimTtlMs ?? 5 * 60_000;
   const observations = new Map<string, number>();
-  const idempotency = new Map<string, IdempotencyRecord<unknown>>();
+  const idempotencyStore = options.idempotencyStore;
 
   function assertProject(identity: ControllerIdentity): void {
     if (!identity.projectIds.includes(projectId)) {
@@ -432,12 +440,12 @@ export function createTaskControlControllerAdapter(
     }
   }
 
-  function replay<T extends { readonly idempotentReplay: boolean }>(
+  async function replay<T extends { readonly idempotentReplay: boolean }>(
     scope: string,
     inputFingerprint: string,
-  ): T | null {
-    const existing = idempotency.get(scope) as IdempotencyRecord<T> | undefined;
-    if (existing === undefined) return null;
+  ): Promise<T | null> {
+    const existing = await idempotencyStore.get<T>(scope);
+    if (existing === null) return null;
     if (existing.fingerprint !== inputFingerprint) {
       throw new ControllerTaskControlError(
         "CONTROLLER_IDEMPOTENCY_CONFLICT",
@@ -448,11 +456,25 @@ export function createTaskControlControllerAdapter(
     return { ...clone(existing.result), idempotentReplay: true };
   }
 
-  function remember<T>(scope: string, inputFingerprint: string, result: T): void {
-    idempotency.set(scope, {
+  async function remember<T extends { readonly idempotentReplay: boolean }>(
+    scope: string,
+    inputFingerprint: string,
+    result: T,
+  ): Promise<T> {
+    const existing = await idempotencyStore.putIfAbsent(scope, {
       fingerprint: inputFingerprint,
       result: clone(result),
+      createdAt: new Date().toISOString(),
     });
+    if (existing === null) return result;
+    if (existing.fingerprint !== inputFingerprint) {
+      throw new ControllerTaskControlError(
+        "CONTROLLER_IDEMPOTENCY_CONFLICT",
+        "The idempotency key was already used with a different request.",
+        409,
+      );
+    }
+    return { ...clone(existing.result), idempotentReplay: true };
   }
 
   async function taskControlCall<T>(operation: () => Promise<T>): Promise<T> {
@@ -514,7 +536,14 @@ export function createTaskControlControllerAdapter(
           resultRef,
           summary: `Formal Task Control result reference: ${resultRef}`,
         })),
-        constraints: [...context.constraints],
+        constraints: [...new Set([
+          ...context.constraints,
+          "REQUEST_ROLE_WORK is unavailable until target domain, capability, input reference, and result reference semantics are frozen.",
+          "REQUEST_APPROVAL is unavailable until a formal approval_ref producer and resolution contract are frozen.",
+          "WAIT Plan Nodes are unavailable until the public waiting-state contract is frozen.",
+          "INSERT_NODE_AFTER is unavailable because Task Control v1 has no atomic dependency-rewiring operation.",
+          "PAUSE, RESUME, and FAIL are not exposed by Controller Command v1 and require a public contract decision.",
+        ])],
         pendingApprovals: [...context.pendingApprovals],
         availableContextRefs: [...context.availableContextRefs],
         allowedControllerCommands: commands,
@@ -535,7 +564,7 @@ export function createTaskControlControllerAdapter(
       request.idempotencyKey,
     );
     const inputFingerprint = fingerprint({ request, identity });
-    const duplicate = replay<ClaimControllerTaskResult>(scope, inputFingerprint);
+    const duplicate = await replay<ClaimControllerTaskResult>(scope, inputFingerprint);
     if (duplicate !== null) return duplicate;
 
     const observedVersion = observations.get(
@@ -576,8 +605,7 @@ export function createTaskControlControllerAdapter(
       claimToken: claimed.claim.claimToken,
       idempotentReplay: false,
     };
-    remember(scope, inputFingerprint, result);
-    return result;
+    return remember(scope, inputFingerprint, result);
   }
 
   function inferNextNode(plan: TaskPlan, nodeId: string): string | undefined {
@@ -663,14 +691,11 @@ export function createTaskControlControllerAdapter(
                 404,
               );
             }
-            operations.push({
-              type: "ADD_NODE",
-              node: toTaskControlNode(
-                operation.node,
-                "PENDING",
-                [operation.afterNodeId],
-              ),
-            });
+            throw new ControllerTaskControlError(
+              "CONTROLLER_COMMAND_NOT_ALLOWED",
+              "INSERT_NODE_AFTER is unsupported because Task Control v1 cannot atomically rewire the anchor successor dependencies.",
+              409,
+            );
           } else {
             operations.push({
               type: "SET_NODE_STATUS",
@@ -751,6 +776,12 @@ export function createTaskControlControllerAdapter(
           "REQUEST_APPROVAL requires a formal Approval Ref producer and is not synthesized by CTL.",
           409,
         );
+      default:
+        throw new ControllerTaskControlError(
+          "CONTROLLER_COMMAND_NOT_ALLOWED",
+          `Controller command ${(command as { type?: unknown }).type ?? "UNKNOWN"} is not available through the frozen public Controller Contract.`,
+          409,
+        );
     }
   }
 
@@ -766,7 +797,7 @@ export function createTaskControlControllerAdapter(
       request.idempotencyKey,
     );
     const inputFingerprint = fingerprint({ request, identity });
-    const duplicate = replay<ControllerCommandResult>(scope, inputFingerprint);
+    const duplicate = await replay<ControllerCommandResult>(scope, inputFingerprint);
     if (duplicate !== null) return duplicate;
 
     const mappedCommand = await taskControlCall(() => mapCommand(request, identity));
@@ -815,8 +846,7 @@ export function createTaskControlControllerAdapter(
       createdRefs: [...result.workItemIds, ...result.dispatchIds],
       idempotentReplay: false,
     };
-    remember(scope, inputFingerprint, response);
-    return response;
+    return remember(scope, inputFingerprint, response);
   }
 
   async function releaseTask(
@@ -831,7 +861,7 @@ export function createTaskControlControllerAdapter(
       request.idempotencyKey,
     );
     const inputFingerprint = fingerprint({ request, identity });
-    const duplicate = replay<ReleaseControllerTaskResult>(scope, inputFingerprint);
+    const duplicate = await replay<ReleaseControllerTaskResult>(scope, inputFingerprint);
     if (duplicate !== null) return duplicate;
 
     const task = await taskControlCall(() =>
@@ -864,8 +894,7 @@ export function createTaskControlControllerAdapter(
       event: mapEvent(selectedEvent, sequence),
       idempotentReplay: false,
     };
-    remember(scope, inputFingerprint, response);
-    return response;
+    return remember(scope, inputFingerprint, response);
   }
 
   return {

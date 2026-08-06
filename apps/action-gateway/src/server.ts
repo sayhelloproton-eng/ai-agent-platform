@@ -15,6 +15,7 @@ import {
   DEFAULT_GATEWAY_MAX_CONCURRENT_TASKS,
 } from "./app.js";
 import { createConcurrencyGate } from "./concurrency.js";
+import { JsonFileControllerIdempotencySnapshotStore } from "./controller-idempotency-store.js";
 import { createTaskControlControllerAdapter } from "./task-control-controller-adapter.js";
 import { createHttpRuntimeClient } from "./runtime-client.js";
 
@@ -24,6 +25,8 @@ const DEFAULT_RUNTIME_URL = "http://127.0.0.1:8790";
 const DEFAULT_RUNTIME_TIMEOUT_MS = 3_000;
 const DEFAULT_CONTROLLER_PROFILE_ID = "ai-agent-platform-controller";
 const DEFAULT_TASK_CONTROL_STATE_PATH = ".runtime/task-control/state.json";
+const DEFAULT_CONTROLLER_IDEMPOTENCY_STATE_PATH =
+  ".runtime/task-control/controller-idempotency.json";
 const LOOPBACK_HOSTS = new Set(["127.0.0.1", "localhost", "::1"]);
 export const GATEWAY_HEADERS_TIMEOUT_MS = 10_000;
 export const GATEWAY_REQUEST_TIMEOUT_MS = 20_000;
@@ -102,10 +105,10 @@ function resolveMaximumConcurrency(input: string | undefined): number {
 }
 
 
-function resolveTaskControlStatePath(input: string | undefined): string {
-  const value = input?.trim() || DEFAULT_TASK_CONTROL_STATE_PATH;
+function resolveStatePath(input: string | undefined, fallback: string): string {
+  const value = input?.trim() || fallback;
   if (value.includes("\u0000") || value.includes("\n") || value.includes("\r")) {
-    throw new Error("Task Control state path contains invalid characters.");
+    throw new Error("Gateway state path contains invalid characters.");
   }
   return value;
 }
@@ -130,6 +133,7 @@ export interface ActionGatewayConfiguration {
   readonly maxConcurrentTasks: number;
   readonly controllerProfileId: string;
   readonly taskControlStatePath: string;
+  readonly controllerIdempotencyStatePath: string;
 }
 
 export function resolveActionGatewayConfiguration(
@@ -153,8 +157,13 @@ export function resolveActionGatewayConfiguration(
     controllerProfileId: resolveControllerProfileId(
       environment.ACTION_GATEWAY_CONTROLLER_PROFILE_ID,
     ),
-    taskControlStatePath: resolveTaskControlStatePath(
+    taskControlStatePath: resolveStatePath(
       environment.ACTION_GATEWAY_TASK_CONTROL_STATE_PATH,
+      DEFAULT_TASK_CONTROL_STATE_PATH,
+    ),
+    controllerIdempotencyStatePath: resolveStatePath(
+      environment.ACTION_GATEWAY_CONTROLLER_IDEMPOTENCY_STATE_PATH,
+      DEFAULT_CONTROLLER_IDEMPOTENCY_STATE_PATH,
     ),
   };
 }
@@ -170,7 +179,12 @@ export function configureGatewayServerTimeouts(server: Server): Server {
 export async function startActionGateway(): Promise<void> {
   try {
     const configuration = resolveActionGatewayConfiguration(process.env);
-    await mkdir(dirname(configuration.taskControlStatePath), { recursive: true });
+    await Promise.all([
+      mkdir(dirname(configuration.taskControlStatePath), { recursive: true }),
+      mkdir(dirname(configuration.controllerIdempotencyStatePath), {
+        recursive: true,
+      }),
+    ]);
     const taskControlStore = await JsonFileTaskControlStore.open(
       configuration.taskControlStatePath,
     );
@@ -180,9 +194,16 @@ export async function startActionGateway(): Promise<void> {
       new RandomIdGenerator(),
     );
     await taskControlService.recoverAll();
+    const controllerIdempotencyStore =
+      await JsonFileControllerIdempotencySnapshotStore.open(
+        configuration.controllerIdempotencyStatePath,
+      );
     const controllerTaskControl = createTaskControlControllerAdapter(
       taskControlService,
-      { projectId: "ai-agent-platform" },
+      {
+        projectId: "ai-agent-platform",
+        idempotencyStore: controllerIdempotencyStore,
+      },
     );
     const runtimeClient = createHttpRuntimeClient({
       baseUrl: configuration.runtimeUrl,
