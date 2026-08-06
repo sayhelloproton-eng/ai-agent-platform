@@ -1,11 +1,15 @@
-import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
+import { mkdir, open, readFile, rename, stat, unlink, writeFile } from "node:fs/promises";
+import { hostname } from "node:os";
 import { dirname, resolve } from "node:path";
+import { randomUUID } from "node:crypto";
 
 import {
   DISPATCH_STATUSES,
   TASK_EVENT_TYPES,
   TASK_STATUSES,
   WORK_ITEM_STATUSES,
+  WORK_PROGRESS_STATUSES,
+  HOST_RESULT_STATUSES,
   type TaskAggregate,
   type TaskControlState,
 } from "./model.js";
@@ -114,6 +118,16 @@ function validateStateShape(value: unknown): TaskControlState {
     if (!Array.isArray(item.evidenceRefs)) throw new TypeError(`workItems.${key}.evidenceRefs must be an array.`);
     if (item.retryable === undefined) item.retryable = null;
     if (item.startedAt === undefined) item.startedAt = null;
+    if (item.progressStatus === undefined) item.progressStatus = "NONE";
+    if (!WORK_PROGRESS_STATUSES.includes(item.progressStatus as (typeof WORK_PROGRESS_STATUSES)[number])) {
+      throw new TypeError(`workItems.${key}.progressStatus is unsupported.`);
+    }
+    if (item.progressRef === undefined) item.progressRef = null;
+    if (item.progressSummary === undefined) item.progressSummary = null;
+    if (item.progressEvidenceRefs === undefined) item.progressEvidenceRefs = [];
+    if (!Array.isArray(item.progressEvidenceRefs)) {
+      throw new TypeError(`workItems.${key}.progressEvidenceRefs must be an array.`);
+    }
   }
 
   const dispatchSignals = value.dispatchSignals as Record<string, unknown>;
@@ -129,6 +143,9 @@ function validateStateShape(value: unknown): TaskControlState {
       throw new TypeError(`dispatchSignals.${key}.claimEpoch must be a non-negative safe integer.`);
     }
     if (signal.hostResultStatus === undefined) signal.hostResultStatus = "PENDING";
+    if (!HOST_RESULT_STATUSES.includes(signal.hostResultStatus as (typeof HOST_RESULT_STATUSES)[number])) {
+      throw new TypeError(`dispatchSignals.${key}.hostResultStatus is unsupported.`);
+    }
     if (signal.hostResultRef === undefined) signal.hostResultRef = null;
     if (signal.hostResultSummary === undefined) signal.hostResultSummary = null;
     if (signal.hostEvidenceRefs === undefined) signal.hostEvidenceRefs = [];
@@ -199,19 +216,78 @@ export class InMemoryTaskControlStore implements TaskControlStore {
   protected async beforeCommit(_draft: TaskControlState): Promise<void> {}
 }
 
+export interface JsonFileTaskControlStoreOptions {
+  readonly staleLockMs?: number;
+}
+
+interface StoreWriterLock {
+  readonly pid: number;
+  readonly hostname: string;
+  readonly token: string;
+  readonly acquiredAt: string;
+  readonly updatedAt: string;
+}
+
+function processIsAlive(pid: number): boolean {
+  if (!Number.isSafeInteger(pid) || pid <= 0) return false;
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    return (error as NodeJS.ErrnoException).code === "EPERM";
+  }
+}
+
+function parseWriterLock(raw: string): StoreWriterLock | null {
+  try {
+    const value = JSON.parse(raw) as Partial<StoreWriterLock>;
+    if (
+      !Number.isSafeInteger(value.pid) ||
+      typeof value.hostname !== "string" ||
+      typeof value.token !== "string" ||
+      typeof value.acquiredAt !== "string" ||
+      typeof value.updatedAt !== "string"
+    ) {
+      return null;
+    }
+    return value as StoreWriterLock;
+  } catch {
+    return null;
+  }
+}
+
 export class JsonFileTaskControlStore extends InMemoryTaskControlStore {
   private static readonly activeWriterPaths = new Set<string>();
+  private static readonly DEFAULT_STALE_LOCK_MS = 30_000;
 
   readonly filePath: string;
+  readonly lockPath: string;
+  private readonly lockToken: string;
+  private readonly staleLockMs: number;
   private closed = false;
 
-  private constructor(filePath: string, initialState: TaskControlState) {
+  private constructor(
+    filePath: string,
+    initialState: TaskControlState,
+    lockToken: string,
+    staleLockMs: number,
+  ) {
     super(initialState);
     this.filePath = filePath;
+    this.lockPath = `${filePath}.writer.lock`;
+    this.lockToken = lockToken;
+    this.staleLockMs = staleLockMs;
   }
 
-  static async open(filePath: string): Promise<JsonFileTaskControlStore> {
+  static async open(
+    filePath: string,
+    options: JsonFileTaskControlStoreOptions = {},
+  ): Promise<JsonFileTaskControlStore> {
     const resolvedPath = resolve(filePath);
+    const staleLockMs = options.staleLockMs ?? JsonFileTaskControlStore.DEFAULT_STALE_LOCK_MS;
+    if (!Number.isSafeInteger(staleLockMs) || staleLockMs < 0) {
+      throw new TypeError("staleLockMs must be a non-negative safe integer.");
+    }
     if (JsonFileTaskControlStore.activeWriterPaths.has(resolvedPath)) {
       throw new TaskControlError(
         "STORE_SINGLE_WRITER_REQUIRED",
@@ -219,17 +295,133 @@ export class JsonFileTaskControlStore extends InMemoryTaskControlStore {
         { filePath: resolvedPath },
       );
     }
-    let state = emptyTaskControlState();
+
+    await mkdir(dirname(resolvedPath), { recursive: true });
+    const lockToken = randomUUID();
+    await JsonFileTaskControlStore.acquireWriterLock(
+      `${resolvedPath}.writer.lock`,
+      lockToken,
+      staleLockMs,
+    );
+
     try {
-      const raw = await readFile(resolvedPath, "utf8");
-      state = validateStateShape(JSON.parse(raw));
+      let state = emptyTaskControlState();
+      try {
+        const raw = await readFile(resolvedPath, "utf8");
+        state = validateStateShape(JSON.parse(raw));
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+      }
+      JsonFileTaskControlStore.activeWriterPaths.add(resolvedPath);
+      return new JsonFileTaskControlStore(resolvedPath, state, lockToken, staleLockMs);
     } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+      await JsonFileTaskControlStore.releaseWriterLock(`${resolvedPath}.writer.lock`, lockToken);
+      throw error;
+    }
+  }
+
+  private static async acquireWriterLock(
+    lockPath: string,
+    token: string,
+    staleLockMs: number,
+  ): Promise<void> {
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      const now = new Date().toISOString();
+      const lock: StoreWriterLock = {
+        pid: process.pid,
+        hostname: hostname(),
+        token,
+        acquiredAt: now,
+        updatedAt: now,
+      };
+      try {
+        const handle = await open(lockPath, "wx", 0o600);
+        try {
+          await handle.writeFile(`${JSON.stringify(lock)}\n`, "utf8");
+        } finally {
+          await handle.close();
+        }
+        return;
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
+      }
+
+      let stale = false;
+      try {
+        const [raw, metadata] = await Promise.all([readFile(lockPath, "utf8"), stat(lockPath)]);
+        const existing = parseWriterLock(raw);
+        const ageMs = Date.now() - metadata.mtimeMs;
+        if (existing === null) {
+          stale = ageMs >= staleLockMs;
+        } else if (existing.hostname === hostname()) {
+          stale = !processIsAlive(existing.pid) || ageMs >= staleLockMs && !processIsAlive(existing.pid);
+        } else {
+          stale = ageMs >= staleLockMs;
+        }
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === "ENOENT") continue;
         throw error;
       }
+
+      if (!stale) {
+        throw new TaskControlError(
+          "STORE_SINGLE_WRITER_REQUIRED",
+          "Another OS process owns the JSON Task Control Store writer lock.",
+          { lockPath },
+        );
+      }
+
+      const stalePath = `${lockPath}.stale-${process.pid}-${Date.now()}-${randomUUID()}`;
+      try {
+        await rename(lockPath, stalePath);
+        await unlink(stalePath).catch(() => undefined);
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === "ENOENT") continue;
+        throw new TaskControlError(
+          "STORE_SINGLE_WRITER_REQUIRED",
+          "Stale JSON Task Control writer lock could not be recovered safely.",
+          { lockPath },
+        );
+      }
     }
-    JsonFileTaskControlStore.activeWriterPaths.add(resolvedPath);
-    return new JsonFileTaskControlStore(resolvedPath, state);
+    throw new TaskControlError(
+      "STORE_SINGLE_WRITER_REQUIRED",
+      "JSON Task Control writer lock could not be acquired.",
+      { lockPath },
+    );
+  }
+
+  private static async releaseWriterLock(lockPath: string, token: string): Promise<void> {
+    try {
+      const existing = parseWriterLock(await readFile(lockPath, "utf8"));
+      if (existing?.token === token) await unlink(lockPath);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+    }
+  }
+
+  private async assertAndRefreshWriterLock(): Promise<void> {
+    let existing: StoreWriterLock | null = null;
+    try {
+      existing = parseWriterLock(await readFile(this.lockPath, "utf8"));
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+    }
+    if (existing?.token !== this.lockToken) {
+      throw new TaskControlError(
+        "STORE_SINGLE_WRITER_REQUIRED",
+        "JSON Task Control Store writer lock was lost or replaced.",
+        { filePath: this.filePath, lockPath: this.lockPath },
+      );
+    }
+    const refreshed: StoreWriterLock = {
+      ...existing,
+      updatedAt: new Date().toISOString(),
+    };
+    await writeFile(this.lockPath, `${JSON.stringify(refreshed)}\n`, {
+      encoding: "utf8",
+      mode: 0o600,
+    });
   }
 
   async close(): Promise<void> {
@@ -237,6 +429,7 @@ export class JsonFileTaskControlStore extends InMemoryTaskControlStore {
     await this.snapshot();
     this.closed = true;
     JsonFileTaskControlStore.activeWriterPaths.delete(this.filePath);
+    await JsonFileTaskControlStore.releaseWriterLock(this.lockPath, this.lockToken);
   }
 
   protected override async beforeCommit(draft: TaskControlState): Promise<void> {
@@ -247,6 +440,7 @@ export class JsonFileTaskControlStore extends InMemoryTaskControlStore {
         { filePath: this.filePath },
       );
     }
+    await this.assertAndRefreshWriterLock();
     await mkdir(dirname(this.filePath), { recursive: true });
     const tempPath = `${this.filePath}.tmp-${process.pid}-${Date.now()}`;
     await writeFile(tempPath, `${JSON.stringify(draft, null, 2)}\n`, {

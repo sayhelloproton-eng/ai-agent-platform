@@ -38,6 +38,7 @@ export {
   TASK_EVENT_TYPES,
   TASK_STATUSES,
   WORK_ITEM_STATUSES,
+  WORK_PROGRESS_STATUSES,
   type ApprovalResolution,
   type AttentionType,
   type ClaimControllerInput,
@@ -47,6 +48,7 @@ export {
   type CompleteWorkItemInput,
   type ControllerClaim,
   type ControllerCommand,
+  type ControllerCommandReceipt,
   type CreatePlanNodeInput,
   type CreatePlanPayload,
   type CreateTaskInput,
@@ -71,6 +73,8 @@ export {
   type ReconcileResult,
   type ReportDispatchInput,
   type ReportHostResultInput,
+  type ReportUncertainHostResultInput,
+  type ReportWorkProgressInput,
   type ReportWorkFailureInput,
   type ReportWorkResultInput,
   type RetryWorkItemInput,
@@ -89,6 +93,7 @@ export {
   type TaskStatus,
   type WorkItem,
   type WorkItemStatus,
+  type WorkProgressStatus,
 } from "./model.js";
 export {
   RandomIdGenerator,
@@ -100,6 +105,7 @@ export {
   type TaskControlStore,
   type TaskIntakeApplicationPort,
   type WorkItemApplicationPort,
+  type TaskProjectionApplicationPort,
 } from "./ports.js";
 export {
   buildRoleAttentionInbox,
@@ -113,4 +119,5 @@ export {
   emptyTaskControlState,
   InMemoryTaskControlStore,
   JsonFileTaskControlStore,
+  type JsonFileTaskControlStoreOptions,
 } from "./store.js";

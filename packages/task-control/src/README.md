@@ -2,15 +2,15 @@
 
 | 文件 | 职责 |
 |---|---|
-| `model.ts` | TSK 领域对象、Task Intake、Work/Host 生命周期输入和内部枚举 |
+| `model.ts` | TSK 领域对象、Task Intake、稳定 Receipt、Work/Host 生命周期、非二值进度和内部枚举 |
 | `contracts.ts` | 现有 Decision Context snake_case 兼容映射；不是已裁决的唯一平台合同 |
-| `integration-proposals.ts` | Task Intake、CTL、LCL、BHR 候选跨域接口，仅供总控审计 |
+| `integration-proposals.ts` | Command Receipt、Projection、Task Intake、CTL、LCL、BHR、UNCERTAIN 与取消事件候选接口，仅供总控审计 |
 | `request-fingerprint.ts` | 幂等请求规范化与 SHA-256 指纹 |
 | `error.ts` | 领域错误、不变量断言与单 Writer 错误 |
 | `ports.ts` | Clock、ID、Store、Task Intake、WorkItem、Host Dispatch 与 Approval Application Port |
-| `store.ts` | 内存和原子 JSON 文件持久化 Adapter、旧状态安全迁移、单文件单 Writer 门禁 |
+| `store.ts` | 内存和原子 JSON 文件持久化 Adapter、旧状态安全迁移、PID/TTL 跨进程单 Writer 门禁 |
 | `policy.ts` | Plan 完成门禁、版本、Claim 和状态迁移策略 |
-| `service.ts` | Task Intake、Controller、Work、Approval、Dispatch/Host Result Application Service |
+| `service.ts` | Task Intake、稳定命令回执、Controller、Work Progress、Approval、Dispatch/Host Result/UNCERTAIN Application Service |
 | `reconciler.ts` | 确定性单 Task 调和器、Claim 回收事件、Host Result 恢复与重启扫描 |
 | `projections.ts` | Timeline、Role Attention、Dispatch Queue 与审计状态回放 |
 | `index.ts` | 包公开入口 |

@@ -7,12 +7,12 @@ npm ci
 npm run check:task-control
 ```
 
-正式仓库环境使用 Node.js 20。第二轮领域门禁包含原有测试、第一轮整改测试和 `tests/round2-remediation.test.mjs`。
+正式仓库环境使用 Node.js 20。最终领域门禁包含原有测试、两轮整改测试和 `tests/final-remediation.test.mjs`。
 
 预期至少：
 
 ```text
-43 tests passed
+55 tests passed
 0 failed
 ```
 
@@ -38,7 +38,7 @@ JsonFileTaskControlStore.open(path)
 store.close()
 ```
 
-同一进程内不得对同一路径打开第二个 Json Writer；否则返回 `STORE_SINGLE_WRITER_REQUIRED`。所有 Gateway、Worker、Host Adapter 必须共享同一个 TaskControlService/Store 实例，不能各自打开同一 JSON 文件。
+同一路径不得存在第二个 Json Writer，无论它位于同一进程还是另一个 OS 进程；否则返回 `STORE_SINGLE_WRITER_REQUIRED`。Writer Lock 包含 PID、hostname、Token 和更新时间。持锁进程死亡后，下一实例可以按陈旧锁规则恢复。所有 Gateway、Worker、Host Adapter 必须共享同一个 TaskControlService/Store 实例，不能各自打开同一 JSON 文件。
 
 ## 3. 正式 Task Intake
 
@@ -63,7 +63,20 @@ intakeTask
 
 相同请求重复提交稳定回放；不同请求复用 Key 返回 `IDEMPOTENCY_KEY_CONFLICT`。
 
-## 4. 单 Task 验证顺序
+
+## 4. 稳定 Command Receipt 与 Projection
+
+所有写 Application Port 都使用请求指纹和幂等账本保存首次执行结果。调用方必须遵守：
+
+```text
+command(...) → immutable first-execution receipt
+getCurrentTask / getCurrentWorkItem / getCurrentDispatch → current projection
+listTaskEvents → immutable timeline
+```
+
+不得通过重复发送旧命令来查询当前状态。首次、立即回放、状态变化后回放和重启回放必须得到同一回执。Controller Command 回执中的 Dispatch ID、WorkItem ID 和 Event ID 不得因后续 Reconcile 或状态变化而消失。
+
+## 5. 单 Task 验证顺序
 
 ```text
 intakeTask
@@ -86,7 +99,7 @@ intakeTask
 
 Delivery Ack 与 Host Result 是独立阶段。Controller Claim 后，BHR 仍可使用有效 Dispatch Claim Token 上报 Host Result。
 
-## 5. WorkItem 生命周期
+## 6. WorkItem 生命周期
 
 ```text
 PENDING
@@ -107,7 +120,7 @@ Work 完成只允许提交：
 
 禁止提交完整 Local Result、stdout/stderr 正文、命令 Payload 或任意 Body。
 
-## 6. Browser Dispatch 与 Host Result
+## 7. Browser Dispatch 与 Host Result
 
 正常链路：
 
@@ -128,7 +141,7 @@ claimDispatch
 - 旧 Claim Epoch 永远不能覆盖新 Claim；
 - Task Control 不保存 DOM、截图正文、Binding 或页面内部状态。
 
-## 7. 暂停、恢复与 Approval
+## 8. 暂停、恢复与 Approval
 
 ```text
 claimController
@@ -143,7 +156,7 @@ claimController
 
 Approval 领域通过 `ApprovalResolutionPort.resolveApproval()` 提交引用化结果；TSK 不保存 Approval 正文，也不自行判断审批。
 
-## 8. 节点插入
+## 9. 节点插入
 
 `INSERT_NODE_AFTER(anchor, inserted)` 的确定语义：
 
@@ -155,7 +168,31 @@ Approval 领域通过 `ApprovalResolutionPort.resolveApproval()` 提交引用化
 
 不允许“名称叫插入，实际只追加到数组末尾”。
 
-## 9. 恢复与调和
+## 10. 非二值进度与不确定副作用
+
+LCL 长任务可以通过：
+
+```text
+reportWorkProgress(ACCEPTED / PARTIAL)
+```
+
+回报已接受或部分进展。该操作只更新进度引用、摘要和 Evidence Ref，WorkItem 继续保持非终态，不能触发节点完成。
+
+BHR 对“网页副作用可能已经发生，但无法确认完成”的情况必须调用：
+
+```text
+reportUncertainHostResult
+```
+
+该状态：
+
+- 不走普通 `failHostResult`；
+- 不自动生成替代 Dispatch；
+- 保留命令指纹、执行阶段、页面身份引用和 Evidence Ref；
+- 将任务交给复核或人工接管；
+- 只有外部确认副作用未发生后，才允许由总控决定新的重试。
+
+## 11. 恢复与调和
 
 `recoverAll()` 会：
 
@@ -169,7 +206,7 @@ Approval 领域通过 `ApprovalResolutionPort.resolveApproval()` 提交引用化
 - 对暂停 Task 保留历史但不创建或领取新工作；
 - 保持等待中的外部结果，不伪造失败。
 
-## 10. 事故处理
+## 12. 事故处理
 
 - `TASK_VERSION_CONFLICT`：重新读取最新 Task，不覆盖写；
 - `PLAN_VERSION_CONFLICT`：重新读取最新 Plan；
@@ -178,10 +215,11 @@ Approval 领域通过 `ApprovalResolutionPort.resolveApproval()` 提交引用化
 - `CLAIM_TOKEN_INVALID`：检查是否使用了旧 Epoch 或错误阶段 Token；
 - `STORE_SINGLE_WRITER_REQUIRED`：关闭重复 Store，让所有 Adapter 共享唯一 Writer；
 - `HOST_DISPATCH_FAILED`：保留 Task 业务状态，由 Reconciler 或总控决定重试；
+- `UNCERTAIN_SIDE_EFFECT`：禁止自动重发，保留证据并转人工/总控复核；
 - 状态文件损坏：停止写入，保留原文件，从备份恢复；
 - Task 与 Plan 不一致：停止自动推进，按 Event Timeline 审计。
 
-## 11. 不允许的操作
+## 13. 不允许的操作
 
 - Gateway 直接写 Store 或使用测试 Fixture 创建正式 Task；
 - 多个进程直接写同一 JSON 状态文件；

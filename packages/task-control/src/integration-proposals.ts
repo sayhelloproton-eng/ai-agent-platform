@@ -12,8 +12,30 @@ import type {
  * cross-domain audit accepts a version in packages/contracts.
  */
 export const TASK_CONTROL_INTEGRATION_PROPOSAL_VERSION =
-  "2026-08-06-round2-candidate" as const;
+  "2026-08-06-final-domain-candidate" as const;
 
+
+
+export interface StableCommandReceiptProposal {
+  readonly proposalVersion: typeof TASK_CONTROL_INTEGRATION_PROPOSAL_VERSION;
+  readonly operation: string;
+  readonly idempotencyKey: string;
+  readonly requestFingerprint: string;
+  readonly firstCommittedTaskVersion: number | null;
+  readonly firstCommittedPlanVersion: number | null;
+  readonly eventIds: readonly string[];
+  readonly entityRefs: readonly string[];
+  readonly createdAt: string;
+}
+
+export interface CurrentProjectionProposal {
+  readonly taskId: string;
+  readonly taskVersion: number;
+  readonly planVersion: number | null;
+  readonly taskStatus: string;
+  readonly currentNodeId: string | null;
+  readonly latestEventCursor: string | null;
+}
 
 export interface TaskIntakeProposal {
   readonly proposalVersion: typeof TASK_CONTROL_INTEGRATION_PROPOSAL_VERSION;
@@ -78,6 +100,18 @@ export interface LocalWorkCompletionProposal {
   readonly idempotencyKey: string;
 }
 
+
+export interface LocalWorkProgressProposal {
+  readonly workItemId: string;
+  readonly expectedTaskVersion: number;
+  readonly claimToken: string;
+  readonly progress: "accepted" | "partial";
+  readonly progressRef: string | null;
+  readonly progressSummary: string | null;
+  readonly evidenceRefs: readonly string[];
+  readonly idempotencyKey: string;
+}
+
 export interface BrowserDispatchProposal {
   readonly proposalVersion: typeof TASK_CONTROL_INTEGRATION_PROPOSAL_VERSION;
   readonly dispatchId: string;
@@ -116,6 +150,30 @@ export interface BrowserHostResultProposal {
   readonly errorCode: string | null;
   readonly errorSummary: string | null;
   readonly idempotencyKey: string;
+}
+
+
+export interface BrowserUncertainSideEffectProposal {
+  readonly dispatchId: string;
+  readonly claimToken: string;
+  readonly commandFingerprint: string;
+  readonly executionStage: string;
+  readonly pageIdentityRef: string;
+  readonly evidenceRefs: readonly string[];
+  readonly summary: string;
+  readonly idempotencyKey: string;
+  readonly autoRetryAllowed: false;
+}
+
+export interface CancellationEventProposal {
+  readonly taskId: string;
+  readonly taskVersion: number;
+  readonly cancelledEntityType: "work_item" | "dispatch";
+  readonly cancelledEntityId: string;
+  readonly reason: string;
+  readonly triggerCommandRef: string | null;
+  readonly triggerEventId: string | null;
+  readonly occurredAt: string;
 }
 
 export function toControllerInputProposal(

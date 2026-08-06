@@ -57,6 +57,20 @@ Dispatch Claim
 - `materializeHostCommand()` 只返回 Host Command 所需的稳定引用和目标，不保存 DOM、截图正文或浏览器 Binding；
 - Host Result 只保存 `hostResultRef`、摘要和 `evidenceRefs`。
 
+### 稳定 Command Receipt 与 Current Projection
+
+- Intake、Controller Command、Controller Claim/Release、Work Claim/Start/Complete/Progress/Fail/Retry/Expire、Approval Resolution、Dispatch Claim/Ack/Host Result/Uncertain/Fail 都把**首次提交结果快照**写入幂等账本；
+- 相同幂等请求的立即回放、实体状态变化后回放和 JSON Store 重启回放都返回首次快照，不重新读取当前可变实体；
+- Controller Command 首次产生的 WorkItem ID、Dispatch ID 和 Event ID 进入稳定 `ControllerCommandReceipt`；
+- 当前 Task、WorkItem、Dispatch 和 Event 必须通过 `TaskProjectionApplicationPort` 显式查询，不能把命令回执当作当前状态投影。
+
+### 非二值结果与安全接管
+
+- LCL `ACCEPTED/PARTIAL` 通过 `reportWorkProgress()` 进入非终态进度，WorkItem 保持 `RUNNING`，不会提前完成 Task；
+- BHR 可能已经产生网页副作用但无法确认时，通过 `reportUncertainHostResult()` 记录 `UNCERTAIN`；
+- `UNCERTAIN` 会阻断自动重发并把 Task 转为需要复核的阻断状态，保留命令指纹、执行阶段、页面身份引用和 Evidence Ref；
+- `UNCERTAIN` 不会被降级成普通 Delivery Failure，也不会由 Reconciler 自动创建替代 Dispatch。
+
 ### 一致性、恢复与读模型
 
 - Controller Claim、WorkItem Claim、Dispatch Claim 独立，并分别持久化递增 Epoch；
@@ -73,17 +87,22 @@ Dispatch Claim
 MVP 使用 `JsonFileTaskControlStore`：
 
 ```text
-单进程、单文件、单写者
-→ 事务串行
+单状态文件
+→ 跨进程 PID/Token Writer Lock
+→ 进程内事务串行
 → 完整状态克隆
 → 临时文件写入
 → 原子 rename 提交
 → 重启后重新读取
 ```
 
-同一状态文件在同一进程中只允许打开一个写 Store；第二个 Writer 返回 `STORE_SINGLE_WRITER_REQUIRED`。多个 Application Port 或 Adapter 可以共享同一个 Store 实例，所有写入通过 `transact()` 串行化，并继续由 Task/Plan Version 和 Event 顺序提供业务并发门禁。
+- 同一路径只能存在一个有效 Writer；同进程或另一 OS 进程误启动第二个 Writer 时显式返回 `STORE_SINGLE_WRITER_REQUIRED`；
+- Writer Lock 保存 PID、hostname、随机 Token、获取时间和更新时间；同主机 PID 已死亡或锁达到允许恢复条件时，可以安全回收陈旧锁；
+- 每次事务提交前重新校验 Lock Token，锁被替换时拒绝写入，避免失去所有权后继续覆盖状态；
+- 多个 Application Port 或 Adapter 必须共享同一个 Store/Service 实例，写入统一经过 `transact()`；
+- Task/Plan Version、Claim Epoch、Event Sequence 和幂等指纹继续承担业务并发门禁。
 
-该 Adapter 用于第二阶段本地 MVP，不宣称支持多进程写入。跨进程、多实例或多 Task 高并发前，应由总控确认迁移到 SQLite 单写者服务或 PostgreSQL；本轮没有引入第二套控制平面、消息队列或 Daemon。
+该 Adapter 现在可以显式阻止跨进程并发写导致的静默丢更新，但仍是本地单 Writer MVP，不是生产级共享数据库。多主机、高可用或大规模并发前，应由总控冻结 SQLite 单写服务或 PostgreSQL 迁移决策；本领域没有引入第二 Gateway、第二 Task Store、消息队列或 Daemon。
 
 `schema/sqlite.sql` 只是 TSK 内部最低迁移参考，不是已经批准的基础设施决策或跨领域公共合同。
 
@@ -100,10 +119,10 @@ npm run test --workspace @ai-agent-platform/task-control
 npm run check:task-control
 ```
 
-当前第二轮领域回归：
+当前最终领域回归：
 
 ```text
-43 tests passed
+55 tests passed
 0 failed
 ```
 
@@ -146,5 +165,5 @@ await service.recoverAll();
 - 不执行 LCL 命令或 BHR DOM 动作，只提供领域 Application Port 和候选映射；
 - 不实现通用 DAG、BPMN、Workflow DSL、优先级队列或生产消息总线；
 - Approval、Local Result、DOM、截图和 Binding 正文不进入 Task Control；
-- JSON 文件 Adapter 只适用于单进程、单状态文件、单 Writer MVP；
+- JSON 文件 Adapter 只适用于单状态文件、跨进程互斥的单 Writer MVP，不提供多主机共享写；
 - CTL/LCL/BHR 候选接口尚未进入 `packages/contracts`，不得描述为冻结公共合同。

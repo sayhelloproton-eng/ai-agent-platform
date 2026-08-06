@@ -6,6 +6,7 @@ import {
   type CompleteWorkItemInput,
   type ControllerClaim,
   type ControllerCommand,
+  type ControllerCommandReceipt,
   type CreateTaskInput,
   type DecisionContext,
   type ExpireWorkItemInput,
@@ -21,6 +22,8 @@ import {
   type PlanOperation,
   type ReportDispatchInput,
   type ReportHostResultInput,
+  type ReportUncertainHostResultInput,
+  type ReportWorkProgressInput,
   type ReportWorkFailureInput,
   type ReportWorkResultInput,
   type RetryWorkItemInput,
@@ -43,6 +46,7 @@ import type {
   TaskControlStore,
   TaskIntakeApplicationPort,
   WorkItemApplicationPort,
+  TaskProjectionApplicationPort,
 } from "./ports.js";
 import {
   allowedControllerCommands,
@@ -76,15 +80,6 @@ interface ControllerClaimResult {
   readonly claim: ControllerClaim;
   readonly taskVersion: number;
   readonly planVersion: number | null;
-}
-
-interface CommandResult {
-  readonly taskId: string;
-  readonly taskVersion: number;
-  readonly planVersion: number | null;
-  readonly eventIds: readonly string[];
-  readonly workItemIds: readonly string[];
-  readonly dispatchIds: readonly string[];
 }
 
 interface WorkClaimResult {
@@ -230,10 +225,27 @@ function removeValue(values: readonly string[], value: string): readonly string[
 function assertReference(value: string, path: string): void {
   assertNonEmpty(value, path);
   invariant(
-    value.length <= 2048 && !value.includes("\n") && !value.includes("\r"),
+    value.length <= 2048 &&
+      !value.includes("\n") &&
+      !value.includes("\r") &&
+      !/\s/.test(value) &&
+      (
+        /^[A-Za-z][A-Za-z0-9._-]*:[^\s]+$/.test(value) ||
+        /^[A-Za-z][A-Za-z0-9._-]*[-_.][A-Za-z0-9._-]+$/.test(value)
+      ),
     "INVALID_ARGUMENT",
-    `${path} must be a bounded reference, not inline result content.`,
+    `${path} must be a bounded stable reference, not inline result content.`,
     { path },
+  );
+}
+
+function assertBoundedSummary(value: string | undefined, path: string): void {
+  if (value === undefined) return;
+  invariant(
+    value.length <= 1024,
+    "INVALID_ARGUMENT",
+    `${path} must be a bounded summary, not inline result content.`,
+    { path, length: value.length },
   );
 }
 
@@ -432,11 +444,60 @@ function activeControllerDispatches(state: TaskControlState, taskId: string): Di
     (signal) =>
       signal.taskId === taskId &&
       signal.signalType === "CONTROLLER_WAKE" &&
-      ["PENDING", "CLAIMED", "DELIVERED"].includes(signal.status),
+      (["PENDING", "CLAIMED", "DELIVERED"].includes(signal.status) ||
+        signal.hostResultStatus === "UNCERTAIN"),
   );
 }
 
-export class TaskControlService implements TaskIntakeApplicationPort, WorkItemApplicationPort, HostDispatchApplicationPort {
+function createControllerDispatchRecord(
+  state: TaskControlState,
+  task: TaskAggregate,
+  now: string,
+  ids: IdGenerator,
+): DispatchSignal {
+  const signalId = ids.next("dispatch");
+  const signal: DispatchSignal = {
+    signalId,
+    taskId: task.taskId,
+    createdFromTaskVersion: task.taskVersion,
+    signalType: "CONTROLLER_WAKE",
+    targetRole: task.requiredRole,
+    targetProfileRef: null,
+    conversationRef: task.conversationRef,
+    hostCommandType: task.conversationRef === null ? "OPEN_ROLE_SESSION" : "CONTINUE_SESSION",
+    hostCommandRef: `host-command:${signalId}`,
+    workItemId: null,
+    status: "PENDING",
+    claimEpoch: 0,
+    claim: null,
+    attemptCount: 0,
+    idempotencyKey: `controller-wake:${task.taskId}:${task.taskVersion}`,
+    createdAt: now,
+    deliveredAt: null,
+    hostResultStatus: "PENDING",
+    hostResultRef: null,
+    hostResultSummary: null,
+    hostEvidenceRefs: [],
+    reportedAt: null,
+    lastError: null,
+  };
+  state.dispatchSignals[signalId] = signal;
+  return signal;
+}
+
+function shouldMaterializeControllerDispatch(
+  state: TaskControlState,
+  task: TaskAggregate,
+): boolean {
+  return (
+    task.controllerClaim === null &&
+    task.status !== "PAUSED" &&
+    ["PLAN_REQUIRED", "READY_FOR_CONTROLLER", "BLOCKED"].includes(task.status) &&
+    activeControllerDispatches(state, task.taskId).length === 0
+  );
+}
+
+export class TaskControlService implements TaskIntakeApplicationPort, WorkItemApplicationPort, HostDispatchApplicationPort, TaskProjectionApplicationPort {
   readonly reconciler: TaskReconciler;
 
   constructor(
@@ -777,14 +838,14 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
   ): Promise<TaskAggregate> {
     const scope = `controller.release:${taskId}`;
     const fingerprint = requestFingerprint({ taskId, claimToken, producerRef });
-    await this.store.transact((state) => {
-      const duplicate = idempotencyGet<{ taskId: string }>(
+    const receipt = await this.store.transact((state) => {
+      const duplicate = idempotencyGet<TaskAggregate>(
         state,
         scope,
         idempotencyKey,
         fingerprint,
       );
-      if (duplicate !== undefined) return;
+      if (duplicate !== undefined) return duplicate;
       const current = state.tasks[taskId];
       invariant(current !== undefined, "TASK_NOT_FOUND", "Task was not found.", { taskId });
       this.assertActiveControllerClaim(current, claimToken);
@@ -808,19 +869,20 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
       );
       task = { ...task, latestEventId: released.eventId };
       state.tasks[taskId] = task;
-      idempotencyPut(state, scope, idempotencyKey, fingerprint, { taskId }, now);
+      idempotencyPut(state, scope, idempotencyKey, fingerprint, task as unknown as JsonValue, now);
+      return task;
     });
     await this.reconciler.reconcile(taskId);
-    return this.getTask(taskId);
+    return receipt;
   }
 
-  async submitControllerCommand(input: SubmitControllerCommandInput): Promise<CommandResult> {
+  async submitControllerCommand(input: SubmitControllerCommandInput): Promise<ControllerCommandReceipt> {
     assertContractVersion(input.commandContractVersion);
     assertNonEmpty(input.idempotencyKey, "idempotencyKey");
     const scope = `controller.command:${input.taskId}`;
     const fingerprint = requestFingerprint(input);
     const result = await this.store.transact((state) => {
-      const duplicate = idempotencyGet<CommandResult>(
+      const duplicate = idempotencyGet<ControllerCommandReceipt>(
         state,
         scope,
         input.idempotencyKey,
@@ -975,6 +1037,10 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
             errorCode: null,
             errorSummary: null,
             retryable: null,
+            progressStatus: "NONE",
+            progressRef: null,
+            progressSummary: null,
+            progressEvidenceRefs: [],
             createdAt: now,
             claimedAt: null,
             startedAt: null,
@@ -1135,6 +1201,7 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
       };
       assertTaskConsistency(task);
       const eventIds: string[] = [];
+      const dispatchIds: string[] = [];
       let causationId = input.causationId ?? current.latestEventId;
       for (const spec of eventSpecs) {
         const item = appendEvent(
@@ -1166,15 +1233,32 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
         eventIds.push(item.eventId);
         causationId = item.eventId;
       }
+      if (shouldMaterializeControllerDispatch(state, task)) {
+        const signal = createControllerDispatchRecord(state, task, now, this.ids);
+        dispatchIds.push(signal.signalId);
+        const item = appendEvent(
+          state,
+          task,
+          "HOST_DISPATCH_CREATED",
+          "task-control-command-outbox",
+          { dispatchIds: [signal.signalId], sourceCommand: input.command.type },
+          now,
+          this.ids,
+          input.correlationId ?? null,
+          causationId,
+        );
+        eventIds.push(item.eventId);
+        causationId = item.eventId;
+      }
       task = { ...task, latestEventId: causationId };
       state.tasks[task.taskId] = task;
-      const commandResult: CommandResult = {
+      const commandResult: ControllerCommandReceipt = {
         taskId: task.taskId,
         taskVersion: task.taskVersion,
         planVersion: task.plan?.planVersion ?? null,
         eventIds,
         workItemIds,
-        dispatchIds: [],
+        dispatchIds,
       };
       idempotencyPut(
         state,
@@ -1187,12 +1271,8 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
       return commandResult;
     });
 
-    const reconciled = await this.reconciler.reconcile(input.taskId);
-    return {
-      ...result,
-      taskVersion: reconciled.taskVersion,
-      dispatchIds: reconciled.createdDispatchIds,
-    };
+    await this.reconciler.reconcile(input.taskId);
+    return result;
   }
 
   async listAvailableWork(roleId?: string): Promise<readonly WorkItem[]> {
@@ -1331,17 +1411,13 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
     const scope = `work.start:${input.workItemId}`;
     const fingerprint = requestFingerprint(input);
     return this.store.transact((state) => {
-      const duplicate = idempotencyGet<{ workItemId: string }>(
+      const duplicate = idempotencyGet<WorkItem>(
         state,
         scope,
         input.idempotencyKey,
         fingerprint,
       );
-      if (duplicate !== undefined) {
-        const existing = state.workItems[duplicate.workItemId];
-        invariant(existing !== undefined, "WORK_ITEM_NOT_FOUND", "Work Item was not found.");
-        return existing;
-      }
+      if (duplicate !== undefined) return duplicate;
       const item = state.workItems[input.workItemId];
       invariant(item !== undefined, "WORK_ITEM_NOT_FOUND", "Work Item was not found.", {
         workItemId: input.workItemId,
@@ -1383,10 +1459,90 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
         scope,
         input.idempotencyKey,
         fingerprint,
-        { workItemId: item.workItemId },
+        started as unknown as JsonValue,
         now,
       );
       return started;
+    });
+  }
+
+  async reportWorkProgress(input: ReportWorkProgressInput): Promise<WorkItem> {
+    assertContractVersion(input.contractVersion);
+    assertNoInlineResultBody(input, "work.progress");
+    if (input.progressRef !== undefined) assertReference(input.progressRef, "progressRef");
+    const scope = `work.progress:${input.workItemId}:${input.progress.toLowerCase()}`;
+    const fingerprint = requestFingerprint(input);
+    return this.store.transact((state) => {
+      const duplicate = idempotencyGet<WorkItem>(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+      );
+      if (duplicate !== undefined) return duplicate;
+      const item = state.workItems[input.workItemId];
+      invariant(item !== undefined, "WORK_ITEM_NOT_FOUND", "Work Item was not found.", {
+        workItemId: input.workItemId,
+      });
+      this.assertActiveLease(item.claim, input.claimToken);
+      invariant(
+        item.status === "CLAIMED" || item.status === "RUNNING",
+        "COMMAND_NOT_ALLOWED",
+        "Only active Work Items can report non-terminal progress.",
+      );
+      const current = state.tasks[item.taskId];
+      invariant(current !== undefined, "TASK_NOT_FOUND", "Task was not found.", { taskId: item.taskId });
+      assertExpectedVersions(current, input.expectedTaskVersion);
+      invariant(!isTerminalTaskStatus(current.status), "COMMAND_NOT_ALLOWED", "Terminal Task cannot accept Work progress.");
+      invariant(
+        current.plan?.currentNodeId === item.planNodeId,
+        "COMMAND_NOT_ALLOWED",
+        "Work progress does not belong to the current Plan Node.",
+      );
+      const now = this.clock.now().toISOString();
+      const evidenceRefs = assertEvidenceRefs(input.evidenceRefs, "evidenceRefs");
+      const progressed: WorkItem = {
+        ...item,
+        status: "RUNNING",
+        startedAt: item.startedAt ?? now,
+        progressStatus: input.progress,
+        progressRef: input.progressRef ?? null,
+        progressSummary: input.summary ?? null,
+        progressEvidenceRefs: evidenceRefs,
+      };
+      state.workItems[item.workItemId] = progressed;
+      let task: TaskAggregate = {
+        ...current,
+        taskVersion: current.taskVersion + 1,
+        updatedAt: now,
+      };
+      const event = appendEvent(
+        state,
+        task,
+        input.progress === "ACCEPTED" ? "ROLE_WORK_ACCEPTED" : "ROLE_WORK_PARTIAL",
+        input.producerRef,
+        {
+          workItemId: item.workItemId,
+          progressRef: input.progressRef ?? null,
+          summary: input.summary ?? "",
+          evidenceRefs,
+        },
+        now,
+        this.ids,
+        input.correlationId ?? null,
+        current.latestEventId,
+      );
+      task = { ...task, latestEventId: event.eventId };
+      state.tasks[task.taskId] = task;
+      idempotencyPut(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+        progressed as unknown as JsonValue,
+        now,
+      );
+      return progressed;
     });
   }
 
@@ -1424,14 +1580,14 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
   ): Promise<TaskAggregate> {
     const scope = `work.report:${input.workItemId}:${succeeded ? "success" : "failure"}`;
     const fingerprint = requestFingerprint({ ...input, succeeded });
-    const taskId = await this.store.transact((state) => {
-      const duplicate = idempotencyGet<{ taskId: string }>(
+    const receipt = await this.store.transact((state) => {
+      const duplicate = idempotencyGet<TaskAggregate>(
         state,
         scope,
         input.idempotencyKey,
         fingerprint,
       );
-      if (duplicate !== undefined) return duplicate.taskId;
+      if (duplicate !== undefined) return duplicate;
       const item = state.workItems[input.workItemId];
       invariant(item !== undefined, "WORK_ITEM_NOT_FOUND", "Work Item was not found.", {
         workItemId: input.workItemId,
@@ -1547,13 +1703,13 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
         scope,
         input.idempotencyKey,
         fingerprint,
-        { taskId: task.taskId },
+        task as unknown as JsonValue,
         now,
       );
-      return task.taskId;
+      return task;
     });
-    await this.reconciler.reconcile(taskId);
-    return this.getTask(taskId);
+    await this.reconciler.reconcile(receipt.taskId);
+    return receipt;
   }
 
   async retryWorkItem(input: RetryWorkItemInput): Promise<WorkItem> {
@@ -1561,17 +1717,13 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
     const scope = `work.retry:${input.workItemId}`;
     const fingerprint = requestFingerprint(input);
     return this.store.transact((state) => {
-      const duplicate = idempotencyGet<{ workItemId: string }>(
+      const duplicate = idempotencyGet<WorkItem>(
         state,
         scope,
         input.idempotencyKey,
         fingerprint,
       );
-      if (duplicate !== undefined) {
-        const existing = state.workItems[duplicate.workItemId];
-        invariant(existing !== undefined, "WORK_ITEM_NOT_FOUND", "Work Item was not found.");
-        return existing;
-      }
+      if (duplicate !== undefined) return duplicate;
       const item = state.workItems[input.workItemId];
       invariant(item !== undefined, "WORK_ITEM_NOT_FOUND", "Work Item was not found.", {
         workItemId: input.workItemId,
@@ -1601,6 +1753,10 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
         errorCode: null,
         errorSummary: null,
         retryable: null,
+        progressStatus: "NONE",
+        progressRef: null,
+        progressSummary: null,
+        progressEvidenceRefs: [],
         claimedAt: null,
         startedAt: null,
         completedAt: null,
@@ -1646,7 +1802,7 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
         scope,
         input.idempotencyKey,
         fingerprint,
-        { workItemId: item.workItemId },
+        retried as unknown as JsonValue,
         now,
       );
       return retried;
@@ -1659,17 +1815,13 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
     const scope = `work.expire:${input.workItemId}`;
     const fingerprint = requestFingerprint(input);
     return this.store.transact((state) => {
-      const duplicate = idempotencyGet<{ workItemId: string }>(
+      const duplicate = idempotencyGet<WorkItem>(
         state,
         scope,
         input.idempotencyKey,
         fingerprint,
       );
-      if (duplicate !== undefined) {
-        const existing = state.workItems[duplicate.workItemId];
-        invariant(existing !== undefined, "WORK_ITEM_NOT_FOUND", "Work Item was not found.");
-        return existing;
-      }
+      if (duplicate !== undefined) return duplicate;
       const item = state.workItems[input.workItemId];
       invariant(item !== undefined, "WORK_ITEM_NOT_FOUND", "Work Item was not found.", {
         workItemId: input.workItemId,
@@ -1753,7 +1905,7 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
         scope,
         input.idempotencyKey,
         fingerprint,
-        { workItemId: item.workItemId },
+        expired as unknown as JsonValue,
         now,
       );
       return expired;
@@ -1763,18 +1915,21 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
   async resolveApproval(input: ResolveApprovalInput): Promise<TaskAggregate> {
     assertContractVersion(input.contractVersion);
     assertNonEmpty(input.approvalRef, "approvalRef");
+    assertNoInlineResultBody(input, "approval.resolve");
+    if (input.resultRef !== undefined) assertReference(input.resultRef, "resultRef");
+    assertBoundedSummary(input.summary, "summary");
     assertNonEmpty(input.producerRef, "producerRef");
     assertNonEmpty(input.idempotencyKey, "idempotencyKey");
     const scope = `approval.resolve:${input.taskId}:${input.approvalRef}`;
     const fingerprint = requestFingerprint(input);
-    const taskId = await this.store.transact((state) => {
-      const duplicate = idempotencyGet<{ taskId: string }>(
+    const receipt = await this.store.transact((state) => {
+      const duplicate = idempotencyGet<TaskAggregate>(
         state,
         scope,
         input.idempotencyKey,
         fingerprint,
       );
-      if (duplicate !== undefined) return duplicate.taskId;
+      if (duplicate !== undefined) return duplicate;
       const current = state.tasks[input.taskId];
       invariant(current !== undefined, "TASK_NOT_FOUND", "Task was not found.", {
         taskId: input.taskId,
@@ -1874,13 +2029,13 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
         scope,
         input.idempotencyKey,
         fingerprint,
-        { taskId: task.taskId },
+        task as unknown as JsonValue,
         now,
       );
-      return task.taskId;
+      return task;
     });
-    await this.reconciler.reconcile(taskId);
-    return this.getTask(taskId);
+    await this.reconciler.reconcile(receipt.taskId);
+    return receipt;
   }
 
   async listPendingDispatches(): Promise<readonly DispatchSignal[]> {
@@ -2023,17 +2178,13 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
     const scope = `dispatch.delivery:${input.signalId}:ack`;
     const fingerprint = requestFingerprint({ ...input, outcome: "delivered" });
     return this.store.transact((state) => {
-      const duplicate = idempotencyGet<{ signalId: string }>(
+      const duplicate = idempotencyGet<DispatchSignal>(
         state,
         scope,
         input.idempotencyKey,
         fingerprint,
       );
-      if (duplicate !== undefined) {
-        const existing = state.dispatchSignals[duplicate.signalId];
-        invariant(existing !== undefined, "DISPATCH_NOT_FOUND", "Dispatch Signal was not found.");
-        return existing;
-      }
+      if (duplicate !== undefined) return duplicate;
       const signal = state.dispatchSignals[input.signalId];
       invariant(signal !== undefined, "DISPATCH_NOT_FOUND", "Dispatch Signal was not found.", {
         signalId: input.signalId,
@@ -2050,7 +2201,7 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
           scope,
           input.idempotencyKey,
           fingerprint,
-          { signalId: signal.signalId },
+          signal as unknown as JsonValue,
           this.clock.now().toISOString(),
         );
         return signal;
@@ -2091,7 +2242,7 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
         scope,
         input.idempotencyKey,
         fingerprint,
-        { signalId: signal.signalId },
+        updatedSignal as unknown as JsonValue,
         now,
       );
       return updatedSignal;
@@ -2103,17 +2254,13 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
     const scope = `dispatch.delivery:${input.signalId}:fail`;
     const fingerprint = requestFingerprint({ ...input, outcome: "failed" });
     const result = await this.store.transact((state) => {
-      const duplicate = idempotencyGet<{ signalId: string }>(
+      const duplicate = idempotencyGet<DispatchSignal>(
         state,
         scope,
         input.idempotencyKey,
         fingerprint,
       );
-      if (duplicate !== undefined) {
-        const existing = state.dispatchSignals[duplicate.signalId];
-        invariant(existing !== undefined, "DISPATCH_NOT_FOUND", "Dispatch Signal was not found.");
-        return existing;
-      }
+      if (duplicate !== undefined) return duplicate;
       const signal = state.dispatchSignals[input.signalId];
       invariant(signal !== undefined, "DISPATCH_NOT_FOUND", "Dispatch Signal was not found.", {
         signalId: input.signalId,
@@ -2159,7 +2306,7 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
         scope,
         input.idempotencyKey,
         fingerprint,
-        { signalId: signal.signalId },
+        updatedSignal as unknown as JsonValue,
         now,
       );
       return updatedSignal;
@@ -2175,6 +2322,108 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
     return this.finishHostResult(input, true);
   }
 
+  async reportUncertainHostResult(input: ReportUncertainHostResultInput): Promise<DispatchSignal> {
+    assertContractVersion(input.contractVersion);
+    assertNoInlineResultBody(input, "host.uncertain");
+    assertNonEmpty(input.summary, "summary");
+    assertNonEmpty(input.stage, "stage");
+    assertReference(input.commandFingerprint, "commandFingerprint");
+    if (input.pageIdentityRef !== undefined) assertReference(input.pageIdentityRef, "pageIdentityRef");
+    const scope = `dispatch.host-result:${input.signalId}:uncertain`;
+    const fingerprint = requestFingerprint(input);
+    return this.store.transact((state) => {
+      const duplicate = idempotencyGet<DispatchSignal>(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+      );
+      if (duplicate !== undefined) return duplicate;
+      const signal = state.dispatchSignals[input.signalId];
+      invariant(signal !== undefined, "DISPATCH_NOT_FOUND", "Dispatch Signal was not found.", {
+        signalId: input.signalId,
+      });
+      this.assertActiveLease(signal.claim, input.claimToken);
+      invariant(signal.deliveredAt !== null, "COMMAND_NOT_ALLOWED", "Uncertain Host Result requires delivery acknowledgement.");
+      invariant(
+        (signal.status === "DELIVERED" || signal.status === "CONSUMED") &&
+          signal.hostResultStatus === "PENDING",
+        "COMMAND_NOT_ALLOWED",
+        "Dispatch cannot accept an uncertain Host Result in its current state.",
+      );
+      const current = state.tasks[signal.taskId];
+      invariant(current !== undefined, "TASK_NOT_FOUND", "Task was not found.", { taskId: signal.taskId });
+      const now = this.clock.now().toISOString();
+      const evidenceRefs = assertEvidenceRefs(input.evidenceRefs, "evidenceRefs");
+      const updatedSignal: DispatchSignal = {
+        ...signal,
+        status: "CONSUMED",
+        claim: null,
+        hostResultStatus: "UNCERTAIN",
+        hostResultRef: null,
+        hostResultSummary: input.summary,
+        hostEvidenceRefs: evidenceRefs,
+        reportedAt: now,
+        lastError: null,
+      };
+      state.dispatchSignals[signal.signalId] = updatedSignal;
+      let task: TaskAggregate = {
+        ...current,
+        taskVersion: current.taskVersion + 1,
+        status: "BLOCKED",
+        blockedReason: `UNCERTAIN_SIDE_EFFECT:${signal.signalId}`,
+        controllerClaim: null,
+        updatedAt: now,
+      };
+      let causationId = current.latestEventId;
+      const event = appendEvent(
+        state,
+        task,
+        "HOST_RESULT_UNCERTAIN",
+        input.producerRef,
+        {
+          signalId: signal.signalId,
+          stage: input.stage,
+          commandFingerprint: input.commandFingerprint,
+          pageIdentityRef: input.pageIdentityRef ?? null,
+          summary: input.summary,
+          evidenceRefs,
+          autoRetryAllowed: false,
+        },
+        now,
+        this.ids,
+        input.correlationId ?? null,
+        causationId,
+      );
+      causationId = event.eventId;
+      if (current.controllerClaim !== null) {
+        const released = appendEvent(
+          state,
+          task,
+          "CONTROLLER_CLAIM_RELEASED",
+          input.producerRef,
+          { claimId: current.controllerClaim.claimId, reason: "uncertain-side-effect" },
+          now,
+          this.ids,
+          input.correlationId ?? null,
+          causationId,
+        );
+        causationId = released.eventId;
+      }
+      task = { ...task, latestEventId: causationId };
+      state.tasks[task.taskId] = task;
+      idempotencyPut(
+        state,
+        scope,
+        input.idempotencyKey,
+        fingerprint,
+        updatedSignal as unknown as JsonValue,
+        now,
+      );
+      return updatedSignal;
+    });
+  }
+
   async failHostResult(input: FailHostResultInput): Promise<DispatchSignal> {
     assertContractVersion(input.contractVersion);
     assertNoInlineResultBody(input, "host.result");
@@ -2188,17 +2437,13 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
     const scope = `dispatch.host-result:${input.signalId}:${succeeded ? "success" : "failure"}`;
     const fingerprint = requestFingerprint({ ...input, succeeded });
     const result = await this.store.transact((state) => {
-      const duplicate = idempotencyGet<{ signalId: string }>(
+      const duplicate = idempotencyGet<DispatchSignal>(
         state,
         scope,
         input.idempotencyKey,
         fingerprint,
       );
-      if (duplicate !== undefined) {
-        const existing = state.dispatchSignals[duplicate.signalId];
-        invariant(existing !== undefined, "DISPATCH_NOT_FOUND", "Dispatch Signal was not found.");
-        return existing;
-      }
+      if (duplicate !== undefined) return duplicate;
       const signal = state.dispatchSignals[input.signalId];
       invariant(signal !== undefined, "DISPATCH_NOT_FOUND", "Dispatch Signal was not found.", {
         signalId: input.signalId,
@@ -2264,7 +2509,7 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
         scope,
         input.idempotencyKey,
         fingerprint,
-        { signalId: signal.signalId },
+        updatedSignal as unknown as JsonValue,
         now,
       );
       return updatedSignal;
@@ -2279,6 +2524,30 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
 
   async recoverAll() {
     return this.reconciler.recoverAll();
+  }
+
+  async getCurrentTask(taskId: string): Promise<TaskAggregate> {
+    return this.getTask(taskId);
+  }
+
+  async getCurrentWorkItem(workItemId: string): Promise<WorkItem> {
+    return this.store.read((state) => {
+      const item = state.workItems[workItemId];
+      invariant(item !== undefined, "WORK_ITEM_NOT_FOUND", "Work Item was not found.", { workItemId });
+      return item;
+    });
+  }
+
+  async getCurrentDispatch(signalId: string): Promise<DispatchSignal> {
+    return this.store.read((state) => {
+      const signal = state.dispatchSignals[signalId];
+      invariant(signal !== undefined, "DISPATCH_NOT_FOUND", "Dispatch Signal was not found.", { signalId });
+      return signal;
+    });
+  }
+
+  async listTaskEvents(taskId: string): Promise<readonly TaskEvent[]> {
+    return this.listEvents(taskId);
   }
 
   async getTaskTimeline(taskId: string): Promise<readonly TaskEvent[]> {

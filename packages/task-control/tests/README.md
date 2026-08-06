@@ -1,6 +1,6 @@
 # Task Control Tests
 
-当前共 43 个领域测试。
+当前共 55 个领域测试。
 
 ## 基础与第一轮整改
 
@@ -39,3 +39,17 @@
 - stale version 无状态和 Event 副作用；
 - Json Store 单文件单 Writer；
 - 重启后 Dispatch Claim 与 Host Result 补报。
+
+
+## 最终领域整改
+
+- 两个 OS 进程竞争同一 JSON Store 时第二 Writer 显式失败；
+- 带 PID 的陈旧跨进程锁可安全恢复；
+- Controller Command 的 Dispatch ID 在立即回放和重启回放中稳定；
+- Work Start、Claim、Release、Ack、Fail、Host Result、Approval 等命令回执在实体状态变化后保持首次快照；
+- CurrentProjection 通过独立查询 API 获取；
+- Approval 拒绝内联正文、换行、超长内容和伪引用；
+- 终止协调自动取消 WorkItem/Dispatch 时产生不可变取消事件；
+- BHR `UNCERTAIN` 阻止自动重发；
+- LCL `ACCEPTED/PARTIAL` 不提前完成 WorkItem；
+- Delivery Ack 回执在 Host Result 后仍保持首次 `DELIVERED` 快照。

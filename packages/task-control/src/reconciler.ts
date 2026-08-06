@@ -55,7 +55,8 @@ function activeControllerDispatch(
     (signal) =>
       signal.taskId === taskId &&
       signal.signalType === "CONTROLLER_WAKE" &&
-      ["PENDING", "CLAIMED", "DELIVERED"].includes(signal.status),
+      (["PENDING", "CLAIMED", "DELIVERED"].includes(signal.status) ||
+        signal.hostResultStatus === "UNCERTAIN"),
   );
 }
 
@@ -229,6 +230,28 @@ export class TaskReconciler {
         const cancelled = cancelCoordination(state, taskId, now);
         cancelledWorkItemIds.push(...cancelled.workItems);
         cancelledDispatchIds.push(...cancelled.dispatches);
+        for (const workItemId of cancelled.workItems) {
+          pendingEvents.push({
+            eventType: "WORK_ITEM_CANCELLED",
+            payload: {
+              workItemId,
+              reason: `task-${task.status.toLowerCase()}`,
+              triggerEventId: task.latestEventId,
+              triggerTaskVersion: task.taskVersion,
+            },
+          });
+        }
+        for (const signalId of cancelled.dispatches) {
+          pendingEvents.push({
+            eventType: "HOST_DISPATCH_CANCELLED",
+            payload: {
+              signalId,
+              reason: `task-${task.status.toLowerCase()}`,
+              triggerEventId: task.latestEventId,
+              triggerTaskVersion: task.taskVersion,
+            },
+          });
+        }
         changed ||= cancelled.workItems.length > 0 || cancelled.dispatches.length > 0;
       } else if (task.plan !== null && task.plan.currentNodeId !== null) {
         const currentIndex = task.plan.nodes.findIndex(
