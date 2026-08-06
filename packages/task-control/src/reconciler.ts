@@ -77,6 +77,11 @@ function createControllerDispatch(
     conversationRef: task.conversationRef,
     hostCommandType: task.conversationRef === null ? "OPEN_ROLE_SESSION" : "CONTINUE_SESSION",
     hostCommandRef: `host-command:${signalId}`,
+    browserActionType: task.conversationRef === null ? "OPEN_OR_RESUME_SESSION" : "CONTINUE_ROLE_SESSION",
+    payloadRef: null,
+    preconditions: {},
+    approvalRef: null,
+    expiresAt: new Date(Date.parse(now) + 5 * 60_000).toISOString(),
     workItemId: null,
     status: "PENDING",
     claimEpoch: 0,
@@ -85,6 +90,11 @@ function createControllerDispatch(
     idempotencyKey: `controller-wake:${task.taskId}:${task.taskVersion}`,
     createdAt: now,
     deliveredAt: null,
+    deliveryReceipt: null,
+    deliveryId: null,
+    reportToken: null,
+    reportTokenExpiresAt: null,
+    reportTokenConsumedAt: null,
     hostResultStatus: "PENDING",
     hostResultRef: null,
     hostResultSummary: null,
@@ -123,6 +133,8 @@ function cancelCoordination(
       ...signal,
       status: "CANCELLED",
       claim: null,
+      reportToken: null,
+      reportTokenExpiresAt: null,
     };
     dispatches.push(id);
   }

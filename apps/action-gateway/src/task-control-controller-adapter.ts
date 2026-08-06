@@ -54,6 +54,8 @@ const FORMAL_ADAPTER_COMMANDS = new Set<ControllerCommandType>([
   "CREATE_PLAN",
   "REVISE_PLAN",
   "ADVANCE_PLAN_NODE",
+  "REQUEST_ROLE_WORK",
+  "REQUEST_APPROVAL",
   "BLOCK_TASK",
   "COMPLETE_TASK",
 ]);
@@ -132,10 +134,15 @@ export interface ControllerTaskControlService {
   ): Promise<TaskAggregate>;
 }
 
+export interface ApprovalGrantRegistrar {
+  putApprovalGrant(grant: import("@ai-agent-platform/contracts").ApprovalGrantV1): Promise<void>;
+}
+
 export interface TaskControlControllerAdapterOptions {
   readonly projectId?: string;
   readonly claimTtlMs?: number;
   readonly idempotencyStore: ControllerIdempotencySnapshotStore;
+  readonly approvalGrantRegistrar?: ApprovalGrantRegistrar;
 }
 
 function clone<T>(value: T): T {
@@ -568,8 +575,8 @@ export function createTaskControlControllerAdapter(
         })),
         constraints: [...new Set([
           ...context.constraints,
-          "REQUEST_ROLE_WORK is unavailable until target domain, capability, input reference, and result reference semantics are frozen.",
-          "REQUEST_APPROVAL is unavailable until a formal approval_ref producer and resolution contract are frozen.",
+          "REQUEST_ROLE_WORK uses targetDomain, capabilityRef/inputRef, expectedResultType, and reference-only result semantics from Phase 2 Integration Contract v1.",
+          "REQUEST_APPROVAL uses a stable approvalRef; Approval Grant bodies remain outside Task Store and are single-use when consumed by Browser Host.",
           "WAIT Plan Nodes are unavailable until the public waiting-state contract is frozen.",
           "INSERT_NODE_AFTER is supported through REVISE_PLAN and delegates dependency rewiring to formal Task Control.",
           "PAUSE, RESUME, and FAIL exist in Task Control but are not exposed by Controller Command v1; they require a public contract decision.",
@@ -795,17 +802,47 @@ export function createTaskControlControllerAdapter(
         };
       }
       case "REQUEST_ROLE_WORK":
-        throw new ControllerTaskControlError(
-          "CONTROLLER_COMMAND_NOT_ALLOWED",
-          "CONTRACT_NOT_FROZEN: REQUEST_ROLE_WORK requires capabilityRef, inputRef, expectedResultType, and Result Ref ownership that Controller Command v1 does not provide.",
-          409,
-        );
+        return {
+          type: "REQUEST_ROLE_WORK",
+          payload: {
+            nodeId: command.payload.nodeId,
+            targetDomain: command.payload.targetDomain,
+            requiredRole: command.payload.requiredRole,
+            ...(command.payload.capabilityRef === undefined
+              ? {}
+              : { capabilityRef: command.payload.capabilityRef }),
+            ...(command.payload.inputRef === undefined
+              ? {}
+              : { inputRef: command.payload.inputRef }),
+            expectedResultType: command.payload.expectedResultType,
+            ...(command.payload.targetProfileRef === undefined
+              ? {}
+              : { targetProfileRef: command.payload.targetProfileRef }),
+            ...(command.payload.conversationRef === undefined
+              ? {}
+              : { conversationRef: command.payload.conversationRef }),
+            ...(command.payload.hostActionType === undefined
+              ? {}
+              : { hostActionType: command.payload.hostActionType }),
+            ...(command.payload.preconditions === undefined
+              ? {}
+              : { preconditions: command.payload.preconditions }),
+            ...(command.payload.approvalRef === undefined
+              ? {}
+              : { approvalRef: command.payload.approvalRef }),
+            ...(command.payload.expiresAt === undefined
+              ? {}
+              : { expiresAt: command.payload.expiresAt }),
+          },
+        };
       case "REQUEST_APPROVAL":
-        throw new ControllerTaskControlError(
-          "CONTROLLER_COMMAND_NOT_ALLOWED",
-          "CONTRACT_NOT_FROZEN: REQUEST_APPROVAL requires an Approval Ref producer and resolution lifecycle that Controller Command v1 does not provide.",
-          409,
-        );
+        return {
+          type: "REQUEST_APPROVAL",
+          payload: {
+            nodeId: command.payload.nodeId,
+            approvalRef: command.payload.approvalRef,
+          },
+        };
       default:
         throw new ControllerTaskControlError(
           "CONTROLLER_COMMAND_NOT_ALLOWED",
@@ -921,6 +958,9 @@ export function createTaskControlControllerAdapter(
       request,
     );
     if (recovered !== null) {
+      if (request.command.type === "REQUEST_APPROVAL" && request.command.payload.grant !== undefined) {
+        await options.approvalGrantRegistrar?.putApprovalGrant(request.command.payload.grant);
+      }
       return remember(scope, inputFingerprint, recovered);
     }
 
@@ -950,6 +990,9 @@ export function createTaskControlControllerAdapter(
       );
     }
     const response = projectCommandReceipt(receipt, identity, request, false);
+    if (request.command.type === "REQUEST_APPROVAL" && request.command.payload.grant !== undefined) {
+      await options.approvalGrantRegistrar?.putApprovalGrant(request.command.payload.grant);
+    }
     return remember(scope, inputFingerprint, response);
   }
 

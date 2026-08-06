@@ -1,10 +1,25 @@
 # SOL-LCL-001｜Local Control 与 CLI MVP 技术方案
 
+## 2026-08-06 实现状态（当前有效）
+
+| 项目 | 当前结论 |
+|---|---|
+| 状态 | **Implemented / Integrated** |
+| Local Work 合同 | 跨域 Handoff `1.0.0`；Local Work Input 正式版 `1.0.0`，旧 `0.1.0-candidate` 仅兼容历史重放 |
+| 生产消费者 | `apps/action-gateway/src/local-work-worker.ts` |
+| 执行边界 | Worker Claim/Start Work Item 后，通过固定 `shell:false` CLI/Client 调用 Local Control |
+| 结果保存 | Result/Evidence 正文进入 Integration Store，TSK 只保存引用、摘要和状态 |
+| 幂等 | Work Item + Attempt 派生执行键；重启后复用首次持久化结果 |
+| `PARTIAL` | 单次 Local Request 的终态；映射为 Work Item 的非终态进度，是否继续由总控依据 Cursor/Completion Policy 决定 |
+
+同步查询仍可直接调用；需要跨回合、调度、恢复或结果回挂的请求使用正式 Work Item Worker。Local Control 不因此获得 Task、Plan 或工作流所有权。
+
+
 | 字段 | 值 |
 |---|---|
 | 方案 ID | `SOL-LCL-001` |
-| 状态 | Candidate |
-| 版本 | `0.2.0-draft` |
+| 状态 | Implemented / Integrated |
+| 版本 | `1.0.0` |
 | 所属阶段 | 第二阶段 MVP-2 |
 | 核心领域 | Local Control / Local Resource Access |
 | 第一消费者 | 总控 Custom GPT，经唯一 Gateway 调用 |
@@ -141,14 +156,20 @@ aap-local invoke --input - --output json
 
 Gateway 通过锁文件和精确版本调用本地已安装包，不在每次请求时联网下载浮动版本。
 
-### 5.3 候选 HTTP 映射
+### 5.3 当前正式接入边界
+
+第二阶段没有新增第二个 Local Control HTTP 服务，也没有开放任意 `local.*` 公网路由。当前边界为：
 
 ```text
-POST /v1/local/queries
-POST /v1/local/commands
+异步 / 可恢复工作：Task Control Work Item
+→ Action Gateway 内置 Local Work Worker
+→ 固定版本 @ai-agent-platform/local-control Client / CLI
+
+历史兼容链路：POST /v1/tasks
+→ Local Runtime（不作为 Phase 2 Task Intake 或 Work Item 真源）
 ```
 
-`queries` 仅接收读取能力；`commands` 在 MVP 仅接收注册服务的 `ensure_running`。路径和 Operation ID 在四个 MVP 接口审计后冻结。
+后续若增加同步 `local.*` HTTP 映射，必须继续复用唯一 Gateway、公共认证和 Local Control 自身 Policy，不得把文件路径或 Shell 安全判断上移到 Gateway。
 
 ## 六、最小 Capability Catalog
 
@@ -428,14 +449,22 @@ Browser Host 不通过 DOM 搬运 Local Result。页面驱动与本机资源访�
 
 模型推理不进入 `local.*`。DeepSeek、手机模型和推理 Role Profile属于独立 Model Inference Port；Local Control只可提供设备或服务的确定性健康事实，不代理模型语义。
 
-## 十八、待联合审计事项
+## 十八、联合审计结论与后续兼容项
 
-- npm 包、二进制和合同正式版本；
-- 最终 HTTP 路径与 Action Operation ID；
-- Actor / Correlation 公共结构；
-- Result Ref 由 Gateway、Task Control 还是 Evidence 创建；
-- 合同提升到 `packages/contracts/` 的时机；
-- 现有 `apps/local-runtime` 的兼容或退役策略。
+已经冻结并实现：
+
+- npm 包 `@ai-agent-platform/local-control`、CLI `aap-local`、Local Work Handoff `1.0.0` 和 Local Work Input `1.0.0`；
+- TSK → Action Gateway Local Work Worker → Local Control 的生产消费链路；
+- Actor、Correlation、Payload Ref、Result Ref 和 Evidence Ref 的跨域边界；
+- Result/Evidence 正文由 Integration Store Sink 保存，Task Store 只保存引用；
+- 公共合同提升到 `packages/contracts/src/phase2-integration.ts`；
+- `PARTIAL` 在 Local Request 和 Work Item 两层的不同终态语义。
+
+后续兼容项：
+
+- `apps/local-runtime` 与 `POST /v1/tasks` 继续作为历史直通链路，不作为 Phase 2 调度真源；
+- 是否新增同步 `local.*` HTTP 路由需要独立合同变更，不阻塞当前四域闭环；
+- Artifact Store 产品化后可接管大结果和长期 Evidence 保留。
 
 ## 十九、来源与相关文档
 

@@ -367,35 +367,96 @@ function validateControllerCommand(
       break;
     }
     case "REQUEST_ROLE_WORK": {
-      rejectUnknownFields(payload, ["nodeId", "requiredRole", "objective", "expectedOutputContract"], "command.payload", issues);
+      rejectUnknownFields(
+        payload,
+        [
+          "nodeId",
+          "targetDomain",
+          "requiredRole",
+          "objective",
+          "capabilityRef",
+          "inputRef",
+          "expectedResultType",
+          "expectedOutputContract",
+          "targetProfileRef",
+          "conversationRef",
+          "hostActionType",
+          "preconditions",
+          "approvalRef",
+          "expiresAt",
+        ],
+        "command.payload",
+        issues,
+      );
       for (const [field, value] of [
         ["nodeId", payload.nodeId],
+        ["targetDomain", payload.targetDomain],
         ["requiredRole", payload.requiredRole],
         ["objective", payload.objective],
+        ["expectedResultType", payload.expectedResultType],
       ] as const) {
         if (!isNonEmptyString(value)) {
           valid = false;
           issue(issues, `command.payload.${field}`, "INVALID_STRING", "Must be a non-empty string.");
         }
       }
-      if (
-        payload.expectedOutputContract !== undefined &&
-        !isNonEmptyString(payload.expectedOutputContract)
-      ) {
+      for (const field of [
+        "capabilityRef",
+        "inputRef",
+        "expectedOutputContract",
+        "targetProfileRef",
+        "conversationRef",
+        "hostActionType",
+        "approvalRef",
+        "expiresAt",
+      ] as const) {
+        if (payload[field] !== undefined && !isNonEmptyString(payload[field])) {
+          valid = false;
+          issue(issues, `command.payload.${field}`, "INVALID_STRING", "Must be a non-empty string when supplied.");
+        }
+      }
+      if (payload.preconditions !== undefined && !isJsonObject(payload.preconditions)) {
         valid = false;
-        issue(issues, "command.payload.expectedOutputContract", "INVALID_STRING", "Must be a non-empty string.");
+        issue(issues, "command.payload.preconditions", "INVALID_JSON_OBJECT", "Must be a JSON object.");
+      }
+      if (payload.targetDomain === "local-control") {
+        if (!isNonEmptyString(payload.capabilityRef)) {
+          valid = false;
+          issue(issues, "command.payload.capabilityRef", "REQUIRED_FIELD", "Local Control work requires capabilityRef.");
+        }
+        if (!isNonEmptyString(payload.inputRef)) {
+          valid = false;
+          issue(issues, "command.payload.inputRef", "REQUIRED_FIELD", "Local Control work requires inputRef.");
+        }
+      }
+      if (payload.targetDomain === "browser-host") {
+        for (const field of ["targetProfileRef", "hostActionType", "expiresAt"] as const) {
+          if (!isNonEmptyString(payload[field])) {
+            valid = false;
+            issue(issues, `command.payload.${field}`, "REQUIRED_FIELD", "Browser Host work requires this field.");
+          }
+        }
       }
       break;
     }
     case "REQUEST_APPROVAL": {
-      rejectUnknownFields(payload, ["nodeId", "summary"], "command.payload", issues);
-      if (!isNonEmptyString(payload.nodeId)) {
-        valid = false;
-        issue(issues, "command.payload.nodeId", "INVALID_STRING", "Must be a non-empty string.");
+      rejectUnknownFields(payload, ["nodeId", "summary", "approvalRef", "grant"], "command.payload", issues);
+      for (const field of ["nodeId", "summary", "approvalRef"] as const) {
+        if (!isNonEmptyString(payload[field])) {
+          valid = false;
+          issue(issues, `command.payload.${field}`, "INVALID_STRING", "Must be a non-empty string.");
+        }
       }
-      if (!isNonEmptyString(payload.summary)) {
+      if (payload.grant !== undefined && !isJsonObject(payload.grant)) {
         valid = false;
-        issue(issues, "command.payload.summary", "INVALID_STRING", "Must be a non-empty string.");
+        issue(issues, "command.payload.grant", "INVALID_JSON_OBJECT", "Grant must be a JSON object.");
+      }
+      if (
+        isJsonObject(payload.grant) &&
+        payload.grant.approvalRef !== payload.approvalRef
+      ) {
+        valid = false;
+        issue(issues, "command.payload.grant.approvalRef", "APPROVAL_REF_MISMATCH", "Grant approvalRef must match command approvalRef.");
       }
       break;
     }

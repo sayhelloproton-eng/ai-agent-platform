@@ -63,6 +63,7 @@ export {
   type LocalControlTransportErrorCode,
 } from "./gateway-process-adapter.js";
 export {
+  LOCAL_WORK_V1_VERSION,
   LOCAL_REQUEST_ID_SEMANTICS,
   LOCAL_WORK_V1_PROPOSAL_VERSION,
   fingerprintLocalRequest,

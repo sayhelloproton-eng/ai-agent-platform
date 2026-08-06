@@ -1,14 +1,29 @@
 # SOL-CTL-001｜总控 Agent 与动态上下文 MVP 技术方案
 
+## 2026-08-06 实现状态（覆盖本文早期 Candidate 描述）
+
+| 项目 | 当前结论 |
+|---|---|
+| 状态 | **Implemented / Integrated** |
+| 公共合同 | Controller Contract `1.0.0` + Phase 2 Integration Contract `1.0.0` |
+| 运行状态真源 | 正式 `TaskControlService`，不再使用 Mock 作为综合链路真源 |
+| Gateway 路由 | `/v1/controller/task-context`、`task-claim`、`task-command`、`task-release` |
+| 已开放命令 | `CREATE_PLAN`、`REVISE_PLAN`、`ADVANCE_PLAN_NODE`、`REQUEST_ROLE_WORK`、`REQUEST_APPROVAL`、`BLOCK_TASK`、`COMPLETE_TASK` |
+| 幂等恢复 | 首次 Command Receipt 持久化重放；响应缓存故障后可从 Task Control Receipt 恢复 |
+| 跨域结果 | 仅消费 Result Ref、Evidence Ref 和摘要，不复制 LCL/BHR 正文 |
+
+当前总控已经能通过正式 Task Intake 创建的任务执行“先查后领”，并把 Local Work 与 Browser Host Work 作为受版本、Claim 和幂等约束的业务命令提交给 TSK。`REQUEST_APPROVAL` 可登记一次性 Approval Grant，但 Grant 正文不进入 Task Store。
+
+
 | 字段 | 值 |
 |---|---|
 | 方案 ID | `SOL-CTL-001` |
-| 状态 | Candidate（重写候选） |
+| 状态 | Implemented / Integrated |
 | 所属阶段 | 第二阶段 MVP-1 |
 | 文档类型 | Technical Design |
 | 核心领域 | Controller Agent / Agent Profile |
 | 第一宿主 | ChatGPT 网页端 Custom GPT |
-| 运行状态真源 | Task Control（MVP 使用 Mock） |
+| 运行状态真源 | Task Control（正式实现） |
 | 配置真源 | Git |
 | 后续衔接 | `SOL-LCL-001`、`SOL-TSK-001`、`SOL-BHR-001` |
 | Git-only | 是，不进入 `docs/knowledge/**`，不触发飞书发布 |
@@ -68,13 +83,13 @@ Local Control、Browser Host、Approval 各自守住自己的领域边界
 
 ```text
 Custom GPT 加载版本化总控配置
-→ 用户或 Mock 提供 task_id
+→ Task Intake、用户或测试 Fixture 提供 task_id
 → 总控查询 Task Decision Context
 → 总控判断角色、计划、节点、阻塞和最新事件
 → 总控领取短期处理权
 → 总控创建或修订结构化计划
 → 总控提交受约束的 Controller Command
-→ Mock Task Control 原子更新 Task + Plan + Event
+→ 正式 Task Control 原子更新 Task + Plan + Work / Dispatch + Event
 → 任务等待结果、审批或再次停滞
 → 新会话中的同角色总控重新查询并继续推进
 ```
@@ -94,11 +109,11 @@ Custom GPT 加载版本化总控配置
 
 ### 3.3 非目标
 
-- 不实现完整 Task Store、消息队列和生产调度器。
+- 不由 CTL 实现 Task Store、消息队列和生产调度器；这些能力由正式 TSK 领域提供。
 - 不实现多任务依赖图、并行计划和通用 Workflow DSL。
 - 不实现真实 Local Control 写操作或任意 Shell。
-- 不实现 Chrome 自动唤醒；MVP 允许人工或 Mock 输入 `task_id`。
-- 不实现正式飞书、微信或管理后台审批入口；只提供本地 Mock。
+- CTL 不直接操作 Chrome；自动唤醒和页面驱动由已接入的 BHR 领域负责。
+- 不实现飞书、微信或管理后台审批产品；综合层已提供受认证的 Approval Grant 签发与一次性消费接口。
 - 不实现自动发布或自动修改 Custom GPT 在线配置。
 - 不实现完整 RAG、向量库、图数据库或长期 Memory Framework。
 - 不把 ChatGPT 会话、GPT URL 或浏览器标签页作为任务状态真源。
@@ -881,7 +896,7 @@ PENDING → APPROVED / REJECTED
 - Claim 多次过期且没有有效 Command；
 - 计划节点形成无法推进的依赖关系。
 
-MVP 可由 Mock Task Control 使用确定性计数返回 `NO_PROGRESS`，不要求模型自行维护计数。
+正式 Task Control 可基于 Timeline、相同命令指纹、Claim 过期和无新证据次数确定性地产生 `NO_PROGRESS` 或人工复核信号；Mock 仅允许作为局部测试 Fixture，不再作为综合链路真源。
 
 ## 十二、MVP 最小实现
 
@@ -899,7 +914,7 @@ Controller MVP
 │   ├── Task Plan / Plan Node
 │   ├── Controller Claim
 │   └── Controller Command
-├── Mock Task Control Adapter
+├── Formal Task Control Adapter
 │   ├── context query
 │   ├── claim
 │   ├── command validation
@@ -916,7 +931,7 @@ Controller MVP
 ```text
 agent-profiles/**
 packages/contracts/**                    # 仅新增真实复用的合同与校验
-apps/action-gateway/**                   # Action Adapter / Mock Route
+apps/action-gateway/**                   # 正式 Action Adapter / Phase 2 Integration Routes
 apps/action-gateway/**/__fixtures__/**   # 或项目现有测试 Fixture 位置
 docs/technical/技术方案/第二阶段/**       # 方案、测试 Runbook、评估记录
 platform-registry/**                     # 仅登记物化后的资产和关系
@@ -924,9 +939,9 @@ platform-registry/**                     # 仅登记物化后的资产和关系
 
 具体实现路径必须在执行任务前基于最新仓库结构冻结；不得为了本 MVP 创建空壳目录、重复包或未被实际调用的通用框架。
 
-### 12.3 Mock Task
+### 12.3 正式 Task Control 与测试 Fixture
 
-MVP 使用一个可重置的单任务 Fixture，至少支持：
+自动化测试仍保留可重置的单任务 Fixture，但生产综合链路使用正式 Task Control。测试至少支持：
 
 - 有前置计划；
 - 无计划；
@@ -939,7 +954,7 @@ MVP 使用一个可重置的单任务 Fixture，至少支持：
 - 重复命令；
 - 非法计划操作。
 
-Mock 不是未来 Task Control 的内部实现承诺，只模拟公开合同和不变量。
+Fixture 只用于确定性测试，不是生产状态真源；生产链路以 TaskControlService 和持久化 Store 为准。
 
 ## 十三、验证场景
 
@@ -1024,12 +1039,13 @@ Task.plan = null
 → 返回第一次结果
 ```
 
-### 13.9 审批 Mock
+### 13.9 Approval Grant 与审批等待
 
 ```text
 总控提交 REQUEST_APPROVAL
 → Task 等待审批
-→ Mock APPROVED
+→ 受认证入口签发一次性 Approval Grant
+→ BHR 校验并消费 Grant，或审批领域回报 Resolution
 → 生成 Approval Event
 → 新一轮总控读取后继续计划
 ```
@@ -1142,7 +1158,7 @@ event_id / dispatch_ref
 1. 冻结本文与配置目录命名
 2. 建立 agent-profiles 最小四级配置
 3. 定义 Task Plan、Decision Context、Claim、Controller Command Schema
-4. 实现 Mock Task Control Adapter
+4. 实现并接入正式 Task Control Adapter
 5. 生成 Builder-compatible Action OpenAPI
 6. 人工更新一个 Controller Custom GPT
 7. 执行正常、失败、修订、接管、冲突和审批场景
@@ -1161,7 +1177,7 @@ event_id / dispatch_ref
 | 多总控竞争与抢占 | MVP 使用简单可过期 Claim；不做复杂分布式租约。 |
 | Action 操作是否继续拆分 | 先用四个高层 Operation，以 Builder 实测结果决定。 |
 | 自动同步 Custom GPT 配置 | 暂缓；先人工发布并记录 Hash、Commit 和验证证据。 |
-| 正式 Approval 入口 | 暂缓；MVP 使用本地 Mock。 |
+| 正式 Approval 入口 | 已提供 `/v1/approvals/grants` 与 BHR Get/Consume；管理后台审批产品仍暂缓。 |
 | RAG / 向量 / 图谱 | 非 MVP 必需；先用受控引用和按需读取。 |
 
 ## 十八、正式图信息图谱（正文 Review 后单独制作）

@@ -1,5 +1,19 @@
 # SOL-MOB-001｜手机端单模型多角色服务 MVP 技术方案
 
+## 2026-08-06 与四域综合实现的关系（当前有效）
+
+| 项目 | 当前结论 |
+|---|---|
+| 状态 | **Candidate / Optional / Independent** |
+| 是否进入四域 E2E | 否 |
+| 平台边界 | 只实现可替换 Model Inference Provider，不拥有 Task、Approval、工具执行或 Browser Action |
+| 当前消费者 | BHR 的观察解释与后续低风险结构化判断；核心链路可用确定性规则或 DeepSeek 代替 |
+| 合同要求 | 只能通过版本化 Inference Request/Result Ref 接入，不能直接读写 TSK 或 Integration Store |
+| MLXHub 评估 | 已确认 LAN Server 提供 Health、Status、Models、OpenAI 风格 Chat/Completion、SSE、多模态输入和标准错误 Envelope；是否作为正式手机 Provider 仍由 SOL-MOB 独立验收 |
+
+本轮综合修复没有把手机模型加入阶段完成门槛，也没有修改其独立实现。四域 E2E 的通过不能替代手机端功耗、前台常驻、队列、角色隔离和真实设备验收。
+
+
 | 字段 | 值 |
 |---|---|
 | 方案 ID | `SOL-MOB-001` |

@@ -14,7 +14,7 @@ Consumer 只接收已经授权的 `LocalWorkClaimInput`，不读取或解释 Tas
 
 ## Pure mapping
 
-`mapWorkClaimToLocalRequest()` 只处理 Local Work v1 候选字段，并从 Local Capability Catalog 得到固定执行模式。任何额外 Task / Plan / WorkItem 字段都会被拒绝。
+`mapWorkClaimToLocalRequest()` 只处理 Local Work Contract v1 字段，并从 Local Capability Catalog 得到固定执行模式。任何额外 Task / Plan / WorkItem 字段都会被拒绝。
 
 `request_id` 是传输尝试 ID。业务幂等身份是：
 
@@ -80,7 +80,7 @@ idempotency_key
 - `SUCCEEDED`：终态成功；
 - `FAILED`：终态失败，`error.retryable` 仅提供候选建议。
 
-公共 Work 状态映射由总纲冻结。
+公共 Work 状态映射已经由 Phase 2 Integration Contract `1.0.0` 冻结：`ACCEPTED/PARTIAL` 映射为非终态 Work Progress，`SUCCEEDED/FAILED` 映射为终态；`UNCERTAIN` 不属于 Local Result 状态。
 
 ## Transport behavior
 
@@ -94,4 +94,4 @@ idempotency_key
 
 `createLocalWorkContractTestFixture()` 提供稳定内存 Sink、Report Port、引用复用和 Report 失败注入，供总控直接验证统一 Worker 接线。它不是生产存储。
 
-正式候选字段、状态和待总控冻结项见 `LOCAL-WORK-V1-PROPOSAL.md`。
+正式字段与状态见 `packages/contracts/src/phase2-integration.ts` 和 `docs/technical/技术方案/第二阶段/SOL-INT-001-第二阶段四域综合集成与验收.md`。生产 Worker 位于 `apps/action-gateway/src/local-work-worker.ts`。

@@ -1,4 +1,5 @@
 import type { JsonObject } from "./json.js";
+import type { ApprovalGrantV1, BrowserHostActionType } from "./phase2-integration.js";
 
 export const CONTROLLER_CONTRACT_VERSION = "1.0.0" as const;
 export const CONTROLLER_ROLE_ID = "controller" as const;
@@ -236,9 +237,19 @@ export interface RequestRoleWorkCommand {
   readonly reasonSummary: string;
   readonly payload: {
     readonly nodeId: string;
+    readonly targetDomain: string;
     readonly requiredRole: string;
     readonly objective: string;
+    readonly capabilityRef?: string;
+    readonly inputRef?: string;
+    readonly expectedResultType: string;
     readonly expectedOutputContract?: string;
+    readonly targetProfileRef?: string;
+    readonly conversationRef?: string;
+    readonly hostActionType?: BrowserHostActionType;
+    readonly preconditions?: JsonObject;
+    readonly approvalRef?: string;
+    readonly expiresAt?: string;
   };
 }
 
@@ -248,6 +259,8 @@ export interface RequestApprovalCommand {
   readonly payload: {
     readonly nodeId: string;
     readonly summary: string;
+    readonly approvalRef: string;
+    readonly grant?: ApprovalGrantV1;
   };
 }
 

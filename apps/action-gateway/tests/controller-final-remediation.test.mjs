@@ -237,5 +237,7 @@ test("Controller profile declares only the adapter's actual command boundaries",
   assert.match(roleInstructions, /INSERT_NODE_AFTER/);
   assert.match(roleInstructions, /REQUEST_ROLE_WORK/);
   assert.match(actionIntent, /PAUSE、RESUME、FAIL/);
-  assert.doesNotMatch(actionIntent, /REQUEST_ROLE_WORK.*已支持/);
+  assert.match(actionIntent, /REQUEST_ROLE_WORK 与 REQUEST_APPROVAL 已支持/);
+  assert.match(actionIntent, /intakePhase2Task/);
+  assert.match(actionIntent, /issueApprovalGrant/);
 });

@@ -13,6 +13,8 @@ import {
 import { getCapabilityDescriptor } from "./capability-registry.js";
 import { validateLocalRequest } from "./request-validator.js";
 
+export const LOCAL_WORK_V1_VERSION = "1.0.0" as const;
+/** @deprecated accepted only for backward-compatible replay of pre-freeze callers. */
 export const LOCAL_WORK_V1_PROPOSAL_VERSION = "0.1.0-candidate" as const;
 
 /**
@@ -23,7 +25,7 @@ export const LOCAL_WORK_V1_PROPOSAL_VERSION = "0.1.0-candidate" as const;
 export const LOCAL_REQUEST_ID_SEMANTICS = "transport-attempt-id" as const;
 
 export interface LocalWorkClaimInput {
-  readonly local_work_version: typeof LOCAL_WORK_V1_PROPOSAL_VERSION;
+  readonly local_work_version: typeof LOCAL_WORK_V1_VERSION | typeof LOCAL_WORK_V1_PROPOSAL_VERSION;
   readonly request_id: string;
   readonly capability_ref: LocalCapability;
   readonly actor: LocalActor;
@@ -97,8 +99,11 @@ export function mapWorkClaimToLocalRequest(
       `Local Work input contains unsupported fields: ${unknownFields.join(", ")}.`,
     );
   }
-  if (input.local_work_version !== LOCAL_WORK_V1_PROPOSAL_VERSION) {
-    throw new TypeError("Local Work proposal version is unsupported.");
+  if (
+    input.local_work_version !== LOCAL_WORK_V1_VERSION &&
+    input.local_work_version !== LOCAL_WORK_V1_PROPOSAL_VERSION
+  ) {
+    throw new TypeError("Local Work v1 version is unsupported.");
   }
   if (
     typeof input.correlation_id !== "string" ||

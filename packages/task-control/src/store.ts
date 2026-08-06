@@ -142,6 +142,16 @@ function validateStateShape(value: unknown): TaskControlState {
     if (!Number.isSafeInteger(signal.claimEpoch) || Number(signal.claimEpoch) < 0) {
       throw new TypeError(`dispatchSignals.${key}.claimEpoch must be a non-negative safe integer.`);
     }
+    if (signal.browserActionType === undefined) signal.browserActionType = null;
+    if (signal.payloadRef === undefined) signal.payloadRef = null;
+    if (signal.preconditions === undefined) signal.preconditions = {};
+    if (signal.approvalRef === undefined) signal.approvalRef = null;
+    if (signal.expiresAt === undefined) signal.expiresAt = new Date(Date.now() + 5 * 60_000).toISOString();
+    if (signal.deliveryReceipt === undefined) signal.deliveryReceipt = null;
+    if (signal.deliveryId === undefined) signal.deliveryId = null;
+    if (signal.reportToken === undefined) signal.reportToken = null;
+    if (signal.reportTokenExpiresAt === undefined) signal.reportTokenExpiresAt = null;
+    if (signal.reportTokenConsumedAt === undefined) signal.reportTokenConsumedAt = null;
     if (signal.hostResultStatus === undefined) signal.hostResultStatus = "PENDING";
     if (!HOST_RESULT_STATUSES.includes(signal.hostResultStatus as (typeof HOST_RESULT_STATUSES)[number])) {
       throw new TypeError(`dispatchSignals.${key}.hostResultStatus is unsupported.`);

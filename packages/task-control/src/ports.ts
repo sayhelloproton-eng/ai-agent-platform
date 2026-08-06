@@ -30,6 +30,7 @@ export interface TaskIntakeApplicationPort {
 }
 
 export interface WorkItemApplicationPort {
+  listPendingWorkItems(targetDomain?: string): Promise<readonly WorkItem[]>;
   claimWorkItem(input: ClaimWorkItemApplicationInput): Promise<{ readonly workItem: WorkItem }>;
   startWorkItem(input: StartWorkItemInput): Promise<WorkItem>;
   completeWorkItem(input: CompleteWorkItemInput): Promise<TaskAggregate>;

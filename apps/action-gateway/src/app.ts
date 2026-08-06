@@ -7,6 +7,10 @@ import {
   validateGetTaskDecisionContextRequest,
   validateReleaseControllerTaskRequest,
   validateSubmitControllerCommandRequest,
+  validateTaskIntakeV1Request,
+  validateBrowserHostInvocationV1,
+  validateApprovalGrantV1,
+  type ApprovalGrantV1,
   validateTaskRequest,
   type TaskRequest,
   type TaskResult,
@@ -17,6 +21,7 @@ import {
   listAllowedCapabilities,
   type CapabilityPolicy,
 } from "@ai-agent-platform/policy";
+import { TaskControlError } from "@ai-agent-platform/task-control";
 import {
   randomUUID,
 } from "node:crypto";
@@ -33,6 +38,9 @@ import {
   type ConcurrencyGate,
 } from "./concurrency.js";
 import { ControllerTaskControlError } from "./controller-task-control-error.js";
+import { BrowserHostServerError, type BrowserHostServerPort } from "./browser-host-server-adapter.js";
+import type { Phase2TaskIntakePort } from "./phase2-task-intake.js";
+import { Phase2IntegrationStoreError } from "./phase2-integration-store.js";
 import type {
   ControllerIdentity,
   ControllerTaskControl,
@@ -57,6 +65,10 @@ const CONTROLLER_CONTEXT_ROUTE = "/v1/controller/task-context";
 const CONTROLLER_CLAIM_ROUTE = "/v1/controller/task-claim";
 const CONTROLLER_COMMAND_ROUTE = "/v1/controller/task-command";
 const CONTROLLER_RELEASE_ROUTE = "/v1/controller/task-release";
+export const TASK_INTAKE_ROUTE = "/v1/task-control/intake";
+export const BROWSER_HOST_ROUTE = "/v1/browser-host/invoke";
+export const APPROVAL_GRANT_ROUTE = "/v1/approvals/grants";
+const PHASE2_ROUTES = new Set([TASK_INTAKE_ROUTE, BROWSER_HOST_ROUTE, APPROVAL_GRANT_ROUTE]);
 const CONTROLLER_ROUTES = new Set([
   CONTROLLER_CONTEXT_ROUTE,
   CONTROLLER_CLAIM_ROUTE,
@@ -68,6 +80,7 @@ const PROTECTED_ROUTES = new Set([
   TASKS_ROUTE,
   RUNTIME_STATUS_ROUTE,
   ...CONTROLLER_ROUTES,
+  ...PHASE2_ROUTES,
 ]);
 const MAX_BODY_BYTES = 65_536;
 const TASK_RATE_LIMIT_KEY = "authenticated:/v1/tasks";
@@ -91,6 +104,9 @@ export interface GatewayOptions {
   readonly concurrencyGate?: ConcurrencyGate;
   readonly controllerTaskControl?: ControllerTaskControl;
   readonly controllerIdentity?: ControllerIdentity;
+  readonly phase2TaskIntake?: Phase2TaskIntakePort;
+  readonly browserHostServer?: BrowserHostServerPort;
+  readonly approvalGrantRegistrar?: { putApprovalGrant(grant: ApprovalGrantV1): Promise<unknown> };
   readonly auditLog?: (entry: string) => void;
 }
 
@@ -372,7 +388,8 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
       const allowedMethod =
         pathname === TASKS_ROUTE ||
         pathname === RUNTIME_STATUS_ROUTE ||
-        CONTROLLER_ROUTES.has(pathname)
+        CONTROLLER_ROUTES.has(pathname) ||
+        PHASE2_ROUTES.has(pathname)
           ? "POST"
           : "GET";
       if (request.method !== allowedMethod) {
@@ -392,7 +409,7 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
         const rateLimitDecision =
           pathname === CAPABILITIES_ROUTE
             ? capabilitiesRateLimiter.consume(CAPABILITIES_RATE_LIMIT_KEY)
-            : CONTROLLER_ROUTES.has(pathname)
+            : CONTROLLER_ROUTES.has(pathname) || PHASE2_ROUTES.has(pathname)
               ? taskRateLimiter.consume(CONTROLLER_RATE_LIMIT_KEY)
               : taskRateLimiter.consume(TASK_RATE_LIMIT_KEY);
 
@@ -409,6 +426,95 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
             },
           );
           return;
+        }
+      }
+
+      if (PHASE2_ROUTES.has(pathname)) {
+        if (!hasJsonContentType(request)) {
+          discardUnreadRequestBody(request);
+          writeError(response, 415, requestId, "UNSUPPORTED_MEDIA_TYPE", "Content-Type must be application/json.");
+          return;
+        }
+        if (contentLengthExceedsLimit(request)) {
+          discardUnreadRequestBody(request);
+          writeError(response, 413, requestId, "PAYLOAD_TOO_LARGE", "Request body is too large.");
+          return;
+        }
+        const bodyResult = await readRequestBody(request);
+        if (bodyResult.tooLarge) {
+          writeError(response, 413, requestId, "PAYLOAD_TOO_LARGE", "Request body is too large.");
+          return;
+        }
+        let parsedBody: unknown;
+        try {
+          parsedBody = JSON.parse(bodyResult.body ?? "");
+        } catch {
+          writeError(response, 400, requestId, "PHASE2_INVALID_REQUEST", "Phase 2 integration request is invalid.");
+          return;
+        }
+        try {
+          if (pathname === TASK_INTAKE_ROUTE) {
+            if (options.phase2TaskIntake === undefined) {
+              writeError(response, 503, requestId, "TASK_INTAKE_UNAVAILABLE", "Task Intake is unavailable.");
+              return;
+            }
+            const validation = validateTaskIntakeV1Request(parsedBody);
+            if (!validation.ok) {
+              writeError(response, 400, requestId, "TASK_INTAKE_INVALID", "Task Intake request is invalid.");
+              return;
+            }
+            const result = await options.phase2TaskIntake.intake(validation.value);
+            options.auditLog?.(JSON.stringify({ event: "gateway.task-intake.accepted", taskId: result.taskId }));
+            writeSuccess(response, 200, requestId, result);
+            return;
+          }
+          if (pathname === APPROVAL_GRANT_ROUTE) {
+            if (options.approvalGrantRegistrar === undefined) {
+              writeError(response, 503, requestId, "APPROVAL_GRANT_UNAVAILABLE", "Approval Grant service is unavailable.");
+              return;
+            }
+            const validation = validateApprovalGrantV1(parsedBody);
+            if (!validation.ok) {
+              writeError(response, 400, requestId, "INVALID_APPROVAL_GRANT", "Approval Grant request is invalid.");
+              return;
+            }
+            await options.approvalGrantRegistrar.putApprovalGrant(validation.value);
+            options.auditLog?.(JSON.stringify({ event: "gateway.approval-grant.issued", approvalRef: validation.value.approvalRef }));
+            writeSuccess(response, 201, requestId, {
+              approvalRef: validation.value.approvalRef,
+              grantId: validation.value.grantId,
+              status: "ISSUED",
+              expiresAt: validation.value.expiresAt,
+            });
+            return;
+          }
+          if (options.browserHostServer === undefined) {
+            writeError(response, 503, requestId, "BROWSER_HOST_SERVER_UNAVAILABLE", "Browser Host Server Adapter is unavailable.");
+            return;
+          }
+          const validation = validateBrowserHostInvocationV1(parsedBody);
+          if (!validation.ok) {
+            writeError(response, 400, requestId, "BROWSER_HOST_INVALID_REQUEST", "Browser Host request is invalid.");
+            return;
+          }
+          const result = await options.browserHostServer.invoke(validation.value);
+          options.auditLog?.(JSON.stringify({ event: "gateway.browser-host.accepted", operation: validation.value.operation }));
+          writeSuccess(response, 200, requestId, result);
+          return;
+        } catch (error: unknown) {
+          if (error instanceof BrowserHostServerError) {
+            writeError(response, error.httpStatus, requestId, error.code, error.message);
+            return;
+          }
+          if (error instanceof Phase2IntegrationStoreError) {
+            writeError(response, error.httpStatus, requestId, error.code, error.message);
+            return;
+          }
+          if (error instanceof TaskControlError) {
+            writeError(response, error.code.endsWith("NOT_FOUND") ? 404 : 409, requestId, error.code, error.message);
+            return;
+          }
+          throw error;
         }
       }
 

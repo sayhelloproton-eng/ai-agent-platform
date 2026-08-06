@@ -4,6 +4,8 @@ authentication:
   secret_location: builder_only
 openapi_template: ../../../apps/dev-tunnel/openapi/custom-gpt-action.openapi.template.yaml
 operations:
+  - intakePhase2Task
+  - issueApprovalGrant
   - getTaskDecisionContext
   - claimControllerTask
   - submitControllerCommand

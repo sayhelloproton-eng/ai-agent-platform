@@ -598,9 +598,11 @@ test("OpenAPI defines the Runtime Status result component", () => {
   }
 });
 
-test("OpenAPI exposes the four Controller operations and Runtime Status", () => {
+test("OpenAPI exposes Task Intake, Approval Grant, four Controller operations, and Runtime Status", () => {
   const template = readFileSync(OPENAPI_TEMPLATE, "utf8");
   for (const path of [
+    "/v1/task-control/intake",
+    "/v1/approvals/grants",
     "/v1/controller/task-context",
     "/v1/controller/task-claim",
     "/v1/controller/task-command",
@@ -610,6 +612,8 @@ test("OpenAPI exposes the four Controller operations and Runtime Status", () => 
     assert.match(template, new RegExp(`\\n {2}${path.replaceAll("/", "\\/")}:\\n`, "u"));
   }
   for (const operationId of [
+    "intakePhase2Task",
+    "issueApprovalGrant",
     "getTaskDecisionContext",
     "claimControllerTask",
     "submitControllerCommand",
@@ -621,7 +625,7 @@ test("OpenAPI exposes the four Controller operations and Runtime Status", () => 
       1,
     );
   }
-  assert.equal(template.match(/\n {6}operationId:/gu)?.length, 5);
+  assert.equal(template.match(/\n {6}operationId:/gu)?.length, 7);
   assert.doesNotMatch(template, /profileId:\n|roleId:\n|requestedBy:\n/u);
   assert.match(
     template,

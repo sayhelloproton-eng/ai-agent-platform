@@ -6,6 +6,7 @@ export {
   type DecisionContextPlanNodeContractV1,
 } from "./contracts.js";
 export {
+  TASK_CONTROL_INTEGRATION_CONTRACT_VERSION,
   TASK_CONTROL_INTEGRATION_PROPOSAL_VERSION,
   toBrowserDispatchProposal,
   toControllerInputProposal,

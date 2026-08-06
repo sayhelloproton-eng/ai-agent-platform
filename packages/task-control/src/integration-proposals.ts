@@ -7,12 +7,14 @@ import type {
 } from "./model.js";
 
 /**
- * Candidate-only integration boundary. These shapes are owned by TSK as a
- * proposal and MUST NOT be treated as frozen platform contracts until the
- * cross-domain audit accepts a version in packages/contracts.
+ * Stable TSK projection version for Phase 2 Integration Contract v1.
+ * Platform-owned wire contracts live in packages/contracts; this module only
+ * projects TSK-owned state into those frozen boundaries.
  */
+export const TASK_CONTROL_INTEGRATION_CONTRACT_VERSION = "1.0.0" as const;
+/** @deprecated Use TASK_CONTROL_INTEGRATION_CONTRACT_VERSION. */
 export const TASK_CONTROL_INTEGRATION_PROPOSAL_VERSION =
-  "2026-08-06-final-domain-candidate" as const;
+  TASK_CONTROL_INTEGRATION_CONTRACT_VERSION;
 
 
 

@@ -1,4 +1,5 @@
 import { isValidApiKeyFormat } from "@ai-agent-platform/auth";
+import { createLocalControlProcessClient } from "@ai-agent-platform/local-control";
 import {
   JsonFileTaskControlStore,
   RandomIdGenerator,
@@ -7,14 +8,18 @@ import {
 } from "@ai-agent-platform/task-control";
 import { mkdir } from "node:fs/promises";
 import type { Server } from "node:http";
-import { dirname } from "node:path";
-import { pathToFileURL } from "node:url";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import {
   createGatewayServer,
   DEFAULT_GATEWAY_MAX_CONCURRENT_TASKS,
 } from "./app.js";
 import { createConcurrencyGate } from "./concurrency.js";
+import { createBrowserHostServerAdapter } from "./browser-host-server-adapter.js";
+import { createLocalWorkWorker } from "./local-work-worker.js";
+import { Phase2IntegrationStore } from "./phase2-integration-store.js";
+import { createPhase2TaskIntakeAdapter } from "./phase2-task-intake.js";
 import { JsonFileControllerIdempotencySnapshotStore } from "./controller-idempotency-store.js";
 import { createTaskControlControllerAdapter } from "./task-control-controller-adapter.js";
 import { createHttpRuntimeClient } from "./runtime-client.js";
@@ -27,6 +32,9 @@ const DEFAULT_CONTROLLER_PROFILE_ID = "ai-agent-platform-controller";
 const DEFAULT_TASK_CONTROL_STATE_PATH = ".runtime/task-control/state.json";
 const DEFAULT_CONTROLLER_IDEMPOTENCY_STATE_PATH =
   ".runtime/task-control/controller-idempotency.json";
+const DEFAULT_PHASE2_INTEGRATION_STATE_PATH =
+  ".runtime/task-control/phase2-integration.json";
+const DEFAULT_LOCAL_WORKER_POLL_MS = 1_000;
 const LOOPBACK_HOSTS = new Set(["127.0.0.1", "localhost", "::1"]);
 export const GATEWAY_HEADERS_TIMEOUT_MS = 10_000;
 export const GATEWAY_REQUEST_TIMEOUT_MS = 20_000;
@@ -113,6 +121,24 @@ function resolveStatePath(input: string | undefined, fallback: string): string {
   return value;
 }
 
+
+function resolveLocalWorkerPollMs(input: string | undefined): number {
+  if (input === undefined) return DEFAULT_LOCAL_WORKER_POLL_MS;
+  if (!/^\d+$/.test(input)) {
+    throw new Error("Local Worker poll interval must be an integer from 100 to 60000 ms.");
+  }
+  const value = Number(input);
+  if (!Number.isSafeInteger(value) || value < 100 || value > 60_000) {
+    throw new Error("Local Worker poll interval must be an integer from 100 to 60000 ms.");
+  }
+  return value;
+}
+
+function resolveProjectRoot(input: string | undefined): string {
+  const defaultRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
+  return resolve(input?.trim() || defaultRoot);
+}
+
 function resolveControllerProfileId(input: string | undefined): string {
   const value = input ?? DEFAULT_CONTROLLER_PROFILE_ID;
   if (!/^[a-z0-9][a-z0-9._-]{2,127}$/u.test(value)) {
@@ -134,6 +160,9 @@ export interface ActionGatewayConfiguration {
   readonly controllerProfileId: string;
   readonly taskControlStatePath: string;
   readonly controllerIdempotencyStatePath: string;
+  readonly phase2IntegrationStatePath: string;
+  readonly localWorkerPollMs: number;
+  readonly projectRoot: string;
 }
 
 export function resolveActionGatewayConfiguration(
@@ -165,6 +194,14 @@ export function resolveActionGatewayConfiguration(
       environment.ACTION_GATEWAY_CONTROLLER_IDEMPOTENCY_STATE_PATH,
       DEFAULT_CONTROLLER_IDEMPOTENCY_STATE_PATH,
     ),
+    phase2IntegrationStatePath: resolveStatePath(
+      environment.ACTION_GATEWAY_PHASE2_INTEGRATION_STATE_PATH,
+      DEFAULT_PHASE2_INTEGRATION_STATE_PATH,
+    ),
+    localWorkerPollMs: resolveLocalWorkerPollMs(
+      environment.ACTION_GATEWAY_LOCAL_WORKER_POLL_MS,
+    ),
+    projectRoot: resolveProjectRoot(environment.ACTION_GATEWAY_PROJECT_ROOT),
   };
 }
 
@@ -184,6 +221,9 @@ export async function startActionGateway(): Promise<void> {
       mkdir(dirname(configuration.controllerIdempotencyStatePath), {
         recursive: true,
       }),
+      mkdir(dirname(configuration.phase2IntegrationStatePath), {
+        recursive: true,
+      }),
     ]);
     const taskControlStore = await JsonFileTaskControlStore.open(
       configuration.taskControlStatePath,
@@ -198,13 +238,39 @@ export async function startActionGateway(): Promise<void> {
       await JsonFileControllerIdempotencySnapshotStore.open(
         configuration.controllerIdempotencyStatePath,
       );
+    const phase2IntegrationStore = await Phase2IntegrationStore.open(
+      configuration.phase2IntegrationStatePath,
+    );
     const controllerTaskControl = createTaskControlControllerAdapter(
       taskControlService,
       {
         projectId: "ai-agent-platform",
         idempotencyStore: controllerIdempotencyStore,
+        approvalGrantRegistrar: phase2IntegrationStore,
       },
     );
+    const phase2TaskIntake = createPhase2TaskIntakeAdapter(
+      taskControlService,
+      phase2IntegrationStore,
+    );
+    const browserHostServer = createBrowserHostServerAdapter(
+      taskControlService,
+      phase2IntegrationStore,
+    );
+    const localControlClient = createLocalControlProcessClient({
+      executable: process.execPath,
+      trustedPrefixArgs: [
+        resolve(configuration.projectRoot, "packages/local-control/dist/cli.js"),
+      ],
+      cwd: configuration.projectRoot,
+      environment: { LOCAL_PROJECT_ROOT: configuration.projectRoot },
+      timeoutMs: 15_000,
+    });
+    const localWorkWorker = createLocalWorkWorker({
+      taskControl: taskControlService,
+      integrationStore: phase2IntegrationStore,
+      client: localControlClient,
+    });
     const runtimeClient = createHttpRuntimeClient({
       baseUrl: configuration.runtimeUrl,
       apiKey: configuration.runtimeApiKey,
@@ -224,8 +290,28 @@ export async function startActionGateway(): Promise<void> {
           roleId: "controller",
           projectIds: ["ai-agent-platform"],
         },
+        phase2TaskIntake,
+        browserHostServer,
+        approvalGrantRegistrar: phase2IntegrationStore,
       }),
     );
+
+    let workerRunning = false;
+    const workerTimer = setInterval(() => {
+      if (workerRunning) return;
+      workerRunning = true;
+      void localWorkWorker.runOnce()
+        .then((result) => {
+          if (result.processed > 0 || result.failed > 0) {
+            console.log(JSON.stringify({ event: "gateway.local-worker.cycle", ...result }));
+          }
+        })
+        .catch((error: unknown) => {
+          console.error(`Local Work Worker cycle failed: ${error instanceof Error ? error.message : "unknown error"}`);
+        })
+        .finally(() => { workerRunning = false; });
+    }, configuration.localWorkerPollMs);
+    workerTimer.unref();
 
     server.once("error", () => {
       console.error("Action Gateway failed to start.");

@@ -200,6 +200,11 @@ export interface DispatchSignal {
   readonly conversationRef: string | null;
   readonly hostCommandType: HostCommandType;
   readonly hostCommandRef: string;
+  readonly browserActionType: string | null;
+  readonly payloadRef: string | null;
+  readonly preconditions: JsonObject;
+  readonly approvalRef: string | null;
+  readonly expiresAt: string;
   readonly workItemId: string | null;
   readonly status: DispatchStatus;
   readonly claimEpoch: number;
@@ -208,6 +213,11 @@ export interface DispatchSignal {
   readonly idempotencyKey: string;
   readonly createdAt: string;
   readonly deliveredAt: string | null;
+  readonly deliveryReceipt: string | null;
+  readonly deliveryId: string | null;
+  readonly reportToken: string | null;
+  readonly reportTokenExpiresAt: string | null;
+  readonly reportTokenConsumedAt: string | null;
   readonly hostResultStatus: HostResultStatus;
   readonly hostResultRef: string | null;
   readonly hostResultSummary: string | null;
@@ -377,6 +387,12 @@ export type ControllerCommand =
         readonly capabilityRef?: string;
         readonly inputRef?: string;
         readonly expectedResultType: string;
+        readonly targetProfileRef?: string;
+        readonly conversationRef?: string;
+        readonly hostActionType?: string;
+        readonly preconditions?: JsonObject;
+        readonly approvalRef?: string;
+        readonly expiresAt?: string;
       };
     }
   | {
@@ -538,11 +554,13 @@ export interface ReportDispatchInput {
   readonly idempotencyKey: string;
   readonly producerRef: string;
   readonly correlationId?: string;
+  readonly deliveryId?: string;
   readonly errorSummary?: string;
 }
 
 export interface HostCommandMaterialization {
   readonly dispatchId: string;
+  readonly commandId: string;
   readonly taskId: string;
   readonly createdFromTaskVersion: number;
   readonly workItemId: string | null;
@@ -550,14 +568,20 @@ export interface HostCommandMaterialization {
   readonly targetProfileRef: string | null;
   readonly conversationRef: string | null;
   readonly commandType: HostCommandType;
+  readonly actionType: string;
   readonly commandRef: string;
+  readonly payloadRef: string | null;
+  readonly preconditions: JsonObject;
+  readonly approvalRef: string | null;
+  readonly expiresAt: string;
   readonly idempotencyKey: string;
 }
 
 export interface ReportHostResultInput {
   readonly contractVersion: typeof TASK_CONTROL_CONTRACT_VERSION;
   readonly signalId: string;
-  readonly claimToken: string;
+  readonly reportToken?: string;
+  readonly claimToken?: string;
   readonly hostResultRef: string;
   readonly summary?: string;
   readonly evidenceRefs?: readonly string[];
@@ -569,7 +593,8 @@ export interface ReportHostResultInput {
 export interface FailHostResultInput {
   readonly contractVersion: typeof TASK_CONTROL_CONTRACT_VERSION;
   readonly signalId: string;
-  readonly claimToken: string;
+  readonly reportToken?: string;
+  readonly claimToken?: string;
   readonly errorCode: string;
   readonly errorSummary: string;
   readonly evidenceRefs?: readonly string[];
@@ -582,7 +607,8 @@ export interface FailHostResultInput {
 export interface ReportUncertainHostResultInput {
   readonly contractVersion: typeof TASK_CONTROL_CONTRACT_VERSION;
   readonly signalId: string;
-  readonly claimToken: string;
+  readonly reportToken?: string;
+  readonly claimToken?: string;
   readonly stage: string;
   readonly commandFingerprint: string;
   readonly pageIdentityRef?: string;

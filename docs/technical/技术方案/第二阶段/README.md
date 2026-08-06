@@ -1,5 +1,21 @@
 # 第二阶段技术方案
 
+## 2026-08-06 综合实现基线（当前有效）
+
+- 实现基线：`main@f3ecb0632e42a82f9b67246acf0d02569f2ff422` 的 Gate 0 包继续增量修复。
+- 公共合同：`packages/contracts/src/phase2-integration.ts`，版本 `1.0.0`。
+- 正式入口：`POST /v1/task-control/intake`、Controller 四路由、`POST /v1/browser-host/invoke`、`POST /v1/approvals/grants`。
+- 正式执行：Action Gateway 内置 TSK → LCL Worker；Browser Host 通过 Gateway Server Adapter 使用 Claim、Delivery Receipt、Report Token 三阶段凭证。
+- 数据边界：Task Store 只保存协调状态与引用；Payload、Approval Grant、Local Result 和 Evidence 由 Phase 2 Integration Store 保存。
+- 自动化验收：真实 HTTP Gateway + 正式 CTL/TSK + 真实 Local Control Capability + BHR HTTP Client 的四域 E2E 已纳入统一门禁。
+- 人工验收边界：真实 Chrome 扩展加载、ChatGPT 页面绑定和页面动作仍需在用户本机完成，不以 Fixture 冒充。
+- 当前阶段：Gate 0、公共合同、综合 Adapter 和包内自动化统一回归均已通过；只剩在完整 Node 20 仓库执行根门禁，以及用户本机真实 Chrome 页面验收。
+
+新增综合方案：
+
+- [SOL-INT-001｜第二阶段四域综合集成与验收](./SOL-INT-001-第二阶段四域综合集成与验收.md)
+
+
 本目录承载 `ai-agent-platform` 第二阶段核心四个 MVP，以及一个不构成阶段完成门槛的端侧推理扩展 MVP。
 
 ```text
@@ -142,14 +158,14 @@ Task Control 接受命令时原子更新 Task、Plan / Node、Event 和必要下
 → 继续、审批、完成或明确停止
 ```
 
-核心四项分别通过并跑通该链路，即可结束第二阶段核心验证。手机模型未实现、离线或不达标时继续使用 DeepSeek，不影响结束判定。
+核心四项的自动化门禁与真实 HTTP 链路已经通过；第二阶段从“自动化集成通过”升级为“最终验收通过”，还必须完成 `SOL-INT-001` 定义的本机 Chrome 扩展、真实 ChatGPT Binding 和真实页面动作验收。手机模型未实现、离线或不达标时继续使用 DeepSeek，不影响核心四域结束判定。
 
 ## 七、暂缓事项
 
 - 多任务依赖与并发 Lane；
 - 复杂 DAG / BPMN；
 - 生产消息队列；
-- 正式 Approval / Evidence / Recovery 产品；
+- 超出当前一次性 Grant、引用保存和最小恢复闭环的完整 Approval / Evidence / Recovery 产品；
 - 完整 Platform Management Console；
 - 多执行器竞争和自动路由；
 - 无人监督任意网页自动化；

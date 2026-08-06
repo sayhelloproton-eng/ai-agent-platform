@@ -69,7 +69,7 @@ async function claimAckDispatch(service, taskId, key = taskId) {
     producerRef: `host:${key}`,
   });
   assert.equal(ack.taskId, taskId);
-  return { signal, token, ack };
+  return { signal, token, reportToken: ack.reportToken, ack };
 }
 async function claimController(service, taskId, key = taskId) {
   const task = await service.getTask(taskId);
@@ -353,11 +353,11 @@ test("terminal reconciliation records immutable WorkItem and Dispatch cancellati
 test("UNCERTAIN Host Result blocks automatic retry and remains replay-stable", async () => {
   const { service } = harness();
   await intake(service, "task-uncertain");
-  const { signal, token } = await claimAckDispatch(service, "task-uncertain");
+  const { signal, reportToken } = await claimAckDispatch(service, "task-uncertain");
   const input = {
     contractVersion: TASK_CONTROL_CONTRACT_VERSION,
     signalId: signal.signalId,
-    claimToken: token,
+    reportToken,
     stage: "SIDE_EFFECT_STARTED",
     commandFingerprint: "fingerprint:host-command-1",
     pageIdentityRef: "page-identity:conversation-1",
@@ -429,11 +429,11 @@ test("ACCEPTED and PARTIAL progress do not complete WorkItem or Task", async () 
 test("Delivery Ack receipt remains DELIVERED after Host Result changes current Dispatch", async () => {
   const { service } = harness();
   await intake(service, "task-ack-receipt");
-  const { signal, token, ack } = await claimAckDispatch(service, "task-ack-receipt");
+  const { signal, token, reportToken, ack } = await claimAckDispatch(service, "task-ack-receipt");
   await service.reportHostResult({
     contractVersion: TASK_CONTROL_CONTRACT_VERSION,
     signalId: signal.signalId,
-    claimToken: token,
+    reportToken,
     hostResultRef: "host-result:ack-receipt",
     idempotencyKey: "ack-receipt-host-result",
     producerRef: "browser-host",

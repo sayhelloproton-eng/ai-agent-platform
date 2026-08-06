@@ -1,5 +1,9 @@
 role_id: controller
 operations:
+  - operation_id: intakePhase2Task
+    intent: 把明确的新目标创建为带版本化 Plan、幂等键和引用资源的正式 Task
+  - operation_id: issueApprovalGrant
+    intent: 为已确定的 Browser Host Command 签发一次性、绑定明确且可审计的 Approval Grant
   - operation_id: getTaskDecisionContext
     intent: 查询最新 Task、Plan、Event、Result、约束和当前实际允许命令
   - operation_id: claimControllerTask
@@ -9,6 +13,6 @@ operations:
   - operation_id: releaseControllerTask
     intent: 主动释放当前 Controller Claim
 capability_boundaries:
-  - REQUEST_ROLE_WORK 与 REQUEST_APPROVAL 在公共引用合同冻结前不得提交
+  - REQUEST_ROLE_WORK 与 REQUEST_APPROVAL 已支持，但只能在 Decision Context 当前允许且所有引用字段完整时提交
   - WAIT 节点在等待状态合同冻结前不得创建
   - PAUSE、RESUME、FAIL 尚未进入 Controller Command v1，不得伪造调用

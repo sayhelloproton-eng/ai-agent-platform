@@ -1,9 +1,26 @@
 # SOL-TSK-001｜任务消息中心与单任务调度 MVP 技术方案
 
+## 2026-08-06 实现状态（当前有效）
+
+| 项目 | 当前结论 |
+|---|---|
+| 状态 | **Implemented / Integrated** |
+| 正式 Intake | `POST /v1/task-control/intake` → `TaskControlService.intakeTask()` |
+| 持久化 | JSON Store 具备跨进程写锁、陈旧锁恢复、原子替换和持久化首次 Receipt |
+| Work 调度 | 正式 TSK → LCL Worker 已接入 Action Gateway |
+| Browser 调度 | `REQUEST_ROLE_WORK(targetDomain=browser-host)` 同时创建 Work Item 与 Dispatch |
+| 凭证生命周期 | Claim Token 只负责领取；Delivery Receipt 证明投递；Report Token 独立负责最终结果/不确定回报 |
+| 不确定副作用 | `UNCERTAIN` 进入人工/总控复核，禁止自动重发 |
+| 取消 | Task、Work Item、Dispatch 取消均形成审计事件并清理有效凭证 |
+| 内容边界 | Task Store 不保存 Payload、Result、DOM、截图、Approval Grant 正文 |
+
+`packages/task-control/src/integration-proposals.ts` 现在只是 TSK 内部状态投影兼容层；平台公共线协议以 `packages/contracts/src/phase2-integration.ts` 的 `1.0.0` 为准，不再把 Candidate Proposal 当作跨域合同。
+
+
 | 字段 | 值 |
 |---|---|
 | 方案 ID | `SOL-TSK-001` |
-| 状态 | Candidate |
+| 状态 | Implemented / Integrated |
 | 所属阶段 | 第二阶段 MVP-3 |
 | 核心领域 | Task Control |
 | 产品归属 | Platform Management Console 的“任务与工作流”模块 |
@@ -378,7 +395,7 @@ Browser Host 投递状态不直接进入 Task 业务状态：
 
 ```text
 Task.status = READY_FOR_CONTROLLER
-DispatchSignal.status = PENDING / CLAIMED / DELIVERED / FAILED
+DispatchSignal.status = PENDING / CLAIMED / DELIVERED / CONSUMED / FAILED / CANCELLED
 ```
 
 Host 投递失败不会把 Task 标记为业务失败。
@@ -593,12 +610,19 @@ capability_ref
 input_ref
 expected_result_type
 status
+attempt
+claim_epoch
 claimed_by
 claim_token
+progress_status
+progress_ref
 result_ref
+evidence_refs
 error_code
+retryable
 created_at
 claimed_at
+started_at
 completed_at
 ```
 
@@ -613,10 +637,14 @@ Work Item 回答：
 ```text
 PENDING
 CLAIMED
+RUNNING
 SUCCEEDED
 FAILED
+EXPIRED
 CANCELLED
 ```
+
+Work Item 的 `progress_status` 独立为 `NONE / ACCEPTED / PARTIAL`。`PARTIAL` 只表示一次 Local Request 已终止且工作项获得了可继续的部分结果，不把 Work Item 直接标记为 `SUCCEEDED`。
 
 ## 十二、Task Event
 

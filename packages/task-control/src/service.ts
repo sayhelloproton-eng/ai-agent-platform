@@ -466,6 +466,11 @@ function createControllerDispatchRecord(
     conversationRef: task.conversationRef,
     hostCommandType: task.conversationRef === null ? "OPEN_ROLE_SESSION" : "CONTINUE_SESSION",
     hostCommandRef: `host-command:${signalId}`,
+    browserActionType: task.conversationRef === null ? "OPEN_OR_RESUME_SESSION" : "CONTINUE_ROLE_SESSION",
+    payloadRef: null,
+    preconditions: {},
+    approvalRef: null,
+    expiresAt: new Date(Date.parse(now) + 5 * 60_000).toISOString(),
     workItemId: null,
     status: "PENDING",
     claimEpoch: 0,
@@ -474,6 +479,11 @@ function createControllerDispatchRecord(
     idempotencyKey: `controller-wake:${task.taskId}:${task.taskVersion}`,
     createdAt: now,
     deliveredAt: null,
+    deliveryReceipt: null,
+    deliveryId: null,
+    reportToken: null,
+    reportTokenExpiresAt: null,
+    reportTokenConsumedAt: null,
     hostResultStatus: "PENDING",
     hostResultRef: null,
     hostResultSummary: null,
@@ -898,6 +908,7 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
       let task = current;
       let plan = current.plan;
       const workItemIds: string[] = [];
+      const dispatchIds: string[] = [];
       const eventSpecs: Array<{ type: TaskEvent["eventType"]; payload: JsonObject }> = [];
       let releaseClaim = input.command.type === "RELEASE_CLAIM";
 
@@ -1048,6 +1059,53 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
           };
           state.workItems[workItemId] = workItem;
           workItemIds.push(workItemId);
+          if (command.payload.targetDomain === "browser-host") {
+            invariant(command.payload.targetProfileRef !== undefined, "INVALID_ARGUMENT", "targetProfileRef is required.");
+            invariant(command.payload.hostActionType !== undefined, "INVALID_ARGUMENT", "hostActionType is required.");
+            invariant(command.payload.expiresAt !== undefined, "INVALID_ARGUMENT", "expiresAt is required.");
+            const signalId = this.ids.next("dispatch");
+            const dispatch: DispatchSignal = {
+              signalId,
+              taskId: task.taskId,
+              createdFromTaskVersion: task.taskVersion,
+              signalType: "ROLE_WORK_WAKE",
+              targetRole: command.payload.requiredRole,
+              targetProfileRef: command.payload.targetProfileRef!,
+              conversationRef: command.payload.conversationRef ?? task.conversationRef,
+              hostCommandType: "EXECUTE_APPROVED_UI_ACTION",
+              hostCommandRef: `host-command:${signalId}`,
+              browserActionType: command.payload.hostActionType!,
+              payloadRef: command.payload.inputRef ?? null,
+              preconditions: command.payload.preconditions ?? {},
+              approvalRef: command.payload.approvalRef ?? null,
+              expiresAt: command.payload.expiresAt!,
+              workItemId,
+              status: "PENDING",
+              claimEpoch: 0,
+              claim: null,
+              attemptCount: 0,
+              idempotencyKey: `role-work-wake:${workItemId}:1`,
+              createdAt: now,
+              deliveredAt: null,
+              deliveryReceipt: null,
+              deliveryId: null,
+              reportToken: null,
+              reportTokenExpiresAt: null,
+              reportTokenConsumedAt: null,
+              hostResultStatus: "PENDING",
+              hostResultRef: null,
+              hostResultSummary: null,
+              hostEvidenceRefs: [],
+              reportedAt: null,
+              lastError: null,
+            };
+            state.dispatchSignals[signalId] = dispatch;
+            dispatchIds.push(signalId);
+            eventSpecs.push({
+              type: "HOST_DISPATCH_CREATED",
+              payload: { dispatchIds: [signalId], workItemId },
+            });
+          }
           plan = withPlanVersion(
             updateNode(
               plan,
@@ -1201,7 +1259,6 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
       };
       assertTaskConsistency(task);
       const eventIds: string[] = [];
-      const dispatchIds: string[] = [];
       let causationId = input.causationId ?? current.latestEventId;
       for (const spec of eventSpecs) {
         const item = appendEvent(
@@ -1287,6 +1344,14 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
             (roleId === undefined || item.requiredRole === roleId)
           );
         })
+        .sort((left, right) => left.createdAt.localeCompare(right.createdAt)),
+    );
+  }
+
+  async listPendingWorkItems(targetDomain?: string): Promise<readonly WorkItem[]> {
+    return this.store.read((state) =>
+      Object.values(state.workItems)
+        .filter((item) => item.status === "PENDING" && (targetDomain === undefined || item.targetDomain === targetDomain))
         .sort((left, right) => left.createdAt.localeCompare(right.createdAt)),
     );
   }
@@ -2060,11 +2125,8 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
       });
       const parentTask = state.tasks[signal.taskId];
       invariant(parentTask !== undefined, "TASK_NOT_FOUND", "Task was not found.", { taskId: signal.taskId });
-      const reportRecovery =
-        (signal.status === "DELIVERED" || signal.status === "CONSUMED") &&
-        signal.hostResultStatus === "PENDING";
       invariant(
-        reportRecovery || !["PAUSED", "COMPLETED", "FAILED", "CANCELLED"].includes(parentTask.status),
+        !["PAUSED", "COMPLETED", "FAILED", "CANCELLED"].includes(parentTask.status),
         "COMMAND_NOT_ALLOWED",
         "New Dispatch delivery cannot be claimed while Task is paused or terminal.",
       );
@@ -2073,9 +2135,9 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
         throw new TaskControlError("DISPATCH_ALREADY_CLAIMED", "Dispatch Signal is already claimed.");
       }
       invariant(
-        signal.status === "PENDING" || signal.status === "CLAIMED" || reportRecovery,
+        signal.status === "PENDING" || signal.status === "CLAIMED",
         "COMMAND_NOT_ALLOWED",
-        "Dispatch is not claimable.",
+        "Dispatch delivery is not claimable after Delivery Ack; the persisted Report Token owns the result phase.",
       );
       const replacedClaim = signal.claim;
       const claim = lease(
@@ -2089,10 +2151,10 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
       const now = nowDate.toISOString();
       const claimed: DispatchSignal = {
         ...signal,
-        status: reportRecovery ? signal.status : "CLAIMED",
+        status: "CLAIMED",
         claimEpoch: claim.claimEpoch,
         claim,
-        attemptCount: reportRecovery ? signal.attemptCount : signal.attemptCount + 1,
+        attemptCount: signal.attemptCount + 1,
       };
       state.dispatchSignals[signal.signalId] = claimed;
       let task: TaskAggregate = {
@@ -2130,7 +2192,7 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
           claimId: claim.claimId,
           claimEpoch: claim.claimEpoch,
           reclaimed: signal.claimEpoch > 0,
-          phase: reportRecovery ? "host-result-recovery" : "delivery",
+          phase: "delivery",
         },
         now,
         this.ids,
@@ -2160,6 +2222,7 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
       });
       return {
         dispatchId: signal.signalId,
+        commandId: signal.hostCommandRef,
         taskId: signal.taskId,
         createdFromTaskVersion: signal.createdFromTaskVersion,
         workItemId: signal.workItemId,
@@ -2167,7 +2230,13 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
         targetProfileRef: signal.targetProfileRef,
         conversationRef: signal.conversationRef,
         commandType: signal.hostCommandType,
+        actionType: signal.browserActionType ??
+          (signal.hostCommandType === "OPEN_ROLE_SESSION" ? "OPEN_OR_RESUME_SESSION" : "CONTINUE_ROLE_SESSION"),
         commandRef: signal.hostCommandRef,
+        payloadRef: signal.payloadRef,
+        preconditions: signal.preconditions,
+        approvalRef: signal.approvalRef,
+        expiresAt: signal.expiresAt,
         idempotencyKey: signal.idempotencyKey,
       };
     });
@@ -2209,13 +2278,18 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
       const current = state.tasks[signal.taskId];
       invariant(current !== undefined, "TASK_NOT_FOUND", "Task was not found.", { taskId: signal.taskId });
       const now = this.clock.now().toISOString();
+      const deliveryReceipt = this.ids.token("delivery-receipt");
+      const reportToken = this.ids.token("report-token");
       const updatedSignal: DispatchSignal = {
         ...signal,
         status: signal.status === "CONSUMED" ? "CONSUMED" : "DELIVERED",
-        // Keep the report credential alive. Controller Claim is allowed to
-        // consume the wake without invalidating the later Host Result.
-        claim: signal.claim,
+        claim: null,
         deliveredAt: now,
+        deliveryReceipt,
+        deliveryId: input.deliveryId ?? `${signal.hostCommandRef}:delivery`,
+        reportToken,
+        reportTokenExpiresAt: new Date(Date.parse(now) + 60 * 60_000).toISOString(),
+        reportTokenConsumedAt: null,
         lastError: null,
       };
       state.dispatchSignals[signal.signalId] = updatedSignal;
@@ -2343,8 +2417,12 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
       invariant(signal !== undefined, "DISPATCH_NOT_FOUND", "Dispatch Signal was not found.", {
         signalId: input.signalId,
       });
-      this.assertActiveLease(signal.claim, input.claimToken);
-      invariant(signal.deliveredAt !== null, "COMMAND_NOT_ALLOWED", "Uncertain Host Result requires delivery acknowledgement.");
+      this.assertHostReportCredential(signal, input.reportToken, input.claimToken);
+      invariant(
+        signal.deliveredAt !== null || input.claimToken !== undefined,
+        "COMMAND_NOT_ALLOWED",
+        "Uncertain Host Result requires a delivery or claim credential.",
+      );
       invariant(
         (signal.status === "DELIVERED" || signal.status === "CONSUMED") &&
           signal.hostResultStatus === "PENDING",
@@ -2359,6 +2437,7 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
         ...signal,
         status: "CONSUMED",
         claim: null,
+        reportTokenConsumedAt: input.reportToken === undefined ? signal.reportTokenConsumedAt : now,
         hostResultStatus: "UNCERTAIN",
         hostResultRef: null,
         hostResultSummary: input.summary,
@@ -2448,7 +2527,7 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
       invariant(signal !== undefined, "DISPATCH_NOT_FOUND", "Dispatch Signal was not found.", {
         signalId: input.signalId,
       });
-      this.assertActiveLease(signal.claim, input.claimToken);
+      this.assertHostReportCredential(signal, input.reportToken, input.claimToken);
       invariant(signal.deliveredAt !== null, "COMMAND_NOT_ALLOWED", "Host Result requires delivery acknowledgement.");
       invariant(
         (signal.status === "DELIVERED" || signal.status === "CONSUMED") &&
@@ -2464,8 +2543,9 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
       const failedInput = succeeded ? null : (input as FailHostResultInput);
       const updatedSignal: DispatchSignal = {
         ...signal,
-        status: succeeded ? signal.status : "FAILED",
+        status: succeeded ? "CONSUMED" : "FAILED",
         claim: null,
+        reportTokenConsumedAt: input.reportToken === undefined ? signal.reportTokenConsumedAt : now,
         hostResultStatus: succeeded ? "SUCCEEDED" : "FAILED",
         hostResultRef: successInput?.hostResultRef ?? null,
         hostResultSummary: successInput?.summary ?? null,
@@ -2474,11 +2554,50 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
         lastError: failedInput?.errorSummary ?? null,
       };
       state.dispatchSignals[signal.signalId] = updatedSignal;
-      let task: TaskAggregate = {
+      let plan = current.plan;
+      let latestResultRefs = current.latestResultRefs;
+      if (signal.workItemId !== null) {
+        const workItem = state.workItems[signal.workItemId];
+        invariant(workItem !== undefined, "WORK_ITEM_NOT_FOUND", "Dispatch references a missing Work Item.", {
+          workItemId: signal.workItemId,
+        });
+        state.workItems[signal.workItemId] = {
+          ...workItem,
+          status: succeeded ? "SUCCEEDED" : "FAILED",
+          claim: null,
+          resultRef: successInput?.hostResultRef ?? null,
+          resultSummary: successInput?.summary ?? null,
+          evidenceRefs,
+          errorCode: failedInput?.errorCode ?? null,
+          errorSummary: failedInput?.errorSummary ?? null,
+          retryable: succeeded ? false : false,
+          completedAt: now,
+        };
+        if (plan !== null) {
+          plan = withPlanVersion(
+            updateNode(
+              plan,
+              workItem.planNodeId,
+              (node) => ({
+                ...node,
+                status: succeeded ? "COMPLETED" : "FAILED",
+                resultRefs: successInput === null ? node.resultRefs : addUnique(node.resultRefs, [successInput.hostResultRef]),
+                summary: successInput?.summary ?? failedInput?.errorSummary ?? node.summary,
+              }),
+              now,
+            ),
+            now,
+          );
+        }
+        if (successInput !== null) latestResultRefs = addUnique(latestResultRefs, [successInput.hostResultRef]);
+      }
+      let task: TaskAggregate = setOperationalStatus({
         ...current,
         taskVersion: current.taskVersion + 1,
+        plan,
+        latestResultRefs,
         updatedAt: now,
-      };
+      }, signal.workItemId === null ? current.status : "READY_FOR_CONTROLLER");
       const event = appendEvent(
         state,
         task,
@@ -2580,5 +2699,26 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
     invariant(claim !== null, "CLAIM_TOKEN_INVALID", "Object has no active Claim.");
     invariant(claim.claimToken === claimToken, "CLAIM_TOKEN_INVALID", "Claim token is invalid.");
     invariant(!isClaimExpired(claim.expiresAt, this.clock.now()), "CLAIM_EXPIRED", "Claim has expired.");
+  }
+
+  private assertHostReportCredential(
+    signal: DispatchSignal,
+    reportToken: string | undefined,
+    claimToken: string | undefined,
+  ): void {
+    if (reportToken !== undefined) {
+      invariant(signal.reportToken !== null, "CLAIM_TOKEN_INVALID", "Dispatch has no Report Token.");
+      invariant(signal.reportToken === reportToken, "CLAIM_TOKEN_INVALID", "Report Token is invalid.");
+      invariant(signal.reportTokenConsumedAt === null, "COMMAND_NOT_ALLOWED", "Report Token is already consumed.");
+      invariant(
+        signal.reportTokenExpiresAt !== null && !isClaimExpired(signal.reportTokenExpiresAt, this.clock.now()),
+        "CLAIM_EXPIRED",
+        "Report Token has expired.",
+      );
+      return;
+    }
+    invariant(signal.reportToken === null, "CLAIM_TOKEN_INVALID", "Report Token is required after delivery acknowledgement.");
+    invariant(claimToken !== undefined, "CLAIM_TOKEN_INVALID", "Host report credential is missing.");
+    this.assertActiveLease(signal.claim, claimToken);
   }
 }

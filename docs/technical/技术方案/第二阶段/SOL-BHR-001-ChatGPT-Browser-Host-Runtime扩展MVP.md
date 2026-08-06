@@ -1,10 +1,27 @@
 # SOL-BHR-001｜ChatGPT Browser Host Runtime 扩展 MVP 技术方案
 
+## 2026-08-06 实现状态（当前有效）
+
+| 项目 | 当前结论 |
+|---|---|
+| 状态 | **Implemented / Integrated；真实页面待本机验收** |
+| 扩展版本 | `0.3.0` |
+| Gateway Server Contract | `1.0.0`，入口 `/v1/browser-host/invoke` |
+| Host Registry | 注册、心跳、TTL、Capability 过滤和过期阻断已实现 |
+| Dispatch | Claim → Get → Delivery Ack → Report Token → Host Result/Uncertain 三阶段链路 |
+| Approval | `/v1/approvals/grants` 签发；BHR Get/Consume；单次消费、绑定和过期校验 |
+| 安全恢复 | 并发 Journal、裁剪保护、损坏记录隔离、Conversation 重验、`UNCERTAIN` 禁止盲重试 |
+| 自动化 E2E | BHR `HttpGatewayClient`/`DispatchClient` 已通过真实 Gateway HTTP 边界串联 TSK |
+| 尚需人工 | Chrome MV3 加载、真实 ChatGPT 页面 Binding、DOM/截图观察和真实页面动作 |
+
+自动化测试证明的是生产 HTTP Adapter、凭证、状态和回报链路，不宣称已经在当前执行环境操作真实 ChatGPT 页面。
+
+
 | 字段 | 值 |
 |---|---|
 | 方案 ID | `SOL-BHR-001` |
-| 状态 | Candidate |
-| 版本 | `0.1.0-draft` |
+| 状态 | Implemented / Integrated（真实页面待本机验收） |
+| 版本 | `0.3.0` |
 | 所属阶段 | 第二阶段 MVP-4 |
 | 核心领域 | Browser Host / Browser Runtime Adapter |
 | 第一宿主 | Chrome Manifest V3 扩展 |
@@ -411,7 +428,8 @@ Claim Host Command
 → 再次采集 Observation
 → 确定性规则 + 推理 Provider 验证
 → SUCCEEDED / FAILED / UNCERTAIN
-→ 回报结果并释放 Claim
+→ Delivery Ack 结束 Claim 并取得 Report Token
+→ 使用 Report Token 回报结果
 ```
 
 `UNCERTAIN` 不自动重复发送或点击。相同 `command_id`、`dispatch_ref` 或 `idempotency_key` 不得产生重复副作用。
@@ -549,19 +567,25 @@ BHR只依赖 Model Inference Port，不依赖手机设备或模型品牌。DeepS
 
 BHR消费一次性 Grant并产生观察引用；审批决定与 Artifact 生命周期由各自领域拥有。
 
-## 二十三、待联合审计事项
+## 二十三、联合审计结论与剩余人工项
 
-- 扩展与 npm包正式名称；
-- Host/Observation/Command/Result合同版本；
-- `browser.*`最终路径；
-- Host Dispatch是否作为 Task Control内部对象或专用 Browser Work Item；
-- Dispatch Claim最终字段；
-- Screenshot Ref的创建者与保留策略；
-- Approval Fixture入口；
-- Side Panel和Native Messaging是否需要；
-- 多标签页截图和窗口焦点策略；
-- ChatGPT真实 DOM适配证据；
-- 合同提升到 `packages/contracts/`的时机。
+已经冻结并实现：
+
+- 扩展包名与版本：`apps/browser-host-runtime` / `0.3.0`；
+- Browser Host Server、Dispatch Credential 和 Approval Grant 公共合同：`1.0.0`；
+- 正式入口：`POST /v1/browser-host/invoke`；
+- Dispatch 作为 Task Control 协调对象，并可关联 Browser Work Item；
+- Claim Token、Delivery Receipt、Report Token 三阶段字段和失效规则；
+- Payload Resolver、Host Registry、Approval Grant Get/Consume；
+- 合同提升到 `packages/contracts/src/phase2-integration.ts`；
+- 自动化 Gateway HTTP、TSK 和 BHR Client 端到端证据。
+
+仍需用户本机人工验收或后续产品化：
+
+- ChatGPT 真实 DOM、Conversation/GPT Binding 和页面身份证据；
+- Screenshot / Observation Ref 的长期保留与 Artifact Store 接管；
+- 多标签页、窗口焦点、Side Panel 与 Native Messaging 的产品化策略；
+- 真实高风险页面动作的一次性 Approval Grant 消费与 `UNCERTAIN` 恢复演练。
 
 ## 二十四、来源与相关文档
 

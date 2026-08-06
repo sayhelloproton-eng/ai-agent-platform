@@ -1,11 +1,57 @@
 openapi: 3.1.0
 info:
   title: AI Agent Platform Controller Actions
-  version: 1.0.0
-  description: Query authenticated task context, claim Controller work, submit constrained Controller commands, release claims, and query Runtime status through the Action Gateway.
+  version: 1.1.0
+  description: Create Phase 2 tasks, query authenticated task context, claim Controller work, submit constrained Controller commands, issue Approval Grants, release claims, and query Runtime status through the Action Gateway.
 servers:
   - url: ${DEV_TUNNEL_PUBLIC_BASE_URL}
 paths:
+  /v1/task-control/intake:
+    post:
+      operationId: intakePhase2Task
+      summary: Create an idempotent Phase 2 Task with a versioned Plan and reference-only payload resources
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskIntakeRequest"
+      responses:
+        "200":
+          description: Task Intake receipt
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ControllerSuccessEnvelope"
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /v1/approvals/grants:
+    post:
+      operationId: issueApprovalGrant
+      summary: Issue an authenticated single-use Browser Host Approval Grant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApprovalGrant"
+      responses:
+        "201":
+          description: Approval Grant issued or idempotently confirmed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ControllerSuccessEnvelope"
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "409":
+          $ref: "#/components/responses/Conflict"
   /v1/controller/task-context:
     post:
       operationId: getTaskDecisionContext
@@ -117,6 +163,144 @@ paths:
           description: Local Runtime is unavailable
 components:
   schemas:
+    TaskIntakeRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        contractVersion:
+          type: string
+          const: 1.0.0
+        taskId:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        objective:
+          type: string
+          minLength: 1
+        requiredRole:
+          type: string
+          minLength: 1
+        requirementRef:
+          type: string
+        goalRef:
+          type: string
+        conversationRef:
+          type: string
+        plan:
+          $ref: "#/components/schemas/TaskIntakePlan"
+        payloadResources:
+          type: array
+          items:
+            $ref: "#/components/schemas/PayloadResource"
+        approvalGrants:
+          type: array
+          items:
+            $ref: "#/components/schemas/ApprovalGrant"
+        idempotencyKey:
+          type: string
+          minLength: 1
+        producerRef:
+          type: string
+        correlationId:
+          type: string
+      required:
+        - contractVersion
+        - taskId
+        - title
+        - objective
+        - requiredRole
+        - idempotencyKey
+    TaskIntakePlan:
+      type: object
+      additionalProperties: false
+      properties:
+        source:
+          type: object
+          additionalProperties: false
+          properties:
+            type:
+              type: string
+              enum: [user, controller, upstream, fixture]
+            ref:
+              type: string
+          required: [type, ref]
+        currentNodeId:
+          type: string
+        nodes:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/TaskIntakePlanNode"
+      required: [source, nodes]
+    TaskIntakePlanNode:
+      type: object
+      additionalProperties: false
+      properties:
+        nodeId:
+          type: string
+        title:
+          type: string
+        kind:
+          type: string
+          enum: [DECISION, WORK, REVIEW, WAIT, APPROVAL, FINALIZE]
+        requiredRole:
+          type: string
+        dependsOn:
+          type: array
+          items: { type: string }
+        acceptanceCriteria:
+          type: array
+          items: { type: string }
+        summary:
+          type: string
+      required: [nodeId, title, kind, requiredRole]
+    PayloadResource:
+      type: object
+      additionalProperties: false
+      properties:
+        payloadRef:
+          type: string
+          minLength: 1
+        value: {}
+      required: [payloadRef, value]
+    ApprovalGrant:
+      type: object
+      additionalProperties: false
+      properties:
+        approvalContractVersion:
+          type: string
+          const: 1.0.0
+        approvalRef:
+          type: string
+        grantId:
+          type: string
+        actionFingerprint:
+          type: string
+        bindingId:
+          type: string
+        taskId:
+          type: string
+        commandId:
+          type: string
+        allowedActionType:
+          type: string
+          enum: [OBSERVE_PAGE, FOLLOW_LATEST, OPEN_OR_RESUME_SESSION, CONTINUE_ROLE_SESSION, SET_COMPOSER_TEXT, SUBMIT_MESSAGE, STOP_GENERATION, CLICK_REGISTERED_UI, WAIT_FOR_RESPONSE]
+        pagePreconditionHash:
+          type: string
+        singleUse:
+          type: boolean
+          const: true
+        expiresAt:
+          type: string
+          format: date-time
+        consumedAt:
+          type: [string, "null"]
+          format: date-time
+        consumedBy:
+          type: [string, "null"]
+      required: [approvalContractVersion, approvalRef, grantId, actionFingerprint, bindingId, taskId, commandId, allowedActionType, pagePreconditionHash, singleUse, expiresAt, consumedAt, consumedBy]
     TaskContextRequest:
       type: object
       additionalProperties: false
@@ -230,6 +414,40 @@ components:
           type: string
         requiredRole:
           type: string
+        targetDomain:
+          type: string
+        capabilityRef:
+          type: string
+        inputRef:
+          type: string
+        expectedResultType:
+          type: string
+        targetProfileRef:
+          type: string
+        conversationRef:
+          type: string
+        hostActionType:
+          type: string
+          enum:
+            - OBSERVE_PAGE
+            - FOLLOW_LATEST
+            - OPEN_OR_RESUME_SESSION
+            - CONTINUE_ROLE_SESSION
+            - SET_COMPOSER_TEXT
+            - SUBMIT_MESSAGE
+            - STOP_GENERATION
+            - CLICK_REGISTERED_UI
+            - WAIT_FOR_RESPONSE
+        preconditions:
+          type: object
+          additionalProperties: true
+        approvalRef:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+        grant:
+          $ref: "#/components/schemas/ApprovalGrant"
         objective:
           type: string
         expectedOutputContract:

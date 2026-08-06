@@ -105,7 +105,7 @@ async function claimAndAckControllerDispatch(service, hostId = "browser-host", l
     idempotencyKey: `delivery:${signal.signalId}`,
     producerRef: hostId,
   });
-  return { signal: ack, token };
+  return { signal: ack, token, reportToken: ack.reportToken };
 }
 
 async function claimController(service, task, key = "controller-claim") {
@@ -178,9 +178,9 @@ test("formal Task Intake is validated, eventful, replay-stable and fingerprinted
 test("BHR delivery credential survives Controller Claim and can report Host Result", async () => {
   const { service } = harness();
   await createTask(service, "task-dispatch-race");
-  const { signal, token } = await claimAndAckControllerDispatch(service, "host-race");
+  const { signal, token, reportToken } = await claimAndAckControllerDispatch(service, "host-race");
   assert.equal(signal.status, "DELIVERED");
-  assert.ok(signal.claim);
+  assert.equal(signal.claim, null);
 
   const claimedTask = await claimController(
     service,
@@ -190,12 +190,12 @@ test("BHR delivery credential survives Controller Claim and can report Host Resu
   assert.ok(claimedTask.claim.claimToken);
   const consumed = (await service.getDispatches("task-dispatch-race"))[0];
   assert.equal(consumed.status, "CONSUMED");
-  assert.equal(consumed.claim.claimToken, token);
+  assert.equal(consumed.claim, null);
 
   const reported = await service.reportHostResult({
     contractVersion: TASK_CONTROL_CONTRACT_VERSION,
     signalId: signal.signalId,
-    claimToken: token,
+    reportToken,
     hostResultRef: "host-result:task-dispatch-race",
     summary: "response completed",
     evidenceRefs: ["evidence:response-observed"],
@@ -209,7 +209,7 @@ test("BHR delivery credential survives Controller Claim and can report Host Resu
   const duplicate = await service.reportHostResult({
     contractVersion: TASK_CONTROL_CONTRACT_VERSION,
     signalId: signal.signalId,
-    claimToken: token,
+    reportToken,
     hostResultRef: "host-result:task-dispatch-race",
     summary: "response completed",
     evidenceRefs: ["evidence:response-observed"],
@@ -221,7 +221,7 @@ test("BHR delivery credential survives Controller Claim and can report Host Resu
   assert.equal(events.filter((item) => item.eventType === "HOST_RESULT_REPORTED").length, 1);
 });
 
-test("delivered Dispatch can expire, be reclaimed for report recovery, and deduplicate Ack/Report", async () => {
+test("Delivery Ack ends the claim and its Report Token remains replay-stable", async () => {
   const { service, clock } = harness();
   await createTask(service, "task-dispatch-recovery");
   const [pending] = await service.listPendingDispatches();
@@ -237,28 +237,33 @@ test("delivered Dispatch can expire, be reclaimed for report recovery, and dedup
     contractVersion: TASK_CONTROL_CONTRACT_VERSION,
     signalId: pending.signalId,
     claimToken: firstToken,
+    deliveryId: "delivery:task-dispatch-recovery",
     idempotencyKey: "dispatch-recovery-ack",
     producerRef: "host-recovery",
   };
   const firstAck = await service.acknowledgeDispatch(ackInput);
   const secondAck = await service.acknowledgeDispatch(ackInput);
   assert.deepEqual(secondAck, firstAck);
+  assert.equal(firstAck.claim, null);
+  assert.ok(firstAck.reportToken);
 
   clock.advance(2_000);
   await service.reconcile("task-dispatch-recovery");
-  const expired = (await service.getDispatches("task-dispatch-recovery"))[0];
-  assert.equal(expired.status, "DELIVERED");
-  assert.equal(expired.claim, null);
+  const delivered = (await service.getDispatches("task-dispatch-recovery"))[0];
+  assert.equal(delivered.status, "DELIVERED");
+  assert.equal(delivered.claim, null);
+  assert.equal(delivered.reportToken, firstAck.reportToken);
 
-  const reclaimed = await service.claimDispatch({
-    contractVersion: TASK_CONTROL_CONTRACT_VERSION,
-    signalId: pending.signalId,
-    hostId: "host-recovery",
-    leaseMs: 60_000,
-    idempotencyKey: "dispatch-recovery-claim-2",
-  });
-  assert.equal(reclaimed.dispatch.status, "DELIVERED");
-  assert.ok(reclaimed.dispatch.claim.claimEpoch > claimed.dispatch.claim.claimEpoch);
+  await assert.rejects(
+    service.claimDispatch({
+      contractVersion: TASK_CONTROL_CONTRACT_VERSION,
+      signalId: pending.signalId,
+      hostId: "host-recovery",
+      leaseMs: 60_000,
+      idempotencyKey: "dispatch-recovery-claim-2",
+    }),
+    (error) => error instanceof TaskControlError && error.code === "COMMAND_NOT_ALLOWED",
+  );
   await assert.rejects(
     service.reportHostResult({
       contractVersion: TASK_CONTROL_CONTRACT_VERSION,
@@ -274,7 +279,7 @@ test("delivered Dispatch can expire, be reclaimed for report recovery, and dedup
   const reportInput = {
     contractVersion: TASK_CONTROL_CONTRACT_VERSION,
     signalId: pending.signalId,
-    claimToken: reclaimed.dispatch.claim.claimToken,
+    reportToken: firstAck.reportToken,
     hostResultRef: "host-result:recovered",
     evidenceRefs: ["evidence:journal-replay"],
     idempotencyKey: "recovered-host-result",
@@ -283,9 +288,7 @@ test("delivered Dispatch can expire, be reclaimed for report recovery, and dedup
   const firstReport = await service.reportHostResult(reportInput);
   const secondReport = await service.reportHostResult(reportInput);
   assert.deepEqual(secondReport, firstReport);
-  const events = await service.listEvents("task-dispatch-recovery");
-  assert.ok(events.some((item) => item.eventType === "DISPATCH_CLAIM_RELEASED"));
-  assert.equal(events.filter((item) => item.eventType === "HOST_RESULT_REPORTED").length, 1);
+  assert.equal(firstReport.reportTokenConsumedAt !== null, true);
 });
 
 test("WorkItem Application Port supports claim/start/complete with refs only", async () => {
@@ -532,6 +535,7 @@ test("Host Command materialization exposes stable coordination refs and rejects 
   const command = await service.materializeHostCommand(pending.signalId);
   assert.deepEqual(command, {
     dispatchId: pending.signalId,
+    commandId: `host-command:${pending.signalId}`,
     taskId: "task-host-materialization",
     createdFromTaskVersion: pending.createdFromTaskVersion,
     workItemId: null,
@@ -539,7 +543,12 @@ test("Host Command materialization exposes stable coordination refs and rejects 
     targetProfileRef: null,
     conversationRef: "conversation:task-host-materialization",
     commandType: "CONTINUE_SESSION",
+    actionType: "CONTINUE_ROLE_SESSION",
     commandRef: `host-command:${pending.signalId}`,
+    payloadRef: null,
+    preconditions: {},
+    approvalRef: null,
+    expiresAt: pending.expiresAt,
     idempotencyKey: pending.idempotencyKey,
   });
   assert.equal("dom" in command, false);
@@ -554,7 +563,7 @@ test("Host Command materialization exposes stable coordination refs and rejects 
     idempotencyKey: "host-materialization-claim",
   });
   const token = claimed.dispatch.claim.claimToken;
-  await service.acknowledgeDispatch({
+  const materializationAck = await service.acknowledgeDispatch({
     contractVersion: TASK_CONTROL_CONTRACT_VERSION,
     signalId: pending.signalId,
     claimToken: token,
@@ -566,7 +575,7 @@ test("Host Command materialization exposes stable coordination refs and rejects 
     service.reportHostResult({
       contractVersion: TASK_CONTROL_CONTRACT_VERSION,
       signalId: pending.signalId,
-      claimToken: token,
+      reportToken: materializationAck.reportToken,
       hostResultRef: "host-result:materialization",
       dom: "<html>not allowed</html>",
       idempotencyKey: "host-materialization-inline",
@@ -595,7 +604,7 @@ test("persisted delivery Claim survives Store restart, Controller Claim, and lat
       idempotencyKey: "host-restart-claim",
     });
     const token = claimed.dispatch.claim.claimToken;
-    await first.acknowledgeDispatch({
+    const restartAck = await first.acknowledgeDispatch({
       contractVersion: TASK_CONTROL_CONTRACT_VERSION,
       signalId: pending.signalId,
       claimToken: token,
@@ -611,7 +620,7 @@ test("persisted delivery Claim survives Store restart, Controller Claim, and lat
     const reported = await second.reportHostResult({
       contractVersion: TASK_CONTROL_CONTRACT_VERSION,
       signalId: pending.signalId,
-      claimToken: token,
+      reportToken: restartAck.reportToken,
       hostResultRef: "host-result:after-restart",
       evidenceRefs: ["evidence:journal-persisted"],
       idempotencyKey: "host-result-after-restart",
