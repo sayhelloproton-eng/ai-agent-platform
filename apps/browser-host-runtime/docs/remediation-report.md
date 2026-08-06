@@ -1,42 +1,54 @@
-# SOL-BHR-001 综合审计整改报告
+# SOL-BHR-001｜第二轮综合审计整改报告
 
-## 已完成的 BHR 领域整改
+## 输入
 
-| 审计项 | 处理结果 |
-|---|---|
-| BHR-H01 Binding 会话漂移 | Observation 增加页面身份；动作前后强校验；ChatGPT 内切换会话自动 STALE |
-| BHR-H02 响应生命周期不完整 | `SUBMIT_MESSAGE` 默认等待提交、开始、完成；支持开始/完成超时和人工中断 |
-| BHR-H03 后台 Tab 截图 | 临时激活指定 Tab、截图、恢复原活动 Tab；串行 Capture Queue |
-| BHR-H04 Journal 恢复窗口 | `PREPARED / EXECUTING / EXECUTED / REPORTED`；EXECUTED 只补报 |
-| B-04 Fixture-only | Gateway 成为默认；Fixture 需显式测试开关 |
-| B-06 无 Binding 打开角色 | 新增 RoleSessionManager 和 PROVISIONING → READY 生命周期 |
-| B-07 Wake Approval | 提供 opt-in 提案模式；strict 仍为默认，等待总控冻结 |
+- 综合审计参考：`main@353a9ff39af6582e33f0ea8078af75f40c64380c`；
+- 连续实现基线：上一轮 BHR 整改包应用后的实现；
+- 本轮范围：`apps/browser-host-runtime/**`；
+- 未修改 Task、Plan、Gateway 服务端、TSK、LCL 或公共 Contracts。
 
-## 自动测试
+## 已关闭
 
-覆盖：
+1. HTTP Client 正确解析 `{ ok, requestId, data }`；
+2. 错误 Envelope、空 Data、无 Request ID、Envelope Version 不兼容具有确定错误；
+3. 增加真实 Node HTTP Fixture Server Contract Test；
+4. 正式 HTTP 不可用时清晰失败，不回退 Fixture；
+5. 默认配置启用 Platform Wake Candidate；
+6. Platform Wake 校验签名验证声明、目标、Task、Role、Expiry、Idempotency、Allowlist 和 Wake Envelope；
+7. 敏感 UI Action 继续要求 Single-use Approval；
+8. 新增 `CONTINUE_ROLE_SESSION`；
+9. Dispatch 分为 Delivery Ack 与 Host Result；
+10. Delivery Ack 后 Host Result 使用独立 `report_token`，不再依赖原 Dispatch Claim；
+11. Journal 新增 `DELIVERY_CONFIRMED / DELIVERY_ACKED`；
+12. Ack 失败、回答观察中重启和 Host Result 上报失败均不会重复发送；
+13. Service Worker 启动时主动尝试恢复补报；
+14. Runbook 明确真实 Chrome + ChatGPT 必验项；
+15. BHR Package Version 更新为 `0.2.1`，交付工具要求同步根锁文件中唯一 BHR Workspace 版本。
 
-- 无 Binding 创建角色会话；
-- 错误会话防误发；
-- ChatGPT 会话切换后 Binding 失效；
-- 完整响应开始与完成；
-- 开始超时、用户中断；
-- 扩展重启后只补报；
-- duplicate Host Command 和请求指纹冲突；
-- 指定非活动标签页截图与恢复；
-- Approval Grant 一次性消费；
-- 页面身份变化停止执行；
-- Host Result ack / fail 路由。
+## 自动化验证
+
+```text
+42 tests passed
+0 failed
+```
+
+覆盖 HTTP Envelope、正式无服务端失败、平台 Wake、敏感 Approval、双阶段回报、Controller Claim 后 Report、重复 Ack/Report、重启补报、错误会话、过期 Command、后台截图和响应生命周期。
+
+## 公共合同提案
+
+本领域只提交以下候选，等待总控冻结：
+
+- Platform Wake Authorization v0.1.0；
+- `browser.dispatch.deliveryAck`；
+- `browser.dispatch.hostResult`；
+- `delivery_receipt` 与 `report_token`；
+- Delivery Claim 与 Response Observation 的双阶段生命周期。
 
 ## 剩余跨领域阻断
 
-以下不属于 BHR 单领域可完成事项：
-
-1. Gateway 尚未实现 `browser.host.* / browser.dispatch.* / browser.payload.resolve / approval.grant.*` 路由；
-2. TSK DispatchSignal 尚未物化为本文 Candidate Host Command；
-3. TSK 尚未接收完整 Host Result、Observation 和 Evidence 引用；
-4. 普通 Platform Wake 的授权语义尚未由总控冻结；
-5. CTL / TSK 公共 Task 与 Command 合同仍未统一；
-6. 四领域 E2E 和根 `verify` 门禁仍由总控集成实现。
-
-BHR 不修改 Task / Plan，不代替 Gateway、TSK 或 Approval 领域实现这些部分。
+- Gateway 尚需实现正式 Browser Host Operation；
+- TSK 尚需物化 Host Command；
+- TSK 尚需冻结 Delivery Ack 与 Controller Claim 的交互；
+- Approval 服务端合同未冻结；
+- 四领域真实 E2E 与根级 BHR 门禁由总控完成；
+- 真实 Chrome + ChatGPT 手工验收尚需在用户环境执行。

@@ -68,7 +68,7 @@ export class RoleSessionManager {
         action_type: "SUBMIT_MESSAGE",
         payload: {
           text: resolved_payload.wake_text,
-          wait_for_response: resolved_payload.wait_for_response !== false,
+          wait_for_response: false,
           timeout_ms: resolved_payload.timeout_ms,
           expected_identity: {
             gpt_ref: binding.gpt_ref,
@@ -90,6 +90,18 @@ export class RoleSessionManager {
     return {
       status: wake_execution?.status ?? "ACTION_SUCCEEDED",
       binding,
+      response_pending: Boolean(wake_execution),
+      delivery: wake_execution ? {
+        delivery_id: `${command.command_id}:delivery`,
+        submitted_at: wake_execution.details?.submitted_at ?? new Date().toISOString(),
+        response_baseline: wake_execution.details?.response_baseline ?? null,
+        details: wake_execution.details ?? {}
+      } : {
+        delivery_id: `${command.command_id}:delivery`,
+        submitted_at: new Date().toISOString(),
+        response_baseline: null,
+        details: { session_opened: true }
+      },
       details: {
         session_created: created,
         tab_id: binding.chrome_tab_id,

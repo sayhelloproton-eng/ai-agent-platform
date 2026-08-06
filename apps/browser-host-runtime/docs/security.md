@@ -12,6 +12,7 @@
 - `EXECUTING` 后不确定即停止，不重试副作用；
 - `EXECUTED` 后未上报只补报原结果；
 - 指定后台标签页截图需要短暂激活目标 Tab，并恢复原活动 Tab；该行为必须可见、串行且可暂停；
-- 正式默认 Approval Policy 为 `strict`；
-- Platform Wake 免审批仅为等待总控冻结的提案模式；
+- 当前发布候选默认 Approval Policy 为 `platform_wake_candidate`；只有签名、目标、任务、角色、过期时间、幂等键、动作白名单与结构化 Wake Envelope 全部匹配时，最小 Platform Wake 才可免逐次 Approval；
+- `strict` 仍作为可切换的收紧模式；候选策略属于公共安全语义提案，最终由总控冻结；
+- 发布、删除、付款、授权确认、任意已登记敏感 UI Action 仍必须消费一次性 Approval；
 - 视觉模型输出只形成 Assessment，不构成授权。

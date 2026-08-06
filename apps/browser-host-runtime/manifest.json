@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "AI Agent Platform Browser Host Runtime",
-  "version": "0.2.0",
-  "description": "Observe, open and drive approved ChatGPT role sessions for ai-agent-platform.",
+  "version": "0.2.1",
+  "description": "Observe, open and drive authorized ChatGPT role sessions with dual-stage dispatch reporting.",
   "minimum_chrome_version": "120",
   "permissions": [
     "activeTab",

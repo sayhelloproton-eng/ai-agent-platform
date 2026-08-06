@@ -15,7 +15,7 @@ export const DEFAULT_CONFIG = Object.freeze({
   model_timeout_ms: 20000,
   screenshot_quality: 75,
   observe_visible_text_max_chars: 20000,
-  approval_policy_mode: APPROVAL_POLICY_MODE.STRICT,
+  approval_policy_mode: APPROVAL_POLICY_MODE.PLATFORM_WAKE_CANDIDATE,
   fixture_test_mode: false,
   paused: false,
   emergency_stopped: false

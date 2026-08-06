@@ -5,7 +5,9 @@ import assert from "node:assert/strict";
 
 const root = new URL("../", import.meta.url).pathname;
 const manifest = JSON.parse(await readFile(join(root, "manifest.json"), "utf8"));
+const packageJson = JSON.parse(await readFile(join(root, "package.json"), "utf8"));
 assert.equal(manifest.manifest_version, 3);
+assert.equal(manifest.version, packageJson.version, "manifest.json and package.json versions must match");
 assert.equal(manifest.background.type, "module");
 assert(!manifest.host_permissions.includes("<all_urls>"));
 for (const forbidden of ["cookies", "debugger", "nativeMessaging", "downloads", "webRequestBlocking"]) {

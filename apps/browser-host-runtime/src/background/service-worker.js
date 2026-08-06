@@ -22,6 +22,7 @@ async function registerAndRecover() {
   const runtime = await createRuntime();
   await runtime.journal?.recoverAfterRestart?.();
   try { await runtime.hostRegistry.register(); } catch (error) { console.warn("BHR host registration deferred", asSafeError(error)); }
+  try { await runtime.coordinator.processOne(); } catch (error) { console.warn("BHR recovery report/observation deferred", asSafeError(error)); }
   await ensureAlarms();
 }
 

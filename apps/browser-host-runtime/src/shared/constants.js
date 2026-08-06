@@ -1,4 +1,5 @@
 export const CONTRACT_VERSION = "0.1.0";
+export const GATEWAY_ENVELOPE_VERSION = "1.0";
 
 export const APPLICATION_OPERATIONS = Object.freeze({
   HOST_REGISTER: "browser.host.register",
@@ -6,8 +7,10 @@ export const APPLICATION_OPERATIONS = Object.freeze({
   DISPATCH_LIST_PENDING: "browser.dispatch.listPending",
   DISPATCH_CLAIM: "browser.dispatch.claim",
   DISPATCH_GET: "browser.dispatch.get",
-  DISPATCH_ACK: "browser.dispatch.ack",
+  DISPATCH_DELIVERY_ACK: "browser.dispatch.deliveryAck",
+  DISPATCH_HOST_RESULT: "browser.dispatch.hostResult",
   DISPATCH_FAIL: "browser.dispatch.fail",
+  DISPATCH_ACK_LEGACY: "browser.dispatch.ack",
   DISPATCH_REPORT_LEGACY: "browser.dispatch.report",
   PAYLOAD_RESOLVE: "browser.payload.resolve",
   APPROVAL_GRANT_GET: "approval.grant.get",
@@ -18,6 +21,7 @@ export const ACTION_TYPES = Object.freeze({
   OBSERVE_PAGE: "OBSERVE_PAGE",
   FOLLOW_LATEST: "FOLLOW_LATEST",
   OPEN_OR_RESUME_SESSION: "OPEN_OR_RESUME_SESSION",
+  CONTINUE_ROLE_SESSION: "CONTINUE_ROLE_SESSION",
   SET_COMPOSER_TEXT: "SET_COMPOSER_TEXT",
   SUBMIT_MESSAGE: "SUBMIT_MESSAGE",
   STOP_GENERATION: "STOP_GENERATION",
@@ -27,14 +31,23 @@ export const ACTION_TYPES = Object.freeze({
 
 export const HIGH_RISK_ACTIONS = new Set([
   ACTION_TYPES.OPEN_OR_RESUME_SESSION,
+  ACTION_TYPES.CONTINUE_ROLE_SESSION,
   ACTION_TYPES.SET_COMPOSER_TEXT,
   ACTION_TYPES.SUBMIT_MESSAGE,
   ACTION_TYPES.STOP_GENERATION,
   ACTION_TYPES.CLICK_REGISTERED_UI
 ]);
 
+export const PLATFORM_WAKE_ACTIONS = new Set([
+  ACTION_TYPES.OPEN_OR_RESUME_SESSION,
+  ACTION_TYPES.CONTINUE_ROLE_SESSION,
+  ACTION_TYPES.SUBMIT_MESSAGE
+]);
+
 export const APPROVAL_POLICY_MODE = Object.freeze({
   STRICT: "strict",
+  PLATFORM_WAKE_CANDIDATE: "platform_wake_candidate",
+  // Kept as an input alias for configs written by the first remediation.
   PLATFORM_WAKE_PROPOSAL: "platform_wake_proposal"
 });
 
@@ -53,6 +66,8 @@ export const JOURNAL_STATE = Object.freeze({
   CLAIMED: "CLAIMED",
   PREPARED: "PREPARED",
   EXECUTING: "EXECUTING",
+  DELIVERY_CONFIRMED: "DELIVERY_CONFIRMED",
+  DELIVERY_ACKED: "DELIVERY_ACKED",
   EXECUTED: "EXECUTED",
   REPORTED: "REPORTED",
   FAILED: "FAILED",

@@ -13,7 +13,7 @@
   };
 
   const ACTIONS = new Set([
-    "OBSERVE_PAGE", "FOLLOW_LATEST", "SET_COMPOSER_TEXT", "SUBMIT_MESSAGE",
+    "OBSERVE_PAGE", "FOLLOW_LATEST", "SET_COMPOSER_TEXT", "SUBMIT_MESSAGE", "CONTINUE_ROLE_SESSION",
     "STOP_GENERATION", "CLICK_REGISTERED_UI", "WAIT_FOR_RESPONSE"
   ]);
 
@@ -237,7 +237,7 @@
     send.click();
     const submittedAt = new Date().toISOString();
     if (payload.wait_for_response === false) {
-      return { status: "ACTION_SUCCEEDED", details: { message_submitted: true, submitted_at: submittedAt, submitted_text: set.composer_text } };
+      return { status: "ACTION_SUCCEEDED", details: { message_submitted: true, submitted_at: submittedAt, submitted_text: set.composer_text, response_baseline: baseline } };
     }
     const completed = await waitForCompleteResponse(payload, baseline);
     return {
@@ -260,7 +260,7 @@
   }
 
   async function waitForResponse(payload) {
-    return waitForCompleteResponse(payload, responseSnapshot());
+    return waitForCompleteResponse(payload, payload.response_baseline ?? responseSnapshot());
   }
 
   async function execute(actionType, payload) {
@@ -269,7 +269,8 @@
       case "OBSERVE_PAGE": return { status: "ACTION_SUCCEEDED", details: {} };
       case "FOLLOW_LATEST": state.followLatest = payload.enabled !== false; state.userReviewing = false; if (state.followLatest) scrollToBottom(); return { status: "ACTION_SUCCEEDED", details: { follow_latest: state.followLatest } };
       case "SET_COMPOSER_TEXT": return { status: "ACTION_SUCCEEDED", details: setComposerText(payload.text, payload.expected_identity) };
-      case "SUBMIT_MESSAGE": return submitMessage(payload);
+      case "SUBMIT_MESSAGE":
+      case "CONTINUE_ROLE_SESSION": return submitMessage(payload);
       case "STOP_GENERATION": {
         ensureNoUserConflict();
         ensureExpectedIdentity(payload.expected_identity);

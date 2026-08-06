@@ -7,7 +7,7 @@
     <form id="config">
       <label>Transport Mode<select id="transport_mode"><option value="gateway">gateway</option><option value="fixture">fixture（仅测试）</option></select></label>
       <label><input id="fixture_test_mode" type="checkbox">允许 Fixture Transport（仅本地测试）</label>
-      <label>Approval Policy<select id="approval_policy_mode"><option value="strict">strict（正式默认）</option><option value="platform_wake_proposal">platform_wake_proposal（等待总控冻结）</option></select></label>
+      <label>Approval Policy<select id="approval_policy_mode"><option value="platform_wake_candidate">platform_wake_candidate（当前默认候选策略）</option><option value="strict">strict（所有高风险动作审批）</option></select></label>
       <label>Gateway Endpoint<input id="gateway_endpoint" type="url"></label>
       <label>Model Mode<select id="model_mode"><option value="fixture">fixture</option><option value="http">http / DeepSeek Adapter</option></select></label>
       <label>Model Endpoint<input id="model_endpoint" type="url"></label>

@@ -74,6 +74,10 @@ export class BindingRegistry {
     ) ?? null;
   }
 
+  async get(binding_id) {
+    return (await this.list()).find((item) => item.binding_id === binding_id) ?? null;
+  }
+
   async findByTabId(chrome_tab_id) {
     return (await this.list()).find((item) => item.chrome_tab_id === chrome_tab_id) ?? null;
   }

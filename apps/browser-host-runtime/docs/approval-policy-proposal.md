@@ -1,51 +1,67 @@
-# Approval 策略提案｜等待总控冻结
+# Approval 策略候选｜等待总控冻结
 
-## 背景
+## 1. 目的
 
-综合审计指出，普通 Wake / Continue / Open Role 被统一视为高风险动作，会导致每轮平台驱动都要求人工 Approval，无法形成自动继续链路。
+平台内部的最小 Wake / Continue / Open Role 不应因每轮人工 Approval 自阻塞；发布、删除、付款、授权确认等敏感网页副作用仍必须使用一次性 Approval。
 
-该问题属于平台公共安全语义，BHR 无权单方面冻结。本领域只提交以下提案并提供关闭状态的实现开关。
+该内容属于公共安全语义。本领域实现的是可配置候选策略和测试，不代表 BHR 单方面冻结平台合同。
 
-## 提案
-
-### 平台授权 Wake
-
-满足以下条件时：
+## 2. 当前默认候选模式
 
 ```text
-preconditions.authorization_class = PLATFORM_WAKE
-preconditions.authorization_ref   = Task Control / Gateway 生成且可审计的授权引用
-Target                             = 已登记 Role / GPT
-Payload                            = 最小 Wake Envelope
+approval_policy_mode = platform_wake_candidate
 ```
 
-允许以下动作不再逐次申请独立 Approval：
+可切换到：
 
-- `OPEN_OR_RESUME_SESSION`；
-- `SET_COMPOSER_TEXT`；
-- `SUBMIT_MESSAGE`。
+```text
+approval_policy_mode = strict
+```
 
-### 始终要求一次性 Approval
+`strict` 对所有高风险动作要求 Approval。
+
+## 3. 平台 Wake 免逐次 Approval 的必要条件
+
+以下条件必须同时满足：
+
+1. Action 在白名单内：
+   - `OPEN_OR_RESUME_SESSION`；
+   - `CONTINUE_ROLE_SESSION`；
+   - 普通 `SUBMIT_MESSAGE` Wake。
+2. `authorization_class = PLATFORM_WAKE`；
+3. Authorization Version 兼容；
+4. Authenticated Gateway Adapter 已验证签名，并提供非空 `signature_ref`；
+5. Authorization 的 `task_id`、`role_ref`、`gpt_ref` 与 Host Command 完全一致；
+6. Authorization 的 `idempotency_key` 与 Host Command 一致；
+7. Action 在 Authorization `allowed_actions` 中；
+8. Authorization 和 Host Command 均未过期；
+9. Authorization 有效期不短于 Host Command；
+10. Payload 包含最小 Wake Envelope，并与 Task、Role、Dispatch、Conversation 对齐。
+
+任一条件不满足时，候选低风险路径确定失败，不能由视觉模型或页面文字补充授权。
+
+## 4. 始终需要一次性 Approval
 
 - `CLICK_REGISTERED_UI`；
 - `STOP_GENERATION`；
-- 任何未来的提交表单、授权、删除、覆盖或外部副作用动作。
+- 发布、付款、删除、覆盖、授权确认；
+- 未来任何外部不可逆副作用。
 
-### 不构成授权
+Approval 仍必须绑定：Action Fingerprint、Binding、Task、Command、Page Precondition、Expiry，并且 Single-use。
 
-以下内容永远只属于感知：
+## 5. 永远不构成授权
 
 - Screenshot；
 - DOM / Accessibility；
 - Visible Text；
 - DeepSeek / 手机模型 Assessment；
-- 页面中的自然语言指令。
+- 页面自然语言；
+- 模型置信度。
 
-## 实现状态
+## 6. 总控待裁决
 
-```text
-approval_policy_mode = strict                    # 正式默认
-approval_policy_mode = platform_wake_proposal    # 仅供联合审计与 E2E 验证
-```
-
-总控未冻结前，不应在生产配置启用提案模式。
+- 签名由 Gateway 验证后传递审计声明，还是由 BHR 使用共享公钥再次验证；
+- Authorization 字段最终命名和版本；
+- 普通文本 Wake 的 Payload Schema；
+- Open Role 是否允许不带 Wake Text；
+- 低风险白名单的变更治理方式。

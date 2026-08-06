@@ -140,3 +140,20 @@ export function buildHostResult({ command, status, binding_id, pre_observation_r
     completed_at: new Date().toISOString()
   };
 }
+export function buildDeliveryFact({ command, binding_id, execution }) {
+  const submittedAt = execution?.delivery?.submitted_at ?? execution?.details?.submitted_at ?? new Date().toISOString();
+  return {
+    delivery_version: CONTRACT_VERSION,
+    delivery_id: execution?.delivery?.delivery_id ?? `${command.command_id}:delivery`,
+    command_id: command.command_id,
+    dispatch_ref: command.dispatch_ref,
+    task_id: command.task_id,
+    binding_id,
+    action_type: command.action.type,
+    status: "DELIVERED",
+    submitted_at: submittedAt,
+    response_expected: Boolean(execution?.response_pending),
+    details: execution?.delivery?.details ?? {}
+  };
+}
+

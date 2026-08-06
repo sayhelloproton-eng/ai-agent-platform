@@ -46,6 +46,9 @@ export class CommandJournal {
       command,
       state: JOURNAL_STATE.RECEIVED,
       result: null,
+      delivery: null,
+      delivery_ack: null,
+      report_token: null,
       history: [{ state: JOURNAL_STATE.RECEIVED, at: now }],
       created_at: now,
       updated_at: now
@@ -61,14 +64,25 @@ export class CommandJournal {
     const entry = entries[command_id];
     if (!entry) throw new BhrError("JOURNAL_ENTRY_NOT_FOUND", `No journal entry for ${command_id}`);
     entry.state = state;
-    entry.details = details;
+    entry.details = { ...(entry.details ?? {}), ...(details ?? {}) };
     if (details?.result) entry.result = details.result;
     if (details?.claim_token) entry.claim_token = details.claim_token;
     if (details?.binding_id) entry.binding_id = details.binding_id;
+    if (details?.delivery) entry.delivery = details.delivery;
+    if (details?.delivery_ack) entry.delivery_ack = details.delivery_ack;
+    if (details?.report_token) entry.report_token = details.report_token;
     entry.updated_at = new Date().toISOString();
     entry.history.push({ state, at: entry.updated_at, details });
     await this.pruneAndSave(entries);
     return entry;
+  }
+
+  async markDeliveryConfirmed(command_id, { delivery, binding_id, execution = null }) {
+    return this.mark(command_id, JOURNAL_STATE.DELIVERY_CONFIRMED, { delivery, binding_id, execution });
+  }
+
+  async markDeliveryAcked(command_id, { delivery_ack, report_token, binding_id }) {
+    return this.mark(command_id, JOURNAL_STATE.DELIVERY_ACKED, { delivery_ack, report_token, binding_id });
   }
 
   async markExecuted(command_id, { result, binding_id, execution = null }) {
@@ -77,13 +91,17 @@ export class CommandJournal {
 
   async recoverAfterRestart() {
     const entries = await this.entries();
-    const recovered = { uncertain: [], reportable: [] };
+    const recovered = { uncertain: [], delivery_ack_pending: [], observation_pending: [], reportable: [] };
     for (const entry of Object.values(entries)) {
       if (entry.state === JOURNAL_STATE.EXECUTING || entry.state === JOURNAL_STATE.SIDE_EFFECT_STARTED) {
         entry.state = JOURNAL_STATE.UNCERTAIN;
         entry.updated_at = new Date().toISOString();
         entry.history.push({ state: JOURNAL_STATE.UNCERTAIN, at: entry.updated_at, details: { reason: "SERVICE_WORKER_RESTART_DURING_EXECUTION" } });
         recovered.uncertain.push(entry.command_id);
+      } else if (entry.state === JOURNAL_STATE.DELIVERY_CONFIRMED && entry.delivery) {
+        recovered.delivery_ack_pending.push(entry.command_id);
+      } else if (entry.state === JOURNAL_STATE.DELIVERY_ACKED && entry.delivery && entry.report_token) {
+        recovered.observation_pending.push(entry.command_id);
       } else if (entry.state === JOURNAL_STATE.SIDE_EFFECT_CONFIRMED) {
         if (entry.result || entry.details?.result) {
           entry.state = JOURNAL_STATE.EXECUTED;
@@ -103,6 +121,13 @@ export class CommandJournal {
     }
     await this.pruneAndSave(entries);
     return recovered;
+  }
+
+  async recoverableEntries() {
+    const entries = await this.entries();
+    return Object.values(entries)
+      .filter((entry) => [JOURNAL_STATE.DELIVERY_CONFIRMED, JOURNAL_STATE.DELIVERY_ACKED, JOURNAL_STATE.EXECUTED].includes(entry.state))
+      .sort((a, b) => a.updated_at.localeCompare(b.updated_at));
   }
 
   async recoverUncertain() { return this.recoverAfterRestart(); }
