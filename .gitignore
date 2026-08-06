@@ -44,6 +44,7 @@ secrets/
 .omo/
 .local-state/
 runtime-state/
+.runtime/
 
 # Local private context: ignored
 .private-context
