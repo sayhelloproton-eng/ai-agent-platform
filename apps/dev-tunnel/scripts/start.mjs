@@ -111,6 +111,7 @@ try {
   writeState(partialState);
   const publicBaseUrl = await waitForPublicUrl();
   await waitForHttp(`${publicBaseUrl}/health`, {
+    timeoutMs: 30_000,
     headers: {
       accept: "application/json",
       "x-tunnel-skip-antiphishing-page": "true",

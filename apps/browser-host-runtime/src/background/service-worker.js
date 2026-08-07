@@ -222,7 +222,10 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       }
       default: throw Object.assign(new Error(`Unsupported runtime message: ${message.type}`), { code: "MESSAGE_TYPE_UNSUPPORTED" });
     }
-  })().then(sendResponse).catch((error) => sendResponse({ ok: false, error: asSafeError(error) }));
+  })().then(sendResponse).catch((error) => {
+    console.error("BHR runtime message failed", error);
+    sendResponse({ ok: false, error: asSafeError(error) });
+  });
   return true;
 });
 
