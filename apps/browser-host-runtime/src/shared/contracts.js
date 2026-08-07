@@ -98,6 +98,7 @@ export function assertObservation(value) {
   requireString(input.generation_state, "observation.generation_state", { max: 64 });
   requireBoolean(input.follow_latest, "observation.follow_latest");
   optionalString(input.screenshot_ref, "observation.screenshot_ref", { max: 512 });
+  optionalString(input.screenshot_unavailable_reason, "observation.screenshot_unavailable_reason", { max: 128 });
   optionalString(input.visible_text_ref, "observation.visible_text_ref", { max: 512 });
   optionalString(input.dom_summary_ref, "observation.dom_summary_ref", { max: 512 });
   requireArray(input.interactive_elements ?? [], "observation.interactive_elements", { max: 200 });

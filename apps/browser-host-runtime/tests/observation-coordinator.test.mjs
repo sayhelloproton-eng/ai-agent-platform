@@ -153,3 +153,47 @@ test("message-port closure is not treated as a missing receiver and is never aut
   assert.equal(injectionCalls, 0);
 });
 
+
+test("observation exposes explicit screenshot unavailability reason in the public observation result", async () => {
+  globalThis.chrome = {
+    runtime: { lastError: null },
+    tabs: {
+      sendMessage: (_tabId, message, callback) => {
+        if (message.type === "BHR_OBSERVE") {
+          callback({
+            ok: true,
+            data: {
+              provider: "chatgpt-web",
+              gpt_ref: "g-test",
+              conversation_ref: "c-test",
+              url: "https://chatgpt.com/g/g-test/c/c-test",
+              page_state: "READY",
+              generation_state: "IDLE",
+              follow_latest: true,
+              visible_text: "hello",
+              dom_summary: {},
+              accessibility_summary: {},
+              message_summary: {},
+              interactive_elements: [],
+              blocking_ui: [],
+              observed_at: "2026-08-07T15:06:17.559Z"
+            }
+          });
+          return;
+        }
+        callback({ ok: true, data: { provider: "chatgpt-web" } });
+      },
+      get: async () => ({ id: 20, windowId: 2, active: true, url: "https://chatgpt.com/g/g-test/c/c-test" }),
+      query: async () => [{ id: 20, windowId: 2, active: true }],
+      captureVisibleTab: async () => {
+        throw new Error("Either the '<all_urls>' or 'activeTab' permission is required.");
+      }
+    }
+  };
+  const stored = [];
+  const coordinator = new ObservationCoordinator({ host_id: "host", evidenceStore: { put: async (ref, value) => stored.push({ ref, value }) } });
+  const observed = await coordinator.observe({ binding_id: "binding", chrome_tab_id: 20 }, { includeScreenshot: true });
+  assert.equal(observed.observation.screenshot_ref, null);
+  assert.equal(observed.observation.screenshot_unavailable_reason, "SCREENSHOT_PERMISSION_UNAVAILABLE");
+  assert.equal(observed.local.screenshot_unavailable_reason, "SCREENSHOT_PERMISSION_UNAVAILABLE");
+});

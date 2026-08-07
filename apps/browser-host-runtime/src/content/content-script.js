@@ -399,15 +399,39 @@
     disposeContentScript("EXTENSION_CONTEXT_INVALIDATED");
   }
 
+  function isExtensionContextInvalidated(error) {
+    return /Extension context invalidated/i.test(String(error?.message ?? error));
+  }
+
+  function handleRuntimeDeliveryError(error) {
+    if (!isExtensionContextInvalidated(error)) return false;
+    invalidateOldRuntimeContext();
+    return true;
+  }
+
   function sendRuntimeMessageSafely(message) {
-    if (state.runtimeInvalidated) return;
+    if (state.runtimeInvalidated || state.disposed) return;
     try {
       const pending = chrome.runtime.sendMessage(message);
       if (pending?.catch) pending.catch((error) => {
-        if (/Extension context invalidated/i.test(String(error?.message ?? error))) invalidateOldRuntimeContext();
+        handleRuntimeDeliveryError(error);
       });
     } catch (error) {
-      if (/Extension context invalidated/i.test(String(error?.message ?? error))) invalidateOldRuntimeContext();
+      handleRuntimeDeliveryError(error);
+    }
+  }
+
+  function sendResponseSafely(sendResponse, response) {
+    if (state.runtimeInvalidated || state.disposed) return false;
+    try {
+      sendResponse(response);
+      return true;
+    } catch (error) {
+      if (handleRuntimeDeliveryError(error)) return false;
+      // Never let a late response-port failure escape as an uncaught content-script
+      // exception. The background caller owns transport retry policy; browser side
+      // effects must not be re-executed merely because the response channel closed.
+      return false;
     }
   }
 
@@ -431,7 +455,7 @@
   mutationObserver.observe(document.documentElement, { childList: true, subtree: true });
 
   runtimeMessageListener = (message, _sender, sendResponse) => {
-    (async () => {
+    void (async () => {
       try {
         if (message.type === "BHR_PING") return { ok: true, data: identifyPage() };
         if (message.type === "BHR_OBSERVE") return { ok: true, data: observe(message.observation_id) };
@@ -445,7 +469,11 @@
       } catch (error) {
         return safeError(error.code ?? "CONTENT_ACTION_FAILED", error.message ?? "Content action failed.", error.details ?? null);
       }
-    })().then(sendResponse);
+    })().then((response) => {
+      sendResponseSafely(sendResponse, response);
+    }, (error) => {
+      sendResponseSafely(sendResponse, safeError(error?.code ?? "CONTENT_ACTION_FAILED", error?.message ?? "Content action failed.", error?.details ?? null));
+    });
     return true;
   };
   chrome.runtime.onMessage.addListener(runtimeMessageListener);

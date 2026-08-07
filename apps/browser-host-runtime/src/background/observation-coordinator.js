@@ -205,6 +205,7 @@ export class ObservationCoordinator {
       generation_state: page.data.generation_state,
       follow_latest: page.data.follow_latest,
       screenshot_ref: screenshot.ref,
+      screenshot_unavailable_reason: screenshot.unavailable_reason,
       visible_text_ref: visibleTextRef,
       dom_summary_ref: domRef,
       interactive_elements: page.data.interactive_elements,

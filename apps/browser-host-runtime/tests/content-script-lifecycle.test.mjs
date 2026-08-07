@@ -104,7 +104,7 @@ test("reinjection disposes the previous live content-script instance before regi
   assert.equal(secondMarker.state, "ready");
 });
 
-function createComposerHarness({ transform = (value) => value, bodyText = "", extraButtons = [], messageRoles = [] } = {}) {
+function createComposerHarness({ transform = (value) => value, bodyText = "", extraButtons = [], messageRoles = [], hidden = false } = {}) {
   const runtimeListeners = new Set();
   let sendClicks = 0;
   const extraButtonClicks = new Map();
@@ -148,6 +148,8 @@ function createComposerHarness({ transform = (value) => value, bodyText = "", ex
   const document = {
     documentElement: { scrollHeight: 0, scrollTop: 0, clientHeight: 0, scrollTo() {} },
     readyState: "complete",
+    hidden,
+    visibilityState: hidden ? "hidden" : "visible",
     body: { innerText: bodyText },
     title: "GPT",
     scrollingElement: null,
@@ -306,4 +308,47 @@ test("a fresh pre-observation does not invalidate a still-live registered UI ref
   }, {}, resolve));
   assert.equal(clicked.ok, true);
   assert.equal(harness.getExtraButtonClicks("Approve"), 1);
+});
+
+
+test("inactive ChatGPT tab remains content-addressable and does not self-invalidate merely because it is hidden", async () => {
+  const harness = createComposerHarness({ hidden: true });
+  const listener = [...harness.runtimeListeners][0];
+  const response = await new Promise((resolve) => {
+    listener({
+      type: "BHR_EXECUTE_ACTION",
+      action_type: "SUBMIT_MESSAGE",
+      payload: {
+        text: "continue task",
+        wait_for_response: false,
+        expected_identity: { gpt_ref: "g-test", conversation_ref: "conv" }
+      }
+    }, {}, resolve);
+  });
+  assert.equal(response.ok, true);
+  assert.equal(harness.context.__AI_AGENT_PLATFORM_BHR_CONTENT_SCRIPT__.state, "ready");
+  assert.equal(harness.getSendClicks(), 1);
+});
+
+test("late response delivery after extension reload is contained and disposes the stale content-script context", async () => {
+  const harness = createComposerHarness({ hidden: true });
+  const listener = [...harness.runtimeListeners][0];
+  const marker = harness.context.__AI_AGENT_PLATFORM_BHR_CONTENT_SCRIPT__;
+  const accepted = listener({
+    type: "BHR_EXECUTE_ACTION",
+    action_type: "SUBMIT_MESSAGE",
+    payload: {
+      text: "continue task",
+      wait_for_response: false,
+      expected_identity: { gpt_ref: "g-test", conversation_ref: "conv" }
+    }
+  }, {}, () => {
+    throw new Error("Extension context invalidated.");
+  });
+  assert.equal(accepted, true);
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.equal(harness.getSendClicks(), 1);
+  assert.equal(marker.state, "disposed");
+  assert.equal(marker.reason, "EXTENSION_CONTEXT_INVALIDATED");
+  assert.equal(harness.runtimeListeners.size, 0);
 });
