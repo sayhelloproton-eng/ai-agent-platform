@@ -1,15 +1,29 @@
 (() => {
   "use strict";
 
+  const CONTENT_SCRIPT_SLOT = "__AI_AGENT_PLATFORM_BHR_CONTENT_SCRIPT__";
+  const previousRuntime = globalThis[CONTENT_SCRIPT_SLOT];
+  if (previousRuntime && typeof previousRuntime.dispose === "function") {
+    try { previousRuntime.dispose("REINJECTED"); } catch { /* stale contexts are best-effort only */ }
+  }
+  // Never short-circuit on the legacy string marker. After an extension reload,
+  // the old content-script JavaScript may still exist in the page while its
+  // extension context is invalid. A fresh programmatic injection must therefore
+  // replace the marker and install a new live message listener.
+  const runtimeMarker = { state: "loading", dispose: null, reason: null };
+  globalThis[CONTENT_SCRIPT_SLOT] = runtimeMarker;
+
   const state = {
     followLatest: true,
     userReviewing: false,
     userActiveUntil: 0,
     currentObservationId: null,
-    elementCatalog: new Map(),
+    elementCatalogs: new Map(),
     lastProgrammaticScrollAt: 0,
     lastPageSignal: "",
-    signalTimer: null
+    signalTimer: null,
+    runtimeInvalidated: false,
+    disposed: false
   };
 
   const ACTIONS = new Set([
@@ -17,7 +31,7 @@
     "STOP_GENERATION", "CLICK_REGISTERED_UI", "WAIT_FOR_RESPONSE"
   ]);
 
-  function safeError(code, message) { return { ok: false, error: { code, message } }; }
+  function safeError(code, message, details = null) { return { ok: false, error: { code, message, details } }; }
   function normalizeText(value) { return String(value ?? "").replace(/\s+/g, " ").trim(); }
   function sleep(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
   function visible(element) {
@@ -78,14 +92,27 @@
     for (const element of candidates.slice(0, 20)) {
       result.push({ type: roleOf(element).toUpperCase(), text: normalizeText(element.innerText || element.textContent).slice(0, 500) });
     }
-    const bodyText = normalizeText(document.body?.innerText).toLowerCase();
+
+    // Never classify ordinary conversation text as blocking UI. A transcript may
+    // legitimately discuss phrases such as "network error", "log in" or
+    // "rate limit". Only visible UI controls or dialog/alert surfaces count as
+    // deterministic blocking evidence.
+    const interactiveNames = [...document.querySelectorAll('button,a,[role="button"],[role="link"]')]
+      .filter(visible)
+      .map(accessibleName);
+    const loginName = interactiveNames.find((name) => /^(log in|sign up|登录|注册)$/iu.test(name));
+    if (loginName) result.push({ type: "LOGIN_REQUIRED", text: loginName });
+
+    const surfaceText = candidates
+      .map((element) => normalizeText(element.innerText || element.textContent).toLowerCase())
+      .join(" ");
     const patterns = [
-      ["LOGIN_REQUIRED", ["log in", "sign up", "登录", "注册"]],
       ["RATE_LIMIT", ["too many requests", "rate limit", "达到上限", "请求过多"]],
       ["NETWORK_ERROR", ["network error", "网络错误", "连接错误"]]
     ];
     for (const [type, terms] of patterns) {
-      if (terms.some((term) => bodyText.includes(term.toLowerCase()))) result.push({ type, text: terms.find((term) => bodyText.includes(term.toLowerCase())) });
+      const matched = terms.find((term) => surfaceText.includes(term.toLowerCase()));
+      if (matched) result.push({ type, text: matched });
     }
     return result.slice(0, 20);
   }
@@ -116,12 +143,17 @@
     return true;
   }
   function collectInteractive(observationId) {
-    state.elementCatalog.clear();
+    const catalog = new Map();
+    state.elementCatalogs.set(observationId, catalog);
+    while (state.elementCatalogs.size > 4) {
+      const oldest = state.elementCatalogs.keys().next().value;
+      state.elementCatalogs.delete(oldest);
+    }
     const selectors = 'button,a[href],input,textarea,select,[role="button"],[role="link"],[contenteditable="true"]';
     const elements = [...document.querySelectorAll(selectors)].filter(visible).slice(0, 150);
     return elements.map((element, index) => {
       const ref = `${observationId}:el:${index}`;
-      state.elementCatalog.set(ref, element);
+      catalog.set(ref, element);
       const rect = element.getBoundingClientRect();
       return {
         element_ref: ref,
@@ -149,8 +181,13 @@
       .slice(0, 120)
       .map((element) => ({ role: roleOf(element), name: accessibleName(element), disabled: element.disabled === true || element.getAttribute("aria-disabled") === "true" }));
   }
+  function messageNodes() {
+    const authored = [...document.querySelectorAll('[data-message-author-role]')].filter(visible);
+    if (authored.length > 0) return authored;
+    return [...document.querySelectorAll('article')].filter(visible);
+  }
   function collectMessageSummary() {
-    const nodes = [...document.querySelectorAll('[data-message-author-role],article')].filter(visible).slice(-12);
+    const nodes = messageNodes().slice(-12);
     return nodes.map((node, index) => ({
       index,
       role: node.getAttribute("data-message-author-role") || "unknown",
@@ -158,18 +195,24 @@
     }));
   }
   function responseSnapshot() {
-    const messages = collectMessageSummary();
-    const assistant = messages.filter((item) => item.role === "assistant" || item.role === "unknown");
+    // Response lifecycle counters must not use the 12-message evidence window.
+    // Long conversations would otherwise stay pinned at 12 and a newly submitted
+    // message could be misclassified as unconfirmed.
+    const nodes = messageNodes();
+    const assistantNodes = nodes.filter((node) => {
+      const role = node.getAttribute("data-message-author-role") || "unknown";
+      return role === "assistant" || role === "unknown";
+    });
     return {
-      message_count: messages.length,
-      assistant_count: assistant.length,
-      last_assistant_text: assistant.at(-1)?.text ?? "",
+      message_count: nodes.length,
+      assistant_count: assistantNodes.length,
+      last_assistant_text: normalizeText(assistantNodes.at(-1)?.innerText || assistantNodes.at(-1)?.textContent).slice(0, 4000),
       generation_state: generationState(),
       identity: identifyPage()
     };
   }
   function observe(observationId) {
-    if (state.followLatest && !state.userReviewing) scrollToBottom();
+    if (state.followLatest && !state.userReviewing && Date.now() >= state.userActiveUntil) scrollToBottom();
     state.currentObservationId = observationId;
     const page = identifyPage();
     return {
@@ -213,7 +256,15 @@
     target.dispatchEvent(new InputEvent("input", { bubbles: true, inputType: "insertText", data: text }));
     target.dispatchEvent(new Event("change", { bubbles: true }));
     ensureExpectedIdentity(expectedIdentity);
-    return { composer_text: normalizeText(target.value ?? target.innerText ?? target.textContent) };
+    const expectedText = normalizeText(text);
+    const actualText = normalizeText(target.value ?? target.innerText ?? target.textContent);
+    if (actualText !== expectedText) {
+      throw Object.assign(new Error("ChatGPT composer content did not match the requested message after input."), {
+        code: "COMPOSER_TEXT_MISMATCH",
+        details: { expected_chars: expectedText.length, actual_chars: actualText.length }
+      });
+    }
+    return { composer_text: actualText };
   }
 
   async function waitForCompleteResponse(payload, baseline) {
@@ -236,21 +287,48 @@
     }
     send.click();
     const submittedAt = new Date().toISOString();
+    const confirmation = await globalThis.BhrResponseLifecycle.waitForSubmissionConfirmation({
+      payload,
+      baseline,
+      snapshot: responseSnapshot,
+      composerText: () => {
+        const current = composer();
+        return current ? normalizeText(current.value ?? current.innerText ?? current.textContent) : null;
+      },
+      ensureIdentity: ensureExpectedIdentity,
+      isInterrupted: () => state.userReviewing || Date.now() < state.userActiveUntil
+    });
     if (payload.wait_for_response === false) {
-      return { status: "ACTION_SUCCEEDED", details: { message_submitted: true, submitted_at: submittedAt, submitted_text: set.composer_text, response_baseline: baseline } };
+      return {
+        status: "ACTION_SUCCEEDED",
+        details: {
+          message_submitted: true,
+          submitted_at: submittedAt,
+          submitted_chars: set.composer_text.length,
+          response_baseline: baseline,
+          submission_confirmation: confirmation.details
+        }
+      };
     }
     const completed = await waitForCompleteResponse(payload, baseline);
     return {
       ...completed,
-      details: { ...completed.details, submitted_at: submittedAt, submitted_text: set.composer_text, message_count_before: baseline.message_count }
+      details: {
+        ...completed.details,
+        submitted_at: submittedAt,
+        submitted_chars: set.composer_text.length,
+        message_count_before: baseline.message_count,
+        submission_confirmation: confirmation.details
+      }
     };
   }
 
   function clickRegistered(payload) {
     ensureNoUserConflict();
     ensureExpectedIdentity(payload.expected_identity);
-    if (payload.observation_id !== state.currentObservationId) throw Object.assign(new Error("Element reference belongs to a stale observation."), { code: "ELEMENT_REFERENCE_STALE" });
-    const element = state.elementCatalog.get(payload.element_ref);
+    const catalog = state.elementCatalogs.get(payload.observation_id);
+    if (!catalog) throw Object.assign(new Error("Element reference belongs to an expired observation catalog."), { code: "ELEMENT_REFERENCE_STALE" });
+    const element = catalog.get(payload.element_ref);
     if (!element || !visible(element)) throw Object.assign(new Error("Registered element is no longer available."), { code: "ELEMENT_NOT_AVAILABLE" });
     if (payload.expected_accessible_name && accessibleName(element) !== payload.expected_accessible_name) {
       throw Object.assign(new Error("Element accessible name changed."), { code: "ELEMENT_PRECONDITION_CHANGED" });
@@ -285,32 +363,74 @@
     }
   }
 
-  document.addEventListener("pointerdown", (event) => { if (event.isTrusted) state.userActiveUntil = Date.now() + 10000; }, true);
-  document.addEventListener("keydown", (event) => { if (event.isTrusted) state.userActiveUntil = Date.now() + 10000; }, true);
-  document.addEventListener("scroll", (event) => {
+  function onPointerDown(event) { if (event.isTrusted) state.userActiveUntil = Date.now() + 10000; }
+  function onKeyDown(event) { if (event.isTrusted) state.userActiveUntil = Date.now() + 10000; }
+  function onScroll(event) {
     if (!event.isTrusted || Date.now() - state.lastProgrammaticScrollAt < 300) return;
     const scroller = findScroller();
     if (scroller) state.userReviewing = distanceFromBottom(scroller) > 180;
-  }, true);
+  }
+
+  document.addEventListener("pointerdown", onPointerDown, true);
+  document.addEventListener("keydown", onKeyDown, true);
+  document.addEventListener("scroll", onScroll, true);
+
+  let mutationObserver = null;
+  let runtimeMessageListener = null;
+
+  function disposeContentScript(reason = "DISPOSED") {
+    if (state.disposed) return;
+    state.disposed = true;
+    state.runtimeInvalidated = true;
+    clearTimeout(state.signalTimer);
+    mutationObserver?.disconnect();
+    state.elementCatalogs.clear();
+    document.removeEventListener("pointerdown", onPointerDown, true);
+    document.removeEventListener("keydown", onKeyDown, true);
+    document.removeEventListener("scroll", onScroll, true);
+    if (runtimeMessageListener) {
+      try { chrome.runtime.onMessage.removeListener(runtimeMessageListener); } catch { /* invalidated extension context */ }
+    }
+    runtimeMarker.state = "disposed";
+    runtimeMarker.reason = reason;
+  }
+
+  function invalidateOldRuntimeContext() {
+    disposeContentScript("EXTENSION_CONTEXT_INVALIDATED");
+  }
+
+  function sendRuntimeMessageSafely(message) {
+    if (state.runtimeInvalidated) return;
+    try {
+      const pending = chrome.runtime.sendMessage(message);
+      if (pending?.catch) pending.catch((error) => {
+        if (/Extension context invalidated/i.test(String(error?.message ?? error))) invalidateOldRuntimeContext();
+      });
+    } catch (error) {
+      if (/Extension context invalidated/i.test(String(error?.message ?? error))) invalidateOldRuntimeContext();
+    }
+  }
 
   function schedulePageSignal() {
+    if (state.runtimeInvalidated) return;
     clearTimeout(state.signalTimer);
     state.signalTimer = setTimeout(() => {
+      if (state.runtimeInvalidated) return;
       const identity = identifyPage();
       const signal = JSON.stringify({ page_state: pageState(), generation_state: generationState(), blocking_types: blockingUi().map((item) => item.type), gpt_ref: identity.gpt_ref, conversation_ref: identity.conversation_ref, url: identity.url });
       if (signal === state.lastPageSignal) return;
       state.lastPageSignal = signal;
-      chrome.runtime.sendMessage({ type: "BHR_PAGE_SIGNAL", signal: JSON.parse(signal) }).catch(() => {});
+      sendRuntimeMessageSafely({ type: "BHR_PAGE_SIGNAL", signal: JSON.parse(signal) });
     }, 1500);
   }
 
-  const mutationObserver = new MutationObserver(() => {
+  mutationObserver = new MutationObserver(() => {
     if (state.followLatest && !state.userReviewing && Date.now() >= state.userActiveUntil) scrollToBottom();
     schedulePageSignal();
   });
   mutationObserver.observe(document.documentElement, { childList: true, subtree: true });
 
-  chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  runtimeMessageListener = (message, _sender, sendResponse) => {
     (async () => {
       try {
         if (message.type === "BHR_PING") return { ok: true, data: identifyPage() };
@@ -323,9 +443,13 @@
         if (message.type === "BHR_EXECUTE_ACTION") return { ok: true, data: await execute(message.action_type, message.payload ?? {}) };
         return safeError("MESSAGE_TYPE_UNSUPPORTED", `Unsupported content message: ${message.type}`);
       } catch (error) {
-        return safeError(error.code ?? "CONTENT_ACTION_FAILED", error.message ?? "Content action failed.");
+        return safeError(error.code ?? "CONTENT_ACTION_FAILED", error.message ?? "Content action failed.", error.details ?? null);
       }
     })().then(sendResponse);
     return true;
-  });
+  };
+  chrome.runtime.onMessage.addListener(runtimeMessageListener);
+
+  runtimeMarker.dispose = disposeContentScript;
+  runtimeMarker.state = "ready";
 })();

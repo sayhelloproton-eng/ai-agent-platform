@@ -1,6 +1,7 @@
-import { JOURNAL_STATE } from "../shared/constants.js";
+import { HOST_RESULT_STATUS, JOURNAL_STATE } from "../shared/constants.js";
 import { sha256Ref } from "../shared/crypto.js";
 import { BhrError } from "../shared/errors.js";
+import { buildHostResult } from "../shared/contracts.js";
 
 const KEY = "bhr.command_journal";
 const DEFAULT_RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
@@ -151,7 +152,7 @@ export class CommandJournal {
     });
   }
 
-  async begin(command) {
+  async begin(command, { claim_token = null } = {}) {
     return this._exclusive(async () => {
       const entries = await this._load();
       const nowMs = this.now();
@@ -205,6 +206,7 @@ export class CommandJournal {
         delivery_ack: null,
         report_token: null,
         pending_report: null,
+        claim_token,
         recovery: { attempts: 0, last_error: null, next_retry_at: null, quarantined_at: null },
         history: [{ state: JOURNAL_STATE.RECEIVED, at: nowIso }],
         created_at: nowIso,
@@ -393,7 +395,59 @@ export class CommandJournal {
       const recovered = { uncertain: [], delivery_ack_pending: [], observation_pending: [], reportable: [], quarantined: [] };
       const nowMs = this.now();
       for (const entry of Object.values(entries)) {
-        if (entry.state === JOURNAL_STATE.EXECUTING || entry.state === JOURNAL_STATE.SIDE_EFFECT_STARTED) {
+        if ([JOURNAL_STATE.RECEIVED, JOURNAL_STATE.CLAIMED, JOURNAL_STATE.PREPARED].includes(entry.state)) {
+          const previousState = entry.state;
+          if (entry.claim_token) {
+            const result = buildHostResult({
+              command: entry.command,
+              status: HOST_RESULT_STATUS.BLOCKED,
+              binding_id: entry.binding_id ?? "unbound",
+              error: {
+                code: "SERVICE_WORKER_RESTART_BEFORE_EXECUTION",
+                message: "The Browser Host service worker restarted before browser execution began. The command was not retried automatically."
+              },
+              details: { recovery_stage: previousState }
+            });
+            entry.state = JOURNAL_STATE.PRE_DELIVERY_FAILURE_PENDING;
+            entry.result = result;
+            entry.pending_report = {
+              kind: "FAIL",
+              operation: "browser.dispatch.fail",
+              credential_type: "CLAIM_TOKEN",
+              credential: entry.claim_token,
+              payload: { result }
+            };
+            entry.details = { ...(entry.details ?? {}), result, recovery_stage: previousState };
+            entry.updated_at = iso(nowMs);
+            entry.history ??= [];
+            entry.history.push({
+              state: JOURNAL_STATE.PRE_DELIVERY_FAILURE_PENDING,
+              at: entry.updated_at,
+              details: { reason: "SERVICE_WORKER_RESTART_BEFORE_EXECUTION", last_stage: previousState }
+            });
+            recovered.reportable.push(entry.command_id);
+          } else {
+            entry.state = JOURNAL_STATE.QUARANTINED;
+            entry.recovery = {
+              attempts: Number(entry.recovery?.attempts ?? 0),
+              last_error: {
+                code: "RECOVERY_REPORT_CREDENTIAL_MISSING",
+                message: "A pre-execution Journal record has no persisted claim token, so it cannot be retried or failed automatically."
+              },
+              next_retry_at: null,
+              quarantined_at: iso(nowMs)
+            };
+            entry.updated_at = iso(nowMs);
+            entry.history ??= [];
+            entry.history.push({
+              state: JOURNAL_STATE.QUARANTINED,
+              event: "PRE_EXECUTION_RECOVERY_QUARANTINED",
+              at: entry.updated_at,
+              details: { last_stage: previousState }
+            });
+            recovered.quarantined.push(entry.command_id);
+          }
+        } else if (entry.state === JOURNAL_STATE.EXECUTING || entry.state === JOURNAL_STATE.SIDE_EFFECT_STARTED) {
           const previousState = entry.state;
           const uncertain = pendingUncertainReport(entry, "SERVICE_WORKER_RESTART_DURING_EXECUTION", nowMs);
           uncertain.last_stage = previousState;

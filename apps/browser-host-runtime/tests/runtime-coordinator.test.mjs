@@ -299,3 +299,136 @@ test("delivery Ack failure is retried without resubmitting the browser action", 
   assert.equal(ackAttempts, 2);
   assert.equal(reports, 1);
 });
+
+test("approval precondition failure before browser execution is BLOCKED, never UNCERTAIN", async () => {
+  const command = hostCommand();
+  const bound = binding();
+  const observed = observation();
+  let executions = 0, consumes = 0, failures = 0, uncertainReports = 0;
+  const coordinator = new RuntimeCoordinator({
+    host_id: "host",
+    dispatchClient: {
+      listPending: async () => [{ dispatch_ref: command.dispatch_ref }],
+      claim: async () => ({ claim_token: "claim" }),
+      get: async () => command,
+      resolvePayload: async () => ({ text: "wake" }),
+      fail: async (_ref, _claim, result) => { failures += 1; assert.equal(result.status, "BLOCKED"); return { status: "RECORDED" }; },
+      uncertain: async () => { uncertainReports += 1; return { status: "RECORDED" }; }
+    },
+    approvalClient: {
+      getGrant: async () => ({
+        approval_ref: command.approval_ref,
+        grant_id: "grant",
+        action_fingerprint: "wrong-action-fingerprint",
+        binding_id: bound.binding_id,
+        task_id: command.task_id,
+        command_id: command.command_id,
+        allowed_action_type: command.action.type,
+        page_precondition_hash: "wrong-page-hash",
+        single_use: true,
+        expires_at: "2030-01-01T00:00:00.000Z",
+        consumed_at: null
+      }),
+      consume: async () => { consumes += 1; }
+    },
+    bindingRegistry: { findForTarget: async () => bound, validateObservation: async (value) => value },
+    journal: new CommandJournal(new MemoryStorageArea()),
+    observationCoordinator: observationService(observed),
+    actionExecutor: { execute: async () => { executions += 1; } },
+    modelProvider: {}, evidenceStore: {},
+    configProvider: async () => ({ paused: false, emergency_stopped: false, approval_policy_mode: "strict" })
+  });
+
+  const response = await coordinator.processOne();
+  assert.equal(response.result.status, "BLOCKED");
+  assert.equal(response.result.error.code, "APPROVAL_PRECONDITION_CHANGED");
+  assert.equal(executions, 0);
+  assert.equal(consumes, 0);
+  assert.equal(failures, 1);
+  assert.equal(uncertainReports, 0);
+});
+
+test("approval consume failure stays pre-delivery BLOCKED and never becomes UNCERTAIN", async () => {
+  const command = hostCommand();
+  const bound = binding();
+  const observed = observation();
+  const payload = { text: "wake" };
+  const pageHash = await computePagePreconditionHash(observed);
+  const fingerprint = await computeActionFingerprint({ command, binding_id: bound.binding_id, resolved_payload: payload, page_precondition_hash: pageHash });
+  const grant = {
+    approval_ref: command.approval_ref,
+    grant_id: "grant",
+    action_fingerprint: fingerprint,
+    binding_id: bound.binding_id,
+    task_id: command.task_id,
+    command_id: command.command_id,
+    allowed_action_type: command.action.type,
+    page_precondition_hash: pageHash,
+    single_use: true,
+    expires_at: "2030-01-01T00:00:00.000Z",
+    consumed_at: null
+  };
+  let executions = 0, failures = 0, uncertainReports = 0;
+  const coordinator = new RuntimeCoordinator({
+    host_id: "host",
+    dispatchClient: {
+      listPending: async () => [{ dispatch_ref: command.dispatch_ref }],
+      claim: async () => ({ claim_token: "claim" }),
+      get: async () => command,
+      resolvePayload: async () => payload,
+      fail: async (_ref, _claim, result) => {
+        failures += 1;
+        assert.equal(result.status, "BLOCKED");
+        assert.equal(result.error.code, "APPROVAL_ALREADY_CONSUMED");
+        return { status: "RECORDED" };
+      },
+      uncertain: async () => { uncertainReports += 1; return { status: "RECORDED" }; }
+    },
+    approvalClient: {
+      getGrant: async () => grant,
+      consume: async () => { throw Object.assign(new Error("already consumed"), { code: "APPROVAL_ALREADY_CONSUMED" }); }
+    },
+    bindingRegistry: { findForTarget: async () => bound, validateObservation: async (value) => value },
+    journal: new CommandJournal(new MemoryStorageArea()),
+    observationCoordinator: observationService(observed),
+    actionExecutor: { execute: async () => { executions += 1; } },
+    modelProvider: {}, evidenceStore: {},
+    configProvider: async () => ({ paused: false, emergency_stopped: false, approval_policy_mode: "strict" })
+  });
+
+  const response = await coordinator.processOne();
+  assert.equal(response.result.status, "BLOCKED");
+  assert.equal(executions, 0);
+  assert.equal(failures, 1);
+  assert.equal(uncertainReports, 0);
+});
+
+test("emergency stop flushes report-only recovery but never resumes browser observation", async () => {
+  const command = hostCommand();
+  const bound = binding();
+  const journal = new CommandJournal(new MemoryStorageArea(), { recoveryBaseDelayMs: 0 });
+  await journal.begin(command, { claim_token: "claim" });
+  await journal.mark(command.command_id, "DELIVERY_ACKED", {
+    binding_id: bound.binding_id,
+    delivery: { delivery_id: "delivery", response_expected: true, response_baseline: { generation_state: "IDLE", assistant_count: 0, last_assistant_text: "" } },
+    report_token: "report-token"
+  });
+  let waits = 0, observations = 0;
+  const coordinator = new RuntimeCoordinator({
+    host_id: "host",
+    dispatchClient: {},
+    approvalClient: {},
+    bindingRegistry: { get: async () => bound },
+    journal,
+    observationCoordinator: { observe: async () => { observations += 1; return { observation: observation(), local: {} }; } },
+    actionExecutor: { waitForResponse: async () => { waits += 1; return { status: "ACTION_SUCCEEDED" }; } },
+    modelProvider: {}, evidenceStore: {},
+    configProvider: async () => ({ paused: true, emergency_stopped: true, approval_policy_mode: "strict" })
+  });
+  const response = await coordinator.processOne();
+  assert.equal(response.reason, "EMERGENCY_STOPPED");
+  assert.equal(response.recovery.reason, "RECOVERY_BROWSER_OBSERVATION_DEFERRED");
+  assert.equal(waits, 0);
+  assert.equal(observations, 0);
+  assert.equal((await journal.get(command.command_id)).state, "DELIVERY_ACKED");
+});

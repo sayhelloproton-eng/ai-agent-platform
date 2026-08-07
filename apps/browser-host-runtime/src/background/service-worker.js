@@ -1,11 +1,12 @@
 import { createRuntime } from "./factory.js";
 import { readConfig, readSessionSecrets, writeConfig, writeSessionSecrets } from "./config.js";
-import { asSafeError } from "../shared/errors.js";
+import { BhrError, asSafeError } from "../shared/errors.js";
 import { buildWakeEnvelope } from "../shared/contracts.js";
 import { computeActionFingerprint, computePagePreconditionHash } from "../shared/fingerprints.js";
 import { randomId } from "../shared/crypto.js";
 import { computePageIdentityFingerprint, parseChatGptIdentity } from "../shared/page-identity.js";
 import { ExecutionGate } from "./execution-gate.js";
+import { ensureContentScript, sendTabMessage } from "./observation-coordinator.js";
 
 const ALARMS = { HEARTBEAT: "bhr-heartbeat", POLL: "bhr-dispatch-poll", OBSERVE: "bhr-observation" };
 const PENDING_REVIEW_KEY = "bhr.pending_reviews";
@@ -19,10 +20,29 @@ async function ensureAlarms() {
   await chrome.alarms.create(ALARMS.OBSERVE, { periodInMinutes: Math.max(0.5, config.observation_seconds / 60) });
 }
 
+async function reconcileReadyBindings(runtime) {
+  await runtime.bindingRegistry.reconcileHostOwnership(runtime.host.host_id);
+  await runtime.bindingRegistry.reconcileReadyUniqueness();
+  const bindings = (await runtime.bindingRegistry.list()).filter((item) => item.state === "READY");
+  for (const binding of bindings) {
+    try {
+      const ready = await ensureContentScript(binding.chrome_tab_id);
+      const identity = ready.page ?? null;
+      if (identity) await runtime.bindingRegistry.reconcileNavigation(binding.chrome_tab_id, identity);
+    } catch (error) {
+      const safe = asSafeError(error);
+      const reason = safe.code === "TAB_NOT_FOUND" ? "TAB_NOT_FOUND" : "CONTENT_SCRIPT_UNAVAILABLE";
+      try { await runtime.bindingRegistry.markTabStale(binding.chrome_tab_id, reason); } catch { /* best effort */ }
+      console.warn("BHR binding recovery deferred", { binding_id: binding.binding_id, error: safe });
+    }
+  }
+}
+
 async function registerAndRecover() {
   return executionGate.run("register-and-recover", async () => {
     const runtime = await createRuntime();
     await runtime.journal?.recoverAfterRestart?.();
+    await reconcileReadyBindings(runtime);
     try { await runtime.hostRegistry.register(); } catch (error) { console.warn("BHR host registration deferred", asSafeError(error)); }
     try { await runtime.coordinator.processOne(); } catch (error) { console.warn("BHR recovery report/observation deferred", asSafeError(error)); }
     await ensureAlarms();
@@ -43,7 +63,7 @@ async function heartbeat() {
 async function pollOnce() {
   return executionGate.run("dispatch-poll", async () => (await createRuntime()).coordinator.processOne());
 }
-async function observeReadyBindings({ tabId = null } = {}) {
+async function observeReadyBindingsUnlocked({ tabId = null } = {}) {
   const runtime = await createRuntime();
   if (runtime.config.paused || runtime.config.emergency_stopped) return [];
   const bindings = (await runtime.bindingRegistry.list()).filter((item) => item.state === "READY" && (tabId === null || item.chrome_tab_id === tabId));
@@ -69,31 +89,31 @@ async function observeReadyBindings({ tabId = null } = {}) {
   return results;
 }
 
-function sendTabMessage(tabId, message) {
-  return new Promise((resolve, reject) => chrome.tabs.sendMessage(tabId, message, (response) => {
-    if (chrome.runtime.lastError) reject(new Error(chrome.runtime.lastError.message)); else resolve(response);
-  }));
+async function observeReadyBindings(options = {}) {
+  return executionGate.run("passive-observation", () => observeReadyBindingsUnlocked(options));
 }
 
 async function bindActiveTab(role_ref = "controller") {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (!tab?.id || !tab.url?.startsWith("https://chatgpt.com/")) throw Object.assign(new Error("Active tab must be a ChatGPT page."), { code: "ACTIVE_TAB_NOT_CHATGPT" });
-  const page = await sendTabMessage(tab.id, { type: "BHR_PING" });
-  if (!page?.ok) throw Object.assign(new Error("ChatGPT content adapter is unavailable."), { code: "CONTENT_SCRIPT_UNAVAILABLE" });
-  const runtime = await createRuntime();
-  const page_fingerprint = await computePageIdentityFingerprint(page.data);
-  const binding = await runtime.bindingRegistry.bind({
-    host_id: runtime.host.host_id,
-    chrome_tab_id: tab.id,
-    window_id: tab.windowId,
-    role_ref,
-    gpt_ref: page.data.gpt_ref,
-    conversation_ref: page.data.conversation_ref,
-    page_fingerprint,
-    url: tab.url
+  return executionGate.run("bind-active-tab", async () => {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tab?.id || !tab.url?.startsWith("https://chatgpt.com/")) throw new BhrError("ACTIVE_TAB_NOT_CHATGPT", "Active tab must be a ChatGPT page.");
+    const page = await sendTabMessage(tab.id, { type: "BHR_PING" });
+    if (!page?.ok) throw new BhrError("CONTENT_SCRIPT_UNAVAILABLE", "ChatGPT content adapter is unavailable. Reload the ChatGPT tab, then retry.");
+    const runtime = await createRuntime();
+    const page_fingerprint = await computePageIdentityFingerprint(page.data);
+    const binding = await runtime.bindingRegistry.bind({
+      host_id: runtime.host.host_id,
+      chrome_tab_id: tab.id,
+      window_id: tab.windowId,
+      role_ref,
+      gpt_ref: page.data.gpt_ref,
+      conversation_ref: page.data.conversation_ref,
+      page_fingerprint,
+      url: tab.url
+    });
+    await sendTabMessage(tab.id, { type: "BHR_SET_FOLLOW_LATEST", enabled: true });
+    return binding;
   });
-  await sendTabMessage(tab.id, { type: "BHR_SET_FOLLOW_LATEST", enabled: true });
-  return binding;
 }
 
 async function buildStatus() {
@@ -168,10 +188,11 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 chrome.commands.onCommand.addListener((command) => {
   if (command === "emergency-stop") writeConfig({ emergency_stopped: true, paused: true }).catch(console.error);
 });
-chrome.tabs.onRemoved.addListener((tabId) => createRuntime().then((runtime) => runtime.bindingRegistry.markTabStale(tabId, "TAB_CLOSED")).catch(console.warn));
+chrome.tabs.onRemoved.addListener((tabId) => executionGate.run("tab-removed", async () => (await createRuntime()).bindingRegistry.markTabStale(tabId, "TAB_CLOSED")).catch(console.warn));
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (!changeInfo.url) return;
-  createRuntime().then(async (runtime) => {
+  executionGate.run("tab-updated", async () => {
+    const runtime = await createRuntime();
     const binding = await runtime.bindingRegistry.findByTabId(tabId);
     if (!binding) return;
     let identity = null;
@@ -185,28 +206,30 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     switch (message.type) {
       case "BHR_GET_STATUS": return { ok: true, data: await buildStatus() };
       case "BHR_BIND_ACTIVE_TAB": return { ok: true, data: await bindActiveTab(message.role_ref ?? "controller") };
-      case "BHR_OBSERVE_BINDING": {
+      case "BHR_OBSERVE_BINDING": return executionGate.run("manual-observation", async () => {
         const runtime = await createRuntime();
         const binding = (await runtime.bindingRegistry.list()).find((item) => item.binding_id === message.binding_id);
-        if (!binding) throw Object.assign(new Error("Binding not found."), { code: "BINDING_NOT_FOUND" });
+        if (!binding) throw new BhrError("BINDING_NOT_FOUND", "Binding not found.");
+        if (binding.state !== "READY") throw new BhrError("BINDING_NOT_READY", `Binding ${binding.binding_id} is ${binding.state}, not READY.`);
         const observed = await runtime.observationCoordinator.observe(binding, { includeScreenshot: true });
         await runtime.bindingRegistry.validateObservation(binding, observed.observation);
         const assessment = await runtime.modelProvider.analyze({ observation: observed.observation, evidence: { page: observed.local } });
         return { ok: true, data: { observation: observed.observation, assessment } };
-      }
-      case "BHR_SET_FOLLOW_LATEST": {
+      });
+      case "BHR_SET_FOLLOW_LATEST": return executionGate.run("set-follow-latest", async () => {
         const runtime = await createRuntime();
         const binding = (await runtime.bindingRegistry.list()).find((item) => item.binding_id === message.binding_id);
-        if (!binding) throw Object.assign(new Error("Binding not found."), { code: "BINDING_NOT_FOUND" });
+        if (!binding) throw new BhrError("BINDING_NOT_FOUND", "Binding not found.");
+        if (binding.state !== "READY") throw new BhrError("BINDING_NOT_READY", `Binding ${binding.binding_id} is ${binding.state}, not READY.`);
         const result = await sendTabMessage(binding.chrome_tab_id, { type: "BHR_SET_FOLLOW_LATEST", enabled: Boolean(message.enabled) });
         await runtime.bindingRegistry.update(binding.binding_id, { mode: message.enabled ? "FOLLOW_LATEST" : "MANUAL" });
         return result;
-      }
-      case "BHR_UNBIND": {
+      });
+      case "BHR_UNBIND": return executionGate.run("unbind", async () => {
         const runtime = await createRuntime();
         await runtime.bindingRegistry.remove(message.binding_id);
         return { ok: true, data: { removed: true } };
-      }
+      });
       case "BHR_PAUSE": return { ok: true, data: await writeConfig({ paused: true }) };
       case "BHR_RESUME": return { ok: true, data: await writeConfig({ paused: false, emergency_stopped: false }) };
       case "BHR_EMERGENCY_STOP": return { ok: true, data: await writeConfig({ paused: true, emergency_stopped: true }) };

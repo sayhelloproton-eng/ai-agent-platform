@@ -32,7 +32,7 @@ export class BrowserActionExecutor {
       action_type: actionType,
       payload
     });
-    if (!response?.ok) throw new BhrError(response?.error?.code ?? "PAGE_ACTION_FAILED", response?.error?.message ?? "Page action failed.");
+    if (!response?.ok) throw new BhrError(response?.error?.code ?? "PAGE_ACTION_FAILED", response?.error?.message ?? "Page action failed.", response?.error?.details);
     const data = response.data;
     if (!isMessageDelivery) return data;
     return {
@@ -67,7 +67,7 @@ export class BrowserActionExecutor {
         }
       }
     });
-    if (!response?.ok) throw new BhrError(response?.error?.code ?? "RESPONSE_OBSERVATION_FAILED", response?.error?.message ?? "Response observation failed.");
+    if (!response?.ok) throw new BhrError(response?.error?.code ?? "RESPONSE_OBSERVATION_FAILED", response?.error?.message ?? "Response observation failed.", response?.error?.details);
     return response.data;
   }
 }

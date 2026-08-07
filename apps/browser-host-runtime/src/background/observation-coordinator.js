@@ -4,17 +4,115 @@ import { assertObservation } from "../shared/contracts.js";
 import { BhrError } from "../shared/errors.js";
 import { computePageIdentityFingerprint } from "../shared/page-identity.js";
 
-export function sendTabMessage(tabId, message) {
+const CONTENT_SCRIPT_FILES = [
+  "src/content/response-lifecycle.js",
+  "src/content/content-script.js"
+];
+const contentScriptRecovery = new Map();
+
+function delay(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
+
+function sendTabMessageOnce(tabId, message) {
   return new Promise((resolve, reject) => {
     chrome.tabs.sendMessage(tabId, message, (response) => {
       const error = chrome.runtime.lastError;
-      if (error) reject(new BhrError("CONTENT_SCRIPT_UNAVAILABLE", error.message));
-      else resolve(response);
+      if (!error) return resolve(response);
+      const messageText = String(error.message ?? "Content-script message failed.");
+      if (/Could not establish connection|Receiving end does not exist/i.test(messageText)) {
+        return reject(new BhrError("CONTENT_SCRIPT_UNAVAILABLE", messageText));
+      }
+      // A port can close after the receiver already accepted a message. Retrying a
+      // browser action in that case could duplicate a real side effect, so this is
+      // intentionally distinct from a definitely-missing receiver.
+      return reject(new BhrError("CONTENT_SCRIPT_MESSAGE_FAILED", messageText));
     });
   });
 }
 
-function delay(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
+async function assertChatGptTab(tabId) {
+  let tab;
+  try {
+    tab = await chrome.tabs.get(tabId);
+  } catch (error) {
+    throw new BhrError("TAB_NOT_FOUND", "The bound browser tab no longer exists.", {
+      cause: error instanceof Error ? error.message : String(error)
+    });
+  }
+  if (!tab?.id) throw new BhrError("TAB_NOT_FOUND", "The bound browser tab no longer exists.");
+  if (!tab.url?.startsWith("https://chatgpt.com/")) {
+    throw new BhrError("CONTENT_SCRIPT_UNAVAILABLE", "The bound tab is not an allowed ChatGPT page; automatic content-script recovery was not attempted.");
+  }
+  return tab;
+}
+
+async function ensureContentScriptUnlocked(tabId) {
+  try {
+    const response = await sendTabMessageOnce(tabId, { type: "BHR_PING" });
+    if (response?.ok && response.data?.provider === "chatgpt-web") {
+      return { ready: true, injected: false, page: response.data };
+    }
+  } catch (error) {
+    if (!(error instanceof BhrError) || error.code !== "CONTENT_SCRIPT_UNAVAILABLE") throw error;
+  }
+
+  await assertChatGptTab(tabId);
+  if (!chrome.scripting?.executeScript) {
+    throw new BhrError(
+      "CONTENT_SCRIPT_UNAVAILABLE",
+      "The ChatGPT content script is unavailable and automatic reinjection is not permitted. Reload the ChatGPT tab, then retry."
+    );
+  }
+
+  try {
+    for (const file of CONTENT_SCRIPT_FILES) {
+      await chrome.scripting.executeScript({ target: { tabId }, files: [file] });
+    }
+  } catch (error) {
+    throw new BhrError(
+      "CONTENT_SCRIPT_UNAVAILABLE",
+      "The ChatGPT content script is unavailable and automatic reinjection failed. Reload the ChatGPT tab, then retry.",
+      { cause: error instanceof Error ? error.message : String(error) }
+    );
+  }
+
+  await delay(20);
+  try {
+    const response = await sendTabMessageOnce(tabId, { type: "BHR_PING" });
+    if (response?.ok && response.data?.provider === "chatgpt-web") {
+      return { ready: true, injected: true, page: response.data };
+    }
+    throw new BhrError("CONTENT_SCRIPT_UNAVAILABLE", "The ChatGPT content script did not become ready after automatic reinjection. Reload the ChatGPT tab, then retry.");
+  } catch (error) {
+    if (error instanceof BhrError && error.code === "CONTENT_SCRIPT_UNAVAILABLE") {
+      throw new BhrError(
+        "CONTENT_SCRIPT_UNAVAILABLE",
+        "The ChatGPT content script did not become ready after automatic reinjection. Reload the ChatGPT tab, then retry.",
+        error.details
+      );
+    }
+    throw error;
+  }
+}
+
+export async function ensureContentScript(tabId) {
+  const existing = contentScriptRecovery.get(tabId);
+  if (existing) return existing;
+  const pending = ensureContentScriptUnlocked(tabId).finally(() => {
+    if (contentScriptRecovery.get(tabId) === pending) contentScriptRecovery.delete(tabId);
+  });
+  contentScriptRecovery.set(tabId, pending);
+  return pending;
+}
+
+export async function sendTabMessage(tabId, message, { recoverContentScript = true } = {}) {
+  try {
+    return await sendTabMessageOnce(tabId, message);
+  } catch (error) {
+    if (!recoverContentScript || !(error instanceof BhrError) || error.code !== "CONTENT_SCRIPT_UNAVAILABLE") throw error;
+    await ensureContentScript(tabId);
+    return sendTabMessageOnce(tabId, message);
+  }
+}
 
 export class ObservationCoordinator {
   constructor({ host_id, evidenceStore, screenshotQuality = 75, focusDelayMs = 120 }) {
@@ -29,41 +127,40 @@ export class ObservationCoordinator {
     const run = async () => {
       const tab = await chrome.tabs.get(binding.chrome_tab_id);
       if (!tab?.id || tab.windowId === undefined) throw new BhrError("TAB_NOT_FOUND", "The bound browser tab no longer exists.");
-      const [previous] = await chrome.tabs.query({ active: true, windowId: tab.windowId });
-      const switched = !tab.active;
-      try {
-        if (switched) {
-          await chrome.tabs.update(tab.id, { active: true });
-          await delay(this.focusDelayMs);
-        }
-        let dataUrl;
-        try {
-          dataUrl = await chrome.tabs.captureVisibleTab(tab.windowId, { format: "jpeg", quality: this.screenshotQuality });
-        } catch (error) {
-          const message = error instanceof Error ? error.message : String(error);
-          if (/Either the '<all_urls>' or 'activeTab' permission is required/u.test(message)) {
-            return {
-              ref: null,
-              unavailable_reason: "SCREENSHOT_PERMISSION_UNAVAILABLE",
-              temporarily_activated: switched
-            };
-          }
-          throw error;
-        }
-        const ref = `local-screenshot-${randomId("evidence")}`;
-        await this.evidenceStore.put(ref, {
-          data_url: dataUrl,
-          captured_at: new Date().toISOString(),
-          binding_id: binding.binding_id,
-          chrome_tab_id: binding.chrome_tab_id,
-          temporarily_activated: switched
-        });
-        return { ref, unavailable_reason: null, temporarily_activated: switched };
-      } finally {
-        if (switched && previous?.id && previous.id !== tab.id) {
-          try { await chrome.tabs.update(previous.id, { active: true }); } catch { /* best-effort restoration */ }
-        }
+      const [active] = await chrome.tabs.query({ active: true, windowId: tab.windowId });
+      // Screenshot evidence is auxiliary. Passive observation must never steal the
+      // user's active tab merely to satisfy captureVisibleTab. DOM/text evidence
+      // remains available for an inactive Binding.
+      if (!tab.active || active?.id !== tab.id) {
+        return {
+          ref: null,
+          unavailable_reason: "SCREENSHOT_TAB_NOT_ACTIVE",
+          temporarily_activated: false
+        };
       }
+      let dataUrl;
+      try {
+        dataUrl = await chrome.tabs.captureVisibleTab(tab.windowId, { format: "jpeg", quality: this.screenshotQuality });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        if (/Either the '<all_urls>' or 'activeTab' permission is required/u.test(message)) {
+          return {
+            ref: null,
+            unavailable_reason: "SCREENSHOT_PERMISSION_UNAVAILABLE",
+            temporarily_activated: false
+          };
+        }
+        throw error;
+      }
+      const ref = `local-screenshot-${randomId("evidence")}`;
+      await this.evidenceStore.put(ref, {
+        data_url: dataUrl,
+        captured_at: new Date().toISOString(),
+        binding_id: binding.binding_id,
+        chrome_tab_id: binding.chrome_tab_id,
+        temporarily_activated: false
+      });
+      return { ref, unavailable_reason: null, temporarily_activated: false };
     };
     const pending = this.captureQueue.then(run, run);
     this.captureQueue = pending.catch(() => {});
@@ -73,7 +170,7 @@ export class ObservationCoordinator {
   async observe(binding, { includeScreenshot = true } = {}) {
     const observationId = randomId("observation");
     const page = await sendTabMessage(binding.chrome_tab_id, { type: "BHR_OBSERVE", observation_id: observationId });
-    if (!page?.ok) throw new BhrError(page?.error?.code ?? "OBSERVATION_FAILED", page?.error?.message ?? "Page observation failed.");
+    if (!page?.ok) throw new BhrError(page?.error?.code ?? "OBSERVATION_FAILED", page?.error?.message ?? "Page observation failed.", page?.error?.details);
 
     const identity = {
       provider: page.data.provider,

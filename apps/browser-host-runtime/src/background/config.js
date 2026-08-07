@@ -3,6 +3,15 @@ import { APPROVAL_POLICY_MODE } from "../shared/constants.js";
 const LOCAL_KEY = "bhr.config";
 const SESSION_SECRET_KEY = "bhr.session_secrets";
 const LOCAL_DEV_SECRET_KEY = "bhr.local_dev_gateway_secret";
+const configWriteQueues = new WeakMap();
+
+function exclusiveConfigWrite(work) {
+  const target = chrome.storage.local;
+  const previous = configWriteQueues.get(target) ?? Promise.resolve();
+  const run = previous.then(work, work);
+  configWriteQueues.set(target, run.catch(() => undefined));
+  return run;
+}
 
 export const DEFAULT_CONFIG = Object.freeze({
   transport_mode: "gateway",
@@ -28,10 +37,12 @@ export async function readConfig() {
 }
 
 export async function writeConfig(patch) {
-  const current = await readConfig();
-  const next = { ...current, ...patch };
-  await chrome.storage.local.set({ [LOCAL_KEY]: next });
-  return next;
+  return exclusiveConfigWrite(async () => {
+    const current = await readConfig();
+    const next = { ...current, ...patch };
+    await chrome.storage.local.set({ [LOCAL_KEY]: next });
+    return next;
+  });
 }
 
 export async function readSessionSecrets() {

@@ -4,6 +4,9 @@ export function pagePreconditionProjection(observation) {
   return {
     binding_id: observation.binding_id,
     provider: observation.provider,
+    gpt_ref: observation.gpt_ref ?? null,
+    conversation_ref: observation.conversation_ref ?? null,
+    page_fingerprint: observation.page_fingerprint,
     page_state: observation.page_state,
     generation_state: observation.generation_state,
     blocking_ui: observation.blocking_ui,

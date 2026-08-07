@@ -1,6 +1,6 @@
 import { ACTION_TYPES, HOST_RESULT_STATUS, JOURNAL_STATE } from "../shared/constants.js";
 import { assertHostCommand, buildDeliveryFact, buildHostResult, buildUncertainSideEffect } from "../shared/contracts.js";
-import { requiresApproval, validateResolvedPayload } from "../shared/action-policy.js";
+import { classifyAction, requiresApproval, validateResolvedPayload } from "../shared/action-policy.js";
 import { BhrError, asSafeError } from "../shared/errors.js";
 import { validateApprovalGrant } from "./approval-validator.js";
 
@@ -175,7 +175,16 @@ export class RuntimeCoordinator {
       });
     }
     const post = await this.observationCoordinator.observe(binding, { includeScreenshot: true });
-    binding = await this.bindingRegistry.validateObservation(binding, post.observation, command.target);
+    const allowConversationPromotion = !binding.conversation_ref &&
+      !command.target.conversation_ref &&
+      [ACTION_TYPES.SUBMIT_MESSAGE, ACTION_TYPES.CONTINUE_ROLE_SESSION].includes(command.action.type) &&
+      Boolean(execution?.response_pending);
+    binding = await this.bindingRegistry.validateObservation(
+      binding,
+      post.observation,
+      command.target,
+      { allowConversationPromotion }
+    );
     const assessment = await this.collectAssessment(post);
     const uncertain = execution?.status === "UNCERTAIN" || responseLifecycle?.status === "UNCERTAIN";
     const result = buildHostResult({
@@ -199,7 +208,7 @@ export class RuntimeCoordinator {
     return { processed: true, result, report, delivery_acknowledged: true };
   }
 
-  async _resumeEntry(entry) {
+  async _resumeEntry(entry, { allowBrowserObservation = true } = {}) {
     const command = assertHostCommand(entry.command);
 
     if ([JOURNAL_STATE.PRE_DELIVERY_FAILURE_PENDING, JOURNAL_STATE.HOST_RESULT_PENDING, JOURNAL_STATE.UNCERTAIN].includes(entry.state)) {
@@ -244,6 +253,14 @@ export class RuntimeCoordinator {
     delivery = entry.delivery ?? delivery;
     reportToken = entry.report_token ?? reportToken;
     if (!delivery || !reportToken) throw new BhrError("RECOVERY_RECORD_INVALID", "Response observation recovery requires delivery and report token.");
+    if (!allowBrowserObservation) {
+      return {
+        processed: false,
+        deferred_browser_observation: true,
+        command_id: command.command_id,
+        state: entry.state
+      };
+    }
     const binding = await this.bindingRegistry.get(entry.binding_id);
     if (!binding) {
       const result = buildHostResult({
@@ -282,13 +299,18 @@ export class RuntimeCoordinator {
     }
   }
 
-  async resumeRecoverable() {
+  async resumeRecoverable({ allowBrowserObservation = true } = {}) {
     const entries = await this.journal.recoverableEntries();
     if (entries.length === 0) return null;
     const failures = [];
+    const deferredBrowserObservation = [];
     for (const entry of entries) {
       try {
-        const result = await this._resumeEntry(entry);
+        const result = await this._resumeEntry(entry, { allowBrowserObservation });
+        if (result?.deferred_browser_observation) {
+          deferredBrowserObservation.push({ command_id: entry.command_id, state: result.state });
+          continue;
+        }
         if (result?.report?.reported === false) {
           const current = await this.journal.get(entry.command_id);
           failures.push({
@@ -311,14 +333,27 @@ export class RuntimeCoordinator {
         // later safe report-only recovery item.
       }
     }
-    return { processed: false, reason: "RECOVERY_DEFERRED", recovery_failures: failures };
+    return {
+      processed: false,
+      reason: failures.length > 0 ? "RECOVERY_DEFERRED" : "RECOVERY_BROWSER_OBSERVATION_DEFERRED",
+      recovery_failures: failures,
+      deferred_browser_observation: deferredBrowserObservation
+    };
   }
 
   async processOne() {
     const config = await this.configProvider();
-    const recoverable = await this.resumeRecoverable();
+    const stopped = Boolean(config.paused || config.emergency_stopped);
+    const recoverable = await this.resumeRecoverable({ allowBrowserObservation: !stopped });
+    if (recoverable?.processed) return recoverable;
+    if (stopped) {
+      return {
+        processed: false,
+        reason: config.emergency_stopped ? "EMERGENCY_STOPPED" : "PAUSED",
+        recovery: recoverable ?? null
+      };
+    }
     if (recoverable) return recoverable;
-    if (config.paused || config.emergency_stopped) return { processed: false, reason: config.emergency_stopped ? "EMERGENCY_STOPPED" : "PAUSED" };
 
     const capacity = await this.journal.capacityStatus();
     if (!capacity.accepting_new_commands) {
@@ -330,16 +365,38 @@ export class RuntimeCoordinator {
     const dispatch = pending[0];
     const claim = await this.dispatchClient.claim(dispatch.dispatch_ref, this.host_id);
     const command = await this.dispatchClient.get(dispatch.dispatch_ref, claim.claim_token);
-    const started = await this.journal.begin(command);
+    const started = await this.journal.begin(command, { claim_token: claim.claim_token });
 
     if (started.duplicate) {
       if (started.duplicate_by === "IDEMPOTENCY_KEY" && started.entry.command_id !== command.command_id) {
+        const result = buildHostResult({
+          command,
+          status: HOST_RESULT_STATUS.BLOCKED,
+          binding_id: started.entry.binding_id ?? "unbound",
+          error: {
+            code: "LOGICAL_COMMAND_DUPLICATE_SUPPRESSED",
+            message: "A previously journaled command already owns this idempotency key; the rematerialized Browser Dispatch was not executed."
+          },
+          details: { canonical_command_id: started.entry.command_id }
+        });
+        let report;
+        try {
+          const receipt = await this.dispatchClient.fail(command.dispatch_ref, claim.claim_token, result);
+          report = { reported: true, receipt };
+        } catch (error) {
+          // No browser side effect occurred. If this bounded rejection report cannot
+          // be delivered, the server may re-offer the dispatch after claim expiry;
+          // the same idempotency guard will suppress it again.
+          report = { reported: false, error: asSafeError(error) };
+        }
         return {
-          processed: false,
+          processed: true,
           reason: "LOGICAL_COMMAND_DUPLICATE_SUPPRESSED",
           canonical_command_id: started.entry.command_id,
           received_command_id: command.command_id,
-          idempotency_key: command.idempotency_key
+          idempotency_key: command.idempotency_key,
+          result,
+          report
         };
       }
       if (started.entry.state === JOURNAL_STATE.REPORTED) return { processed: false, reason: "ALREADY_REPORTED", command_id: command.command_id };
@@ -419,15 +476,20 @@ export class RuntimeCoordinator {
           action_fingerprint: validated.action_fingerprint,
           page_precondition_hash: validated.page_precondition_hash
         });
-        await this.journal.mark(command.command_id, JOURNAL_STATE.EXECUTING, { binding_id: binding.binding_id, page_identity: pageIdentity(pre.observation) });
-        actionStarted = true;
+        // Consume the one-time grant before crossing the browser side-effect
+        // boundary. A consume failure is therefore a deterministic pre-delivery
+        // BLOCKED result, never UNCERTAIN.
         await this.approvalClient.consume(grant.approval_ref, grant.grant_id, command.command_id);
+        await this.journal.mark(command.command_id, JOURNAL_STATE.PREPARED, { approval_consumed_at: new Date().toISOString() });
       } else {
         await this.journal.mark(command.command_id, JOURNAL_STATE.PREPARED, preparedDetails);
-        await this.journal.mark(command.command_id, JOURNAL_STATE.EXECUTING, { binding_id: binding?.binding_id ?? null, page_identity: pageIdentity(pre?.observation) });
-        actionStarted = true;
       }
 
+      await this.journal.mark(command.command_id, JOURNAL_STATE.EXECUTING, {
+        binding_id: binding?.binding_id ?? null,
+        page_identity: pageIdentity(pre?.observation)
+      });
+      actionStarted = true;
       execution = await this.actionExecutor.execute({ binding, command, resolved_payload: resolvedPayload });
       binding = execution.binding ?? binding;
       if (!binding) throw new BhrError("BINDING_NOT_READY", "The browser action completed without a confirmed Binding.");
@@ -452,16 +514,12 @@ export class RuntimeCoordinator {
       });
     } catch (error) {
       const safe = asSafeError(error);
-      const uncertainCodes = new Set([
-        "APPROVAL_PRECONDITION_CHANGED",
-        "CONTENT_SCRIPT_UNAVAILABLE",
-        "PAGE_ACTION_UNCERTAIN",
-        "RESPONSE_START_TIMEOUT",
-        "RESPONSE_COMPLETION_TIMEOUT",
-        "RESPONSE_INTERRUPTED_BY_USER",
-        "PAGE_IDENTITY_CHANGED"
-      ]);
-      const status = actionStarted || uncertainCodes.has(safe.code) ? HOST_RESULT_STATUS.UNCERTAIN : HOST_RESULT_STATUS.BLOCKED;
+      // UNCERTAIN is reserved for a high-risk browser action that may already have
+      // crossed the side-effect boundary. Pre-action validation/observation
+      // failures are BLOCKED, even if they use an error code that may also occur
+      // later during response observation.
+      const sideEffectMayHaveStarted = actionStarted && classifyAction(command.action.type) === "HIGH";
+      const status = sideEffectMayHaveStarted ? HOST_RESULT_STATUS.UNCERTAIN : HOST_RESULT_STATUS.BLOCKED;
       const result = buildHostResult({
         command,
         status,

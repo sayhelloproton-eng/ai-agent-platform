@@ -13,29 +13,53 @@ export class RoleSessionManager {
     this.pollMs = pollMs;
   }
 
-  async waitForPageIdentity(tabId) {
+  async waitForPageIdentity(tabId, { predicate = null, timeoutMs = this.contentReadyTimeoutMs } = {}) {
     const started = Date.now();
     let lastError = null;
-    while (Date.now() - started < this.contentReadyTimeoutMs) {
+    let lastPage = null;
+    while (Date.now() - started < timeoutMs) {
       try {
         const response = await sendTabMessage(tabId, { type: "BHR_PING" });
-        if (response?.ok && response.data?.provider === "chatgpt-web") return response.data;
+        if (response?.ok && response.data?.provider === "chatgpt-web") {
+          lastPage = response.data;
+          if (!predicate || predicate(response.data)) return response.data;
+        }
       } catch (error) { lastError = error; }
       await delay(this.pollMs);
     }
-    throw new BhrError("ROLE_SESSION_PAGE_TIMEOUT", lastError?.message ?? "Timed out waiting for the ChatGPT page adapter.");
+    throw new BhrError(
+      "ROLE_SESSION_PAGE_TIMEOUT",
+      lastError?.message ?? "Timed out waiting for the ChatGPT page adapter to reach the required identity.",
+      { last_page: lastPage }
+    );
   }
 
   async navigateAndConfirm(binding, url, target) {
     const tab = await chrome.tabs.get(binding.chrome_tab_id);
-    if (tab.url !== url) await chrome.tabs.update(tab.id, { url, active: true });
+    const previousUrl = tab.url ?? null;
+    const navigationRequested = previousUrl !== url;
+    if (navigationRequested) await chrome.tabs.update(tab.id, { url, active: true });
     else if (!tab.active) await chrome.tabs.update(tab.id, { active: true });
-    const page = await this.waitForPageIdentity(tab.id);
-    const identity = { ...page, page_fingerprint: await computePageIdentityFingerprint(page) };
-    if (!targetMatchesIdentity(target, identity)) {
-      await this.bindingRegistry.update(binding.binding_id, { state: BINDING_STATE.STALE, stale_reason: "OPENED_PAGE_TARGET_MISMATCH", observed_identity: identity });
-      throw new BhrError("ROLE_SESSION_TARGET_MISMATCH", "The opened ChatGPT page does not match the requested role/GPT/conversation target.");
+    let page;
+    try {
+      page = await this.waitForPageIdentity(tab.id, {
+        predicate: (candidate) => targetMatchesIdentity(target, candidate) &&
+          (!navigationRequested || candidate.url !== previousUrl)
+      });
+    } catch (error) {
+      if (error instanceof BhrError && error.code === "ROLE_SESSION_PAGE_TIMEOUT") {
+        const lastPage = error.details?.last_page ?? null;
+        await this.bindingRegistry.update(binding.binding_id, {
+          state: BINDING_STATE.STALE,
+          stale_reason: lastPage && !targetMatchesIdentity(target, lastPage)
+            ? "OPENED_PAGE_TARGET_MISMATCH"
+            : "OPENED_PAGE_NOT_CONFIRMED",
+          observed_identity: lastPage
+        });
+      }
+      throw error;
     }
+    const identity = { ...page, page_fingerprint: await computePageIdentityFingerprint(page) };
     return this.bindingRegistry.confirmPageIdentity(binding.binding_id, identity);
   }
 
@@ -62,6 +86,7 @@ export class RoleSessionManager {
 
     let wake_execution = null;
     if (resolved_payload.wake_text) {
+      const expectConversationPromotion = !binding.conversation_ref;
       const response = await sendTabMessage(binding.chrome_tab_id, {
         type: "BHR_EXECUTE_ACTION",
         command_id: command.command_id,
@@ -76,9 +101,14 @@ export class RoleSessionManager {
           }
         }
       });
-      if (!response?.ok) throw new BhrError(response?.error?.code ?? "PAGE_ACTION_FAILED", response?.error?.message ?? "Wake message failed.");
+      if (!response?.ok) throw new BhrError(response?.error?.code ?? "PAGE_ACTION_FAILED", response?.error?.message ?? "Wake message failed.", response?.error?.details);
       wake_execution = response.data;
-      const refreshed = await this.waitForPageIdentity(binding.chrome_tab_id);
+      const refreshed = await this.waitForPageIdentity(binding.chrome_tab_id, {
+        predicate: expectConversationPromotion
+          ? (page) => targetMatchesIdentity(command.target, page) && Boolean(page.conversation_ref)
+          : null,
+        timeoutMs: expectConversationPromotion ? Math.min(this.contentReadyTimeoutMs, 10000) : this.contentReadyTimeoutMs
+      });
       const refreshedIdentity = { ...refreshed, page_fingerprint: await computePageIdentityFingerprint(refreshed) };
       if (!targetMatchesIdentity(command.target, refreshedIdentity)) {
         await this.bindingRegistry.update(binding.binding_id, {

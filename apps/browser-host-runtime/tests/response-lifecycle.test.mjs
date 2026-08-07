@@ -73,3 +73,69 @@ test("response lifecycle reports user interruption", async () => {
     (error) => error.code === "RESPONSE_INTERRUPTED_BY_USER"
   );
 });
+
+test("send click is not considered delivered until page state confirms submission", async () => {
+  let now = 0;
+  let index = 0;
+  const before = { message_count: 1, assistant_count: 0, last_assistant_text: "", generation_state: "IDLE", identity: { conversation_ref: "conv" } };
+  const snapshots = [before, { ...before, message_count: 2, generation_state: "RUNNING" }];
+  const result = await globalThis.BhrResponseLifecycle.waitForSubmissionConfirmation({
+    payload: { submission_confirm_timeout_ms: 500, submission_confirm_poll_ms: 0 },
+    baseline: before,
+    snapshot: () => snapshots[Math.min(index++, snapshots.length - 1)],
+    composerText: () => "",
+    ensureIdentity: () => {},
+    isInterrupted: () => false,
+    sleepImpl: async () => { now += 20; },
+    nowImpl: () => now
+  });
+  assert.equal(result.details.submission_confirmed, true);
+});
+
+test("unconfirmed send click becomes PAGE_ACTION_UNCERTAIN instead of a false delivery Ack", async () => {
+  let now = 0;
+  const before = { message_count: 1, assistant_count: 0, last_assistant_text: "", generation_state: "IDLE", identity: { conversation_ref: "conv" } };
+  await assert.rejects(
+    () => globalThis.BhrResponseLifecycle.waitForSubmissionConfirmation({
+      payload: { submission_confirm_timeout_ms: 250, submission_confirm_poll_ms: 0 },
+      baseline: before,
+      snapshot: () => before,
+      composerText: () => "still here",
+      ensureIdentity: () => {},
+      isInterrupted: () => false,
+      sleepImpl: async () => { now += 100; },
+      nowImpl: () => now
+    }),
+    (error) => error?.code === "PAGE_ACTION_UNCERTAIN" && error?.details?.reason === "SUBMISSION_CONFIRMATION_TIMEOUT"
+  );
+});
+
+test("response timeout diagnostics never expose assistant transcript text", async () => {
+  let now = 0;
+  const secretText = "sensitive assistant transcript that must stay local";
+  const snapshot = {
+    message_count: 2,
+    assistant_count: 1,
+    last_assistant_text: secretText,
+    generation_state: "RUNNING",
+    identity: { gpt_ref: "g-test", conversation_ref: "conv" }
+  };
+  await assert.rejects(
+    () => globalThis.BhrResponseLifecycle.waitForCompleteResponse({
+      payload: { timeout_ms: 1000, start_timeout_ms: 500, stable_ms: 100, poll_ms: 0 },
+      baseline: { message_count: 1, assistant_count: 0, last_assistant_text: "", generation_state: "IDLE", identity: snapshot.identity },
+      snapshot: () => snapshot,
+      ensureIdentity: () => {},
+      isInterrupted: () => false,
+      sleepImpl: async () => { now += 500; },
+      nowImpl: () => now
+    }),
+    (error) => {
+      assert.equal(error.code, "RESPONSE_COMPLETION_TIMEOUT");
+      assert.equal(error.details.last_snapshot.last_assistant_chars, secretText.length);
+      assert.equal(Object.prototype.hasOwnProperty.call(error.details.last_snapshot, "last_assistant_text"), false);
+      assert.equal(JSON.stringify(error.details).includes(secretText), false);
+      return true;
+    }
+  );
+});

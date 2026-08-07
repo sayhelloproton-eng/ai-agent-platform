@@ -9,6 +9,9 @@ export async function validateApprovalGrant({ grant, command, binding, resolved_
   if (new Date(value.expires_at) <= now) throw new BhrError("APPROVAL_EXPIRED", "Approval grant has expired.");
   if (value.approval_ref !== command.approval_ref) throw new BhrError("APPROVAL_REFERENCE_MISMATCH", "Approval reference does not match command.");
   if (value.binding_id !== binding.binding_id) throw new BhrError("APPROVAL_BINDING_MISMATCH", "Approval binding does not match current binding.");
+  if (binding.role_ref !== command.target.role_ref || binding.gpt_ref !== command.target.gpt_ref || (command.target.conversation_ref && binding.conversation_ref !== command.target.conversation_ref)) {
+    throw new BhrError("APPROVAL_TARGET_MISMATCH", "Approval binding no longer matches the Host Command target.");
+  }
   if (value.task_id !== command.task_id) throw new BhrError("APPROVAL_TASK_MISMATCH", "Approval task does not match command.");
   if (value.command_id !== command.command_id) throw new BhrError("APPROVAL_COMMAND_MISMATCH", "Approval command does not match.");
   if (value.allowed_action_type !== command.action.type) throw new BhrError("APPROVAL_ACTION_MISMATCH", "Approval does not allow this action type.");

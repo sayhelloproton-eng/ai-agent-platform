@@ -66,3 +66,12 @@ test("Dispatch client exposes independent Uncertain Side Effect operation", asyn
   assert.equal(calls[0].operation, "browser.dispatch.uncertain");
   assert.equal(calls[0].payload.credential.claim_token, "claim");
 });
+
+test("Approval client refuses an unconfirmed one-time consume receipt", async () => {
+  const { ApprovalClient } = await import("../src/background/dispatch-client.js");
+  const client = new ApprovalClient({ invoke: async () => ({ status: "PENDING" }) });
+  await assert.rejects(
+    () => client.consume("approval", "grant", "cmd"),
+    (error) => error.code === "APPROVAL_CONSUME_NOT_CONFIRMED"
+  );
+});

@@ -199,17 +199,76 @@ test("server rematerialization with a new Command ID cannot execute the same ide
   await journal.begin(canonical);
   const rematerialized = { ...canonical, command_id: "cmd-new", dispatch_ref: "dispatch-new" };
   let executeCalls = 0;
+  const failed = [];
   const coordinator = coordinatorBase({
     journal,
     dispatchClient: {
       listPending: async () => [{ dispatch_ref: rematerialized.dispatch_ref }],
       claim: async () => ({ claim_token: "claim" }),
-      get: async () => rematerialized
+      get: async () => rematerialized,
+      fail: async (dispatchRef, claimToken, result) => {
+        failed.push({ dispatchRef, claimToken, result });
+        return { status: "RECORDED" };
+      }
     },
     actionExecutor: { execute: async () => { executeCalls += 1; } }
   });
   const response = await coordinator.processOne();
+  assert.equal(response.processed, true);
   assert.equal(response.reason, "LOGICAL_COMMAND_DUPLICATE_SUPPRESSED");
   assert.equal(response.canonical_command_id, canonical.command_id);
+  assert.equal(response.report.reported, true);
+  assert.equal(failed.length, 1, "the newly claimed duplicate dispatch is closed instead of being left stuck in CLAIMED");
+  assert.equal(failed[0].dispatchRef, rematerialized.dispatch_ref);
+  assert.equal(failed[0].claimToken, "claim");
+  assert.equal(failed[0].result.status, "BLOCKED");
+  assert.equal(failed[0].result.error.code, "LOGICAL_COMMAND_DUPLICATE_SUPPRESSED");
   assert.equal(executeCalls, 0);
+});
+
+test("service-worker restart before browser execution fails safely and never leaves CLAIMED/PREPARED commands stuck", async () => {
+  const journal = new CommandJournal(new MemoryStorageArea(), { recoveryBaseDelayMs: 0 });
+  const received = command("restart-received");
+  const claimed = command("restart-claimed");
+  const prepared = command("restart-prepared");
+
+  await journal.begin(received, { claim_token: "claim-received" });
+  await journal.begin(claimed, { claim_token: "claim-claimed" });
+  await journal.mark(claimed.command_id, JOURNAL_STATE.CLAIMED, { claim_token: "claim-claimed" });
+  await journal.begin(prepared, { claim_token: "claim-prepared" });
+  await journal.mark(prepared.command_id, JOURNAL_STATE.CLAIMED, { claim_token: "claim-prepared" });
+  await journal.mark(prepared.command_id, JOURNAL_STATE.PREPARED, { binding_id: "binding" });
+
+  const recovered = await journal.recoverAfterRestart();
+  assert.deepEqual(new Set(recovered.reportable), new Set([received.command_id, claimed.command_id, prepared.command_id]));
+
+  const failed = [];
+  let uncertainCalls = 0;
+  let executeCalls = 0;
+  const coordinator = coordinatorBase({
+    journal,
+    dispatchClient: {
+      fail: async (_ref, claim, result) => {
+        failed.push({ claim, result });
+        assert.equal(result.status, "BLOCKED");
+        assert.equal(result.error.code, "SERVICE_WORKER_RESTART_BEFORE_EXECUTION");
+        return { status: "RECORDED" };
+      },
+      uncertain: async () => { uncertainCalls += 1; return { status: "RECORDED" }; }
+    },
+    actionExecutor: { execute: async () => { executeCalls += 1; } }
+  });
+
+  for (let index = 0; index < 3; index += 1) {
+    const response = await coordinator.processOne();
+    assert.equal(response.recovered_report_only, true);
+    assert.equal(response.report_kind, "FAIL");
+  }
+
+  assert.deepEqual(new Set(failed.map((item) => item.claim)), new Set(["claim-received", "claim-claimed", "claim-prepared"]));
+  assert.equal(uncertainCalls, 0);
+  assert.equal(executeCalls, 0);
+  assert.equal((await journal.get(received.command_id)).state, JOURNAL_STATE.REPORTED);
+  assert.equal((await journal.get(claimed.command_id)).state, JOURNAL_STATE.REPORTED);
+  assert.equal((await journal.get(prepared.command_id)).state, JOURNAL_STATE.REPORTED);
 });

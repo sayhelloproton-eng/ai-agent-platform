@@ -73,7 +73,15 @@ export class DispatchClient {
 export class ApprovalClient {
   constructor(gateway) { this.gateway = gateway; }
   getGrant(approval_ref) { return this.gateway.invoke(APPLICATION_OPERATIONS.APPROVAL_GRANT_GET, { approval_ref }); }
-  consume(approval_ref, grant_id, command_id) {
-    return this.gateway.invoke(APPLICATION_OPERATIONS.APPROVAL_GRANT_CONSUME, { approval_ref, grant_id, command_id });
+  async consume(approval_ref, grant_id, command_id) {
+    const value = requireObject(
+      await this.gateway.invoke(APPLICATION_OPERATIONS.APPROVAL_GRANT_CONSUME, { approval_ref, grant_id, command_id }),
+      "APPROVAL_CONSUME_INVALID",
+      "Gateway approval consume data must be an object."
+    );
+    if (value.status !== "CONSUMED") {
+      throw new BhrError("APPROVAL_CONSUME_NOT_CONFIRMED", "Gateway did not confirm one-time Approval consumption.", { status: value.status ?? null });
+    }
+    return value;
   }
 }
