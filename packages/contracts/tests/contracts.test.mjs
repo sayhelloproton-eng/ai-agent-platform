@@ -338,3 +338,57 @@ test("rejects unknown Controller fields instead of silently ignoring them", () =
   assert.ok(result.issues.some((entry) => entry.path === "command.payload.unexpectedPayloadField"));
   assert.ok(result.issues.some((entry) => entry.path === "command.payload.nodes[0].unexpectedNodeField"));
 });
+
+
+test("Browser Host role work separates executor role from page target role", () => {
+  const valid = validateSubmitControllerCommandRequest({
+    taskId: "task-browser-target-001",
+    claimToken: "token-browser-target-001",
+    expectedTaskVersion: 3,
+    expectedPlanVersion: 2,
+    idempotencyKey: "browser-target-valid",
+    command: {
+      type: "REQUEST_ROLE_WORK",
+      reasonSummary: "Observe the bound Controller page.",
+      payload: {
+        nodeId: "browser-observe",
+        targetDomain: "browser-host",
+        requiredRole: "browser-host",
+        objective: "Observe the bound page without mutating it.",
+        inputRef: "payload:browser-observe",
+        expectedResultType: "browser-host-result-v0.1.0",
+        targetRoleRef: "controller",
+        targetProfileRef: "g-controller-real",
+        conversationRef: "conversation-real",
+        hostActionType: "OBSERVE_PAGE",
+        expiresAt: "2030-01-01T00:00:00.000Z",
+      },
+    },
+  });
+  assert.equal(valid.ok, true, JSON.stringify(valid));
+
+  const missingTargetRole = validateSubmitControllerCommandRequest({
+    taskId: "task-browser-target-001",
+    claimToken: "token-browser-target-001",
+    expectedTaskVersion: 3,
+    expectedPlanVersion: 2,
+    idempotencyKey: "browser-target-missing-role",
+    command: {
+      type: "REQUEST_ROLE_WORK",
+      reasonSummary: "Observe the bound Controller page.",
+      payload: {
+        nodeId: "browser-observe",
+        targetDomain: "browser-host",
+        requiredRole: "browser-host",
+        objective: "Observe the bound page without mutating it.",
+        inputRef: "payload:browser-observe",
+        expectedResultType: "browser-host-result-v0.1.0",
+        targetProfileRef: "g-controller-real",
+        hostActionType: "OBSERVE_PAGE",
+        expiresAt: "2030-01-01T00:00:00.000Z",
+      },
+    },
+  });
+  assert.equal(missingTargetRole.ok, false);
+  assert.ok(missingTargetRole.issues.some((item) => item.path === "command.payload.targetRoleRef" && item.code === "REQUIRED_FIELD"));
+});

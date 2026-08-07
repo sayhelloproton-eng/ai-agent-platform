@@ -19,6 +19,8 @@ import {
   TaskControlService,
 } from "@ai-agent-platform/task-control";
 
+import { BindingRegistry } from "../../browser-host-runtime/src/background/binding-registry.js";
+import { MemoryStorageArea } from "../../browser-host-runtime/src/background/storage.js";
 import { HttpGatewayClient } from "../../browser-host-runtime/src/background/gateway-client.js";
 import { DispatchClient } from "../../browser-host-runtime/src/background/dispatch-client.js";
 import {
@@ -259,7 +261,8 @@ test("Phase 2 real HTTP E2E closes CTL -> TSK -> LCL/BHR -> TSK -> CTL", async (
           objective: "Observe the bound page without mutating it.",
           inputRef: "payload:browser-observe",
           expectedResultType: "browser-host-result-v0.1.0",
-          targetProfileRef: "gpt:ai-agent-platform-controller",
+          targetRoleRef: "controller",
+          targetProfileRef: "g-controller-e2e",
           conversationRef: "conversation:e2e-controller",
           hostActionType: "OBSERVE_PAGE",
           preconditions: { provider: "chatgpt", pageState: "READY" },
@@ -287,6 +290,28 @@ test("Phase 2 real HTTP E2E closes CTL -> TSK -> LCL/BHR -> TSK -> CTL", async (
     const deliveryClaim = await dispatch.claim(dispatchRef, hostId);
     const hostCommand = await dispatch.get(dispatchRef, deliveryClaim.claim_token);
     assert.equal(hostCommand.action.type, "OBSERVE_PAGE");
+    assert.deepEqual(hostCommand.target, {
+      role_ref: "controller",
+      gpt_ref: "g-controller-e2e",
+      conversation_ref: "conversation:e2e-controller",
+    });
+
+    // Exercise the same strict target identity matching used by the real BHR runtime.
+    // This catches regressions where Work executor role (browser-host) is accidentally
+    // reused as the page target role (controller).
+    const bindingRegistry = new BindingRegistry(new MemoryStorageArea());
+    const realBinding = await bindingRegistry.bind({
+      host_id: hostId,
+      chrome_tab_id: 101,
+      window_id: 1,
+      role_ref: "controller",
+      gpt_ref: "g-controller-e2e",
+      conversation_ref: "conversation:e2e-controller",
+      url: "https://chatgpt.com/g/g-controller-e2e/c/conversation:e2e-controller",
+      page_fingerprint: "sha256:e2e-page",
+    });
+    assert.equal((await bindingRegistry.findForTarget(hostCommand.target))?.binding_id, realBinding.binding_id);
+
     assert.deepEqual(await dispatch.resolvePayload(hostCommand.action.payload_ref), {
       purpose: "Phase 2 Browser Host observation E2E",
     });

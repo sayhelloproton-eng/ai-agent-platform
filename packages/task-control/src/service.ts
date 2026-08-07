@@ -1060,6 +1060,7 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
           state.workItems[workItemId] = workItem;
           workItemIds.push(workItemId);
           if (command.payload.targetDomain === "browser-host") {
+            invariant(command.payload.targetRoleRef !== undefined, "INVALID_ARGUMENT", "targetRoleRef is required.");
             invariant(command.payload.targetProfileRef !== undefined, "INVALID_ARGUMENT", "targetProfileRef is required.");
             invariant(command.payload.hostActionType !== undefined, "INVALID_ARGUMENT", "hostActionType is required.");
             invariant(command.payload.expiresAt !== undefined, "INVALID_ARGUMENT", "expiresAt is required.");
@@ -1069,9 +1070,12 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
               taskId: task.taskId,
               createdFromTaskVersion: task.taskVersion,
               signalType: "ROLE_WORK_WAKE",
-              targetRole: command.payload.requiredRole,
+              targetRole: command.payload.targetRoleRef!,
               targetProfileRef: command.payload.targetProfileRef!,
-              conversationRef: command.payload.conversationRef ?? task.conversationRef,
+              // Task conversationRef is Controller/Task context, not Browser page identity.
+              // Browser targeting must never silently inherit it. Omitted means match the
+              // unique READY Binding by role + GPT and let BHR validate/promote conversation.
+              conversationRef: command.payload.conversationRef ?? null,
               hostCommandType: "EXECUTE_APPROVED_UI_ACTION",
               hostCommandRef: `host-command:${signalId}`,
               browserActionType: command.payload.hostActionType!,

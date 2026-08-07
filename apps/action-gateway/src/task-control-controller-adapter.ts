@@ -815,6 +815,9 @@ export function createTaskControlControllerAdapter(
               ? {}
               : { inputRef: command.payload.inputRef }),
             expectedResultType: command.payload.expectedResultType,
+            ...(command.payload.targetRoleRef === undefined
+              ? {}
+              : { targetRoleRef: command.payload.targetRoleRef }),
             ...(command.payload.targetProfileRef === undefined
               ? {}
               : { targetProfileRef: command.payload.targetProfileRef }),

@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: AI Agent Platform Controller Actions
-  version: 1.1.0
+  version: 1.2.0
   description: Create Phase 2 tasks, query authenticated task context, claim Controller work, submit constrained Controller commands, issue Approval Grants, release claims, and query Runtime status through the Action Gateway.
 servers:
   - url: ${DEV_TUNNEL_PUBLIC_BASE_URL}
@@ -401,6 +401,8 @@ components:
         - payload
     ControllerCommandPayload:
       type: object
+      additionalProperties: false
+      description: Command-specific payload. For REQUEST_ROLE_WORK, objective and expectedResultType are required; Local Control additionally requires capabilityRef/inputRef; Browser Host additionally requires targetRoleRef/targetProfileRef/hostActionType/expiresAt.
       properties:
         nodes:
           type: array
@@ -414,6 +416,7 @@ components:
           type: string
         requiredRole:
           type: string
+          description: Work executor role. For Browser Host work this is browser-host, not the page role.
         targetDomain:
           type: string
         capabilityRef:
@@ -422,10 +425,15 @@ components:
           type: string
         expectedResultType:
           type: string
+        targetRoleRef:
+          type: string
+          description: Browser page target role_ref, for example controller. Required when targetDomain is browser-host.
         targetProfileRef:
           type: string
+          description: Browser Binding provider-native GPT ref (g-...), not the internal Controller profile id. Required when targetDomain is browser-host.
         conversationRef:
           type: string
+          description: Browser Binding conversation_ref when targeting a specific conversation. It is page identity, not Task conversation context.
         hostActionType:
           type: string
           enum:

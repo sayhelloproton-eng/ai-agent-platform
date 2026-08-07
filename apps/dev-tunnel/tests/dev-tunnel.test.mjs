@@ -802,3 +802,17 @@ test("startup timeout is represented by a stable safe error", () => {
 test("SIGINT and SIGTERM are the only managed shutdown signals", () => {
   assert.deepEqual(["SIGINT", "SIGTERM"], ["SIGINT", "SIGTERM"]);
 });
+
+
+test("OpenAPI 1.2.0 exposes explicit Browser Host target identity fields", () => {
+  const template = readFileSync(OPENAPI_TEMPLATE, "utf8");
+  assert.match(template, /\n {2}version: 1\.2\.0\n/u);
+  const payloadMatch = template.match(
+    /\n {4}ControllerCommandPayload:(?<schema>[\s\S]*?)\n {4}PlanNodeDraft:/u,
+  );
+  assert.notEqual(payloadMatch, null);
+  assert.match(payloadMatch.groups.schema, /\n {8}targetRoleRef:\n/u);
+  assert.match(payloadMatch.groups.schema, /\n {8}targetProfileRef:\n/u);
+  assert.match(payloadMatch.groups.schema, /Work executor role/u);
+  assert.match(payloadMatch.groups.schema, /Browser page target role_ref/u);
+});

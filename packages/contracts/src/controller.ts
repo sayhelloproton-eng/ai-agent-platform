@@ -244,6 +244,7 @@ export interface RequestRoleWorkCommand {
     readonly inputRef?: string;
     readonly expectedResultType: string;
     readonly expectedOutputContract?: string;
+    readonly targetRoleRef?: string;
     readonly targetProfileRef?: string;
     readonly conversationRef?: string;
     readonly hostActionType?: BrowserHostActionType;

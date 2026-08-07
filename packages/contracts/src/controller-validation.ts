@@ -378,6 +378,7 @@ function validateControllerCommand(
           "inputRef",
           "expectedResultType",
           "expectedOutputContract",
+          "targetRoleRef",
           "targetProfileRef",
           "conversationRef",
           "hostActionType",
@@ -404,6 +405,7 @@ function validateControllerCommand(
         "capabilityRef",
         "inputRef",
         "expectedOutputContract",
+        "targetRoleRef",
         "targetProfileRef",
         "conversationRef",
         "hostActionType",
@@ -430,7 +432,7 @@ function validateControllerCommand(
         }
       }
       if (payload.targetDomain === "browser-host") {
-        for (const field of ["targetProfileRef", "hostActionType", "expiresAt"] as const) {
+        for (const field of ["targetRoleRef", "targetProfileRef", "hostActionType", "expiresAt"] as const) {
           if (!isNonEmptyString(payload[field])) {
             valid = false;
             issue(issues, `command.payload.${field}`, "REQUIRED_FIELD", "Browser Host work requires this field.");

@@ -387,6 +387,7 @@ export type ControllerCommand =
         readonly capabilityRef?: string;
         readonly inputRef?: string;
         readonly expectedResultType: string;
+        readonly targetRoleRef?: string;
         readonly targetProfileRef?: string;
         readonly conversationRef?: string;
         readonly hostActionType?: string;
