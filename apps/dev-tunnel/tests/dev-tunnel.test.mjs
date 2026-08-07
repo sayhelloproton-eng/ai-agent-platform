@@ -16,17 +16,22 @@ import {
   generateOpenApi,
   hasAnonymousAccess,
   hasGatewayPort,
+  hasRunningManagedState,
   isProcessAlive,
   migrateLegacyConfig,
   parsePublicUrl,
   parseCliVersion,
   parseTunnelJson,
   planTunnelSetup,
+  probeHttp,
   readState,
   resolveCli,
   secretSafe,
+  selectRunningManagedProcesses,
   stopManagedProcess,
   verifyGateway,
+  waitForHttp,
+  waitForPublicUrl,
   writePrivateConfig,
 } from "../scripts/lib.mjs";
 
@@ -657,6 +662,136 @@ test("Cloudflare active application and Edge Bridge are absent", async () => {
   assert.equal(
     existsSync(new URL("../../../scripts/edge-bridge.mjs", import.meta.url)),
     false,
+  );
+});
+
+
+
+test("public URL discovery tolerates delayed host output within the bounded window", async () => {
+  let clock = 0;
+  let reads = 0;
+  const result = await waitForPublicUrl({
+    timeoutMs: 1_000,
+    read: () => {
+      reads += 1;
+      return reads >= 5
+        ? "Connect via https://late-8787.region.devtunnels.ms"
+        : "host starting";
+    },
+    now: () => clock,
+    sleep: async (delayMs) => {
+      clock += delayMs;
+    },
+  });
+  assert.equal(result, "https://late-8787.region.devtunnels.ms");
+  assert.ok(clock >= 300);
+  assert.ok(clock < 1_000);
+});
+
+test("a saved public URL is reused only after a live health probe succeeds", async () => {
+  let clock = 0;
+  let probes = 0;
+  const result = await waitForPublicUrl({
+    timeoutMs: 1_000,
+    read: () => "host starting without URL output",
+    fallbackUrl: "https://saved-8787.region.devtunnels.ms/",
+    probeFallback: async (candidate) => {
+      probes += 1;
+      assert.equal(candidate, "https://saved-8787.region.devtunnels.ms/");
+      return probes >= 2;
+    },
+    fallbackProbeIntervalMs: 200,
+    now: () => clock,
+    sleep: async (delayMs) => {
+      clock += delayMs;
+    },
+  });
+  assert.equal(result, "https://saved-8787.region.devtunnels.ms");
+  assert.equal(probes, 2);
+});
+
+test("an unreachable saved public URL is never trusted and discovery times out clearly", async () => {
+  let clock = 0;
+  await assert.rejects(
+    waitForPublicUrl({
+      timeoutMs: 350,
+      read: () => "host starting without URL output",
+      fallbackUrl: "https://stale-8787.region.devtunnels.ms",
+      probeFallback: async () => false,
+      fallbackProbeIntervalMs: 100,
+      now: () => clock,
+      sleep: async (delayMs) => {
+        clock += delayMs;
+      },
+    }),
+    (error) => error.code === "PUBLIC_URL_DISCOVERY_TIMEOUT",
+  );
+});
+
+test("public URL discovery stops immediately when the Tunnel host exits", async () => {
+  await assert.rejects(
+    waitForPublicUrl({
+      timeoutMs: 60_000,
+      read: () => "",
+      isHostAlive: () => false,
+    }),
+    (error) => error.code === "DEVTUNNEL_EXITED_DURING_STARTUP",
+  );
+});
+
+test("single-shot public health probe accepts only the expected status", async () => {
+  assert.equal(
+    await probeHttp("https://example.test/health", {
+      fetchImpl: async () => response(200),
+    }),
+    true,
+  );
+  assert.equal(
+    await probeHttp("https://example.test/health", {
+      fetchImpl: async () => response(503),
+    }),
+    false,
+  );
+});
+
+test("HTTP readiness can report a stage-specific timeout code", async () => {
+  await assert.rejects(
+    waitForHttp("https://example.test/health", {
+      timeoutMs: 5,
+      errorCode: "PUBLIC_HEALTH_TIMEOUT",
+      fetchImpl: async () => {
+        throw new Error("not ready");
+      },
+    }),
+    (error) => error.code === "PUBLIC_HEALTH_TIMEOUT",
+  );
+});
+
+test("stale state ignores dead or reused PIDs and isolates owned survivors", () => {
+  const state = {
+    processes: {
+      runtime: { pid: 41, signature: "runtime-signature" },
+      gateway: { pid: 42, signature: "gateway-signature" },
+      devtunnel: { pid: 43, signature: "tunnel-signature" },
+    },
+  };
+  assert.equal(
+    hasRunningManagedState(state, { matches: () => false }),
+    false,
+  );
+  const selected = selectRunningManagedProcesses(state, {
+    matches: (pid, signature) =>
+      pid === 42 && signature === "gateway-signature",
+  });
+  assert.deepEqual(selected, {
+    gateway: { pid: 42, signature: "gateway-signature" },
+  });
+  assert.equal(
+    hasRunningManagedState(state, {
+      matches: (pid, signature) =>
+        pid === 42 && signature === "gateway-signature",
+    }),
+    true,
   );
 });
 

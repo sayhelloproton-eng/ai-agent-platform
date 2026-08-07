@@ -7,7 +7,9 @@ import {
   buildServiceEnvironment,
   clearManagedLogs,
   generateOpenApi,
+  selectRunningManagedProcesses,
   isProcessAlive,
+  probeHttp,
   readPrivateConfig,
   readState,
   removeState,
@@ -42,14 +44,19 @@ for (const signal of ["SIGINT", "SIGTERM"]) {
 
 try {
   const existing = readState();
-  if (
-    existing?.processes &&
-    Object.values(existing.processes).some((record) =>
-      isProcessAlive(record?.pid),
-    )
-  ) {
+  const runningExistingProcesses = selectRunningManagedProcesses(existing);
+  const requiredProcessNames = ["runtime", "gateway", "devtunnel"];
+  const existingStackIsHealthy =
+    existing?.status === "running" &&
+    requiredProcessNames.every((name) => runningExistingProcesses[name]);
+  if (existingStackIsHealthy) {
     throw new Error("ALREADY_RUNNING");
   }
+  if (Object.keys(runningExistingProcesses).length > 0) {
+    await stopRecordedState({ processes: runningExistingProcesses });
+  }
+  // Dead PIDs, reused PIDs, and partial previous startups are stale. Reconcile
+  // only processes whose command signatures still prove platform ownership.
   removeState();
   const config = readPrivateConfig();
   const previousPublicBaseUrl = config.DEV_TUNNEL_PUBLIC_BASE_URL;
@@ -109,13 +116,24 @@ try {
     signature: `devtunnel host ${tunnelId}`,
   };
   writeState(partialState);
-  const publicBaseUrl = await waitForPublicUrl();
+  const publicHealthHeaders = {
+    accept: "application/json",
+    "x-tunnel-skip-antiphishing-page": "true",
+  };
+  const publicBaseUrl = await waitForPublicUrl({
+    timeoutMs: 60_000,
+    fallbackUrl: previousPublicBaseUrl,
+    isHostAlive: () => isProcessAlive(devtunnelPid),
+    probeFallback: (candidateUrl) =>
+      probeHttp(`${candidateUrl}/health`, {
+        timeoutMs: 1_000,
+        headers: publicHealthHeaders,
+      }),
+  });
   await waitForHttp(`${publicBaseUrl}/health`, {
     timeoutMs: 30_000,
-    headers: {
-      accept: "application/json",
-      "x-tunnel-skip-antiphishing-page": "true",
-    },
+    headers: publicHealthHeaders,
+    errorCode: "PUBLIC_HEALTH_TIMEOUT",
   });
   const readyState = {
     ...partialState,
@@ -156,12 +174,17 @@ try {
     }, 500);
   });
 } catch (error) {
+  let cleanupSucceeded = false;
   if (partialState) {
     try {
       await stopRecordedState(partialState);
+      cleanupSucceeded = true;
     } catch {
-      // A failed cleanup is reported by the state retained below.
+      // Retain state only when cleanup cannot be proven complete.
     }
+  }
+  if (cleanupSucceeded) {
+    removeState();
   }
   console.error(`start: FAIL (${error.code ?? error.message ?? "UNKNOWN"})`);
   process.exitCode = 1;

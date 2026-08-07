@@ -379,6 +379,27 @@ export function processMatches(pid, signature, {
   return result.status === 0 && result.stdout.includes(signature);
 }
 
+export function selectRunningManagedProcesses(
+  state,
+  { matches = processMatches } = {},
+) {
+  if (!state?.processes || typeof state.processes !== "object") return {};
+  return Object.fromEntries(
+    Object.entries(state.processes).filter(([, record]) =>
+      Boolean(
+        record &&
+        Number.isSafeInteger(record.pid) &&
+        typeof record.signature === "string" &&
+        matches(record.pid, record.signature),
+      ),
+    ),
+  );
+}
+
+export function hasRunningManagedState(state, dependencies = {}) {
+  return Object.keys(selectRunningManagedProcesses(state, dependencies)).length > 0;
+}
+
 export async function stopManagedProcess(
   processRecord,
   {
@@ -436,19 +457,69 @@ export function clearManagedLogs() {
 }
 
 export async function waitForPublicUrl({
-  timeoutMs = 15_000,
+  timeoutMs = 60_000,
   read = () => readLog("devtunnel"),
+  fallbackUrl,
+  probeFallback = async () => false,
+  isHostAlive = () => true,
+  now = Date.now,
+  sleep = (delayMs) =>
+    new Promise((resolveDelay) => setTimeout(resolveDelay, delayMs)),
+  fallbackProbeIntervalMs = 500,
 } = {}) {
-  const deadline = Date.now() + timeoutMs;
-  while (Date.now() < deadline) {
+  const deadline = now() + timeoutMs;
+  let lastFallbackProbeAt = Number.NEGATIVE_INFINITY;
+  while (now() < deadline) {
+    if (!isHostAlive()) {
+      throw new DevTunnelError("DEVTUNNEL_EXITED_DURING_STARTUP");
+    }
     try {
       return parsePublicUrl(read());
     } catch (error) {
       if (error.code !== "PUBLIC_URL_NOT_FOUND") throw error;
     }
-    await new Promise((resolveDelay) => setTimeout(resolveDelay, 100));
+
+    const currentTime = now();
+    if (
+      typeof fallbackUrl === "string" &&
+      fallbackUrl !== "" &&
+      currentTime - lastFallbackProbeAt >= fallbackProbeIntervalMs
+    ) {
+      lastFallbackProbeAt = currentTime;
+      try {
+        if (await probeFallback(fallbackUrl)) {
+          return fallbackUrl.replace(/\/$/u, "");
+        }
+      } catch {
+        // A saved URL is only a hint. Keep waiting for current host evidence.
+      }
+    }
+
+    const remainingMs = Math.max(0, deadline - now());
+    await sleep(Math.min(100, remainingMs));
   }
-  throw new DevTunnelError("PUBLIC_URL_NOT_FOUND");
+  throw new DevTunnelError("PUBLIC_URL_DISCOVERY_TIMEOUT");
+}
+
+export async function probeHttp(
+  url,
+  {
+    expectedStatus = 200,
+    timeoutMs = 1_000,
+    headers = { accept: "application/json" },
+    fetchImpl = fetch,
+  } = {},
+) {
+  try {
+    const response = await fetchImpl(url, {
+      headers,
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+    await response.body?.cancel();
+    return response.status === expectedStatus;
+  } catch {
+    return false;
+  }
 }
 
 function selectEnvironment(parentEnvironment, names) {
@@ -534,6 +605,7 @@ export async function waitForHttp(
     timeoutMs = 10_000,
     headers = { accept: "application/json" },
     fetchImpl = fetch,
+    errorCode = "STARTUP_TIMEOUT",
   } = {},
 ) {
   const deadline = Date.now() + timeoutMs;
@@ -550,7 +622,7 @@ export async function waitForHttp(
     }
     await new Promise((resolveDelay) => setTimeout(resolveDelay, 100));
   }
-  throw new DevTunnelError("STARTUP_TIMEOUT");
+  throw new DevTunnelError(errorCode);
 }
 
 function isJsonContentType(response) {
