@@ -36,7 +36,20 @@ export class ObservationCoordinator {
           await chrome.tabs.update(tab.id, { active: true });
           await delay(this.focusDelayMs);
         }
-        const dataUrl = await chrome.tabs.captureVisibleTab(tab.windowId, { format: "jpeg", quality: this.screenshotQuality });
+        let dataUrl;
+        try {
+          dataUrl = await chrome.tabs.captureVisibleTab(tab.windowId, { format: "jpeg", quality: this.screenshotQuality });
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          if (/Either the '<all_urls>' or 'activeTab' permission is required/u.test(message)) {
+            return {
+              ref: null,
+              unavailable_reason: "SCREENSHOT_PERMISSION_UNAVAILABLE",
+              temporarily_activated: switched
+            };
+          }
+          throw error;
+        }
         const ref = `local-screenshot-${randomId("evidence")}`;
         await this.evidenceStore.put(ref, {
           data_url: dataUrl,

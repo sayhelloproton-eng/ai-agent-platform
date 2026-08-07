@@ -23,3 +23,29 @@ test("specified inactive tab is temporarily activated for screenshot and previou
   assert.equal(stored.length, 1);
   assert.equal(stored[0].value.chrome_tab_id, 20);
 });
+
+
+test("screenshot permission failure degrades observation evidence instead of failing", async () => {
+  const updates = [];
+  globalThis.chrome = {
+    tabs: {
+      get: async () => ({ id: 20, windowId: 2, active: false }),
+      query: async () => [{ id: 10, windowId: 2, active: true }],
+      update: async (id, patch) => { updates.push({ id, patch }); return { id, windowId: 2, ...patch }; },
+      captureVisibleTab: async () => {
+        throw new Error("Either the '<all_urls>' or 'activeTab' permission is required.");
+      }
+    }
+  };
+  const stored = [];
+  const coordinator = new ObservationCoordinator({ host_id: "host", evidenceStore: { put: async (ref, value) => stored.push({ ref, value }) }, focusDelayMs: 0 });
+  const result = await coordinator.captureScreenshot({ binding_id: "binding", chrome_tab_id: 20 });
+  assert.equal(result.ref, null);
+  assert.equal(result.unavailable_reason, "SCREENSHOT_PERMISSION_UNAVAILABLE");
+  assert.equal(result.temporarily_activated, true);
+  assert.equal(stored.length, 0);
+  assert.deepEqual(updates, [
+    { id: 20, patch: { active: true } },
+    { id: 10, patch: { active: true } }
+  ]);
+});
