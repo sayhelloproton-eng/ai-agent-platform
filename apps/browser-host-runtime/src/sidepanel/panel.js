@@ -5,8 +5,14 @@ function output(value) { $("output").textContent = JSON.stringify(value, null, 2
 async function refresh() {
   const response = await request({ type: "BHR_GET_STATUS" });
   if (!response.ok) return output(response);
-  const { host, config, bindings, pending_reviews } = response.data;
-  $("host-state").textContent = config.emergency_stopped ? "STOPPED" : config.paused ? "PAUSED" : host.state;
+  const { host, config, credential_state, bindings, pending_reviews } = response.data;
+  $("host-state").textContent = config.emergency_stopped
+    ? "STOPPED"
+    : config.paused
+      ? "PAUSED"
+      : !credential_state?.gateway_api_key_set
+        ? "NEEDS_CREDENTIAL"
+        : host.state;
   const root = $("bindings");
   root.textContent = "";
   for (const binding of bindings) {

@@ -40,7 +40,7 @@ export class HttpGatewayClient {
     this.endpoint = endpoint;
     this.apiKey = apiKey;
     this.timeoutMs = timeoutMs;
-    this.fetchImpl = fetchImpl;
+    this.fetchImpl = (...args) => fetchImpl(...args);
   }
 
   async invoke(operation, payload) {

@@ -1,5 +1,5 @@
 import { createRuntime } from "./factory.js";
-import { readConfig, writeConfig, writeSessionSecrets } from "./config.js";
+import { readConfig, readSessionSecrets, writeConfig, writeSessionSecrets } from "./config.js";
 import { asSafeError } from "../shared/errors.js";
 import { buildWakeEnvelope } from "../shared/contracts.js";
 import { computeActionFingerprint, computePagePreconditionHash } from "../shared/fingerprints.js";
@@ -98,10 +98,15 @@ async function bindActiveTab(role_ref = "controller") {
 
 async function buildStatus() {
   const runtime = await createRuntime();
+  const secrets = await readSessionSecrets();
   const bindings = await runtime.bindingRegistry.list();
   const journal = await runtime.journal?.entries?.() ?? {};
   return {
     host: runtime.host,
+    credential_state: {
+      gateway_api_key_set: Boolean(secrets.gateway_api_key),
+      model_api_key_set: Boolean(secrets.model_api_key)
+    },
     config: { ...runtime.config, gateway_endpoint: runtime.config.gateway_endpoint, model_endpoint: runtime.config.model_endpoint },
     bindings,
     pending_reviews: (await runtime.localStorage.get(PENDING_REVIEW_KEY)) ?? [],
@@ -210,7 +215,11 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       case "BHR_APPROVE_FIXTURE_WAKE": return { ok: true, data: await approveFixtureWake() };
       case "BHR_PAGE_SIGNAL": return { ok: true, data: await observeReadyBindings({ tabId: _sender.tab?.id ?? null }) };
       case "BHR_SAVE_CONFIG": return { ok: true, data: await writeConfig(message.patch ?? {}) };
-      case "BHR_SET_SESSION_SECRETS": return { ok: true, data: await writeSessionSecrets(message.secrets ?? {}) };
+      case "BHR_SET_SESSION_SECRETS": {
+        const saved = await writeSessionSecrets(message.secrets ?? {});
+        await registerAndRecover();
+        return { ok: true, data: { ...saved, status: await buildStatus() } };
+      }
       default: throw Object.assign(new Error(`Unsupported runtime message: ${message.type}`), { code: "MESSAGE_TYPE_UNSUPPORTED" });
     }
   })().then(sendResponse).catch((error) => sendResponse({ ok: false, error: asSafeError(error) }));

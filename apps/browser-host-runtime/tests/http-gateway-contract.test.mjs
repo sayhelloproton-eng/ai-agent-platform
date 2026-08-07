@@ -55,6 +55,22 @@ test("HTTP client rejects empty data and incompatible Envelope version", async (
   });
 });
 
+
+test("HTTP client invokes injected fetch as a plain function, never as a client method", async () => {
+  let observedThis = Symbol("unset");
+  const fetchImpl = async function (_url, options) {
+    observedThis = this;
+    const request = JSON.parse(options.body);
+    return new Response(JSON.stringify({ ok: true, requestId: request.requestId, data: { status: "ONLINE" } }), {
+      status: 200,
+      headers: { "content-type": "application/json" }
+    });
+  };
+  const client = new HttpGatewayClient({ endpoint: "http://127.0.0.1:8787/v1/browser-host/invoke", fetchImpl });
+  assert.deepEqual(await client.invoke("browser.host.heartbeat", {}), { status: "ONLINE" });
+  assert.equal(observedThis, undefined);
+});
+
 test("HTTP mode fails clearly when no server is available and does not fall back to Fixture", async () => {
   const client = new HttpGatewayClient({ endpoint: "http://127.0.0.1:1/v1/browser-host/invoke", timeoutMs: 200 });
   await assert.rejects(() => client.invoke("browser.host.register", {}), (error) => error.code === "GATEWAY_UNAVAILABLE");
