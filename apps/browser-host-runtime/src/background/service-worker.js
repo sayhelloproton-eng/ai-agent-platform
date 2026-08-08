@@ -90,7 +90,11 @@ async function observeReadyBindingsUnlocked({ tabId = null } = {}) {
 }
 
 async function observeReadyBindings(options = {}) {
-  return executionGate.run("passive-observation", () => observeReadyBindingsUnlocked(options));
+  return executionGate.tryRun(
+    "passive-observation",
+    () => observeReadyBindingsUnlocked(options),
+    [{ skipped: true, reason: "DISPATCH_OR_COMMAND_BUSY", recorded_at: new Date().toISOString() }]
+  );
 }
 
 async function bindActiveTab(role_ref = "controller") {
@@ -121,8 +125,25 @@ async function buildStatus() {
   const secrets = await readSessionSecrets();
   const bindings = await runtime.bindingRegistry.list();
   const journal = await runtime.journal?.entries?.() ?? {};
+  const persistedHost = await runtime.hostRegistry.getOrCreate();
+  const ackAt = Date.parse(persistedHost.last_gateway_ack_at ?? persistedHost.last_heartbeat_success_at ?? persistedHost.registered_at ?? "");
+  const staleAfterMs = Math.max(120000, Number(runtime.config.heartbeat_seconds ?? 60) * 2500);
+  const freshnessMs = Number.isFinite(ackAt) ? Date.now() - ackAt : null;
+  const effectiveState = persistedHost.state === "STOPPED" || persistedHost.state === "PAUSED"
+    ? persistedHost.state
+    : freshnessMs === null
+      ? (persistedHost.state === "STARTING" ? "STARTING" : "DEGRADED")
+      : freshnessMs > staleAfterMs
+        ? "OFFLINE"
+        : persistedHost.state;
   return {
-    host: runtime.host,
+    host: {
+      ...persistedHost,
+      reported_state: persistedHost.state,
+      state: effectiveState,
+      heartbeat_freshness_ms: freshnessMs,
+      heartbeat_stale_after_ms: staleAfterMs
+    },
     credential_state: {
       gateway_api_key_set: Boolean(secrets.gateway_api_key),
       model_api_key_set: Boolean(secrets.model_api_key)

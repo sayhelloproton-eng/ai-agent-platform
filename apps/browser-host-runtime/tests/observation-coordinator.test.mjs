@@ -197,3 +197,20 @@ test("observation exposes explicit screenshot unavailability reason in the publi
   assert.equal(observed.observation.screenshot_unavailable_reason, "SCREENSHOT_PERMISSION_UNAVAILABLE");
   assert.equal(observed.local.screenshot_unavailable_reason, "SCREENSHOT_PERMISSION_UNAVAILABLE");
 });
+
+
+test("Chrome screenshot quota errors degrade to SCREENSHOT_RATE_LIMITED", async () => {
+  globalThis.chrome = {
+    tabs: {
+      get: async () => ({ id: 77, windowId: 3, active: true }),
+      query: async () => [{ id: 77, windowId: 3, active: true }],
+      captureVisibleTab: async () => {
+        throw new Error("This request exceeds the MAX_CAPTURE_VISIBLE_TAB_CALLS_PER_SECOND quota.");
+      }
+    }
+  };
+  const coordinator = new ObservationCoordinator({ host_id: "host", evidenceStore: { put: async () => {} } });
+  const result = await coordinator.captureScreenshot({ binding_id: "binding", chrome_tab_id: 77 });
+  assert.equal(result.ref, null);
+  assert.equal(result.unavailable_reason, "SCREENSHOT_RATE_LIMITED");
+});

@@ -29,7 +29,7 @@
     "dev-tunnel:doctor": "npm run doctor --workspace @ai-agent-platform/dev-tunnel",
     "dev-tunnel:install": "npm run cli:install --workspace @ai-agent-platform/dev-tunnel",
     "dev-tunnel:setup": "npm run setup --workspace @ai-agent-platform/dev-tunnel",
-    "dev-tunnel:start": "npm run start --workspace @ai-agent-platform/dev-tunnel",
+    "dev-tunnel:start": "npm run dev-tunnel:stop &&npm run start --workspace @ai-agent-platform/dev-tunnel",
     "dev-tunnel:status": "npm run status --workspace @ai-agent-platform/dev-tunnel",
     "dev-tunnel:stop": "npm run stop --workspace @ai-agent-platform/dev-tunnel",
     "dev-tunnel:refresh": "npm run refresh --workspace @ai-agent-platform/dev-tunnel",

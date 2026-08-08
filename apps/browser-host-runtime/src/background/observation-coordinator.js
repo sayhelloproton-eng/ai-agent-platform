@@ -9,6 +9,14 @@ const CONTENT_SCRIPT_FILES = [
   "src/content/content-script.js"
 ];
 const contentScriptRecovery = new Map();
+const sharedScreenshotState = {
+  queue: Promise.resolve(),
+  lastCaptureAt: 0,
+  cooldownUntil: 0,
+  inFlightByTab: new Map()
+};
+const SCREENSHOT_MIN_INTERVAL_MS = 1100;
+const SCREENSHOT_QUOTA_COOLDOWN_MS = 3000;
 
 function delay(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
 
@@ -120,11 +128,18 @@ export class ObservationCoordinator {
     this.evidenceStore = evidenceStore;
     this.screenshotQuality = screenshotQuality;
     this.focusDelayMs = focusDelayMs;
-    this.captureQueue = Promise.resolve();
   }
 
   async captureScreenshot(binding) {
+    const existing = sharedScreenshotState.inFlightByTab.get(binding.chrome_tab_id);
+    if (existing) return existing;
     const run = async () => {
+      const now = Date.now();
+      if (now < sharedScreenshotState.cooldownUntil) {
+        return { ref: null, unavailable_reason: "SCREENSHOT_RATE_LIMITED", temporarily_activated: false };
+      }
+      const waitMs = Math.max(0, sharedScreenshotState.lastCaptureAt + SCREENSHOT_MIN_INTERVAL_MS - now);
+      if (waitMs > 0) await delay(waitMs);
       const tab = await chrome.tabs.get(binding.chrome_tab_id);
       if (!tab?.id || tab.windowId === undefined) throw new BhrError("TAB_NOT_FOUND", "The bound browser tab no longer exists.");
       const [active] = await chrome.tabs.query({ active: true, windowId: tab.windowId });
@@ -150,8 +165,17 @@ export class ObservationCoordinator {
             temporarily_activated: false
           };
         }
+        if (/MAX_CAPTURE_VISIBLE_TAB_CALLS_PER_SECOND|exceeds the.*captureVisibleTab.*quota/i.test(message)) {
+          sharedScreenshotState.cooldownUntil = Date.now() + SCREENSHOT_QUOTA_COOLDOWN_MS;
+          return {
+            ref: null,
+            unavailable_reason: "SCREENSHOT_RATE_LIMITED",
+            temporarily_activated: false
+          };
+        }
         throw error;
       }
+      sharedScreenshotState.lastCaptureAt = Date.now();
       const ref = `local-screenshot-${randomId("evidence")}`;
       await this.evidenceStore.put(ref, {
         data_url: dataUrl,
@@ -162,8 +186,13 @@ export class ObservationCoordinator {
       });
       return { ref, unavailable_reason: null, temporarily_activated: false };
     };
-    const pending = this.captureQueue.then(run, run);
-    this.captureQueue = pending.catch(() => {});
+    const pending = sharedScreenshotState.queue.then(run, run).finally(() => {
+      if (sharedScreenshotState.inFlightByTab.get(binding.chrome_tab_id) === pending) {
+        sharedScreenshotState.inFlightByTab.delete(binding.chrome_tab_id);
+      }
+    });
+    sharedScreenshotState.inFlightByTab.set(binding.chrome_tab_id, pending);
+    sharedScreenshotState.queue = pending.catch(() => {});
     return pending;
   }
 

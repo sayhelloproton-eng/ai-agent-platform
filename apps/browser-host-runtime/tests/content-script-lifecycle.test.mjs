@@ -352,3 +352,15 @@ test("late response delivery after extension reload is contained and disposes th
   assert.equal(marker.reason, "EXTENSION_CONTEXT_INVALIDATED");
   assert.equal(harness.runtimeListeners.size, 0);
 });
+
+
+test("ChatGPT Action allow/deny controls surface ACTION_CONFIRMATION_PENDING", async () => {
+  const harness = createComposerHarness({ extraButtons: ["允许", "拒绝"] });
+  const listener = [...harness.runtimeListeners][0];
+  const response = await new Promise((resolve) => {
+    listener({ type: "BHR_OBSERVE", observation_id: "action-confirmation" }, {}, resolve);
+  });
+  assert.equal(response.ok, true);
+  assert.equal(response.data.page_state, "ACTION_CONFIRMATION_PENDING");
+  assert.ok(response.data.blocking_ui.some((item) => item.type === "ACTION_CONFIRMATION_PENDING"));
+});

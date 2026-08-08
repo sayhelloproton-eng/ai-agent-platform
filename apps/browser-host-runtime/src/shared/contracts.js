@@ -136,6 +136,7 @@ export function buildHostResult({ command, status, binding_id, pre_observation_r
     status,
     pre_observation_ref,
     post_observation_ref,
+    evidence_refs: [...new Set([pre_observation_ref, post_observation_ref].filter(Boolean))],
     error,
     details,
     completed_at: new Date().toISOString()

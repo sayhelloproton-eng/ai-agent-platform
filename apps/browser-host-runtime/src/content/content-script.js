@@ -38,7 +38,19 @@
     if (!(element instanceof Element)) return false;
     const style = getComputedStyle(element);
     const rect = element.getBoundingClientRect();
-    return style.visibility !== "hidden" && style.display !== "none" && rect.width > 0 && rect.height > 0;
+    const domVisible = style.visibility !== "hidden" && style.display !== "none" && rect.width > 0 && rect.height > 0;
+    if (!domVisible) return false;
+    const viewportWidth = Math.max(document.documentElement.clientWidth || 0, globalThis.innerWidth || 0);
+    const viewportHeight = Math.max(document.documentElement.clientHeight || 0, globalThis.innerHeight || 0);
+    // Synthetic/unit-test DOMs and backgrounded documents may not expose viewport
+    // dimensions. Preserve DOM visibility in that case; when real dimensions are
+    // available, visible means actual viewport intersection.
+    if (viewportWidth <= 0 || viewportHeight <= 0) return domVisible;
+    const top = Number.isFinite(rect.top) ? rect.top : (Number.isFinite(rect.y) ? rect.y : 0);
+    const left = Number.isFinite(rect.left) ? rect.left : (Number.isFinite(rect.x) ? rect.x : 0);
+    const bottom = Number.isFinite(rect.bottom) ? rect.bottom : top + rect.height;
+    const right = Number.isFinite(rect.right) ? rect.right : left + rect.width;
+    return bottom > 0 && right > 0 && top < viewportHeight && left < viewportWidth;
   }
   function accessibleName(element) {
     return normalizeText(element.getAttribute("aria-label") || element.getAttribute("title") || element.innerText || element.textContent).slice(0, 200);
@@ -90,7 +102,27 @@
     const result = [];
     const candidates = [...document.querySelectorAll('[role="dialog"],[role="alert"],dialog')].filter(visible);
     for (const element of candidates.slice(0, 20)) {
-      result.push({ type: roleOf(element).toUpperCase(), text: normalizeText(element.innerText || element.textContent).slice(0, 500) });
+      const text = normalizeText(element.innerText || element.textContent).slice(0, 500);
+      // ChatGPT currently keeps empty role=alert surfaces in the DOM. They are
+      // accessibility plumbing, not blocking UI, and must not trigger review.
+      if (!text && roleOf(element).toLowerCase() === "alert") continue;
+      result.push({ type: roleOf(element).toUpperCase(), text });
+    }
+
+    const confirmationButtons = buttons()
+      .map((button) => ({ name: accessibleName(button), role: roleOf(button) }))
+      .filter((item) => /^(allow|deny|允许|拒绝)$/iu.test(item.name));
+    const hasAllow = confirmationButtons.some((item) => /^(allow|允许)$/iu.test(item.name));
+    const hasDeny = confirmationButtons.some((item) => /^(deny|拒绝)$/iu.test(item.name));
+    if (hasAllow && hasDeny) {
+      const confirmationSurface = candidates.find((element) => {
+        const text = normalizeText(element.innerText || element.textContent);
+        return /希望与|wants to (talk|communicate|connect)|allow|允许/iu.test(text);
+      });
+      result.push({
+        type: "ACTION_CONFIRMATION_PENDING",
+        text: normalizeText(confirmationSurface?.innerText || confirmationSurface?.textContent || "ChatGPT Action confirmation requires user choice.").slice(0, 500)
+      });
     }
 
     // Never classify ordinary conversation text as blocking UI. A transcript may
@@ -119,6 +151,7 @@
   function pageState() {
     const blocking = blockingUi();
     if (blocking.some((item) => item.type === "LOGIN_REQUIRED")) return "LOGIN_REQUIRED";
+    if (blocking.some((item) => item.type === "ACTION_CONFIRMATION_PENDING")) return "ACTION_CONFIRMATION_PENDING";
     if (blocking.some((item) => item.type === "NETWORK_ERROR")) return "ERROR";
     if (composer()) return "READY";
     return document.readyState === "complete" ? "UNKNOWN" : "LOADING";

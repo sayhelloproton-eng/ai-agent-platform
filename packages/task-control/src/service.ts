@@ -664,6 +664,10 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
   }
 
   async getDecisionContext(taskId: string, afterEventId?: string): Promise<DecisionContext> {
+    // Decision reads are a recovery boundary: expire stale coordination facts
+    // before presenting the Controller with a state that could otherwise remain
+    // permanently WAITING after Host/worker interruption.
+    await this.reconciler.reconcile(taskId);
     return this.store.read((state) => {
       const task = state.tasks[taskId];
       invariant(task !== undefined, "TASK_NOT_FOUND", "Task was not found.", { taskId });
@@ -2108,6 +2112,10 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
   }
 
   async listPendingDispatches(): Promise<readonly DispatchSignal[]> {
+    const taskIds = await this.store.read((state) => [...new Set(Object.values(state.dispatchSignals)
+      .filter((signal) => signal.status === "PENDING" || signal.status === "CLAIMED")
+      .map((signal) => signal.taskId))]);
+    for (const taskId of taskIds) await this.reconciler.reconcile(taskId);
     return this.store.read((state) => listRuntimeDispatchQueue(state));
   }
 
@@ -2361,11 +2369,41 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
         lastError: input.errorSummary ?? "Host dispatch delivery failed.",
       };
       state.dispatchSignals[signal.signalId] = updatedSignal;
-      let task: TaskAggregate = {
+      let plan = current.plan;
+      let workFailureEvent: TaskEvent | null = null;
+      if (signal.workItemId !== null) {
+        const workItem = state.workItems[signal.workItemId];
+        invariant(workItem !== undefined, "WORK_ITEM_NOT_FOUND", "Dispatch references a missing Work Item.", {
+          workItemId: signal.workItemId,
+        });
+        state.workItems[signal.workItemId] = {
+          ...workItem,
+          status: "FAILED",
+          claim: null,
+          errorCode: "HOST_DISPATCH_FAILED",
+          errorSummary: updatedSignal.lastError,
+          retryable: true,
+          completedAt: now,
+        };
+        if (plan !== null) {
+          plan = withPlanVersion(
+            updateNode(plan, workItem.planNodeId, (node) => ({
+              ...node,
+              status: "IN_PROGRESS",
+              summary: updatedSignal.lastError ?? node.summary,
+            }), now),
+            now,
+          );
+        }
+      }
+      let task: TaskAggregate = setOperationalStatus({
         ...current,
         taskVersion: current.taskVersion + 1,
+        plan,
+        blockedReason: null,
         updatedAt: now,
-      };
+      }, signal.workItemId === null ? current.status : "READY_FOR_CONTROLLER");
+      let causationId = current.latestEventId;
       const event = appendEvent(
         state,
         task,
@@ -2375,9 +2413,30 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
         now,
         this.ids,
         input.correlationId ?? null,
-        current.latestEventId,
+        causationId,
       );
-      task = { ...task, latestEventId: event.eventId };
+      causationId = event.eventId;
+      if (signal.workItemId !== null) {
+        workFailureEvent = appendEvent(
+          state,
+          task,
+          "ROLE_WORK_FAILED",
+          input.producerRef,
+          {
+            workItemId: signal.workItemId,
+            errorCode: "HOST_DISPATCH_FAILED",
+            errorSummary: updatedSignal.lastError!,
+            retryable: true,
+            evidenceRefs: [],
+          },
+          now,
+          this.ids,
+          input.correlationId ?? null,
+          causationId,
+        );
+        causationId = workFailureEvent.eventId;
+      }
+      task = { ...task, latestEventId: causationId };
       state.tasks[task.taskId] = task;
       idempotencyPut(
         state,
@@ -2428,7 +2487,7 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
         "Uncertain Host Result requires a delivery or claim credential.",
       );
       invariant(
-        (signal.status === "DELIVERED" || signal.status === "CONSUMED") &&
+        (["CLAIMED", "DELIVERED", "CONSUMED"].includes(signal.status)) &&
           signal.hostResultStatus === "PENDING",
         "COMMAND_NOT_ALLOWED",
         "Dispatch cannot accept an uncertain Host Result in its current state.",
@@ -2450,9 +2509,37 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
         lastError: null,
       };
       state.dispatchSignals[signal.signalId] = updatedSignal;
+      let plan = current.plan;
+      if (signal.workItemId !== null) {
+        const workItem = state.workItems[signal.workItemId];
+        invariant(workItem !== undefined, "WORK_ITEM_NOT_FOUND", "Dispatch references a missing Work Item.", {
+          workItemId: signal.workItemId,
+        });
+        state.workItems[signal.workItemId] = {
+          ...workItem,
+          status: "FAILED",
+          claim: null,
+          errorCode: "UNCERTAIN_SIDE_EFFECT",
+          errorSummary: input.summary,
+          retryable: false,
+          evidenceRefs,
+          completedAt: now,
+        };
+        if (plan !== null) {
+          plan = withPlanVersion(
+            updateNode(plan, workItem.planNodeId, (node) => ({
+              ...node,
+              status: "BLOCKED",
+              summary: input.summary,
+            }), now),
+            now,
+          );
+        }
+      }
       let task: TaskAggregate = {
         ...current,
         taskVersion: current.taskVersion + 1,
+        plan,
         status: "BLOCKED",
         blockedReason: `UNCERTAIN_SIDE_EFFECT:${signal.signalId}`,
         controllerClaim: null,

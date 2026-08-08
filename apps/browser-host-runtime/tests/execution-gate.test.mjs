@@ -25,3 +25,19 @@ test("startup, alarm and manual processing share one serialized execution gate",
     "manual:start", "manual:end"
   ]);
 });
+
+
+test("passive work coalesces instead of queueing behind dispatch work", async () => {
+  const gate = new ExecutionGate();
+  let release;
+  const blocker = new Promise((resolve) => { release = resolve; });
+  const dispatch = gate.run("dispatch", async () => blocker);
+  await Promise.resolve();
+  let passiveRan = false;
+  const passive = await gate.tryRun("passive", async () => { passiveRan = true; });
+  assert.equal(passive.reason, "EXECUTION_BUSY");
+  assert.equal(passiveRan, false);
+  release();
+  await dispatch;
+  assert.equal(gate.status().busy, false);
+});

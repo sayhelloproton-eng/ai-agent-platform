@@ -168,6 +168,160 @@ export class TaskReconciler {
       const cancelledDispatchIds: string[] = [];
       const pendingEvents: PendingEvent[] = [];
 
+      // Dispatch wall-clock expiry is independent from the shorter delivery claim
+      // lease. Expired undelivered browser work must not remain invisible in
+      // PENDING/CLAIMED forever. Close the old attempt, make the Work Item
+      // retryable, and return control to the Controller without replaying it.
+      for (const [id, signal] of Object.entries(state.dispatchSignals)) {
+        if (
+          signal.taskId !== taskId ||
+          signal.deliveredAt !== null ||
+          !["PENDING", "CLAIMED"].includes(signal.status) ||
+          Date.parse(signal.expiresAt) > nowDate.getTime()
+        ) continue;
+        state.dispatchSignals[id] = {
+          ...signal,
+          status: "CANCELLED",
+          claim: null,
+          lastError: "DISPATCH_EXPIRED",
+        };
+        cancelledDispatchIds.push(signal.signalId);
+        pendingEvents.push({
+          eventType: "HOST_DISPATCH_CANCELLED",
+          payload: { signalId: signal.signalId, reason: "DISPATCH_EXPIRED" },
+        });
+        if (signal.workItemId !== null) {
+          const workItem = state.workItems[signal.workItemId];
+          if (workItem !== undefined && ["PENDING", "CLAIMED", "RUNNING"].includes(workItem.status)) {
+            state.workItems[signal.workItemId] = {
+              ...workItem,
+              status: "FAILED",
+              claim: null,
+              errorCode: "DISPATCH_EXPIRED",
+              errorSummary: "Browser Dispatch expired before delivery.",
+              retryable: true,
+              completedAt: now,
+            };
+            if (task.plan !== null) {
+              const index = task.plan.nodes.findIndex((node) => node.nodeId === workItem.planNodeId);
+              if (index >= 0) {
+                const nodes = [...task.plan.nodes];
+                const currentNode = nodes[index]!;
+                nodes[index] = {
+                  ...currentNode,
+                  status: "IN_PROGRESS",
+                  summary: "Browser Dispatch expired before delivery.",
+                };
+                task = {
+                  ...task,
+                  plan: {
+                    ...task.plan,
+                    planVersion: task.plan.planVersion + 1,
+                    nodes,
+                    updatedAt: now,
+                  },
+                  status: "READY_FOR_CONTROLLER",
+                  blockedReason: null,
+                  controllerClaim: null,
+                  updatedAt: now,
+                };
+              }
+            }
+            pendingEvents.push({
+              eventType: "ROLE_WORK_FAILED",
+              payload: {
+                workItemId: workItem.workItemId,
+                errorCode: "DISPATCH_EXPIRED",
+                errorSummary: "Browser Dispatch expired before delivery.",
+                retryable: true,
+                evidenceRefs: [],
+              },
+            });
+          }
+        }
+        changed = true;
+      }
+
+      // Once delivery is acknowledged, browser side effects must never be
+      // replayed merely because the short-lived Report Token expires. Escalate
+      // the Work to UNCERTAIN/BLOCKED and require Controller/operator recovery.
+      for (const [id, signal] of Object.entries(state.dispatchSignals)) {
+        if (
+          signal.taskId !== taskId ||
+          signal.deliveredAt === null ||
+          signal.hostResultStatus !== "PENDING" ||
+          signal.reportTokenExpiresAt === null ||
+          Date.parse(signal.reportTokenExpiresAt) > nowDate.getTime()
+        ) continue;
+        state.dispatchSignals[id] = {
+          ...signal,
+          status: "CONSUMED",
+          claim: null,
+          hostResultStatus: "UNCERTAIN",
+          hostResultSummary: "Host Result report token expired after delivery; browser action must not be replayed.",
+          reportedAt: now,
+          lastError: "REPORT_TOKEN_EXPIRED",
+        };
+        if (signal.workItemId !== null) {
+          const workItem = state.workItems[signal.workItemId];
+          if (workItem !== undefined && !["SUCCEEDED", "FAILED", "EXPIRED", "CANCELLED"].includes(workItem.status)) {
+            state.workItems[signal.workItemId] = {
+              ...workItem,
+              status: "FAILED",
+              claim: null,
+              errorCode: "REPORT_TOKEN_EXPIRED",
+              errorSummary: "Host Result could not be reported before the post-delivery credential expired.",
+              retryable: false,
+              completedAt: now,
+            };
+            if (task.plan !== null) {
+              const index = task.plan.nodes.findIndex((node) => node.nodeId === workItem.planNodeId);
+              if (index >= 0) {
+                const nodes = [...task.plan.nodes];
+                const currentNode = nodes[index]!;
+                nodes[index] = {
+                  ...currentNode,
+                  status: "BLOCKED",
+                  summary: "Browser delivery is confirmed but Host Result reporting is uncertain.",
+                };
+                task = {
+                  ...task,
+                  plan: {
+                    ...task.plan,
+                    planVersion: task.plan.planVersion + 1,
+                    nodes,
+                    updatedAt: now,
+                  },
+                  status: "BLOCKED",
+                  blockedReason: `HOST_RESULT_REPORT_EXPIRED:${signal.signalId}`,
+                  controllerClaim: null,
+                  updatedAt: now,
+                };
+              }
+            }
+          }
+        } else {
+          task = {
+            ...task,
+            status: "BLOCKED",
+            blockedReason: `HOST_RESULT_REPORT_EXPIRED:${signal.signalId}`,
+            controllerClaim: null,
+            updatedAt: now,
+          };
+        }
+        pendingEvents.push({
+          eventType: "HOST_RESULT_UNCERTAIN",
+          payload: {
+            signalId: signal.signalId,
+            stage: "HOST_RESULT_PENDING",
+            summary: "Report token expired after delivery; automatic replay is forbidden.",
+            evidenceRefs: signal.hostEvidenceRefs,
+            autoRetryAllowed: false,
+          },
+        });
+        changed = true;
+      }
+
       if (task.controllerClaim !== null && isClaimExpired(task.controllerClaim.expiresAt, nowDate)) {
         const claim = task.controllerClaim;
         expiredClaimIds.push(claim.claimId);

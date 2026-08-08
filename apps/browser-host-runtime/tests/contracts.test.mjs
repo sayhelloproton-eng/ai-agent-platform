@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { assertHostCommand, assertWakeEnvelope, buildWakeEnvelope } from "../src/shared/contracts.js";
+import { assertHostCommand, assertWakeEnvelope, buildHostResult, buildWakeEnvelope } from "../src/shared/contracts.js";
 
 const command = {
   host_command_version: "0.1.0",
@@ -27,4 +27,16 @@ test("Wake Envelope is minimal and rejects extra task body", () => {
   const wake = buildWakeEnvelope({ task_id: "task-1", required_role: "controller", event_id: "event-1", dispatch_ref: "dispatch-1" });
   assert.equal(wake.required_role, "controller");
   assert.throws(() => assertWakeEnvelope({ ...wake, plan: { nodes: [] } }), /forbidden field/);
+});
+
+
+test("Host Result promotes observation references into durable evidence_refs", () => {
+  const result = buildHostResult({
+    command,
+    status: "ACTION_SUCCEEDED",
+    binding_id: "binding-001",
+    pre_observation_ref: "observation:pre",
+    post_observation_ref: "observation:post",
+  });
+  assert.deepEqual(result.evidence_refs, ["observation:pre", "observation:post"]);
 });

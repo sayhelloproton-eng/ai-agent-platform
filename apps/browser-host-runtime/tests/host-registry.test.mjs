@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { HostRegistry } from "../src/background/host-registry.js";
+import { HostRegistry, PRODUCTION_ROUTABLE_CAPABILITIES } from "../src/background/host-registry.js";
+import { BhrError } from "../src/shared/errors.js";
 import { MemoryStorageArea } from "../src/background/storage.js";
 
 class YieldingStorage extends MemoryStorageArea {
@@ -47,4 +48,45 @@ test("register and heartbeat are serialized across HostRegistry instances", asyn
     "browser.host.heartbeat:end"
   ]);
   assert.equal((await storage.get("bhr.host")).state, "ONLINE");
+});
+
+
+test("production Host advertises only the safe Level 2 browser action", async () => {
+  const storage = new MemoryStorageArea();
+  const registrations = [];
+  const gateway = {
+    invoke: async (operation, payload) => {
+      if (operation === "browser.host.register") registrations.push(payload);
+      return { status: "OK" };
+    }
+  };
+  const registry = new HostRegistry(storage, gateway);
+  await registry.register();
+  assert.ok(PRODUCTION_ROUTABLE_CAPABILITIES.includes("OBSERVE_PAGE"));
+  assert.equal(PRODUCTION_ROUTABLE_CAPABILITIES.includes("SUBMIT_MESSAGE"), false);
+  assert.equal(PRODUCTION_ROUTABLE_CAPABILITIES.includes("CONTINUE_ROLE_SESSION"), false);
+  assert.deepEqual(registrations[0].capabilities, [...PRODUCTION_ROUTABLE_CAPABILITIES]);
+});
+
+test("heartbeat re-registers safely after HOST_NOT_REGISTERED and records freshness", async () => {
+  const storage = new MemoryStorageArea();
+  const calls = [];
+  let firstHeartbeat = true;
+  const gateway = {
+    invoke: async (operation) => {
+      calls.push(operation);
+      if (operation === "browser.host.heartbeat" && firstHeartbeat) {
+        firstHeartbeat = false;
+        throw new BhrError("HOST_NOT_REGISTERED", "registration expired");
+      }
+      return { status: "OK" };
+    }
+  };
+  const registry = new HostRegistry(storage, gateway);
+  await registry.heartbeat({ state: "ONLINE" });
+  assert.deepEqual(calls, ["browser.host.heartbeat", "browser.host.register", "browser.host.heartbeat"]);
+  const host = await storage.get("bhr.host");
+  assert.equal(host.state, "ONLINE");
+  assert.ok(host.last_heartbeat_success_at);
+  assert.ok(host.last_gateway_ack_at);
 });

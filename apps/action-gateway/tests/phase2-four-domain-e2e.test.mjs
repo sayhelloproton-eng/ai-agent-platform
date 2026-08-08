@@ -21,6 +21,7 @@ import {
 
 import { BindingRegistry } from "../../browser-host-runtime/src/background/binding-registry.js";
 import { MemoryStorageArea } from "../../browser-host-runtime/src/background/storage.js";
+import { HostRegistry } from "../../browser-host-runtime/src/background/host-registry.js";
 import { HttpGatewayClient } from "../../browser-host-runtime/src/background/gateway-client.js";
 import { DispatchClient } from "../../browser-host-runtime/src/background/dispatch-client.js";
 import {
@@ -279,12 +280,13 @@ test("Phase 2 real HTTP E2E closes CTL -> TSK -> LCL/BHR -> TSK -> CTL", async (
       timeoutMs: 5_000,
     });
     const dispatch = new DispatchClient(gateway);
-    const hostId = "host:phase2-e2e";
-    await gateway.invoke("browser.host.register", {
-      host_id: hostId,
-      host_version: "0.1.0",
-      capabilities: ["OBSERVE_PAGE"],
-    });
+    // Production E2E must use the real HostRegistry registration contract. This
+    // prevents tests from manually injecting OBSERVE_PAGE and masking a production
+    // capability vocabulary mismatch.
+    const hostStorage = new MemoryStorageArea();
+    const hostRegistry = new HostRegistry(hostStorage, gateway);
+    const registeredHost = await hostRegistry.register();
+    const hostId = registeredHost.host.host_id;
     const pending = await dispatch.listPending(hostId);
     assert.equal(pending[0].dispatch_ref, dispatchRef);
     const deliveryClaim = await dispatch.claim(dispatchRef, hostId);

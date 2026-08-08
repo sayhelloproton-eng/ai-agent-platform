@@ -573,3 +573,117 @@ test("Approval Resolution receipt remains immutable after Controller reclaims Ta
   assert.equal(resolved.controllerClaim, null);
   assert.notDeepEqual(await service.getCurrentTask(task.taskId), resolved);
 });
+
+
+test("expired Browser Dispatch closes its Work attempt and returns Task to Controller without replay", async () => {
+  const { service, clock } = harness();
+  const taskId = "task-browser-dispatch-expiry-recovery";
+  await intake(service, taskId);
+  await claimAckDispatch(service, taskId, "browser-expiry-controller");
+  const controller = await claimController(service, taskId, "browser-expiry");
+  const before = await service.getTask(taskId);
+  const receipt = await service.submitControllerCommand({
+    commandContractVersion: TASK_CONTROL_CONTRACT_VERSION,
+    taskId,
+    claimToken: controller.claim.claimToken,
+    expectedTaskVersion: controller.taskVersion,
+    expectedPlanVersion: controller.planVersion,
+    idempotencyKey: "request-browser-expiring",
+    producerRef: "controller-profile",
+    command: {
+      type: "REQUEST_ROLE_WORK",
+      payload: {
+        nodeId: "node-01",
+        targetDomain: "browser-host",
+        requiredRole: "browser-host",
+        inputRef: "payload:browser-observe",
+        expectedResultType: "browser-host-result-v0.1.0",
+        targetRoleRef: "controller",
+        targetProfileRef: "g-controller",
+        conversationRef: "conversation:controller",
+        hostActionType: "OBSERVE_PAGE",
+        expiresAt: new Date(clock.now().getTime() + 1000).toISOString(),
+      },
+    },
+  });
+  const dispatchId = receipt.dispatchIds.find((ref) => ref.startsWith("dispatch-"));
+  const workItemId = receipt.workItemIds.find((ref) => ref.startsWith("work-"));
+  assert.ok(dispatchId);
+  assert.ok(workItemId);
+  clock.advance(1001);
+  await service.listPendingDispatches();
+  const expired = await service.getCurrentDispatch(dispatchId);
+  const work = await service.getCurrentWorkItem(workItemId);
+  const current = await service.getTask(taskId);
+  assert.equal(expired.status, "CANCELLED");
+  assert.equal(expired.lastError, "DISPATCH_EXPIRED");
+  assert.equal(work.status, "FAILED");
+  assert.equal(work.retryable, true);
+  assert.equal(current.status, "READY_FOR_CONTROLLER");
+  assert.equal(current.plan.currentNodeId, "node-01");
+  assert.equal(current.plan.nodes[0].status, "IN_PROGRESS");
+  assert.ok(current.taskVersion > before.taskVersion);
+  const events = await service.listEvents(taskId);
+  assert.ok(events.some((event) => event.eventType === "HOST_DISPATCH_CANCELLED" && event.payload.reason === "DISPATCH_EXPIRED"));
+  assert.ok(events.some((event) => event.eventType === "ROLE_WORK_FAILED" && event.payload.retryable === true));
+});
+
+test("CLAIMED Browser Dispatch can report UNCERTAIN and blocks retry", async () => {
+  const { service } = harness();
+  const taskId = "task-claimed-uncertain";
+  await intake(service, taskId);
+  await claimAckDispatch(service, taskId, "uncertain-controller");
+  const controller = await claimController(service, taskId, "uncertain");
+  const receipt = await service.submitControllerCommand({
+    commandContractVersion: TASK_CONTROL_CONTRACT_VERSION,
+    taskId,
+    claimToken: controller.claim.claimToken,
+    expectedTaskVersion: controller.taskVersion,
+    expectedPlanVersion: controller.planVersion,
+    idempotencyKey: "request-browser-uncertain",
+    producerRef: "controller-profile",
+    command: {
+      type: "REQUEST_ROLE_WORK",
+      payload: {
+        nodeId: "node-01",
+        targetDomain: "browser-host",
+        requiredRole: "browser-host",
+        inputRef: "payload:browser-submit",
+        expectedResultType: "browser-host-result-v0.1.0",
+        targetRoleRef: "controller",
+        targetProfileRef: "g-controller",
+        conversationRef: "conversation:controller",
+        hostActionType: "SUBMIT_MESSAGE",
+        expiresAt: new Date(Date.now() + 60_000).toISOString(),
+      },
+    },
+  });
+  const dispatchId = receipt.dispatchIds.find((ref) => ref.startsWith("dispatch-"));
+  const workItemId = receipt.workItemIds.find((ref) => ref.startsWith("work-"));
+  const claimed = await service.claimDispatch({
+    contractVersion: TASK_CONTROL_CONTRACT_VERSION,
+    signalId: dispatchId,
+    hostId: "browser-host",
+    leaseMs: 60_000,
+    idempotencyKey: "claim-browser-uncertain",
+  });
+  await service.reportUncertainHostResult({
+    contractVersion: TASK_CONTROL_CONTRACT_VERSION,
+    signalId: dispatchId,
+    claimToken: claimed.dispatch.claim.claimToken,
+    stage: "EXECUTING",
+    commandFingerprint: "sha256:claimed-uncertain",
+    summary: "side effect may have occurred before delivery ack",
+    evidenceRefs: ["evidence:uncertain"],
+    idempotencyKey: "uncertain-before-ack",
+    producerRef: "browser-host-runtime",
+  });
+  const signal = await service.getCurrentDispatch(dispatchId);
+  const work = await service.getCurrentWorkItem(workItemId);
+  const current = await service.getTask(taskId);
+  assert.equal(signal.hostResultStatus, "UNCERTAIN");
+  assert.equal(work.status, "FAILED");
+  assert.equal(work.retryable, false);
+  assert.equal(current.status, "BLOCKED");
+  assert.match(current.blockedReason, /^UNCERTAIN_SIDE_EFFECT:/);
+});
