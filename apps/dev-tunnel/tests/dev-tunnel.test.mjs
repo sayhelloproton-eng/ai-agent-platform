@@ -603,10 +603,11 @@ test("OpenAPI defines the Runtime Status result component", () => {
   }
 });
 
-test("OpenAPI exposes Task Intake, Approval Grant, four Controller operations, and Runtime Status", () => {
+test("OpenAPI exposes Task Intake, Approval Draft/Grant, four Controller operations, and Runtime Status", () => {
   const template = readFileSync(OPENAPI_TEMPLATE, "utf8");
   for (const path of [
     "/v1/task-control/intake",
+    "/v1/approvals/drafts/lookup",
     "/v1/approvals/grants",
     "/v1/controller/task-context",
     "/v1/controller/task-claim",
@@ -618,6 +619,7 @@ test("OpenAPI exposes Task Intake, Approval Grant, four Controller operations, a
   }
   for (const operationId of [
     "intakePhase2Task",
+    "getApprovalDraft",
     "issueApprovalGrant",
     "getTaskDecisionContext",
     "claimControllerTask",
@@ -630,7 +632,7 @@ test("OpenAPI exposes Task Intake, Approval Grant, four Controller operations, a
       1,
     );
   }
-  assert.equal(template.match(/\n {6}operationId:/gu)?.length, 7);
+  assert.equal(template.match(/\n {6}operationId:/gu)?.length, 8);
   assert.doesNotMatch(template, /profileId:\n|roleId:\n|requestedBy:\n/u);
   assert.match(
     template,
@@ -804,9 +806,9 @@ test("SIGINT and SIGTERM are the only managed shutdown signals", () => {
 });
 
 
-test("OpenAPI 1.2.0 exposes explicit Browser Host target identity fields", () => {
+test("OpenAPI 1.3.0 preserves explicit Browser Host target identity fields", () => {
   const template = readFileSync(OPENAPI_TEMPLATE, "utf8");
-  assert.match(template, /\n {2}version: 1\.2\.0\n/u);
+  assert.match(template, /\n {2}version: 1\.3\.0\n/u);
   const payloadMatch = template.match(
     /\n {4}ControllerCommandPayload:(?<schema>[\s\S]*?)\n {4}PlanNodeDraft:/u,
   );

@@ -438,6 +438,10 @@ function validateControllerCommand(
             issue(issues, `command.payload.${field}`, "REQUIRED_FIELD", "Browser Host work requires this field.");
           }
         }
+        if (payload.hostActionType === "SUBMIT_MESSAGE" && !isNonEmptyString(payload.approvalRef)) {
+          valid = false;
+          issue(issues, "command.payload.approvalRef", "REQUIRED_FIELD", "SUBMIT_MESSAGE requires a stable approvalRef for the production Approval Draft handshake.");
+        }
       }
       break;
     }

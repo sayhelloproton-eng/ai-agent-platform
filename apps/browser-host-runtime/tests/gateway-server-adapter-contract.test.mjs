@@ -26,6 +26,7 @@ async function withContractServer(run) {
         case "browser.dispatch.hostResult": data = { status: "RECORDED", result_id: request.payload.result.result_id }; break;
         case "browser.dispatch.uncertain": data = { status: "RECORDED", uncertain_id: request.payload.uncertain.uncertain_id }; break;
         case "browser.dispatch.fail": data = { status: "RECORDED", result_id: request.payload.result.result_id }; break;
+        case "approval.draft.put": data = { status: "PENDING_APPROVAL", approval_ref: "approval", draft_id: "draft" }; break;
         case "approval.grant.get": data = { approval_ref: "approval", grant_id: "grant" }; break;
         case "approval.grant.consume": data = { status: "CONSUMED" }; break;
         default: data = { status: "IGNORED" };
@@ -66,6 +67,7 @@ test("real HTTP fixture freezes the final Browser Host Server Adapter operation 
     });
     await dispatch.uncertain(command.dispatch_ref, { claim_token: claim.claim_token }, uncertain);
     await dispatch.fail(command.dispatch_ref, claim.claim_token, { result_id: "failure" });
+    await approval.putDraft({ approval_ref: "approval", dispatch_ref: command.dispatch_ref }, claim.claim_token);
     await approval.getGrant("approval");
     await approval.consume("approval", "grant", command.command_id);
     assert.deepEqual(operations.map((item) => item.operation), [
@@ -77,6 +79,7 @@ test("real HTTP fixture freezes the final Browser Host Server Adapter operation 
       "browser.dispatch.hostResult",
       "browser.dispatch.uncertain",
       "browser.dispatch.fail",
+      "approval.draft.put",
       "approval.grant.get",
       "approval.grant.consume"
     ]);
@@ -84,5 +87,6 @@ test("real HTTP fixture freezes the final Browser Host Server Adapter operation 
     assert.deepEqual(Object.keys(operations[4].payload).sort(), ["claim_token", "delivery", "dispatch_ref"]);
     assert.deepEqual(Object.keys(operations[5].payload).sort(), ["dispatch_ref", "report_token", "result"]);
     assert.deepEqual(Object.keys(operations[6].payload).sort(), ["credential", "dispatch_ref", "uncertain"]);
+    assert.deepEqual(Object.keys(operations[8].payload).sort(), ["claim_token", "draft"]);
   });
 });

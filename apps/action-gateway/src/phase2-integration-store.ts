@@ -1,4 +1,5 @@
 import type {
+  ApprovalDraftV1,
   ApprovalGrantV1,
   BrowserHostRecordV1,
   JsonValue,
@@ -28,6 +29,7 @@ export class Phase2IntegrationStoreError extends Error {
 interface Phase2IntegrationState {
   readonly hosts: Record<string, BrowserHostRecordV1>;
   readonly payloads: Record<string, JsonValue>;
+  readonly approvalDrafts: Record<string, ApprovalDraftV1>;
   readonly approvalGrants: Record<string, ApprovalGrantV1>;
   readonly localResults: Record<string, StoredLocalWorkResult>;
   readonly localEvidence: Record<string, StoredLocalEvidenceReferences>;
@@ -37,6 +39,7 @@ function emptyState(): Phase2IntegrationState {
   return {
     hosts: {},
     payloads: {},
+    approvalDrafts: {},
     approvalGrants: {},
     localResults: {},
     localEvidence: {},
@@ -65,6 +68,7 @@ function validateState(value: unknown): Phase2IntegrationState {
   return {
     hosts: clone(state.hosts ?? {}),
     payloads: clone(state.payloads ?? {}),
+    approvalDrafts: clone(state.approvalDrafts ?? {}),
     approvalGrants: clone(state.approvalGrants ?? {}),
     localResults: clone(state.localResults ?? {}),
     localEvidence: clone(state.localEvidence ?? {}),
@@ -144,9 +148,63 @@ export class Phase2IntegrationStore {
     return this.read((state) => clone(state.payloads[payloadRef] ?? null));
   }
 
+  async putApprovalDraft(draft: ApprovalDraftV1): Promise<void> {
+    assertRef(draft.approvalRef, "approvalRef");
+    await this.transact((state) => {
+      const existing = state.approvalDrafts[draft.approvalRef];
+      if (existing !== undefined && JSON.stringify(existing) !== JSON.stringify(draft)) {
+        throw new Phase2IntegrationStoreError(
+          "APPROVAL_DRAFT_CONFLICT",
+          "Approval Draft already exists with different preconditions or action fingerprint.",
+          409,
+        );
+      }
+      state.approvalDrafts[draft.approvalRef] = clone(draft);
+    });
+  }
+
+  async getApprovalDraft(approvalRef: string): Promise<ApprovalDraftV1 | null> {
+    assertRef(approvalRef, "approvalRef");
+    return this.read((state) => clone(state.approvalDrafts[approvalRef] ?? null));
+  }
+
   async putApprovalGrant(grant: ApprovalGrantV1): Promise<void> {
     assertRef(grant.approvalRef, "approvalRef");
     await this.transact((state) => {
+      const draft = state.approvalDrafts[grant.approvalRef];
+      if (draft === undefined) {
+        throw new Phase2IntegrationStoreError(
+          "APPROVAL_DRAFT_REQUIRED",
+          "Approval Grant cannot be issued before the Browser Host publishes the matching Approval Draft.",
+          409,
+        );
+      }
+      const mismatch =
+        grant.taskId !== draft.taskId ||
+        grant.commandId !== draft.commandId ||
+        grant.bindingId !== draft.bindingId ||
+        grant.allowedActionType !== draft.allowedActionType ||
+        grant.actionFingerprint !== draft.actionFingerprint ||
+        grant.pagePreconditionHash !== draft.pagePreconditionHash;
+      if (mismatch) {
+        throw new Phase2IntegrationStoreError(
+          "APPROVAL_DRAFT_MISMATCH",
+          "Approval Grant must exactly match the immutable Browser Host Approval Draft.",
+          409,
+        );
+      }
+      const draftExpiry = Date.parse(draft.expiresAt);
+      const grantExpiry = Date.parse(grant.expiresAt);
+      if (!Number.isFinite(draftExpiry) || draftExpiry <= Date.now()) {
+        throw new Phase2IntegrationStoreError("APPROVAL_DRAFT_EXPIRED", "Approval Draft has expired.", 409);
+      }
+      if (!Number.isFinite(grantExpiry) || grantExpiry > draftExpiry) {
+        throw new Phase2IntegrationStoreError(
+          "APPROVAL_GRANT_EXPIRY_INVALID",
+          "Approval Grant cannot outlive its Approval Draft or Host Command.",
+          409,
+        );
+      }
       const existing = state.approvalGrants[grant.approvalRef];
       if (existing !== undefined && JSON.stringify(existing) !== JSON.stringify(grant)) {
         throw new Phase2IntegrationStoreError("APPROVAL_REF_CONFLICT", "Approval reference already exists with different content.", 409);

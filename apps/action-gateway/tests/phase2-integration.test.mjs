@@ -3,6 +3,7 @@ import { once } from "node:events";
 import test from "node:test";
 
 import {
+  APPROVAL_DRAFT_CONTRACT_VERSION,
   APPROVAL_GRANT_CONTRACT_VERSION,
   LOCAL_WORK_HANDOFF_VERSION,
 } from "@ai-agent-platform/contracts";
@@ -42,10 +43,33 @@ function approvalGrant(overrides = {}) {
   };
 }
 
+function approvalDraftForGrant(grant, overrides = {}) {
+  return {
+    approvalDraftContractVersion: APPROVAL_DRAFT_CONTRACT_VERSION,
+    approvalRef: grant.approvalRef,
+    draftId: `${grant.commandId}:approval-draft`,
+    taskId: grant.taskId,
+    dispatchRef: "dispatch:phase2-001",
+    commandId: grant.commandId,
+    bindingId: grant.bindingId,
+    allowedActionType: grant.allowedActionType,
+    actionFingerprint: grant.actionFingerprint,
+    pagePreconditionHash: grant.pagePreconditionHash,
+    targetRoleRef: "controller",
+    targetProfileRef: "g-controller-real",
+    conversationRef: "conversation-real",
+    payloadPreview: { text: "continue task" },
+    preparedAt: new Date().toISOString(),
+    expiresAt: new Date(Date.now() + 120_000).toISOString(),
+    ...overrides,
+  };
+}
+
 async function startApprovalGateway(store) {
   const server = createGatewayServer({
     apiKey: API_KEY,
     approvalGrantRegistrar: store,
+    approvalDraftReader: store,
   });
   server.listen(0, "127.0.0.1");
   await once(server, "listening");
@@ -60,7 +84,61 @@ async function startApprovalGateway(store) {
   };
 }
 
-test("Approval Grant issuance is authenticated, idempotent, binding-aware, and single-use", async () => {
+test("Approval Draft lookup exposes only the immutable Browser Host precheck record", async () => {
+  const store = Phase2IntegrationStore.inMemory();
+  const gateway = await startApprovalGateway(store);
+  const draft = {
+    approvalDraftContractVersion: APPROVAL_DRAFT_CONTRACT_VERSION,
+    approvalRef: "approval:draft-001",
+    draftId: "host-command:draft-001:approval-draft",
+    taskId: "task:draft-001",
+    dispatchRef: "dispatch:draft-001",
+    commandId: "host-command:draft-001",
+    bindingId: "binding:draft-001",
+    allowedActionType: "SUBMIT_MESSAGE",
+    actionFingerprint: "fingerprint:draft-001",
+    pagePreconditionHash: "page:draft-001",
+    targetRoleRef: "controller",
+    targetProfileRef: "g-controller",
+    conversationRef: "conversation:draft-001",
+    payloadPreview: { text: "continue task" },
+    preparedAt: new Date().toISOString(),
+    expiresAt: new Date(Date.now() + 60_000).toISOString(),
+  };
+  await store.putApprovalDraft(draft);
+  try {
+    const unauthenticated = await fetch(`${gateway.baseUrl}/v1/approvals/drafts/lookup`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ approvalRef: draft.approvalRef }),
+    });
+    assert.equal(unauthenticated.status, 401);
+
+    const response = await fetch(`${gateway.baseUrl}/v1/approvals/drafts/lookup`, {
+      method: "POST",
+      headers: { authorization: `Bearer ${API_KEY}`, "content-type": "application/json" },
+      body: JSON.stringify({ approvalRef: draft.approvalRef }),
+    });
+    assert.equal(response.status, 200);
+    const body = await response.json();
+    assert.equal(body.data.commandId, draft.commandId);
+    assert.equal(body.data.bindingId, draft.bindingId);
+    assert.equal(body.data.actionFingerprint, draft.actionFingerprint);
+    assert.equal(body.data.pagePreconditionHash, draft.pagePreconditionHash);
+    assert.deepEqual(body.data.payloadPreview, draft.payloadPreview);
+
+    const missing = await fetch(`${gateway.baseUrl}/v1/approvals/drafts/lookup`, {
+      method: "POST",
+      headers: { authorization: `Bearer ${API_KEY}`, "content-type": "application/json" },
+      body: JSON.stringify({ approvalRef: "approval:missing" }),
+    });
+    assert.equal(missing.status, 404);
+  } finally {
+    await gateway.close();
+  }
+});
+
+test("Approval Grant issuance requires the immutable Draft, is idempotent, binding-aware, and single-use", async () => {
   const store = Phase2IntegrationStore.inMemory();
   const gateway = await startApprovalGateway(store);
   const grant = approvalGrant();
@@ -71,6 +149,24 @@ test("Approval Grant issuance is authenticated, idempotent, binding-aware, and s
       body: JSON.stringify(grant),
     });
     assert.equal(unauthenticated.status, 401);
+
+    const beforeDraft = await fetch(`${gateway.baseUrl}/v1/approvals/grants`, {
+      method: "POST",
+      headers: { authorization: `Bearer ${API_KEY}`, "content-type": "application/json" },
+      body: JSON.stringify(grant),
+    });
+    assert.equal(beforeDraft.status, 409);
+    assert.equal((await beforeDraft.json()).error.code, "APPROVAL_DRAFT_REQUIRED");
+
+    await store.putApprovalDraft(approvalDraftForGrant(grant));
+
+    const mismatched = await fetch(`${gateway.baseUrl}/v1/approvals/grants`, {
+      method: "POST",
+      headers: { authorization: `Bearer ${API_KEY}`, "content-type": "application/json" },
+      body: JSON.stringify({ ...grant, commandId: "host-command:different" }),
+    });
+    assert.equal(mismatched.status, 409);
+    assert.equal((await mismatched.json()).error.code, "APPROVAL_DRAFT_MISMATCH");
 
     for (const expectedStatus of [201, 201]) {
       const response = await fetch(`${gateway.baseUrl}/v1/approvals/grants`, {
@@ -85,10 +181,6 @@ test("Approval Grant issuance is authenticated, idempotent, binding-aware, and s
       assert.equal((await response.json()).data.status, "ISSUED");
     }
 
-    await assert.rejects(
-      store.putApprovalGrant(approvalGrant({ commandId: "host-command:different" })),
-      (error) => error?.code === "APPROVAL_REF_CONFLICT" && error?.httpStatus === 409,
-    );
     const consumed = await store.consumeApprovalGrant(
       grant.approvalRef,
       grant.grantId,

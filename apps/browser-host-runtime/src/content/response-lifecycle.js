@@ -13,6 +13,7 @@
       assistant_count: Number(snapshot.assistant_count ?? 0),
       last_assistant_chars: String(snapshot.last_assistant_text ?? "").length,
       generation_state: snapshot.generation_state ?? null,
+      page_state: snapshot.page_state ?? null,
       identity: snapshot.identity ?? null
     };
   }
@@ -88,6 +89,10 @@
     const pollMs = boundedNumber(payload.poll_ms, 250, 0, 2000);
     const startedAt = nowImpl();
     let responseStartedAt = baseline.generation_state === "RUNNING" ? startedAt : null;
+    let responseStartWindowAt = startedAt;
+    let confirmationPendingAt = baseline.page_state === "ACTION_CONFIRMATION_PENDING" ? startedAt : null;
+    let confirmationSeen = confirmationPendingAt !== null;
+    let confirmationResolvedAt = null;
     let lastChangedAt = startedAt;
     let previousText = baseline.last_assistant_text;
     let lastSnapshot = baseline;
@@ -100,14 +105,32 @@
       }
       const current = snapshot();
       lastSnapshot = current;
+      const confirmationPending = current.page_state === "ACTION_CONFIRMATION_PENDING";
+      if (confirmationPending) {
+        confirmationSeen = true;
+        confirmationPendingAt ??= nowImpl();
+        // The submitted message has reached ChatGPT and is legitimately waiting for
+        // the user's Action allow/deny choice. Do not misclassify this bounded human
+        // approval wait as RESPONSE_START_TIMEOUT. The overall response timeout still
+        // applies, so the Browser Host never waits forever.
+        continue;
+      }
+      if (confirmationPendingAt !== null && confirmationResolvedAt === null) {
+        confirmationResolvedAt = nowImpl();
+        responseStartWindowAt = confirmationResolvedAt;
+      }
+
       const changed = current.assistant_count > baseline.assistant_count || current.last_assistant_text !== baseline.last_assistant_text;
       if (!responseStartedAt && (current.generation_state === "RUNNING" || changed)) responseStartedAt = nowImpl();
       if (current.last_assistant_text !== previousText) {
         previousText = current.last_assistant_text;
         lastChangedAt = nowImpl();
       }
-      if (!responseStartedAt && nowImpl() - startedAt >= startTimeoutMs) {
-        throw Object.assign(new Error("ChatGPT did not start a response before the start timeout."), { code: "RESPONSE_START_TIMEOUT" });
+      if (!responseStartedAt && nowImpl() - responseStartWindowAt >= startTimeoutMs) {
+        throw Object.assign(new Error("ChatGPT did not start a response before the start timeout."), {
+          code: "RESPONSE_START_TIMEOUT",
+          details: { action_confirmation_seen: confirmationSeen, last_snapshot: snapshotDiagnostics(lastSnapshot) }
+        });
       }
       if (responseStartedAt && current.generation_state === "IDLE" && changed && nowImpl() - lastChangedAt >= stableMs) {
         return {
@@ -116,6 +139,8 @@
             message_submitted: true,
             response_started: true,
             response_completed: true,
+            action_confirmation_seen: confirmationSeen,
+            action_confirmation_resolved_at: confirmationResolvedAt === null ? null : new Date(confirmationResolvedAt).toISOString(),
             response_started_at: new Date(responseStartedAt).toISOString(),
             response_completed_at: new Date(nowImpl()).toISOString(),
             assistant_message_count_after: current.assistant_count,
@@ -124,9 +149,17 @@
         };
       }
     }
-    throw Object.assign(new Error("ChatGPT response did not complete before timeout."), {
-      code: "RESPONSE_COMPLETION_TIMEOUT",
-      details: { response_started: Boolean(responseStartedAt), last_snapshot: snapshotDiagnostics(lastSnapshot) }
+    const confirmationStillPending = lastSnapshot?.page_state === "ACTION_CONFIRMATION_PENDING";
+    throw Object.assign(new Error(confirmationStillPending
+      ? "ChatGPT Action confirmation was not resolved before the response timeout."
+      : "ChatGPT response did not complete before timeout."), {
+      code: confirmationStillPending ? "ACTION_CONFIRMATION_TIMEOUT" : "RESPONSE_COMPLETION_TIMEOUT",
+      details: {
+        response_started: Boolean(responseStartedAt),
+        action_confirmation_seen: confirmationSeen,
+        action_confirmation_pending: confirmationStillPending,
+        last_snapshot: snapshotDiagnostics(lastSnapshot)
+      }
     });
   }
 

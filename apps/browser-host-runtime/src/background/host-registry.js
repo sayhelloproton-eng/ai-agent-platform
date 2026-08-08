@@ -8,12 +8,14 @@ const sharedQueues = new WeakMap();
 // Runtime implementation support and production routing eligibility are separate
 // contracts. Phase 2 Level 2 intentionally exposes only the read-only action
 // whose end-to-end safety protocol is complete. High-risk actions remain
-// fail-closed until Approval Draft/resume and exactly-once recovery are complete.
+// Level 3 adds SUBMIT_MESSAGE only after the production Approval Draft/resume handshake is available.
+// Other high-risk actions remain fail-closed.
 export const PRODUCTION_ROUTABLE_CAPABILITIES = Object.freeze([
   "chatgpt-web@v1",
   "observation@0.1.0",
   "host-command@0.1.0",
-  ACTION_TYPES.OBSERVE_PAGE
+  ACTION_TYPES.OBSERVE_PAGE,
+  ACTION_TYPES.SUBMIT_MESSAGE
 ]);
 
 function lockTarget(storage) {

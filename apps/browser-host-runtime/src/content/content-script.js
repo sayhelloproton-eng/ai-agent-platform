@@ -241,6 +241,7 @@
       assistant_count: assistantNodes.length,
       last_assistant_text: normalizeText(assistantNodes.at(-1)?.innerText || assistantNodes.at(-1)?.textContent).slice(0, 4000),
       generation_state: generationState(),
+      page_state: pageState(),
       identity: identifyPage()
     };
   }

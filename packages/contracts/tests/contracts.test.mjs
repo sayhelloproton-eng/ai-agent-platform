@@ -391,4 +391,31 @@ test("Browser Host role work separates executor role from page target role", () 
   });
   assert.equal(missingTargetRole.ok, false);
   assert.ok(missingTargetRole.issues.some((item) => item.path === "command.payload.targetRoleRef" && item.code === "REQUIRED_FIELD"));
+
+  const submitWithoutApprovalRef = validateSubmitControllerCommandRequest({
+    taskId: "task-browser-target-001",
+    claimToken: "token-browser-target-001",
+    expectedTaskVersion: 3,
+    expectedPlanVersion: 2,
+    idempotencyKey: "browser-target-submit-no-approval",
+    command: {
+      type: "REQUEST_ROLE_WORK",
+      reasonSummary: "Submit one approved message.",
+      payload: {
+        nodeId: "browser-submit",
+        targetDomain: "browser-host",
+        requiredRole: "browser-host",
+        objective: "Submit the approved message exactly once.",
+        inputRef: "payload:browser-submit",
+        expectedResultType: "browser-host-result-v0.1.0",
+        targetRoleRef: "controller",
+        targetProfileRef: "g-controller-real",
+        conversationRef: "conversation-real",
+        hostActionType: "SUBMIT_MESSAGE",
+        expiresAt: "2030-01-01T00:00:00.000Z",
+      },
+    },
+  });
+  assert.equal(submitWithoutApprovalRef.ok, false);
+  assert.ok(submitWithoutApprovalRef.issues.some((item) => item.path === "command.payload.approvalRef" && item.code === "REQUIRED_FIELD"));
 });

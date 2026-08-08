@@ -1,4 +1,6 @@
 import {
+  APPROVAL_DRAFT_CONTRACT_VERSION,
+  type ApprovalDraftV1,
   type ApprovalGrantV1,
   type BrowserHostInvocationV1,
   type JsonObject,
@@ -99,6 +101,33 @@ function taskControlError(error: unknown): never {
   throw new BrowserHostServerError("BROWSER_HOST_INTERNAL_ERROR", "Browser Host operation failed.", 500);
 }
 
+
+function readApprovalDraft(input: JsonObject): ApprovalDraftV1 {
+  const conversationValue = input.conversation_ref;
+  const conversationRef = conversationValue === null || conversationValue === undefined
+    ? null
+    : string(input, "conversation_ref");
+  const preview = record(input, "payload_preview");
+  const allowedActionType = string(input, "allowed_action_type") as ApprovalDraftV1["allowedActionType"];
+  return {
+    approvalDraftContractVersion: string(input, "approval_draft_version") as typeof APPROVAL_DRAFT_CONTRACT_VERSION,
+    approvalRef: string(input, "approval_ref"),
+    draftId: string(input, "draft_id"),
+    taskId: string(input, "task_id"),
+    dispatchRef: string(input, "dispatch_ref"),
+    commandId: string(input, "command_id"),
+    bindingId: string(input, "binding_id"),
+    allowedActionType,
+    actionFingerprint: string(input, "action_fingerprint"),
+    pagePreconditionHash: string(input, "page_precondition_hash"),
+    targetRoleRef: string(input, "target_role_ref"),
+    targetProfileRef: string(input, "target_profile_ref"),
+    conversationRef,
+    payloadPreview: structuredClone(preview),
+    preparedAt: string(input, "prepared_at"),
+    expiresAt: string(input, "expires_at"),
+  };
+}
 
 function mapGrant(grant: ApprovalGrantV1): JsonObject {
   return {
@@ -395,6 +424,26 @@ export function createBrowserHostServerAdapter(
             const value = await integrationStore.getPayload(string(payload, "payload_ref"));
             if (value === null) throw new BrowserHostServerError("PAYLOAD_NOT_FOUND", "Payload reference was not found.", 404);
             return value;
+          }
+          case "approval.draft.put": {
+            const draft = readApprovalDraft(record(payload, "draft"));
+            const claimToken = string(payload, "claim_token");
+            if (draft.approvalDraftContractVersion !== APPROVAL_DRAFT_CONTRACT_VERSION) {
+              throw new BrowserHostServerError("APPROVAL_DRAFT_VERSION_UNSUPPORTED", "Approval Draft contract version is unsupported.", 400);
+            }
+            const signal = await taskControl.getCurrentDispatch(draft.dispatchRef);
+            if (signal.status !== "CLAIMED" || signal.claim?.claimToken !== claimToken || Date.parse(signal.claim.expiresAt) <= Date.now()) {
+              throw new BrowserHostServerError("CLAIM_TOKEN_INVALID", "Approval Draft requires the active dispatch claim token.", 409);
+            }
+            const command = await taskControl.materializeHostCommand(draft.dispatchRef);
+            if (command.commandId !== draft.commandId || command.taskId !== draft.taskId || command.approvalRef !== draft.approvalRef) {
+              throw new BrowserHostServerError("APPROVAL_DRAFT_COMMAND_MISMATCH", "Approval Draft does not match the materialized Host Command.", 409);
+            }
+            if (command.actionType !== draft.allowedActionType || command.targetRole !== draft.targetRoleRef || command.targetProfileRef !== draft.targetProfileRef || (command.conversationRef ?? null) !== draft.conversationRef) {
+              throw new BrowserHostServerError("APPROVAL_DRAFT_TARGET_MISMATCH", "Approval Draft target does not match the materialized Host Command.", 409);
+            }
+            await integrationStore.putApprovalDraft(draft);
+            return { status: "PENDING_APPROVAL", approval_ref: draft.approvalRef, draft_id: draft.draftId };
           }
           case "approval.grant.get": {
             const grant = await integrationStore.getApprovalGrant(string(payload, "approval_ref"));

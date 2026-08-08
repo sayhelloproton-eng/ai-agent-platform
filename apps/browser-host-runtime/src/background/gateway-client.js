@@ -78,7 +78,7 @@ export class HttpGatewayClient {
 }
 
 function fixtureState() {
-  return { host: null, dispatches: [], grants: {}, payloads: {}, deliveryAcks: [], hostResults: [], uncertainReports: [], failures: [] };
+  return { host: null, dispatches: [], drafts: {}, grants: {}, payloads: {}, deliveryAcks: [], hostResults: [], uncertainReports: [], failures: [] };
 }
 
 export class FixtureGatewayClient {
@@ -93,6 +93,7 @@ export class FixtureGatewayClient {
 
   async invoke(operation, payload) {
     const state = await this.state();
+    state.drafts ??= {};
     state.deliveryAcks ??= [];
     state.hostResults ??= [];
     state.uncertainReports ??= [];
@@ -126,6 +127,18 @@ export class FixtureGatewayClient {
         const resolved = state.payloads[payload.payload_ref];
         if (resolved === undefined || resolved === null) throw new BhrError("PAYLOAD_NOT_FOUND", "Fixture payload was not found.");
         return resolved;
+      }
+      case "approval.draft.put": {
+        const draft = payload.draft;
+        const item = state.dispatches.find((candidate) => candidate.dispatch_ref === draft.dispatch_ref);
+        if (!item || !payload.claim_token || item.claim_token !== payload.claim_token) {
+          throw new BhrError("CLAIM_TOKEN_INVALID", "Fixture Approval Draft requires the active dispatch claim token.");
+        }
+        const existing = state.drafts[draft.approval_ref];
+        if (existing && JSON.stringify(existing) !== JSON.stringify(draft)) throw new BhrError("APPROVAL_DRAFT_CONFLICT", "Fixture Approval Draft changed after preparation.");
+        state.drafts[draft.approval_ref] = draft;
+        await this.save(state);
+        return { status: "PENDING_APPROVAL", approval_ref: draft.approval_ref, draft_id: draft.draft_id };
       }
       case "approval.grant.get":
         return state.grants[payload.approval_ref] ?? null;

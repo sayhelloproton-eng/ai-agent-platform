@@ -72,7 +72,16 @@ export class DispatchClient {
 
 export class ApprovalClient {
   constructor(gateway) { this.gateway = gateway; }
+  putDraft(draft, claim_token) { return this.gateway.invoke(APPLICATION_OPERATIONS.APPROVAL_DRAFT_PUT, { draft, claim_token }); }
   getGrant(approval_ref) { return this.gateway.invoke(APPLICATION_OPERATIONS.APPROVAL_GRANT_GET, { approval_ref }); }
+  async getGrantOrNull(approval_ref) {
+    try {
+      return await this.getGrant(approval_ref);
+    } catch (error) {
+      if (error instanceof BhrError && error.code === "APPROVAL_NOT_FOUND") return null;
+      throw error;
+    }
+  }
   async consume(approval_ref, grant_id, command_id) {
     const value = requireObject(
       await this.gateway.invoke(APPLICATION_OPERATIONS.APPROVAL_GRANT_CONSUME, { approval_ref, grant_id, command_id }),

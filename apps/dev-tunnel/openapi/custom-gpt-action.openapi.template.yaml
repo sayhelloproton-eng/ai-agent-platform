@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
   title: AI Agent Platform Controller Actions
-  version: 1.2.0
-  description: Create Phase 2 tasks, query authenticated task context, claim Controller work, submit constrained Controller commands, issue Approval Grants, release claims, and query Runtime status through the Action Gateway.
+  version: 1.3.0
+  description: Create Phase 2 tasks, query authenticated task context, claim Controller work, submit constrained Controller commands, read Browser Host Approval Drafts, issue single-use Approval Grants, release claims, and query Runtime status through the Action Gateway.
 servers:
   - url: ${DEV_TUNNEL_PUBLIC_BASE_URL}
 paths:
@@ -29,6 +29,29 @@ paths:
           $ref: "#/components/responses/Unauthenticated"
         "409":
           $ref: "#/components/responses/Conflict"
+  /v1/approvals/drafts/lookup:
+    post:
+      operationId: getApprovalDraft
+      summary: Read the Browser Host prechecked Approval Draft before issuing a one-time Grant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApprovalDraftLookup"
+      responses:
+        "200":
+          description: Approval Draft prepared by the real Browser Host
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ControllerSuccessEnvelope"
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /v1/approvals/grants:
     post:
       operationId: issueApprovalGrant
@@ -194,10 +217,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/PayloadResource"
-        approvalGrants:
-          type: array
-          items:
-            $ref: "#/components/schemas/ApprovalGrant"
         idempotencyKey:
           type: string
           minLength: 1
@@ -265,6 +284,14 @@ components:
           minLength: 1
         value: {}
       required: [payloadRef, value]
+    ApprovalDraftLookup:
+      type: object
+      additionalProperties: false
+      properties:
+        approvalRef:
+          type: string
+          minLength: 1
+      required: [approvalRef]
     ApprovalGrant:
       type: object
       additionalProperties: false

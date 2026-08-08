@@ -88,6 +88,7 @@ export {
 } from "./controller-validation.js";
 
 export {
+  APPROVAL_DRAFT_CONTRACT_VERSION,
   APPROVAL_GRANT_CONTRACT_VERSION,
   BROWSER_HOST_ACTION_TYPES,
   BROWSER_HOST_OPERATIONS,
@@ -101,6 +102,7 @@ export {
   validateApprovalGrantV1,
   validateBrowserHostInvocationV1,
   validateTaskIntakeV1Request,
+  type ApprovalDraftV1,
   type ApprovalGrantV1,
   type BrowserHostActionType,
   type BrowserHostCommandV1,

@@ -2,8 +2,10 @@ role_id: controller
 operations:
   - operation_id: intakePhase2Task
     intent: 把明确的新目标创建为带版本化 Plan、幂等键和引用资源的正式 Task
+  - operation_id: getApprovalDraft
+    intent: 读取真实 Browser Host 预检查生成的 Approval Draft，核对 Command、Binding、页面哈希、动作指纹与 payload preview
   - operation_id: issueApprovalGrant
-    intent: 为已确定的 Browser Host Command 签发一次性、绑定明确且可审计的 Approval Grant
+    intent: 仅依据已读取且用户明确批准的 Approval Draft 签发一次性、绑定明确且可审计的 Approval Grant
   - operation_id: getTaskDecisionContext
     intent: 查询最新 Task、Plan、Event、Result、约束和当前实际允许命令
   - operation_id: claimControllerTask

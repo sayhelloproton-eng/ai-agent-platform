@@ -68,7 +68,8 @@ const CONTROLLER_RELEASE_ROUTE = "/v1/controller/task-release";
 export const TASK_INTAKE_ROUTE = "/v1/task-control/intake";
 export const BROWSER_HOST_ROUTE = "/v1/browser-host/invoke";
 export const APPROVAL_GRANT_ROUTE = "/v1/approvals/grants";
-const PHASE2_ROUTES = new Set([TASK_INTAKE_ROUTE, BROWSER_HOST_ROUTE, APPROVAL_GRANT_ROUTE]);
+export const APPROVAL_DRAFT_ROUTE = "/v1/approvals/drafts/lookup";
+const PHASE2_ROUTES = new Set([TASK_INTAKE_ROUTE, BROWSER_HOST_ROUTE, APPROVAL_GRANT_ROUTE, APPROVAL_DRAFT_ROUTE]);
 const CONTROLLER_ROUTES = new Set([
   CONTROLLER_CONTEXT_ROUTE,
   CONTROLLER_CLAIM_ROUTE,
@@ -107,6 +108,7 @@ export interface GatewayOptions {
   readonly phase2TaskIntake?: Phase2TaskIntakePort;
   readonly browserHostServer?: BrowserHostServerPort;
   readonly approvalGrantRegistrar?: { putApprovalGrant(grant: ApprovalGrantV1): Promise<unknown> };
+  readonly approvalDraftReader?: { getApprovalDraft(approvalRef: string): Promise<unknown | null> };
   readonly auditLog?: (entry: string) => void;
 }
 
@@ -466,6 +468,25 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
             const result = await options.phase2TaskIntake.intake(validation.value);
             options.auditLog?.(JSON.stringify({ event: "gateway.task-intake.accepted", taskId: result.taskId }));
             writeSuccess(response, 200, requestId, result);
+            return;
+          }
+          if (pathname === APPROVAL_DRAFT_ROUTE) {
+            if (options.approvalDraftReader === undefined) {
+              writeError(response, 503, requestId, "APPROVAL_DRAFT_UNAVAILABLE", "Approval Draft service is unavailable.");
+              return;
+            }
+            const value = parsedBody as { approvalRef?: unknown };
+            if (value === null || typeof value !== "object" || typeof value.approvalRef !== "string" || value.approvalRef.trim().length === 0) {
+              writeError(response, 400, requestId, "INVALID_APPROVAL_DRAFT_LOOKUP", "Approval Draft lookup requires approvalRef.");
+              return;
+            }
+            const draft = await options.approvalDraftReader.getApprovalDraft(value.approvalRef);
+            if (draft === null) {
+              writeError(response, 404, requestId, "APPROVAL_DRAFT_NOT_FOUND", "Approval Draft was not found.");
+              return;
+            }
+            options.auditLog?.(JSON.stringify({ event: "gateway.approval-draft.read", approvalRef: value.approvalRef }));
+            writeSuccess(response, 200, requestId, draft);
             return;
           }
           if (pathname === APPROVAL_GRANT_ROUTE) {

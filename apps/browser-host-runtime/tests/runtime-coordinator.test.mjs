@@ -70,7 +70,7 @@ test("sensitive message uses one-time Approval, Delivery Ack, response observati
   const coordinator = new RuntimeCoordinator({
     host_id: "host",
     dispatchClient: harness.client,
-    approvalClient: { getGrant: async () => grant, consume: async () => { consumed += 1; } },
+    approvalClient: { putDraft: async () => ({ status: "PENDING_APPROVAL" }), getGrant: async () => grant, consume: async () => { consumed += 1; } },
     bindingRegistry: { findForTarget: async () => bound, validateObservation: async (value) => value, get: async () => bound },
     journal: new CommandJournal(new MemoryStorageArea()),
     observationCoordinator: observationService(observed),
@@ -316,6 +316,7 @@ test("approval precondition failure before browser execution is BLOCKED, never U
       uncertain: async () => { uncertainReports += 1; return { status: "RECORDED" }; }
     },
     approvalClient: {
+      putDraft: async () => ({ status: "PENDING_APPROVAL" }),
       getGrant: async () => ({
         approval_ref: command.approval_ref,
         grant_id: "grant",
@@ -385,6 +386,7 @@ test("approval consume failure stays pre-delivery BLOCKED and never becomes UNCE
       uncertain: async () => { uncertainReports += 1; return { status: "RECORDED" }; }
     },
     approvalClient: {
+      putDraft: async () => ({ status: "PENDING_APPROVAL" }),
       getGrant: async () => grant,
       consume: async () => { throw Object.assign(new Error("already consumed"), { code: "APPROVAL_ALREADY_CONSUMED" }); }
     },
@@ -401,6 +403,77 @@ test("approval consume failure stays pre-delivery BLOCKED and never becomes UNCE
   assert.equal(executions, 0);
   assert.equal(failures, 1);
   assert.equal(uncertainReports, 0);
+});
+
+test("high-risk command prepares Approval Draft and resumes the same command after Grant is issued", async () => {
+  const command = hostCommand();
+  const bound = binding();
+  const observed = observation();
+  const payload = { text: "approved wake" };
+  const journal = new CommandJournal(new MemoryStorageArea());
+  let grant = null;
+  const drafts = [];
+  let claimEpoch = 0;
+  let executions = 0;
+  let consumed = 0;
+  const harness = dispatchHarness(command);
+  harness.client.claim = async () => ({ claim_token: `claim-${++claimEpoch}`, expires_at: "2030-01-01T00:00:00.000Z" });
+  harness.client.resolvePayload = async () => payload;
+  const coordinator = new RuntimeCoordinator({
+    host_id: "host",
+    dispatchClient: harness.client,
+    approvalClient: {
+      putDraft: async (draft) => { drafts.push(structuredClone(draft)); return { status: "PENDING_APPROVAL" }; },
+      getGrantOrNull: async () => grant,
+      getGrant: async () => grant,
+      consume: async () => { consumed += 1; }
+    },
+    bindingRegistry: { findForTarget: async () => bound, validateObservation: async (value) => value, get: async () => bound },
+    journal,
+    observationCoordinator: observationService(observed),
+    actionExecutor: {
+      execute: async () => { executions += 1; return deliveryExecution(bound); },
+      waitForResponse: async () => ({ status: "ACTION_SUCCEEDED", details: { response_completed: true } })
+    },
+    modelProvider: { analyze: async () => assessment() },
+    evidenceStore: {},
+    configProvider: async () => ({ paused: false, emergency_stopped: false, approval_policy_mode: "strict" })
+  });
+
+  const pending = await coordinator.processOne();
+  assert.equal(pending.reason, "APPROVAL_PENDING");
+  assert.equal(pending.approval_pending, true);
+  assert.equal(executions, 0);
+  assert.equal((await journal.get(command.command_id)).state, "APPROVAL_PENDING");
+  assert.equal(drafts.length, 1);
+  assert.equal(drafts[0].command_id, command.command_id);
+  assert.equal(drafts[0].binding_id, bound.binding_id);
+  assert.equal(drafts[0].payload_preview.text, payload.text);
+
+  const pageHash = await computePagePreconditionHash(observed);
+  const fingerprint = await computeActionFingerprint({ command, binding_id: bound.binding_id, resolved_payload: payload, page_precondition_hash: pageHash });
+  grant = {
+    approval_ref: command.approval_ref,
+    grant_id: "grant-after-draft",
+    action_fingerprint: fingerprint,
+    binding_id: bound.binding_id,
+    task_id: command.task_id,
+    command_id: command.command_id,
+    allowed_action_type: command.action.type,
+    page_precondition_hash: pageHash,
+    single_use: true,
+    expires_at: "2030-01-01T00:00:00.000Z",
+    consumed_at: null
+  };
+
+  const completed = await coordinator.processOne();
+  assert.equal(completed.result.status, "ACTION_SUCCEEDED");
+  assert.equal(executions, 1);
+  assert.equal(consumed, 1);
+  assert.equal(drafts.length, 2);
+  assert.equal(drafts[1].draft_id, drafts[0].draft_id);
+  assert.equal(drafts[1].prepared_at, drafts[0].prepared_at);
+  assert.equal((await journal.get(command.command_id)).state, "REPORTED");
 });
 
 test("emergency stop flushes report-only recovery but never resumes browser observation", async () => {

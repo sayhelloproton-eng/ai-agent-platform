@@ -293,6 +293,7 @@ export async function startActionGateway(): Promise<void> {
         phase2TaskIntake,
         browserHostServer,
         approvalGrantRegistrar: phase2IntegrationStore,
+        approvalDraftReader: phase2IntegrationStore,
       }),
     );
 

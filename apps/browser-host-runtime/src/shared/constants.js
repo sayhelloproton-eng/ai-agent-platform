@@ -14,6 +14,7 @@ export const APPLICATION_OPERATIONS = Object.freeze({
   DISPATCH_ACK_LEGACY: "browser.dispatch.ack",
   DISPATCH_REPORT_LEGACY: "browser.dispatch.report",
   PAYLOAD_RESOLVE: "browser.payload.resolve",
+  APPROVAL_DRAFT_PUT: "approval.draft.put",
   APPROVAL_GRANT_GET: "approval.grant.get",
   APPROVAL_GRANT_CONSUME: "approval.grant.consume"
 });
@@ -65,6 +66,7 @@ export const HOST_RESULT_STATUS = Object.freeze({
 export const JOURNAL_STATE = Object.freeze({
   RECEIVED: "RECEIVED",
   CLAIMED: "CLAIMED",
+  APPROVAL_PENDING: "APPROVAL_PENDING",
   PREPARED: "PREPARED",
   EXECUTING: "EXECUTING",
   PRE_DELIVERY_FAILURE_PENDING: "PRE_DELIVERY_FAILURE_PENDING",

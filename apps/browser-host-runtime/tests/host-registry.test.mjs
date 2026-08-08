@@ -63,7 +63,7 @@ test("production Host advertises only the safe Level 2 browser action", async ()
   const registry = new HostRegistry(storage, gateway);
   await registry.register();
   assert.ok(PRODUCTION_ROUTABLE_CAPABILITIES.includes("OBSERVE_PAGE"));
-  assert.equal(PRODUCTION_ROUTABLE_CAPABILITIES.includes("SUBMIT_MESSAGE"), false);
+  assert.equal(PRODUCTION_ROUTABLE_CAPABILITIES.includes("SUBMIT_MESSAGE"), true);
   assert.equal(PRODUCTION_ROUTABLE_CAPABILITIES.includes("CONTINUE_ROLE_SESSION"), false);
   assert.deepEqual(registrations[0].capabilities, [...PRODUCTION_ROUTABLE_CAPABILITIES]);
 });

@@ -3,6 +3,7 @@ import { assertHostCommand, buildDeliveryFact, buildHostResult, buildUncertainSi
 import { classifyAction, requiresApproval, validateResolvedPayload } from "../shared/action-policy.js";
 import { BhrError, asSafeError } from "../shared/errors.js";
 import { validateApprovalGrant } from "./approval-validator.js";
+import { computeActionFingerprint, computePagePreconditionHash } from "../shared/fingerprints.js";
 
 const executionStartedStates = new Set([
   JOURNAL_STATE.EXECUTING,
@@ -23,6 +24,35 @@ function responseWaitOptions(payload = {}) {
     start_timeout_ms: payload.start_timeout_ms,
     stable_ms: payload.stable_ms,
     poll_ms: payload.poll_ms
+  };
+}
+
+
+async function buildApprovalDraft({ command, binding, resolvedPayload, observation, preparedAt = null }) {
+  const pagePreconditionHash = await computePagePreconditionHash(observation);
+  const actionFingerprint = await computeActionFingerprint({
+    command,
+    binding_id: binding.binding_id,
+    resolved_payload: resolvedPayload,
+    page_precondition_hash: pagePreconditionHash
+  });
+  return {
+    approval_draft_version: "1.0.0",
+    approval_ref: command.approval_ref,
+    draft_id: `${command.command_id}:approval-draft`,
+    task_id: command.task_id,
+    dispatch_ref: command.dispatch_ref,
+    command_id: command.command_id,
+    binding_id: binding.binding_id,
+    allowed_action_type: command.action.type,
+    action_fingerprint: actionFingerprint,
+    page_precondition_hash: pagePreconditionHash,
+    target_role_ref: command.target.role_ref,
+    target_profile_ref: command.target.gpt_ref,
+    conversation_ref: command.target.conversation_ref ?? null,
+    payload_preview: structuredClone(resolvedPayload),
+    prepared_at: preparedAt ?? new Date().toISOString(),
+    expires_at: command.expires_at
   };
 }
 
@@ -368,7 +398,10 @@ export class RuntimeCoordinator {
     const started = await this.journal.begin(command, { claim_token: claim.claim_token });
 
     if (started.duplicate) {
-      if (started.duplicate_by === "IDEMPOTENCY_KEY" && started.entry.command_id !== command.command_id) {
+      const approvalResume =
+        started.duplicate_by === "COMMAND_ID" &&
+        started.entry.state === JOURNAL_STATE.APPROVAL_PENDING;
+      if (!approvalResume && started.duplicate_by === "IDEMPOTENCY_KEY" && started.entry.command_id !== command.command_id) {
         const result = buildHostResult({
           command,
           status: HOST_RESULT_STATUS.BLOCKED,
@@ -399,8 +432,8 @@ export class RuntimeCoordinator {
           report
         };
       }
-      if (started.entry.state === JOURNAL_STATE.REPORTED) return { processed: false, reason: "ALREADY_REPORTED", command_id: command.command_id };
-      if (executionStartedStates.has(started.entry.state)) {
+      if (!approvalResume && started.entry.state === JOURNAL_STATE.REPORTED) return { processed: false, reason: "ALREADY_REPORTED", command_id: command.command_id };
+      if (!approvalResume && executionStartedStates.has(started.entry.state)) {
         const canonicalCommand = assertHostCommand(started.entry.command);
         const result = started.entry.result ?? buildHostResult({
           command: canonicalCommand,
@@ -419,10 +452,12 @@ export class RuntimeCoordinator {
         });
         return { processed: true, result, report };
       }
-      return { processed: false, reason: "DUPLICATE_COMMAND_IN_PROGRESS", command_id: started.entry.command_id, state: started.entry.state };
+      if (!approvalResume) {
+        return { processed: false, reason: "DUPLICATE_COMMAND_IN_PROGRESS", command_id: started.entry.command_id, state: started.entry.state };
+      }
     }
 
-    await this.journal.mark(command.command_id, JOURNAL_STATE.CLAIMED, { claim_token: claim.claim_token });
+    await this.journal.mark(command.command_id, JOURNAL_STATE.CLAIMED, { claim_token: claim.claim_token, claim_expires_at: claim.expires_at ?? null });
     let binding = null;
     let pre = null;
     let execution = null;
@@ -468,11 +503,50 @@ export class RuntimeCoordinator {
       if (approvalRequired) {
         if (!command.approval_ref) throw new BhrError("APPROVAL_REQUIRED", "This browser action requires approval_ref under the active approval policy.");
         if (!binding || !pre) throw new BhrError("APPROVAL_BINDING_UNAVAILABLE", "Approval requires a confirmed Binding and page precondition.");
-        const grant = await this.approvalClient.getGrant(command.approval_ref);
-        if (!grant) throw new BhrError("APPROVAL_NOT_FOUND", "Approval grant could not be resolved.");
+        const currentEntry = await this.journal.get(command.command_id);
+        const priorDraft = currentEntry?.details?.approval_draft ?? null;
+        const draft = await buildApprovalDraft({
+          command,
+          binding,
+          resolvedPayload,
+          observation: pre.observation,
+          preparedAt: priorDraft?.prepared_at ?? null
+        });
+        await this.approvalClient.putDraft(draft, claim.claim_token);
+        let grant = null;
+        if (typeof this.approvalClient.getGrantOrNull === "function") {
+          grant = await this.approvalClient.getGrantOrNull(command.approval_ref);
+        } else {
+          grant = await this.approvalClient.getGrant(command.approval_ref);
+        }
+        if (!grant) {
+          await this.journal.mark(command.command_id, JOURNAL_STATE.APPROVAL_PENDING, {
+            ...preparedDetails,
+            approval_draft: draft,
+            action_fingerprint: draft.action_fingerprint,
+            page_precondition_hash: draft.page_precondition_hash,
+            claim_token: claim.claim_token,
+            claim_expires_at: claim.expires_at ?? null
+          });
+          return {
+            processed: true,
+            reason: "APPROVAL_PENDING",
+            approval_pending: true,
+            approval_draft: draft,
+            command_id: command.command_id,
+            dispatch_ref: command.dispatch_ref
+          };
+        }
         const validated = await validateApprovalGrant({ grant, command, binding, resolved_payload: resolvedPayload, observation: pre.observation });
+        if (priorDraft && (
+          priorDraft.action_fingerprint !== validated.action_fingerprint ||
+          priorDraft.page_precondition_hash !== validated.page_precondition_hash
+        )) {
+          throw new BhrError("APPROVAL_PRECONDITION_CHANGED", "The page or planned action changed after the Approval Draft was prepared.");
+        }
         await this.journal.mark(command.command_id, JOURNAL_STATE.PREPARED, {
           ...preparedDetails,
+          approval_draft: draft,
           action_fingerprint: validated.action_fingerprint,
           page_precondition_hash: validated.page_precondition_hash
         });

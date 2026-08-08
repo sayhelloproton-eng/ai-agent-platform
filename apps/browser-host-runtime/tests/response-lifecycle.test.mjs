@@ -139,3 +139,45 @@ test("response timeout diagnostics never expose assistant transcript text", asyn
     }
   );
 });
+
+
+test("Action confirmation pauses the response-start deadline and resumes after the user resolves it", async () => {
+  let now = 0;
+  let index = 0;
+  const snapshots = [
+    { ...baseline, page_state: "ACTION_CONFIRMATION_PENDING" },
+    { ...baseline, page_state: "ACTION_CONFIRMATION_PENDING" },
+    { ...baseline, page_state: "READY", generation_state: "RUNNING" },
+    { ...baseline, page_state: "READY", assistant_count: 1, last_assistant_text: "done", generation_state: "IDLE" },
+    { ...baseline, page_state: "READY", assistant_count: 1, last_assistant_text: "done", generation_state: "IDLE" }
+  ];
+  const result = await globalThis.BhrResponseLifecycle.waitForCompleteResponse({
+    payload: { timeout_ms: 2000, start_timeout_ms: 100, stable_ms: 10, poll_ms: 0 },
+    baseline: { ...baseline, page_state: "READY" },
+    snapshot: () => snapshots[Math.min(index++, snapshots.length - 1)],
+    ensureIdentity: () => {},
+    isInterrupted: () => false,
+    sleepImpl: async () => { now += 80; },
+    nowImpl: () => now
+  });
+  assert.equal(result.status, "ACTION_SUCCEEDED");
+  assert.equal(result.details.action_confirmation_seen, true);
+  assert.ok(result.details.action_confirmation_resolved_at);
+});
+
+test("unresolved Action confirmation times out explicitly instead of being misreported as response-start timeout", async () => {
+  let now = 0;
+  const pending = { ...baseline, page_state: "ACTION_CONFIRMATION_PENDING" };
+  await assert.rejects(
+    () => globalThis.BhrResponseLifecycle.waitForCompleteResponse({
+      payload: { timeout_ms: 300, start_timeout_ms: 100, poll_ms: 0 },
+      baseline: { ...baseline, page_state: "READY" },
+      snapshot: () => pending,
+      ensureIdentity: () => {},
+      isInterrupted: () => false,
+      sleepImpl: async () => { now += 100; },
+      nowImpl: () => now
+    }),
+    (error) => error.code === "ACTION_CONFIRMATION_TIMEOUT" && error.details.action_confirmation_pending === true
+  );
+});

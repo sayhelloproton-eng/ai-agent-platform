@@ -13,7 +13,7 @@ import {
   type TaskProjectionApplicationPort,
 } from "@ai-agent-platform/task-control";
 
-import { Phase2IntegrationStore } from "./phase2-integration-store.js";
+import { Phase2IntegrationStore, Phase2IntegrationStoreError } from "./phase2-integration-store.js";
 
 export interface Phase2TaskIntakePort {
   intake(request: TaskIntakeV1Request): Promise<TaskIntakeV1Receipt>;
@@ -57,8 +57,12 @@ export function createPhase2TaskIntakeAdapter(
       for (const resource of request.payloadResources ?? []) {
         await integrationStore.putPayload(resource.payloadRef, resource.value);
       }
-      for (const grant of request.approvalGrants ?? []) {
-        await integrationStore.putApprovalGrant(grant);
+      if ((request.approvalGrants?.length ?? 0) > 0) {
+        throw new Phase2IntegrationStoreError(
+          "PRESEEDED_APPROVAL_GRANT_FORBIDDEN",
+          "Approval Grants cannot be pre-seeded during Task Intake; Browser Host must publish an Approval Draft first.",
+          409,
+        );
       }
       const input: CreateTaskInput = {
         contractVersion: TASK_CONTROL_CONTRACT_VERSION,

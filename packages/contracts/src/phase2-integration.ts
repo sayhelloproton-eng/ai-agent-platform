@@ -6,6 +6,7 @@ export const LOCAL_WORK_HANDOFF_VERSION = "1.0.0" as const;
 export const BROWSER_HOST_SERVER_CONTRACT_VERSION = "1.0.0" as const;
 export const DISPATCH_CREDENTIAL_CONTRACT_VERSION = "1.0.0" as const;
 export const APPROVAL_GRANT_CONTRACT_VERSION = "1.0.0" as const;
+export const APPROVAL_DRAFT_CONTRACT_VERSION = "1.0.0" as const;
 export const RESULT_PROGRESS_OUTCOME_CONTRACT_VERSION = "1.0.0" as const;
 export const CANCELLATION_EVENT_CONTRACT_VERSION = "1.0.0" as const;
 
@@ -42,6 +43,7 @@ export const BROWSER_HOST_OPERATIONS = [
   "browser.dispatch.uncertain",
   "browser.dispatch.fail",
   "browser.payload.resolve",
+  "approval.draft.put",
   "approval.grant.get",
   "approval.grant.consume",
 ] as const;
@@ -69,6 +71,25 @@ export interface TaskIntakePlanV1 {
 export interface TaskIntakePayloadResourceV1 {
   readonly payloadRef: string;
   readonly value: JsonValue;
+}
+
+export interface ApprovalDraftV1 {
+  readonly approvalDraftContractVersion: typeof APPROVAL_DRAFT_CONTRACT_VERSION;
+  readonly approvalRef: string;
+  readonly draftId: string;
+  readonly taskId: string;
+  readonly dispatchRef: string;
+  readonly commandId: string;
+  readonly bindingId: string;
+  readonly allowedActionType: BrowserHostActionType;
+  readonly actionFingerprint: string;
+  readonly pagePreconditionHash: string;
+  readonly targetRoleRef: string;
+  readonly targetProfileRef: string;
+  readonly conversationRef: string | null;
+  readonly payloadPreview: JsonObject;
+  readonly preparedAt: string;
+  readonly expiresAt: string;
 }
 
 export interface ApprovalGrantV1 {

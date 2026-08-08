@@ -5,6 +5,7 @@ authentication:
 openapi_template: ../../../apps/dev-tunnel/openapi/custom-gpt-action.openapi.template.yaml
 operations:
   - intakePhase2Task
+  - getApprovalDraft
   - issueApprovalGrant
   - getTaskDecisionContext
   - claimControllerTask
