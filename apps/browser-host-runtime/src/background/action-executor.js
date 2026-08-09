@@ -21,6 +21,7 @@ export class BrowserActionExecutor {
     const payload = {
       ...resolved_payload,
       ...(isMessageDelivery ? { wait_for_response: false } : {}),
+      ...(command.action.type === ACTION_TYPES.CONTINUE_ROLE_SESSION ? { allow_action_confirmation_activity: true } : {}),
       expected_identity: {
         gpt_ref: binding.gpt_ref,
         conversation_ref: binding.conversation_ref ?? null

@@ -121,10 +121,10 @@
       /发送提示/
     ].some((pattern) => pattern.test(accessibleName(button)))) ?? null;
   }
-  async function waitForEnabledSendButton(expectedIdentity, { timeoutMs = 3000, pollMs = 50 } = {}) {
+  async function waitForEnabledSendButton(expectedIdentity, { timeoutMs = 3000, pollMs = 50, allowActionConfirmationChoice = false } = {}) {
     const deadline = Date.now() + timeoutMs;
     do {
-      ensureNoUserConflict();
+      ensureNoUserConflict({ allowActionConfirmationChoice });
       ensureExpectedIdentity(expectedIdentity);
       const send = findSendButton();
       if (isEnabledButton(send)) return send;
@@ -135,6 +135,26 @@
   function generationState() {
     const stop = findButton([/stop generating/i, /停止生成/, /停止回答/, /停止/]);
     return stop ? "RUNNING" : "IDLE";
+  }
+  const ACTION_CONFIRM_ALLOW_RE = /(?:^|\b)(?:allow|approve)(?:\b|$)|允许|同意/iu;
+  const ACTION_CONFIRM_DENY_RE = /(?:^|\b)(?:deny|reject)(?:\b|$)|拒绝/iu;
+  function buttonChoiceTexts(button) {
+    return [
+      accessibleName(button),
+      normalizeText(button?.innerText || button?.textContent)
+    ].filter(Boolean);
+  }
+  function actionConfirmationChoiceKind(button) {
+    if (!(button instanceof Element) || !visible(button)) return null;
+    const texts = buttonChoiceTexts(button);
+    if (texts.some((text) => ACTION_CONFIRM_ALLOW_RE.test(text))) return "ALLOW";
+    if (texts.some((text) => ACTION_CONFIRM_DENY_RE.test(text))) return "DENY";
+    return null;
+  }
+  function visibleActionConfirmationChoices() {
+    return buttons()
+      .map((button) => ({ button, kind: actionConfirmationChoiceKind(button) }))
+      .filter((item) => item.kind);
   }
   function blockingUi() {
     const result = [];
@@ -147,11 +167,9 @@
       result.push({ type: roleOf(element).toUpperCase(), text });
     }
 
-    const confirmationButtons = buttons()
-      .map((button) => ({ name: accessibleName(button), role: roleOf(button) }))
-      .filter((item) => /^(allow|deny|允许|拒绝)$/iu.test(item.name));
-    const hasAllow = confirmationButtons.some((item) => /^(allow|允许)$/iu.test(item.name));
-    const hasDeny = confirmationButtons.some((item) => /^(deny|拒绝)$/iu.test(item.name));
+    const confirmationButtons = visibleActionConfirmationChoices();
+    const hasAllow = confirmationButtons.some((item) => item.kind === "ALLOW");
+    const hasDeny = confirmationButtons.some((item) => item.kind === "DENY");
     if (hasAllow && hasDeny) {
       const confirmationSurface = candidates.find((element) => {
         const text = normalizeText(element.innerText || element.textContent);
@@ -351,8 +369,14 @@
       observed_at: new Date().toISOString()
     };
   }
-  function ensureNoUserConflict() {
-    if (Date.now() < state.userActiveUntil || state.userReviewing) throw Object.assign(new Error("User is currently controlling or reviewing the page."), { code: "USER_CONTROL_ACTIVE" });
+  function userConflictActive({ allowActionConfirmationChoice = false } = {}) {
+    if (state.userReviewing) return true;
+    if (Date.now() >= state.userActiveUntil) return false;
+    if (allowActionConfirmationChoice && state.userActivityEpoch === state.actionConfirmationChoiceEpoch) return false;
+    return true;
+  }
+  function ensureNoUserConflict(options = {}) {
+    if (userConflictActive(options)) throw Object.assign(new Error("User is currently controlling or reviewing the page."), { code: "USER_CONTROL_ACTIVE" });
   }
   function isActionConfirmationChoiceTarget(target) {
     if (!(target instanceof Element)) return false;
@@ -360,7 +384,7 @@
       ? target.closest('button,[role="button"]')
       : target;
     if (!(button instanceof Element) || !visible(button)) return false;
-    if (!/^(allow|deny|允许|拒绝)$/iu.test(accessibleName(button))) return false;
+    if (!actionConfirmationChoiceKind(button)) return false;
     return blockingUi().some((item) => item.type === "ACTION_CONFIRMATION_PENDING");
   }
   function responseWaitInterrupted() {
@@ -372,8 +396,8 @@
     // and immediately restores the normal interruption guard.
     return state.userActivityEpoch !== state.actionConfirmationChoiceEpoch;
   }
-  function setComposerText(text, expectedIdentity = null) {
-    ensureNoUserConflict();
+  function setComposerText(text, expectedIdentity = null, { allowActionConfirmationChoice = false } = {}) {
+    ensureNoUserConflict({ allowActionConfirmationChoice });
     ensureExpectedIdentity(expectedIdentity);
     const target = composer();
     if (!target) throw Object.assign(new Error("ChatGPT composer was not found."), { code: "COMPOSER_NOT_FOUND" });
@@ -416,15 +440,16 @@
   }
 
   async function submitMessage(payload) {
+    const allowActionConfirmationChoice = payload.allow_action_confirmation_activity === true;
     const baseline = responseSnapshot();
-    const set = setComposerText(payload.text, payload.expected_identity);
+    const set = setComposerText(payload.text, payload.expected_identity, { allowActionConfirmationChoice });
     ensureExpectedIdentity(payload.expected_identity);
     // ChatGPT enables/replaces the send control asynchronously after an input event.
     // A synchronous lookup races React and can strand an approved command after the
     // composer has already been populated. Wait briefly for the exact send control
     // to become visible/enabled while continuously preserving identity/user-control
     // guards. Prefer stable data-testid markers, with accessible-name fallbacks.
-    const send = await waitForEnabledSendButton(payload.expected_identity);
+    const send = await waitForEnabledSendButton(payload.expected_identity, { allowActionConfirmationChoice });
     if (!send) {
       throw Object.assign(new Error("Enabled ChatGPT send button was not found before the bounded readiness timeout."), { code: "SEND_BUTTON_NOT_READY" });
     }
@@ -439,7 +464,7 @@
         return current ? normalizeText(current.value ?? current.innerText ?? current.textContent) : null;
       },
       ensureIdentity: ensureExpectedIdentity,
-      isInterrupted: () => state.userReviewing || Date.now() < state.userActiveUntil
+      isInterrupted: () => userConflictActive({ allowActionConfirmationChoice })
     });
     if (payload.wait_for_response === false) {
       return {
@@ -532,7 +557,9 @@
   }
   function onKeyDown(event) {
     if (!event.isTrusted) return;
+    const confirmationChoice = ["Enter", " ", "Spacebar"].includes(event.key) && isActionConfirmationChoiceTarget(event.target);
     markUserActivity();
+    if (confirmationChoice) state.actionConfirmationChoiceEpoch = state.userActivityEpoch;
     if (isScrollNavigationKey(event)) markUserScrollIntent();
   }
   function onWheel(event) {

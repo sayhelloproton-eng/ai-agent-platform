@@ -140,13 +140,20 @@ function createComposerHarness({
   class InputMock extends ElementMock {}
   const composer = new TextareaMock();
   const builtExtraButtons = extraButtons.map((item) => {
-    if (typeof item !== "string") return item;
+    const spec = typeof item === "string"
+      ? { key: item, ariaLabel: item, text: item }
+      : {
+          key: item?.key ?? item?.ariaLabel ?? item?.text ?? "button",
+          ariaLabel: item?.ariaLabel ?? null,
+          text: item?.text ?? item?.ariaLabel ?? ""
+        };
     const button = new ElementMock();
-    button.attributes = { "aria-label": item };
+    button.attributes = { ...(spec.ariaLabel == null ? {} : { "aria-label": spec.ariaLabel }) };
     button.disabled = false;
-    button.innerText = item;
-    button.textContent = item;
-    button.click = () => extraButtonClicks.set(item, (extraButtonClicks.get(item) ?? 0) + 1);
+    button.innerText = spec.text;
+    button.textContent = spec.text;
+    button.__key = spec.key;
+    button.click = () => extraButtonClicks.set(spec.key, (extraButtonClicks.get(spec.key) ?? 0) + 1);
     return button;
   });
   const messageNodes = messageRoles.map((role, index) => {
@@ -246,7 +253,7 @@ function createComposerHarness({
     composer,
     getSendClicks: () => sendClicks,
     getExtraButtonClicks: (name) => extraButtonClicks.get(name) ?? 0,
-    getExtraButtonElement: (name) => builtExtraButtons.find((button) => button.attributes?.["aria-label"] === name) ?? null,
+    getExtraButtonElement: (name) => builtExtraButtons.find((button) => button.__key === name || button.attributes?.["aria-label"] === name) ?? null,
     dispatchDocumentEvent: (type, event) => {
       for (const listener of documentListeners.get(type) ?? []) listener(event);
     }
@@ -660,4 +667,99 @@ test("post-delivery response wait tolerates the explicit ChatGPT Action choice b
   });
   assert.equal(waitedAfterKey.ok, true);
   assert.deepEqual(interruptions, [false, true], "later unrelated user activity must restore the interruption guard");
+});
+
+
+test("realistic Action confirmation labels are recognized even when aria-label is longer than the visible Allow/Deny text", async () => {
+  const interruptions = [];
+  const harness = createComposerHarness({
+    extraButtons: [
+      { key: "allow", ariaLabel: "Allow this action", text: "允许" },
+      { key: "deny", ariaLabel: "Deny this action", text: "拒绝" }
+    ],
+    responseLifecycle: {
+      waitForSubmissionConfirmation: async ({ snapshot }) => ({
+        status: "ACTION_SUCCEEDED",
+        details: { submission_confirmed: true, confirmed_snapshot: snapshot() }
+      }),
+      waitForCompleteResponse: async ({ isInterrupted }) => {
+        interruptions.push(isInterrupted());
+        return { status: "ACTION_SUCCEEDED", details: { response_completed: true } };
+      }
+    }
+  });
+  const listener = [...harness.runtimeListeners][0];
+  const allow = harness.getExtraButtonElement("allow");
+  assert.ok(allow);
+
+  const observed = await new Promise((resolve) => {
+    listener({ type: "BHR_OBSERVE", observation_id: "realistic-action-confirmation" }, {}, resolve);
+  });
+  assert.equal(observed.ok, true);
+  assert.equal(observed.data.page_state, "ACTION_CONFIRMATION_PENDING");
+
+  harness.dispatchDocumentEvent("pointerdown", { isTrusted: true, target: allow });
+  const waited = await new Promise((resolve) => {
+    listener({
+      type: "BHR_EXECUTE_ACTION",
+      action_type: "WAIT_FOR_RESPONSE",
+      payload: { expected_identity: { gpt_ref: "g-test", conversation_ref: "conv" } }
+    }, {}, resolve);
+  });
+  assert.equal(waited.ok, true);
+  assert.deepEqual(interruptions, [false], "the required Action Allow click must not be treated as unrelated user takeover");
+});
+
+test("authorized platform continuation may cross only the user-activity window created by the immediately preceding Action choice", async () => {
+  const harness = createComposerHarness({
+    extraButtons: [
+      { key: "allow", ariaLabel: "Allow this action", text: "允许" },
+      { key: "deny", ariaLabel: "Deny this action", text: "拒绝" }
+    ]
+  });
+  const listener = [...harness.runtimeListeners][0];
+  const allow = harness.getExtraButtonElement("allow");
+  harness.dispatchDocumentEvent("pointerdown", { isTrusted: true, target: allow });
+
+  const blocked = await new Promise((resolve) => {
+    listener({
+      type: "BHR_EXECUTE_ACTION",
+      action_type: "SUBMIT_MESSAGE",
+      payload: { text: "ordinary send", wait_for_response: false, expected_identity: { gpt_ref: "g-test", conversation_ref: "conv" } }
+    }, {}, resolve);
+  });
+  assert.equal(blocked.ok, false);
+  assert.equal(blocked.error.code, "USER_CONTROL_ACTIVE", "ordinary browser writes remain gated by the user activity window");
+
+  const continued = await new Promise((resolve) => {
+    listener({
+      type: "BHR_EXECUTE_ACTION",
+      action_type: "SUBMIT_MESSAGE",
+      payload: {
+        text: "platform continuation",
+        wait_for_response: false,
+        allow_action_confirmation_activity: true,
+        expected_identity: { gpt_ref: "g-test", conversation_ref: "conv" }
+      }
+    }, {}, resolve);
+  });
+  assert.equal(continued.ok, true);
+  assert.equal(harness.getSendClicks(), 1);
+
+  harness.dispatchDocumentEvent("keydown", { isTrusted: true, key: "x", target: harness.composer });
+  const blockedAfterUnrelatedActivity = await new Promise((resolve) => {
+    listener({
+      type: "BHR_EXECUTE_ACTION",
+      action_type: "SUBMIT_MESSAGE",
+      payload: {
+        text: "must stay blocked",
+        wait_for_response: false,
+        allow_action_confirmation_activity: true,
+        expected_identity: { gpt_ref: "g-test", conversation_ref: "conv" }
+      }
+    }, {}, resolve);
+  });
+  assert.equal(blockedAfterUnrelatedActivity.ok, false);
+  assert.equal(blockedAfterUnrelatedActivity.error.code, "USER_CONTROL_ACTIVE");
+  assert.equal(harness.getSendClicks(), 1, "later unrelated user activity must restore fail-closed behavior");
 });
