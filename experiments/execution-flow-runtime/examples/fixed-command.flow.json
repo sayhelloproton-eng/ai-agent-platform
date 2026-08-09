@@ -1,0 +1,28 @@
+{
+  "contract": "execution.run.v0",
+  "execution_id": "exec-fixed-command-example",
+  "flow": {
+    "contract": "execution.flow.v0",
+    "flow_id": "fixed-command-example",
+    "version": 1,
+    "entry_node": "run-version",
+    "nodes": [
+      {
+        "id": "run-version",
+        "type": "action",
+        "capability": "process.command.run-fixed",
+        "arguments": { "command_ref": "node.version" },
+        "next": "done"
+      },
+      {
+        "id": "done",
+        "type": "return",
+        "output": { "command": "$steps.run-version.output" }
+      }
+    ]
+  },
+  "inputs": {},
+  "authorization": {
+    "allowed_capabilities": ["process.command.run-fixed"]
+  }
+}

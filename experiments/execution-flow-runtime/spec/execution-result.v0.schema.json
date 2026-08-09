@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-agent-platform.local/spec/execution-result.v0.schema.json",
+  "title": "ExecutionResultV0",
+  "type": "object",
+  "required": ["contract", "execution_id", "status", "output", "node_runs", "evidence"],
+  "additionalProperties": false,
+  "properties": {
+    "contract": { "const": "execution.result.v0" },
+    "execution_id": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["completed", "blocked", "failed"] },
+    "output": {},
+    "node_runs": { "type": "array" },
+    "evidence": { "type": "array" },
+    "error": { "type": ["object", "null"] },
+    "correlation": { "type": "object" }
+  }
+}

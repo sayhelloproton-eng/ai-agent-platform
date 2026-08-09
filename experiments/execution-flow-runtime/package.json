@@ -1,0 +1,57 @@
+{
+  "name": "@ai-agent-platform/execution-flow-runtime",
+  "version": "0.0.0-lab.2",
+  "description": "Spec-driven execution-flow runtime with bounded inference and capability execution.",
+  "type": "module",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "bin": {
+    "aap-execution-flow": "./cli.ts"
+  },
+  "files": [
+    "index.ts",
+    "cli.ts",
+    "src/**/*.ts",
+    "spec/**/*.json",
+    "docs/**/*.md",
+    "examples/**/*.json",
+    "README.md"
+  ],
+  "scripts": {
+    "check": "tsc -p tsconfig.json --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "cli": "tsx cli.ts",
+    "install:runtime": "tsx cli.ts install",
+    "start": "tsx cli.ts start",
+    "stop": "tsx cli.ts stop",
+    "restart": "tsx cli.ts restart",
+    "status": "tsx cli.ts status",
+    "doctor": "tsx cli.ts doctor",
+    "docs": "tsx cli.ts docs",
+    "describe": "tsx cli.ts describe --json"
+  },
+  "engines": {
+    "node": ">=20 <21"
+  },
+  "dependencies": {
+    "tsx": "^4.19.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "typescript": "^5.9.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "execution-flow",
+    "runtime",
+    "agent",
+    "workflow",
+    "inference",
+    "capability"
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-agent-platform.local/spec/execution-run.v0.schema.json",
+  "title": "ExecutionRunV0",
+  "type": "object",
+  "required": ["contract", "execution_id", "flow", "inputs", "authorization"],
+  "additionalProperties": false,
+  "properties": {
+    "contract": { "const": "execution.run.v0" },
+    "execution_id": { "type": "string", "minLength": 1 },
+    "flow": { "$ref": "execution-flow.v0.schema.json" },
+    "inputs": { "type": "object" },
+    "authorization": {
+      "type": "object",
+      "required": ["allowed_capabilities"],
+      "additionalProperties": false,
+      "properties": {
+        "allowed_capabilities": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "correlation": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "max_node_runs": { "type": "integer", "minimum": 1, "maximum": 1000 }
+  }
+}

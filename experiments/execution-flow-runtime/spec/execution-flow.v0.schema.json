@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-agent-platform.local/spec/execution-flow.v0.schema.json",
+  "title": "ExecutionFlowV0",
+  "type": "object",
+  "required": ["contract", "flow_id", "version", "entry_node", "nodes"],
+  "additionalProperties": false,
+  "properties": {
+    "contract": { "const": "execution.flow.v0" },
+    "flow_id": { "type": "string", "minLength": 1 },
+    "version": { "type": "integer", "minimum": 1 },
+    "entry_node": { "type": "string", "minLength": 1 },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/actionNode" },
+          { "$ref": "#/$defs/inferenceNode" },
+          { "$ref": "#/$defs/switchNode" },
+          { "$ref": "#/$defs/returnNode" }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "baseNode": {
+      "type": "object",
+      "required": ["id", "type"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "type": { "type": "string" }
+      }
+    },
+    "actionNode": {
+      "type": "object",
+      "required": ["id", "type", "capability", "arguments", "next"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "type": { "const": "action" },
+        "capability": { "type": "string", "minLength": 1 },
+        "arguments": { "type": "object" },
+        "next": { "type": "string", "minLength": 1 }
+      }
+    },
+    "inferenceNode": {
+      "$ref": "inference-node.v0.schema.json"
+    },
+    "switchNode": {
+      "type": "object",
+      "required": ["id", "type", "select", "cases", "default"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "type": { "const": "switch" },
+        "select": { "type": "string", "pattern": "^\\$" },
+        "cases": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "type": "string", "minLength": 1 }
+        },
+        "default": { "type": "string", "minLength": 1 }
+      }
+    },
+    "returnNode": {
+      "type": "object",
+      "required": ["id", "type", "output"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "type": { "const": "return" },
+        "output": {}
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-agent-platform.local/spec/capability.v0.schema.json",
+  "title": "CapabilityDescriptorV0",
+  "type": "object",
+  "required": ["contract", "name", "description", "input_schema", "effects"],
+  "additionalProperties": false,
+  "properties": {
+    "contract": { "const": "execution.capability.v0" },
+    "name": { "type": "string", "minLength": 1 },
+    "description": { "type": "string", "minLength": 1 },
+    "input_schema": { "type": "object" },
+    "effects": { "enum": ["read", "write", "process", "network", "browser", "mixed", "other"] }
+  }
+}

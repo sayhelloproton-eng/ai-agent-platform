@@ -1,0 +1,100 @@
+{
+  "contract": "execution.run.v0",
+  "execution_id": "exec-runtime-health-example",
+  "flow": {
+    "contract": "execution.flow.v0",
+    "flow_id": "runtime-health-check",
+    "version": 1,
+    "entry_node": "read-status",
+    "nodes": [
+      {
+        "id": "read-status",
+        "type": "action",
+        "capability": "workspace.file.read",
+        "arguments": { "path": "fixtures/runtime-status.json" },
+        "next": "judge"
+      },
+      {
+        "id": "judge",
+        "type": "inference",
+        "backend": "mlxhub",
+        "profile": "standard",
+        "instruction": "Classify whether the supplied runtime status is healthy. Return only the declared JSON structure.",
+        "input": { "status": "$steps.read-status.output.json" },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "decision": { "enum": ["healthy", "unhealthy", "uncertain"] },
+            "confidence": { "type": "integer", "minimum": 0, "maximum": 100 }
+          },
+          "required": ["decision", "confidence"],
+          "additionalProperties": false
+        },
+        "next": "route"
+      },
+      {
+        "id": "route",
+        "type": "switch",
+        "select": "$steps.judge.output.decision",
+        "cases": {
+          "healthy": "done",
+          "unhealthy": "not-healthy",
+          "uncertain": "reason"
+        },
+        "default": "not-healthy"
+      },
+      {
+        "id": "reason",
+        "type": "inference",
+        "backend": "mlxhub",
+        "profile": "reasoning",
+        "instruction": "Resolve the explicit uncertainty using only the supplied status and first assessment. Return only the declared JSON structure.",
+        "input": {
+          "status": "$steps.read-status.output.json",
+          "first_assessment": "$steps.judge.output"
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "decision": { "enum": ["healthy", "unhealthy"] },
+            "confidence": { "type": "integer", "minimum": 0, "maximum": 100 }
+          },
+          "required": ["decision", "confidence"],
+          "additionalProperties": false
+        },
+        "next": "reason-route"
+      },
+      {
+        "id": "reason-route",
+        "type": "switch",
+        "select": "$steps.reason.output.decision",
+        "cases": {
+          "healthy": "done",
+          "unhealthy": "not-healthy"
+        },
+        "default": "not-healthy"
+      },
+      {
+        "id": "done",
+        "type": "return",
+        "output": {
+          "healthy": true,
+          "assessment": "$steps.judge.output"
+        }
+      },
+      {
+        "id": "not-healthy",
+        "type": "return",
+        "output": { "healthy": false }
+      }
+    ]
+  },
+  "inputs": {},
+  "authorization": {
+    "allowed_capabilities": ["workspace.file.read"]
+  },
+  "correlation": {
+    "source": "example",
+    "external_ref": "opaque-demo-ref"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-agent-platform.local/spec/inference-node.v0.schema.json",
+  "title": "InferenceNodeV0",
+  "type": "object",
+  "required": ["id", "type", "backend", "profile", "instruction", "input", "output_schema", "next"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "type": { "const": "inference" },
+    "backend": { "type": "string", "minLength": 1 },
+    "profile": { "enum": ["standard", "reasoning"] },
+    "instruction": { "type": "string", "minLength": 1 },
+    "input": { "type": "object" },
+    "output_schema": { "type": "object" },
+    "next": { "type": "string", "minLength": 1 }
+  }
+}
