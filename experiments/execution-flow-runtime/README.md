@@ -134,23 +134,32 @@ The HTTP service remains the same single runtime process; inference backends are
 
 ## MLXHub provider lab configuration
 
-MLXHub is one optional inference backend inside the single Execution Flow Runtime service. The execution-flow protocol does not contain phone URLs or model IDs.
+MLXHub is one optional inference backend inside the single Execution Flow Runtime service. The execution-flow protocol contains only `backend` plus semantic inference `role`; it does not contain phone URLs or model IDs.
 
-Configure the provider through the runtime process environment:
-
-```bash
-export EXECUTION_FLOW_MLXHUB_BASE_URL="http://<phone-lan-host>:8080"
-export EXECUTION_FLOW_MLXHUB_STANDARD_MODEL="<standard-model-id>"
-export EXECUTION_FLOW_MLXHUB_REASONING_MODEL="<reasoning-model-id>"
-```
-
-Optional output budgets:
+Persist the provider mapping into the Runtime-owned config:
 
 ```bash
-export EXECUTION_FLOW_MLXHUB_STANDARD_MAX_TOKENS=1024
-export EXECUTION_FLOW_MLXHUB_REASONING_MAX_TOKENS=<explicit-budget-if-needed>
+aap-execution-flow config mlxhub set \
+  --base-url "http://192.168.0.104:8080/" \
+  --fast-model "sayhelloproton/Qwen3.5-4B-MLX-4bit-no-think" \
+  --reason-model "mlx-community/Qwen3.5-4B-MLX-4bit"
 ```
 
-`standard` keeps the validated 1024-token default. `reasoning` intentionally has no package-wide default output budget; when the environment variable is absent, the backend omits `max_tokens` and leaves the provider/runtime configuration in control.
+Inspect it with:
 
-The normal test suite keeps the real MLXHub test skipped unless the three required provider variables are present. A configured live run proves that the same Execution Flow can execute first with the Fixture backend and then with MLXHub without changing Runtime Core semantics.
+```bash
+aap-execution-flow config show --json
+aap-execution-flow doctor --json
+```
+
+The mapping is persisted under Runtime Home `config.json`; normal `start`, `restart`, `run`, `providers` and service execution do not require per-command provider environment variables. Configuration changes apply after a managed-service start/restart.
+
+`fast` is the high-frequency no-think execution judgement role and defaults to `max_tokens=1024`. `reason` is a different low-frequency escalation role backed by the original thinking model; it intentionally has no package-wide default `max_tokens` unless explicitly configured with `--reason-max-tokens`.
+
+The normal unit suite never calls the real phone. After configuration, the explicit live gate is:
+
+```bash
+npm run test:mlxhub-live
+```
+
+That live gate proves the same Execution Flow can execute first with Fixture inference and then with the MLXHub `fast` role without changing Runtime Core semantics.

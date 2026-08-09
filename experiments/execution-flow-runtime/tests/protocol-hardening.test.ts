@@ -69,7 +69,7 @@ test("Ajv enforces JSON Schema oneOf instead of silently ignoring it", async () 
           id: "judge",
           type: "inference",
           backend: "fixture",
-          profile: "standard",
+          role: "fast",
           instruction: "choose exactly one valid decision",
           input: {},
           output_schema: {

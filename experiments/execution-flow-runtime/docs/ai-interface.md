@@ -33,4 +33,7 @@ An AI caller must not embed MLXHub host/model details into an Execution Flow. Pr
 aap-execution-flow providers --json
 ```
 
-to discover whether `mlxhub` is registered. A Flow may then reference `backend: "mlxhub"` with `profile: "standard"` or `profile: "reasoning"` while keeping all transition logic in the Flow itself.
+to discover whether `mlxhub` is registered. A Flow may then reference `backend: "mlxhub"` with `role: "fast"` or `role: "reason"` while keeping all transition logic in the Flow itself.
+
+
+Operational rule: configure providers with `aap-execution-flow config ...`, start one managed service, then use `run`, `capabilities`, and `providers` as clients of that service. Automation must not spawn parallel Runtime instances.

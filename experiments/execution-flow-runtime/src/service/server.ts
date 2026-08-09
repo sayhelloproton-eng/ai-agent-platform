@@ -88,6 +88,14 @@ export async function createExecutionFlowServer({
         return;
       }
 
+      if (req.method === "GET" && url.pathname === "/v1/inference-backends") {
+        sendJson(res, 200, {
+          contract: "execution.inference-backends.v0",
+          inference_backends: runtime.inferenceBackends.list(),
+        });
+        return;
+      }
+
       if (req.method === "POST" && url.pathname === "/v1/executions") {
         const body = (await readJson(req)) as ExecutionRun;
         if (body.max_node_runs === undefined) {

@@ -13,7 +13,6 @@ import {
   RUNTIME_HOME,
   STATE_PATH,
   ensureRuntimeHome,
-  defaultConfig,
   loadConfig,
   readRuntimeLock,
   readState,
@@ -21,10 +20,9 @@ import {
   acquireRuntimeLock,
   releaseRuntimeLock,
   writeState,
+  writeConfig,
 } from "../service/config.js";
 import { createExecutionFlowServer } from "../service/server.js";
-import { createRuntimeEnvironment } from "../runtime/environment.js";
-import { runExecutionFlow } from "../runtime/run-flow.js";
 import { validateExecutionRun } from "../runtime/validate-flow.js";
 import type { ExecutionRun } from "../types.js";
 
@@ -62,6 +60,9 @@ function helpText(): string {
     "  aap-execution-flow restart",
     "  aap-execution-flow status",
     "  aap-execution-flow doctor",
+    "  aap-execution-flow config show [--json]",
+    "  aap-execution-flow config mlxhub set --base-url <url> --fast-model <id> --reason-model <id>",
+    "  aap-execution-flow config mlxhub clear",
     "  aap-execution-flow run --file <execution-run.json>",
     "  aap-execution-flow validate --file <execution-run.json>",
     "  aap-execution-flow docs <topic>",
@@ -95,6 +96,41 @@ function pidAlive(pid: number): boolean {
   } catch {
     return false;
   }
+}
+
+async function requireRunningState() {
+  const state = await readState();
+  if (!state) {
+    throw new Error("Execution Flow Runtime is not running. Start it with `aap-execution-flow start`.");
+  }
+  const health = await fetchHealth(state.host, state.port);
+  if (health?.instance_id !== state.instance_id) {
+    throw new Error("Execution Flow Runtime state exists but the managed service identity is not verified.");
+  }
+  return state;
+}
+
+async function requestManagedService(
+  pathname: string,
+  init?: RequestInit
+): Promise<{ status: number; body: unknown }> {
+  const state = await requireRunningState();
+  const response = await fetch(`http://${state.host}:${state.port}${pathname}`, {
+    ...init,
+    signal: init?.signal ?? AbortSignal.timeout(130_000),
+  });
+  const body = await response.json().catch(() => undefined);
+  return { status: response.status, body };
+}
+
+function positiveOption(args: string[], name: string): number | undefined {
+  const raw = option(args, name);
+  if (raw === undefined) return undefined;
+  const parsed = Number(raw);
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    throw new Error(`${name} must be a positive integer.`);
+  }
+  return parsed;
 }
 
 async function commandInstall(json: boolean): Promise<void> {
@@ -441,7 +477,7 @@ async function commandRestart(
 }
 
 async function commandDoctor(json: boolean): Promise<void> {
-  let config: unknown = null;
+  let config: Awaited<ReturnType<typeof loadConfig>> | null = null;
   let configError: string | null = null;
 
   try {
@@ -450,24 +486,14 @@ async function commandDoctor(json: boolean): Promise<void> {
     configError = error instanceof Error ? error.message : String(error);
   }
 
-  const mlxhub = {
-    base_url: Boolean(process.env.EXECUTION_FLOW_MLXHUB_BASE_URL),
-    standard_model: Boolean(
-      process.env.EXECUTION_FLOW_MLXHUB_STANDARD_MODEL
-    ),
-    reasoning_model: Boolean(
-      process.env.EXECUTION_FLOW_MLXHUB_REASONING_MODEL
-    ),
-  };
-
+  const mlxhub = config?.inference?.mlxhub;
   const checks = {
     node_major_20: Number(process.versions.node.split(".")[0]) === 20,
     runtime_home_exists: fsSync.existsSync(RUNTIME_HOME),
     config_valid: configError === null,
-    mlxhub_configured:
-      mlxhub.base_url &&
-      mlxhub.standard_model &&
-      mlxhub.reasoning_model,
+    mlxhub_configured: Boolean(
+      mlxhub?.base_url && mlxhub.roles.fast.model && mlxhub.roles.reason.model
+    ),
   };
 
   print(
@@ -476,9 +502,120 @@ async function commandDoctor(json: boolean): Promise<void> {
       checks,
       config,
       config_error: configError,
-      mlxhub,
+      inference: {
+        mlxhub: mlxhub
+          ? {
+              configured: true,
+              base_url: mlxhub.base_url,
+              roles: {
+                fast: { model: mlxhub.roles.fast.model },
+                reason: { model: mlxhub.roles.reason.model },
+              },
+            }
+          : { configured: false },
+      },
     },
     json
+  );
+}
+
+async function commandConfig(args: string[], json: boolean): Promise<void> {
+  const scope = args.find((arg) => !arg.startsWith("-")) ?? "show";
+
+  if (scope === "show") {
+    print(
+      {
+        ok: true,
+        runtime_home: RUNTIME_HOME,
+        config_path: CONFIG_PATH,
+        config: await ensureRuntimeHome(),
+      },
+      true || json
+    );
+    return;
+  }
+
+  if (scope !== "mlxhub") {
+    throw new Error(
+      "Usage: aap-execution-flow config [show | mlxhub set | mlxhub clear]"
+    );
+  }
+
+  const mlxhubIndex = args.indexOf("mlxhub");
+  const action = args.slice(mlxhubIndex + 1).find((arg) => !arg.startsWith("-"));
+  if (action === "clear") {
+    const config = await ensureRuntimeHome();
+    if (config.inference?.mlxhub) {
+      const next = structuredClone(config);
+      if (next.inference) {
+        delete next.inference.mlxhub;
+        if (Object.keys(next.inference).length === 0) delete next.inference;
+      }
+      await writeConfig(next);
+    }
+    print(
+      {
+        ok: true,
+        action: "mlxhub-config-cleared",
+        runtime_home: RUNTIME_HOME,
+        config: await loadConfig(),
+      },
+      true || json
+    );
+    return;
+  }
+
+  if (action !== "set") {
+    throw new Error(
+      "Usage: aap-execution-flow config mlxhub set --base-url <url> --fast-model <id> --reason-model <id> [--fast-max-tokens <n>] [--reason-max-tokens <n>] [--timeout-ms <n>]"
+    );
+  }
+
+  const baseUrl = option(args, "--base-url");
+  const fastModel = option(args, "--fast-model");
+  const reasonModel = option(args, "--reason-model");
+  if (!baseUrl || !fastModel || !reasonModel) {
+    throw new Error(
+      "--base-url, --fast-model and --reason-model are required."
+    );
+  }
+
+  const fastMaxTokens = positiveOption(args, "--fast-max-tokens");
+  const reasonMaxTokens = positiveOption(args, "--reason-max-tokens");
+  const timeoutMs = positiveOption(args, "--timeout-ms");
+  const config = await ensureRuntimeHome();
+  const next = structuredClone(config);
+  next.inference = {
+    ...(next.inference ?? {}),
+    mlxhub: {
+      base_url: baseUrl,
+      ...(timeoutMs !== undefined ? { timeout_ms: timeoutMs } : {}),
+      roles: {
+        fast: {
+          model: fastModel,
+          ...(fastMaxTokens !== undefined
+            ? { max_tokens: fastMaxTokens }
+            : { max_tokens: 1024 }),
+        },
+        reason: {
+          model: reasonModel,
+          ...(reasonMaxTokens !== undefined
+            ? { max_tokens: reasonMaxTokens }
+            : {}),
+        },
+      },
+    },
+  };
+
+  await writeConfig(next);
+  print(
+    {
+      ok: true,
+      action: "mlxhub-config-updated",
+      runtime_home: RUNTIME_HOME,
+      config: await loadConfig(),
+    },
+    true || json
   );
 }
 
@@ -490,16 +627,13 @@ async function readRunFile(args: string[]): Promise<ExecutionRun> {
 
 async function commandRun(args: string[], json: boolean): Promise<void> {
   const run = await readRunFile(args);
-  const config = await loadConfig().catch(() => defaultConfig());
-  const runtime = await createRuntimeEnvironment(config);
-
-  if (run.max_node_runs === undefined) {
-    run.max_node_runs = config.max_node_runs;
-  }
-
-  const result = await runExecutionFlow(run, runtime);
-  print(result, true || json);
-  if (result.status !== "completed") process.exitCode = 2;
+  const response = await requestManagedService("/v1/executions", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(run),
+  });
+  print(response.body, true || json);
+  if (response.status < 200 || response.status >= 300) process.exitCode = 2;
 }
 
 async function commandValidate(args: string[], json: boolean): Promise<void> {
@@ -518,27 +652,19 @@ async function commandValidate(args: string[], json: boolean): Promise<void> {
 }
 
 async function commandCapabilities(json: boolean): Promise<void> {
-  const config = await loadConfig().catch(() => defaultConfig());
-  const runtime = await createRuntimeEnvironment(config);
-  print(
-    {
-      contract: "execution.capabilities.v0",
-      capabilities: runtime.capabilities.list(),
-    },
-    true || json
-  );
+  const response = await requestManagedService("/v1/capabilities");
+  if (response.status !== 200) {
+    throw new Error(`Managed service returned HTTP ${response.status}.`);
+  }
+  print(response.body, true || json);
 }
 
 async function commandProviders(json: boolean): Promise<void> {
-  const config = await loadConfig().catch(() => defaultConfig());
-  const runtime = await createRuntimeEnvironment(config);
-  print(
-    {
-      contract: "execution.inference-backends.v0",
-      inference_backends: runtime.inferenceBackends.list(),
-    },
-    true || json
-  );
+  const response = await requestManagedService("/v1/inference-backends");
+  if (response.status !== 200) {
+    throw new Error(`Managed service returned HTTP ${response.status}.`);
+  }
+  print(response.body, true || json);
 }
 
 async function commandDocs(args: string[], json: boolean): Promise<void> {
@@ -610,6 +736,11 @@ export async function main(argv: string[]): Promise<void> {
 
     if (command === "doctor") {
       await commandDoctor(json);
+      return;
+    }
+
+    if (command === "config") {
+      await commandConfig(args, json);
       return;
     }
 

@@ -49,7 +49,7 @@ test("action -> inference -> switch -> return is flow-defined", async () => {
           id: "judge",
           type: "inference",
           backend: "fixture",
-          profile: "standard",
+          role: "fast",
           instruction: "classify health",
           input: { $ref: "steps.read.output" },
           output_schema: {
@@ -165,7 +165,7 @@ test("model output must match declared schema", async () => {
           id: "judge",
           type: "inference",
           backend: "fixture",
-          profile: "standard",
+          role: "fast",
           instruction: "choose route",
           input: {},
           output_schema: {

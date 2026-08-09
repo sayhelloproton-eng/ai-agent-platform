@@ -51,11 +51,13 @@ Bindings may appear recursively inside action arguments, inference input and ret
 An inference node declares:
 
 - backend
-- profile: `standard | reasoning`
+- role: `fast | reason`
 - instruction
 - input template
 - output schema
 - next node
+
+`fast` and `reason` are semantic execution roles, not a thinking-mode toggle. The provider decides which concrete model implements each role.
 
 The runtime validates model output against the declared JSON Schema 2020-12 document before the next node can use it.
 

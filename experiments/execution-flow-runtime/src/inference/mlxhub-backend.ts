@@ -8,13 +8,13 @@ import type {
 
 export interface MlxHubInferenceBackendOptions {
   baseUrl: string;
-  standardModel: string;
-  reasoningModel: string;
+  fastModel: string;
+  reasonModel: string;
   fetchImpl?: typeof fetch;
   timeoutMs?: number;
   apiKey?: string;
-  standardMaxTokens?: number;
-  reasoningMaxTokens?: number;
+  fastMaxTokens?: number;
+  reasonMaxTokens?: number;
 }
 
 function stripThinking(content: string): string {
@@ -25,7 +25,7 @@ function stripThinking(content: string): string {
   if (end < 0) {
     throw new ExecutionFlowError(
       "INFERENCE_THINK_UNCLOSED",
-      "Reasoning output contained an unclosed <think> block."
+      "Reason-role output contained an unclosed <think> block."
     );
   }
   return trimmed.slice(end + "</think>".length).trim();
@@ -56,9 +56,15 @@ function extractJson(text: string): unknown {
   );
 }
 
-function compileSystemPrompt(outputSchema: JsonSchema): string {
+function compileSystemPrompt(role: "fast" | "reason", outputSchema: JsonSchema): string {
+  const roleRule =
+    role === "fast"
+      ? "You are the FAST bounded judgement role: make a direct structured judgement from the supplied context; do not invent extra work."
+      : "You are the REASON bounded escalation role: resolve the supplied uncertainty, conflict or ambiguity and return only the final structured judgement.";
+
   return [
     "You are one bounded inference node inside an execution-flow runtime.",
+    roleRule,
     "You do not own the flow and you do not decide which tool exists.",
     "You do not execute commands or files directly.",
     "Use only the supplied instruction and input.",
@@ -83,39 +89,39 @@ export class MlxHubInferenceBackend implements InferenceBackend {
   #queue: Promise<void> = Promise.resolve();
 
   readonly baseUrl: string;
-  readonly standardModel: string;
-  readonly reasoningModel: string;
+  readonly fastModel: string;
+  readonly reasonModel: string;
   readonly fetchImpl: typeof fetch;
   readonly timeoutMs: number;
   readonly apiKey?: string;
-  readonly standardMaxTokens: number;
-  readonly reasoningMaxTokens?: number;
+  readonly fastMaxTokens: number;
+  readonly reasonMaxTokens?: number;
 
   constructor({
     baseUrl,
-    standardModel,
-    reasoningModel,
+    fastModel,
+    reasonModel,
     fetchImpl = fetch,
     timeoutMs = 120_000,
     apiKey,
-    standardMaxTokens = 1024,
-    reasoningMaxTokens,
+    fastMaxTokens = 1024,
+    reasonMaxTokens,
   }: MlxHubInferenceBackendOptions) {
-    if (!baseUrl || !standardModel || !reasoningModel) {
+    if (!baseUrl || !fastModel || !reasonModel) {
       throw new ExecutionFlowError(
         "INVALID_MLXHUB_CONFIG",
-        "baseUrl, standardModel and reasoningModel are required."
+        "baseUrl, fastModel and reasonModel are required."
       );
     }
 
     this.baseUrl = baseUrl.replace(/\/$/, "");
-    this.standardModel = standardModel;
-    this.reasoningModel = reasoningModel;
+    this.fastModel = fastModel;
+    this.reasonModel = reasonModel;
     this.fetchImpl = fetchImpl;
     this.timeoutMs = timeoutMs;
-    this.standardMaxTokens = standardMaxTokens;
-    if (reasoningMaxTokens !== undefined) {
-      this.reasoningMaxTokens = reasoningMaxTokens;
+    this.fastMaxTokens = fastMaxTokens;
+    if (reasonMaxTokens !== undefined) {
+      this.reasonMaxTokens = reasonMaxTokens;
     }
     if (apiKey) this.apiKey = apiKey;
   }
@@ -128,9 +134,9 @@ export class MlxHubInferenceBackend implements InferenceBackend {
 
   async #inferOnce(request: InferenceRequest): Promise<InferenceResponse> {
     const model =
-      request.profile === "reasoning"
-        ? this.reasoningModel
-        : this.standardModel;
+      request.role === "reason"
+        ? this.reasonModel
+        : this.fastModel;
 
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), this.timeoutMs);
@@ -140,12 +146,12 @@ export class MlxHubInferenceBackend implements InferenceBackend {
       const requestBody: Record<string, unknown> = {
         model,
         stream: false,
-        temperature: request.profile === "reasoning" ? 0.2 : 0.4,
+        temperature: request.role === "reason" ? 0.2 : 0.4,
         top_p: 0.8,
         messages: [
           {
             role: "system",
-            content: compileSystemPrompt(request.output_schema),
+            content: compileSystemPrompt(request.role, request.output_schema),
           },
           {
             role: "user",
@@ -157,12 +163,12 @@ export class MlxHubInferenceBackend implements InferenceBackend {
         ],
       };
 
-      if (request.profile === "reasoning") {
-        if (this.reasoningMaxTokens !== undefined) {
-          requestBody.max_tokens = this.reasoningMaxTokens;
+      if (request.role === "reason") {
+        if (this.reasonMaxTokens !== undefined) {
+          requestBody.max_tokens = this.reasonMaxTokens;
         }
       } else {
-        requestBody.max_tokens = this.standardMaxTokens;
+        requestBody.max_tokens = this.fastMaxTokens;
       }
 
       const response = await this.fetchImpl(
@@ -200,7 +206,7 @@ export class MlxHubInferenceBackend implements InferenceBackend {
             provider_code: providerCode,
             http_status: response.status,
             model,
-            profile: request.profile,
+            role: request.role,
             retryable:
               response.status === 429 ||
               response.status >= 500 ||
@@ -222,7 +228,7 @@ export class MlxHubInferenceBackend implements InferenceBackend {
         output: extractJson(content),
         metadata: {
           provider: "mlxhub",
-          profile: request.profile,
+          role: request.role,
           model,
           latency_ms: Date.now() - started,
         },
@@ -235,7 +241,7 @@ export class MlxHubInferenceBackend implements InferenceBackend {
           {
             provider: "mlxhub",
             model,
-            profile: request.profile,
+            role: request.role,
             timeout_ms: this.timeoutMs,
             retryable: true,
           }
@@ -250,7 +256,7 @@ export class MlxHubInferenceBackend implements InferenceBackend {
         {
           provider: "mlxhub",
           model,
-          profile: request.profile,
+          role: request.role,
           retryable: true,
         }
       );

@@ -70,3 +70,13 @@ All lifecycle commands support `--json`. In particular, `restart --json` returns
 ```
 
 Use `EXECUTION_FLOW_RUNTIME_HOME` to isolate a managed service instance during tests.
+
+## Runtime-owned provider config
+
+```bash
+aap-execution-flow config show --json
+aap-execution-flow config mlxhub set --base-url http://192.168.0.104:8080/ --fast-model sayhelloproton/Qwen3.5-4B-MLX-4bit-no-think --reason-model mlx-community/Qwen3.5-4B-MLX-4bit --json
+aap-execution-flow config mlxhub clear --json
+```
+
+The provider/model mapping is persisted in Runtime Home config. `run`, `capabilities`, and `providers` communicate with the single managed service and do not instantiate a second Runtime.

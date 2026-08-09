@@ -42,9 +42,9 @@ Default CLI/service startup does not register the Fixture backend. Real provider
 
 ## EF-2 inference-provider boundary
 
-MLXHub configuration belongs to the provider/runtime environment, not to `execution.run.v0` or `execution.flow.v0`. Flow authors select only the registered backend name and the generic profile (`standard` or `reasoning`).
+MLXHub configuration belongs to Runtime-owned persisted config, not to `execution.run.v0` or `execution.flow.v0`. Flow authors select only the registered backend name and the semantic inference role (`fast` or `reason`). `fast` and `reason` are different bounded responsibilities, not two settings for one generic task.
 
-The MLXHub backend serializes all inference requests for one backend instance. This enforces a single active inference operation even when callers concurrently request `standard` and `reasoning` profiles.
+The MLXHub backend serializes all inference requests for one backend instance. This enforces a single active inference operation even when callers concurrently request `fast` and `reason` roles.
 
 Provider failures are normalized for Runtime callers while retaining the provider-specific code in error details:
 
@@ -56,3 +56,9 @@ Provider failures are normalized for Runtime callers while retaining the provide
 - `INFERENCE_INVALID_JSON` / `INFERENCE_EMPTY_RESPONSE` / `INFERENCE_THINK_UNCLOSED` — invalid provider output.
 
 These errors are execution-runtime failures, not Task-domain states.
+
+## Single managed service usage
+
+Normal CLI execution is service-oriented: `run`, `capabilities` and `providers` talk to the verified managed service. They do not create a second in-process Runtime. Programmatic library APIs remain available for embedding/tests, but the CLI operational model is one managed service per Runtime Home.
+
+Provider configuration is persisted through `aap-execution-flow config ...`; provider/model mapping is not expected to be re-exported in the terminal for every command. Fixed host commands remain Runtime-owned `command_ref` definitions and are never model-generated shell strings.

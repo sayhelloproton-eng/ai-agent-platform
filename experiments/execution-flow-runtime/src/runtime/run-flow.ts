@@ -109,7 +109,7 @@ export async function runExecutionFlow(
       } else if (node.type === "inference") {
         const input = resolveBinding(node.input, context);
         const inferred = await inferenceBackends.infer(node.backend, {
-          profile: node.profile,
+          role: node.role,
           instruction: node.instruction,
           input,
           output_schema: structuredClone(node.output_schema),
@@ -131,7 +131,7 @@ export async function runExecutionFlow(
           type: "inference-result",
           node_id: node.id,
           backend: node.backend,
-          profile: node.profile,
+          role: node.role,
           output: structuredClone(output),
           metadata: structuredClone(metadata),
         });

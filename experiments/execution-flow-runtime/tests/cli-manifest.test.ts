@@ -15,6 +15,7 @@ test("CLI publishes an AI-readable command manifest", () => {
     "stop",
     "status",
     "doctor",
+    "config",
     "run",
     "validate",
     "docs",

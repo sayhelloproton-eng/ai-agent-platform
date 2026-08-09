@@ -18,7 +18,7 @@
         "id": "judge",
         "type": "inference",
         "backend": "mlxhub",
-        "profile": "standard",
+        "role": "fast",
         "instruction": "Classify whether the supplied runtime status is healthy. Return only the declared JSON structure.",
         "input": { "status": { "$ref": "steps.read-status.output.json" } },
         "output_schema": {
@@ -47,7 +47,7 @@
         "id": "reason",
         "type": "inference",
         "backend": "mlxhub",
-        "profile": "reasoning",
+        "role": "reason",
         "instruction": "Resolve the explicit uncertainty using only the supplied status and first assessment. Return only the declared JSON structure.",
         "input": {
           "status": { "$ref": "steps.read-status.output.json" },

@@ -2,7 +2,13 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { ExecutionFlowError } from "../runtime/errors.js";
-import type { RuntimeConfig, RuntimeLock, RuntimeState } from "../types.js";
+import type {
+  RuntimeConfig,
+  RuntimeInferenceRoleConfig,
+  RuntimeLock,
+  RuntimeMlxHubConfig,
+  RuntimeState,
+} from "../types.js";
 
 export const RUNTIME_HOME =
   process.env.EXECUTION_FLOW_RUNTIME_HOME ??
@@ -22,6 +28,96 @@ export function defaultConfig(cwd = process.cwd()): RuntimeConfig {
   };
 }
 
+function positiveInt(value: unknown, field: string): number | undefined {
+  if (value === undefined) return undefined;
+  if (!Number.isInteger(value) || (value as number) <= 0) {
+    throw new Error(`${field} must be a positive integer when provided.`);
+  }
+  return value as number;
+}
+
+function parseRoleConfig(value: unknown, field: string): RuntimeInferenceRoleConfig {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error(`${field} must be an object.`);
+  }
+  const object = value as Record<string, unknown>;
+  if (typeof object.model !== "string" || object.model.length === 0) {
+    throw new Error(`${field}.model must be a non-empty string.`);
+  }
+  const maxTokens = positiveInt(object.max_tokens, `${field}.max_tokens`);
+  return {
+    model: object.model,
+    ...(maxTokens !== undefined ? { max_tokens: maxTokens } : {}),
+  };
+}
+
+function parseMlxHubConfig(value: unknown): RuntimeMlxHubConfig {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error("inference.mlxhub must be an object.");
+  }
+  const object = value as Record<string, unknown>;
+  if (typeof object.base_url !== "string" || object.base_url.length === 0) {
+    throw new Error("inference.mlxhub.base_url must be a non-empty string.");
+  }
+  const roles = object.roles;
+  if (!roles || typeof roles !== "object" || Array.isArray(roles)) {
+    throw new Error("inference.mlxhub.roles must be an object.");
+  }
+  const roleObject = roles as Record<string, unknown>;
+  const timeoutMs = positiveInt(object.timeout_ms, "inference.mlxhub.timeout_ms");
+  return {
+    base_url: object.base_url.replace(/\/$/, ""),
+    ...(timeoutMs !== undefined ? { timeout_ms: timeoutMs } : {}),
+    roles: {
+      fast: parseRoleConfig(roleObject.fast, "inference.mlxhub.roles.fast"),
+      reason: parseRoleConfig(roleObject.reason, "inference.mlxhub.roles.reason"),
+    },
+  };
+}
+
+export function normalizeRuntimeConfig(value: unknown): RuntimeConfig {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error("Runtime config must be an object.");
+  }
+  const parsed = value as Record<string, unknown>;
+
+  if (
+    typeof parsed.host !== "string" ||
+    !Number.isInteger(parsed.port) ||
+    typeof parsed.workspace_root !== "string" ||
+    !Number.isInteger(parsed.max_node_runs)
+  ) {
+    throw new Error(`Invalid runtime config: ${CONFIG_PATH}`);
+  }
+
+  const config: RuntimeConfig = {
+    host: parsed.host,
+    port: parsed.port as number,
+    workspace_root: parsed.workspace_root,
+    max_node_runs: parsed.max_node_runs as number,
+  };
+
+  if (parsed.inference !== undefined) {
+    if (!parsed.inference || typeof parsed.inference !== "object" || Array.isArray(parsed.inference)) {
+      throw new Error("inference must be an object when provided.");
+    }
+    const inference = parsed.inference as Record<string, unknown>;
+    if (inference.mlxhub !== undefined) {
+      config.inference = { mlxhub: parseMlxHubConfig(inference.mlxhub) };
+    }
+  }
+
+  return config;
+}
+
+export async function writeConfig(config: RuntimeConfig): Promise<void> {
+  const normalized = normalizeRuntimeConfig(config);
+  await fs.mkdir(RUNTIME_HOME, { recursive: true });
+  const temp = `${CONFIG_PATH}.${process.pid}.tmp`;
+  await fs.writeFile(temp, JSON.stringify(normalized, null, 2) + "\n", "utf8");
+  await fs.rename(temp, CONFIG_PATH);
+}
+
 export async function ensureRuntimeHome(cwd = process.cwd()): Promise<RuntimeConfig> {
   await fs.mkdir(RUNTIME_HOME, { recursive: true });
 
@@ -38,18 +134,7 @@ export async function ensureRuntimeHome(cwd = process.cwd()): Promise<RuntimeCon
 
 export async function loadConfig(): Promise<RuntimeConfig> {
   const content = await fs.readFile(CONFIG_PATH, "utf8");
-  const parsed = JSON.parse(content) as Partial<RuntimeConfig>;
-
-  if (
-    typeof parsed.host !== "string" ||
-    !Number.isInteger(parsed.port) ||
-    typeof parsed.workspace_root !== "string" ||
-    !Number.isInteger(parsed.max_node_runs)
-  ) {
-    throw new Error(`Invalid runtime config: ${CONFIG_PATH}`);
-  }
-
-  return parsed as RuntimeConfig;
+  return normalizeRuntimeConfig(JSON.parse(content));
 }
 
 export async function readState(): Promise<RuntimeState | undefined> {

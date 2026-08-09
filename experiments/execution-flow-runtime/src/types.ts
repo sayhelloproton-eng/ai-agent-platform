@@ -15,7 +15,12 @@ export type TemplateValue =
   | TemplateValue[]
   | { [key: string]: TemplateValue };
 
-export type ExecutionProfile = "standard" | "reasoning";
+/**
+ * Execution-level inference role, independent from any concrete model/provider.
+ * `fast` is the default high-frequency bounded judgement role.
+ * `reason` is the explicit low-frequency escalation role for conflict/ambiguity.
+ */
+export type InferenceRole = "fast" | "reason";
 
 export interface ExecutionAuthorization {
   allowed_capabilities: string[];
@@ -56,7 +61,7 @@ export interface ActionNode extends BaseNode {
 export interface InferenceNode extends BaseNode {
   type: "inference";
   backend: string;
-  profile: ExecutionProfile;
+  role: InferenceRole;
   instruction: string;
   input: TemplateValue;
   output_schema: JsonSchema;
@@ -89,7 +94,7 @@ export interface ExecutionEvidence {
   node_id: string;
   capability?: string;
   backend?: string;
-  profile?: ExecutionProfile;
+  role?: InferenceRole;
   output: unknown;
   metadata?: Record<string, unknown>;
 }
@@ -132,7 +137,7 @@ export type CapabilityHandler = (
 ) => Promise<unknown>;
 
 export interface InferenceRequest {
-  profile: ExecutionProfile;
+  role: InferenceRole;
   instruction: string;
   input: unknown;
   output_schema: JsonSchema;
@@ -157,11 +162,30 @@ export interface FixedCommandDefinition {
   env?: NodeJS.ProcessEnv;
 }
 
+export interface RuntimeInferenceRoleConfig {
+  model: string;
+  max_tokens?: number;
+}
+
+export interface RuntimeMlxHubConfig {
+  base_url: string;
+  timeout_ms?: number;
+  roles: {
+    fast: RuntimeInferenceRoleConfig;
+    reason: RuntimeInferenceRoleConfig;
+  };
+}
+
+export interface RuntimeInferenceConfig {
+  mlxhub?: RuntimeMlxHubConfig;
+}
+
 export interface RuntimeConfig {
   host: string;
   port: number;
   workspace_root: string;
   max_node_runs: number;
+  inference?: RuntimeInferenceConfig;
 }
 
 export interface RuntimeState {

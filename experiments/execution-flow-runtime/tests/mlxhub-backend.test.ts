@@ -5,7 +5,7 @@ import { ExecutionFlowError } from "../src/runtime/errors.js";
 import type { InferenceRequest } from "../src/types.js";
 
 const baseRequest: InferenceRequest = {
-  profile: "standard",
+  role: "fast",
   instruction: "classify runtime health",
   input: { status: "healthy" },
   output_schema: {
@@ -28,12 +28,12 @@ function jsonResponse(body: unknown, status = 200): Response {
   });
 }
 
-test("MLXHub standard profile uses standard model and bounded default output budget", async () => {
+test("MLXHub FAST role uses fast model and bounded default output budget", async () => {
   let captured: any;
   const backend = new MlxHubInferenceBackend({
     baseUrl: "http://mlxhub.local:8080/",
-    standardModel: "fast-model",
-    reasoningModel: "reason-model",
+    fastModel: "fast-model",
+    reasonModel: "reason-model",
     fetchImpl: async (_input, init) => {
       captured = JSON.parse(String(init?.body));
       return jsonResponse({
@@ -48,16 +48,16 @@ test("MLXHub standard profile uses standard model and bounded default output bud
   assert.equal(captured.max_tokens, 1024);
   assert.equal(captured.temperature, 0.4);
   assert.equal(result.metadata?.provider, "mlxhub");
-  assert.equal(result.metadata?.profile, "standard");
+  assert.equal(result.metadata?.role, "fast");
   assert.equal(result.metadata?.model, "fast-model");
 });
 
-test("MLXHub reasoning profile strips closed thinking and does not freeze a default max_tokens", async () => {
+test("MLXHub REASON role strips closed thinking and does not freeze a default max_tokens", async () => {
   let captured: any;
   const backend = new MlxHubInferenceBackend({
     baseUrl: "http://mlxhub.local:8080",
-    standardModel: "fast-model",
-    reasoningModel: "reason-model",
+    fastModel: "fast-model",
+    reasonModel: "reason-model",
     fetchImpl: async (_input, init) => {
       captured = JSON.parse(String(init?.body));
       return jsonResponse({
@@ -72,20 +72,20 @@ test("MLXHub reasoning profile strips closed thinking and does not freeze a defa
     },
   });
 
-  const result = await backend.infer({ ...baseRequest, profile: "reasoning" });
+  const result = await backend.infer({ ...baseRequest, role: "reason" });
   assert.deepEqual(result.output, { status: "healthy" });
   assert.equal(captured.model, "reason-model");
   assert.equal(captured.temperature, 0.2);
   assert.equal(Object.prototype.hasOwnProperty.call(captured, "max_tokens"), false);
 });
 
-test("MLXHub reasoning max_tokens remains explicitly configurable", async () => {
+test("MLXHub reason max_tokens remains explicitly configurable", async () => {
   let captured: any;
   const backend = new MlxHubInferenceBackend({
     baseUrl: "http://mlxhub.local:8080",
-    standardModel: "fast-model",
-    reasoningModel: "reason-model",
-    reasoningMaxTokens: 4096,
+    fastModel: "fast-model",
+    reasonModel: "reason-model",
+    reasonMaxTokens: 4096,
     fetchImpl: async (_input, init) => {
       captured = JSON.parse(String(init?.body));
       return jsonResponse({
@@ -94,15 +94,15 @@ test("MLXHub reasoning max_tokens remains explicitly configurable", async () => 
     },
   });
 
-  await backend.infer({ ...baseRequest, profile: "reasoning" });
+  await backend.infer({ ...baseRequest, role: "reason" });
   assert.equal(captured.max_tokens, 4096);
 });
 
 test("MLXHub provider maps server_paused to unavailable with provider details", async () => {
   const backend = new MlxHubInferenceBackend({
     baseUrl: "http://mlxhub.local:8080",
-    standardModel: "fast-model",
-    reasoningModel: "reason-model",
+    fastModel: "fast-model",
+    reasonModel: "reason-model",
     fetchImpl: async () =>
       jsonResponse(
         { error: { code: "server_paused", message: "server paused" } },
@@ -120,7 +120,7 @@ test("MLXHub provider maps server_paused to unavailable with provider details", 
         provider_code: "server_paused",
         http_status: 503,
         model: "fast-model",
-        profile: "standard",
+        role: "fast",
         retryable: true,
       });
       return true;
@@ -131,8 +131,8 @@ test("MLXHub provider maps server_paused to unavailable with provider details", 
 test("MLXHub provider maps model_busy/429 to busy", async () => {
   const backend = new MlxHubInferenceBackend({
     baseUrl: "http://mlxhub.local:8080",
-    standardModel: "fast-model",
-    reasoningModel: "reason-model",
+    fastModel: "fast-model",
+    reasonModel: "reason-model",
     fetchImpl: async () =>
       jsonResponse(
         { error: { code: "model_busy", message: "busy" } },
@@ -155,8 +155,8 @@ test("MLXHub provider maps model_busy/429 to busy", async () => {
 test("MLXHub provider maps transport failures to unreachable", async () => {
   const backend = new MlxHubInferenceBackend({
     baseUrl: "http://mlxhub.local:8080",
-    standardModel: "fast-model",
-    reasoningModel: "reason-model",
+    fastModel: "fast-model",
+    reasonModel: "reason-model",
     fetchImpl: async () => {
       throw new TypeError("fetch failed");
     },
@@ -176,8 +176,8 @@ test("MLXHub provider maps transport failures to unreachable", async () => {
 test("MLXHub provider rejects invalid JSON and unclosed thinking", async () => {
   const invalidJson = new MlxHubInferenceBackend({
     baseUrl: "http://mlxhub.local:8080",
-    standardModel: "fast-model",
-    reasoningModel: "reason-model",
+    fastModel: "fast-model",
+    reasonModel: "reason-model",
     fetchImpl: async () =>
       jsonResponse({ choices: [{ message: { content: "not-json" } }] }),
   });
@@ -191,8 +191,8 @@ test("MLXHub provider rejects invalid JSON and unclosed thinking", async () => {
 
   const unclosedThink = new MlxHubInferenceBackend({
     baseUrl: "http://mlxhub.local:8080",
-    standardModel: "fast-model",
-    reasoningModel: "reason-model",
+    fastModel: "fast-model",
+    reasonModel: "reason-model",
     fetchImpl: async () =>
       jsonResponse({
         choices: [{ message: { content: "<think>still thinking" } }],
@@ -200,22 +200,22 @@ test("MLXHub provider rejects invalid JSON and unclosed thinking", async () => {
   });
 
   await assert.rejects(
-    () => unclosedThink.infer({ ...baseRequest, profile: "reasoning" }),
+    () => unclosedThink.infer({ ...baseRequest, role: "reason" }),
     (error: unknown) =>
       error instanceof ExecutionFlowError &&
       error.code === "INFERENCE_THINK_UNCLOSED"
   );
 });
 
-test("MLXHub backend serializes concurrent standard/reasoning requests", async () => {
+test("MLXHub backend serializes concurrent FAST/REASON role requests", async () => {
   let active = 0;
   let maxActive = 0;
   const order: string[] = [];
 
   const backend = new MlxHubInferenceBackend({
     baseUrl: "http://mlxhub.local:8080",
-    standardModel: "fast-model",
-    reasoningModel: "reason-model",
+    fastModel: "fast-model",
+    reasonModel: "reason-model",
     fetchImpl: async (_input, init) => {
       const body = JSON.parse(String(init?.body));
       active += 1;
@@ -232,7 +232,7 @@ test("MLXHub backend serializes concurrent standard/reasoning requests", async (
 
   await Promise.all([
     backend.infer(baseRequest),
-    backend.infer({ ...baseRequest, profile: "reasoning" }),
+    backend.infer({ ...baseRequest, role: "reason" }),
   ]);
 
   assert.equal(maxActive, 1);

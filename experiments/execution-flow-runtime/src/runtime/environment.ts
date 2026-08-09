@@ -6,21 +6,13 @@ import { InferenceBackendRegistry } from "../inference/registry.js";
 import { MlxHubInferenceBackend } from "../inference/mlxhub-backend.js";
 import type { RuntimeConfig } from "../types.js";
 
-
-function positiveInt(value: string | undefined): number | undefined {
-  if (!value) return undefined;
-  const parsed = Number(value);
-  return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
-}
-
 export interface RuntimeEnvironment {
   capabilities: CapabilityRegistry;
   inferenceBackends: InferenceBackendRegistry;
 }
 
 export async function createRuntimeEnvironment(
-  config: RuntimeConfig,
-  env: NodeJS.ProcessEnv = process.env
+  config: RuntimeConfig
 ): Promise<RuntimeEnvironment> {
   const capabilities = new CapabilityRegistry();
 
@@ -42,34 +34,23 @@ export async function createRuntimeEnvironment(
   capabilities.register(fixedCommand.descriptor, fixedCommand.handler);
 
   const inferenceBackends = new InferenceBackendRegistry();
+  const mlxhub = config.inference?.mlxhub;
 
-  const baseUrl = env.EXECUTION_FLOW_MLXHUB_BASE_URL;
-  const standardModel = env.EXECUTION_FLOW_MLXHUB_STANDARD_MODEL;
-  const reasoningModel = env.EXECUTION_FLOW_MLXHUB_REASONING_MODEL;
-
-  if (baseUrl && standardModel && reasoningModel) {
+  if (mlxhub) {
     inferenceBackends.register(
       "mlxhub",
       new MlxHubInferenceBackend({
-        baseUrl,
-        standardModel,
-        reasoningModel,
-        ...(env.EXECUTION_FLOW_MLXHUB_API_KEY
-          ? { apiKey: env.EXECUTION_FLOW_MLXHUB_API_KEY }
+        baseUrl: mlxhub.base_url,
+        fastModel: mlxhub.roles.fast.model,
+        reasonModel: mlxhub.roles.reason.model,
+        ...(mlxhub.timeout_ms !== undefined
+          ? { timeoutMs: mlxhub.timeout_ms }
           : {}),
-        ...(positiveInt(env.EXECUTION_FLOW_MLXHUB_STANDARD_MAX_TOKENS)
-          ? {
-              standardMaxTokens: positiveInt(
-                env.EXECUTION_FLOW_MLXHUB_STANDARD_MAX_TOKENS
-              )!,
-            }
+        ...(mlxhub.roles.fast.max_tokens !== undefined
+          ? { fastMaxTokens: mlxhub.roles.fast.max_tokens }
           : {}),
-        ...(positiveInt(env.EXECUTION_FLOW_MLXHUB_REASONING_MAX_TOKENS)
-          ? {
-              reasoningMaxTokens: positiveInt(
-                env.EXECUTION_FLOW_MLXHUB_REASONING_MAX_TOKENS
-              )!,
-            }
+        ...(mlxhub.roles.reason.max_tokens !== undefined
+          ? { reasonMaxTokens: mlxhub.roles.reason.max_tokens }
           : {}),
       })
     );

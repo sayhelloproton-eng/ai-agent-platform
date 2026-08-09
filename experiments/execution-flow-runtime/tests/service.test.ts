@@ -117,7 +117,7 @@ test("HTTP service executes a fixture inference flow without giving the model tr
   const inferenceBackends = new InferenceBackendRegistry().register(
     "fixture",
     new FixtureInferenceBackend((request) => {
-      assert.equal(request.profile, "standard");
+      assert.equal(request.role, "fast");
       assert.equal(request.instruction, "classify runtime health");
       assert.deepEqual(request.input, { status: "healthy" });
       return {
@@ -162,7 +162,7 @@ test("HTTP service executes a fixture inference flow without giving the model tr
               id: "judge",
               type: "inference",
               backend: "fixture",
-              profile: "standard",
+              role: "fast",
               instruction: "classify runtime health",
               input: {
                 status: { $ref: "steps.read.output.status" },
@@ -236,7 +236,7 @@ test("HTTP service executes a fixture inference flow without giving the model tr
         ["capability-result", "inference-result"]
       );
       assert.equal(result.evidence[1].backend, "fixture");
-      assert.equal(result.evidence[1].profile, "standard");
+      assert.equal(result.evidence[1].role, "fast");
     }
   );
 });
