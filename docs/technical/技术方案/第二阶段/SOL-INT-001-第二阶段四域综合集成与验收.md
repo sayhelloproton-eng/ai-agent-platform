@@ -3,15 +3,79 @@
 | 字段 | 值 |
 |---|---|
 | 方案 ID | `SOL-INT-001` |
-| 状态 | Implemented / Automated E2E Passed / Manual Chrome Acceptance Pending |
+| 状态 | Implemented / Automated E2E Passed / Level 2 Real Chrome PASS / Level 3 Closeout Review |
 | 公共合同版本 | `1.0.0` |
-| 实现基线 | `main@f3ecb0632e42a82f9b67246acf0d02569f2ff422` 的累计增量 |
+| 最近已确认收口基线 | `main@c2bded0fbe9b6c6bf5940d890b1e90a4588929e9`；Codex 必须以实际当前 HEAD 复核 |
 | 涉及领域 | CTL、TSK、LCL、BHR、Approval / Integration Store |
 | Git-only | 是，不进入 `docs/knowledge/**`，不触发飞书发布 |
 
 ## 一、目标
 
 本文冻结第二阶段四个核心 MVP 的公共语义、生产 Adapter、自动化端到端门禁与人工验收边界。四个领域继续拥有各自内部模型；综合层只提供版本化合同、路由、引用保存和运行时接线。
+
+## 2026-08-09 真实 Chrome 收口证据
+
+### A. Level 2 已正式 PASS
+
+真实 Task：`phase2-l2-real-20260808-0040-02`。最终 `Task / Plan = COMPLETED`，Local 与 Browser Observe 节点均完成；成功 Browser Dispatch 已出现 Delivery 与 Host Result，并最终形成 `TASK_COMPLETED`。因此 Level 2 只读链不再重复验收。
+
+关键引用：
+
+```text
+Local Result Ref   = local-result:ce8699e2c6fc4ca41503f87148543a29
+Browser Result Ref = browser-host-result:host-result-615b8b35-d63e-48d5-a6ee-143663693205
+Browser WorkItem   = work-9c5b1f5d-1d25-4cfd-9218-ff99cfb0feaf
+Browser Dispatch   = dispatch-ac1815d0-05ce-4606-8144-6e00b0e68400
+```
+
+### B. 旧 Level 3 Task 封存
+
+旧 Task：`phase2-l3-real-20260809-0934-01`。该 Task 已跨越多轮代码版本和多个失败 Attempt，不再用于 Happy Path。
+
+最重要的 attempt-04：
+
+```text
+WorkItem    = work-69adb240-7577-4400-b37e-b49e323fbf0b
+Dispatch    = dispatch-1d23bf1d-de3c-4cac-aba2-cd0362202b77
+approvalRef = approval:phase2-l3-real-20260809-0934-01:browser-submit:attempt-04
+```
+
+Browser Host Journal 权威历史：
+
+```text
+RECEIVED
+→ CLAIMED
+→ APPROVAL_PENDING
+→ 多次 lease reclaim / APPROVAL_PENDING
+→ PREPARED
+→ EXECUTING
+→ UNCERTAIN
+→ REPORTED
+```
+
+最终：
+
+```text
+status     = UNCERTAIN
+error.code = USER_CONTROL_ACTIVE
+```
+
+Draft 到最终 Observation 的 `binding_id / gpt_ref / conversation_ref / page_fingerprint / action_fingerprint / page_precondition_hash` 保持一致，因此该 Attempt 不应再归因为 durable approval identity 漂移。用户未观察到目标消息出现在 Controller Conversation。
+
+### C. attempt-05 没有创建
+
+旧 Task 上的下一次创建尝试在 `submitControllerCommand` 被 `CONTROLLER_COMMAND_NOT_ALLOWED / Current Plan Node is not executable` 拒绝；没有新 `command_id / WorkItem / Dispatch / createdRefs`。随后 `c2bded0` 修复公开 Decision Context 中 inadmissible `REQUEST_ROLE_WORK / REQUEST_APPROVAL` 的投影矛盾。
+
+### D. 当前收口停止条件
+
+- 旧 Level 3 Task 不再 retry、不再创建新 Dispatch；
+- 暂停真实 Browser 测试，先由 Codex 对当前 HEAD 完成集中代码审计；
+- 历史 ChatGPT 生成但未落库的 Overlay 不视为既定修复；
+- 如果代码审计判断已具备条件，只执行一次**全新 Task、无诊断干扰**的 Level 3 Happy Path；
+- 该干净 Happy Path 失败后停止现场 attempt 循环；
+- Level 4 / resilience 是否进入 Phase 2.1，由收口评估裁决。
+
+完整时间线见 [PHASE2-MVP-CLOSEOUT-HANDOFF-20260809](./PHASE2-MVP-CLOSEOUT-HANDOFF-20260809.md)。
 
 ## 二、正式运行链路
 

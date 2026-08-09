@@ -1,6 +1,21 @@
 # 第二阶段技术方案
 
-## 2026-08-06 综合实现基线（当前有效）
+## 2026-08-09 MVP 串联收口检查点（当前有效）
+
+- 最近一次已确认代码基线：`main@c2bded0fbe9b6c6bf5940d890b1e90a4588929e9`，`HEAD == origin/main`，`0/0`，worktree clean。Codex 接管时必须先读取实际 HEAD；若已更新，以实际 HEAD 为代码真源。
+- Level 2 真实四域只读链：**PASS / Task COMPLETED**，不再重复测试。
+- Level 3 写链：已真实验证 Browser Dispatch、Approval Draft、人工批准、one-time Grant、same-command Resume，并在旧 Task 的 attempt-04 进入 `EXECUTING` 后记录 `UNCERTAIN / USER_CONTROL_ACTIVE`。
+- 旧 Level 3 Task `phase2-l3-real-20260809-0934-01`：**封存，不再 retry / 不再追加 attempt**；其历史只作为 Browser ownership、UNCERTAIN、lease/recovery 与 no-blind-retry 证据。
+- 最近已落库关键 hardening：`e9fb952` Platform Wake/Human Approval 分流、`d8cd8b2` Approval precondition 稳定、`b99f49e` busy Resume defer、`ca6bda0` user-control execution gate、`c2bded0` Controller admissible-command filtering。
+- 曾生成但未被确认落库的 `action-confirmation-user-activity-fix` 仅是历史提案；Codex 必须从当前源码独立判断是否真实需要，禁止机械应用。
+- 当前工作方式：**先由新 ChatGPT + Codex 集中评估，暂停真实 Browser 测试；若结论为可继续，只执行一次全新、干净、无诊断干扰的 Level 3 Happy Path。**
+- MVP 与后续 Browser Protocol Hardening 的最终边界尚待收口评估；不得把 Level 4 全量 resilience 默认扩大为 MVP blocker。
+
+详细交接：
+
+- [PHASE2-MVP-CLOSEOUT-HANDOFF-20260809](./PHASE2-MVP-CLOSEOUT-HANDOFF-20260809.md)
+
+### 2026-08-06 自动化综合实现基线（历史参考）
 
 - 实现基线：`main@f3ecb0632e42a82f9b67246acf0d02569f2ff422` 的 Gate 0 包继续增量修复。
 - 公共合同：`packages/contracts/src/phase2-integration.ts`，版本 `1.0.0`。
@@ -8,8 +23,6 @@
 - 正式执行：Action Gateway 内置 TSK → LCL Worker；Browser Host 通过 Gateway Server Adapter 使用 Claim、Delivery Receipt、Report Token 三阶段凭证。
 - 数据边界：Task Store 只保存协调状态与引用；Payload、Approval Grant、Local Result 和 Evidence 由 Phase 2 Integration Store 保存。
 - 自动化验收：真实 HTTP Gateway + 正式 CTL/TSK + 真实 Local Control Capability + BHR HTTP Client 的四域 E2E 已纳入统一门禁。
-- 人工验收边界：真实 Chrome 扩展加载、ChatGPT 页面绑定和页面动作仍需在用户本机完成，不以 Fixture 冒充。
-- 当前阶段：Gate 0、公共合同、综合 Adapter 和包内自动化统一回归均已通过；只剩在完整 Node 20 仓库执行根门禁，以及用户本机真实 Chrome 页面验收。
 
 新增综合方案：
 

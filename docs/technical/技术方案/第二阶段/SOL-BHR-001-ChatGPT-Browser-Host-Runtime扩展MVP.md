@@ -1,10 +1,10 @@
 # SOL-BHR-001｜ChatGPT Browser Host Runtime 扩展 MVP 技术方案
 
-## 2026-08-06 实现状态（当前有效）
+## 2026-08-09 实现与真实页面收口状态（当前有效）
 
 | 项目 | 当前结论 |
 |---|---|
-| 状态 | **Implemented / Integrated；真实页面待本机验收** |
+| 状态 | **Implemented / Integrated；真实 OBSERVE 已 PASS；写路径进入收口评估** |
 | 扩展版本 | `0.3.0` |
 | Gateway Server Contract | `1.0.0`，入口 `/v1/browser-host/invoke` |
 | Host Registry | 注册、心跳、TTL、Capability 过滤和过期阻断已实现 |
@@ -12,9 +12,22 @@
 | Approval | `/v1/approvals/grants` 签发；BHR Get/Consume；单次消费、绑定和过期校验 |
 | 安全恢复 | 并发 Journal、裁剪保护、损坏记录隔离、Conversation 重验、`UNCERTAIN` 禁止盲重试 |
 | 自动化 E2E | BHR `HttpGatewayClient`/`DispatchClient` 已通过真实 Gateway HTTP 边界串联 TSK |
-| 尚需人工 | Chrome MV3 加载、真实 ChatGPT 页面 Binding、DOM/截图观察和真实页面动作 |
+| 真实页面 | MV3 加载、Host ONLINE、真实 ChatGPT Binding、`OBSERVE_PAGE` 已验证；`SUBMIT_MESSAGE` 已走到 Approval / Resume / EXECUTING，但旧 Task 最终 `UNCERTAIN / USER_CONTROL_ACTIVE` |
 
 自动化测试证明的是生产 HTTP Adapter、凭证、状态和回报链路，不宣称已经在当前执行环境操作真实 ChatGPT 页面。
+
+### 2026-08-09 真实写路径证据与当前边界
+
+- 固定目标 Controller：`gpt_ref=g-6a751b0e08ec8191afb52ebfba72902a-ai-agent-platform-zong-kong-zhi-neng-ti-controller`，`conversation_ref=6a77d844-9830-83eb-ba9d-8c9043fa1133`。
+- ordinary `SUBMIT_MESSAGE` 的 Platform Wake 误路由已由 `e9fb952` 修复。
+- Approval Draft、用户明确批准、one-time Grant、same-command Resume 已在真实 Browser 流中发生。
+- attempt-04 Journal 显示 `APPROVAL_PENDING → PREPARED → EXECUTING → UNCERTAIN → REPORTED`，最终错误 `USER_CONTROL_ACTIVE`；稳定 Browser/Approval identity 未漂移。
+- `ca6bda0` 已把“用户正在操作/复核页面”提升为执行前 defer gate：在可知用户控制时不先消费 Grant、不进入副作用执行。
+- `USER_CONTROL_ACTIVE` 的最终 post-delivery/response-lifecycle 语义、以及曾提出的 `action-confirmation-user-activity-fix`，目前必须由 Codex 从当前 HEAD 独立审计；该历史 Overlay 不是既定修复。
+- 旧 Task `phase2-l3-real-20260809-0934-01` 已封存，禁止继续 retry；下一次真实写验收必须使用全新 Task，并把目标 Controller Conversation 当作**被测对象而不是诊断控制台**。
+
+新的现场测试方法：Browser Work 创建后，不再通过同一个目标 Conversation 发送状态诊断消息；诊断应读取 Task/Event/Journal 或独立接口，避免观察行为改变 `generation_state / user_active / blocking_ui`。
+
 
 
 | 字段 | 值 |

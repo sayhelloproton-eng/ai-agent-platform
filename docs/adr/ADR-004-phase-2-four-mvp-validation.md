@@ -342,6 +342,34 @@ Runtime / 服务状态
 | 过早抽象共享层 | 四个 MVP 完成后再统一抽象 |
 | 无限自调用 | Loop Budget、无进展次数、超时、终止状态和人工接管 |
 
+## 2026-08-09 Closeout Review Checkpoint（不改变本 ADR 的 Accepted 决策）
+
+> 本节记录真实串联验收后的收口状态与评估方法，不把尚未共同裁决的 Phase 2.1 边界提升为新的 ADR 决策。
+
+截至最近一次已确认仓库基线 `main@c2bded0fbe9b6c6bf5940d890b1e90a4588929e9`，自动化与真实浏览器验收已经证明：
+
+- Level 2 真实四域只读链路已完成并进入 `Task COMPLETED`；
+- Level 3 写链已经真实走过 `Browser Dispatch → Approval Draft → 人工明确批准 → one-time Grant → same-command Resume → PREPARED / EXECUTING`；
+- 旧 Level 3 Task `phase2-l3-real-20260809-0934-01` 在多轮代码版本和失败 Attempt 后已不再适合作为干净 Happy Path 样本，应封存为 `UNCERTAIN / no-blind-retry / recovery` 历史证据；
+- `attempt-04` 的 Browser Host Journal 最终记录为 `UNCERTAIN / USER_CONTROL_ACTIVE`，且其 Binding、GPT、Conversation、Page Fingerprint、Action Fingerprint 与 Approval Precondition Hash 在 Resume 历史中保持一致；
+- `attempt-05` 实际未创建：Controller Claim 成功，但 `submitControllerCommand` 以 `CONTROLLER_COMMAND_NOT_ALLOWED / Current Plan Node is not executable` 拒绝，没有新 Command、WorkItem、Dispatch 或 Browser Side Effect；
+- 后续已经落库 `USER_CONTROL_ACTIVE` execution gate 与 Controller Decision Context admissible-command filtering。
+
+### 收口评估原则
+
+当前不再采用“现场失败 → 立即打一个窄补丁 → 继续旧 Task”的调试方式。新 ChatGPT + Codex 收口评估必须：
+
+1. 以当前真实仓库 HEAD 为代码真源，以 Browser Host Journal / Task Event / 明确页面证据为现场真源；
+2. 区分“已被证据证明的缺陷”与“历史 ChatGPT 根因推测”，不得机械应用历史 Overlay；
+3. 先离线完成 Task Control → Controller Adapter → Browser Host → Approval → Grant → Resume → SUBMIT_MESSAGE → Result 的集中审计；
+4. 只在代码已冻结且被判定具备条件时，执行**一次全新 Task、无诊断干扰的 Level 3 Happy Path**；
+5. 该干净 Happy Path 若失败，停止现场 attempt 循环，记录为未通过并转离线修复；
+6. Level 4 / Browser resilience 是否拆为 Phase 2.1 Hardening，由收口评估共同裁决，不在本节预先决定。
+
+详细现场证据与 Codex 接管说明见：
+
+- `docs/technical/技术方案/第二阶段/PHASE2-MVP-CLOSEOUT-HANDOFF-20260809.md`
+
 ## Implementation Impact and Follow-up
 
 本决策对应四篇技术方案：

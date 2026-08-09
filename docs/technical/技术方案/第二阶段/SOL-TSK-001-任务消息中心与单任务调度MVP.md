@@ -16,6 +16,15 @@
 
 `packages/task-control/src/integration-proposals.ts` 现在只是 TSK 内部状态投影兼容层；平台公共线协议以 `packages/contracts/src/phase2-integration.ts` 的 `1.0.0` 为准，不再把 Candidate Proposal 当作跨域合同。
 
+### 2026-08-09 串联收口补充
+
+真实 Browser `UNCERTAIN` 场景已出现：旧 Level 3 Task 的 attempt-04 最终由 Browser Host 回报 `UNCERTAIN / USER_CONTROL_ACTIVE`。该证据用于验证“可能存在副作用时禁止 blind retry”的方向，但旧 Task 已跨越多轮修复，不再作为 Happy Path 样本。
+
+同时发现并已落库一个**公开 Decision Context 可提交命令投影**问题：当当前 Plan Node 不可执行时，Controller 公共 Context 不应继续暴露 `REQUEST_ROLE_WORK / REQUEST_APPROVAL`，否则会出现“Context 显示 allowed、实际提交又以 Current Plan Node is not executable 拒绝”的矛盾。最近确认修复 commit 为 `c2bded0`，实现位于 Action Gateway Controller Adapter；Codex 收口时需要复核该职责位置是否与 Task Control 的领域策略一致，但不得在未证明问题的情况下机械回滚。
+
+旧 Task `phase2-l3-real-20260809-0934-01` 现作为 recovery / UNCERTAIN 历史证据封存；不得再创建 WorkItem/Dispatch 试图把它恢复成干净 Happy Path。
+
+
 
 | 字段 | 值 |
 |---|---|
