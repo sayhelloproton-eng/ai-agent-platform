@@ -124,8 +124,14 @@ function cancelCoordination(
     workItems.push(id);
   }
   for (const [id, signal] of Object.entries(state.dispatchSignals)) {
+    const preserveDeliveredControllerWake =
+      signal.signalType === "CONTROLLER_WAKE" &&
+      signal.deliveredAt !== null &&
+      ["DELIVERED", "CONSUMED"].includes(signal.status) &&
+      signal.hostResultStatus === "PENDING";
     if (
       signal.taskId !== taskId ||
+      preserveDeliveredControllerWake ||
       !["PENDING", "CLAIMED", "DELIVERED", "CONSUMED"].includes(signal.status) ||
       signal.hostResultStatus !== "PENDING"
     ) continue;

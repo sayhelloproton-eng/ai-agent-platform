@@ -2724,7 +2724,10 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
       );
       return updatedSignal;
     });
-    if (!succeeded) await this.reconciler.reconcile(result.taskId);
+    // A terminal Browser Host Result is a scheduling boundary just like a Local
+    // Work result. Reconcile both success and failure so the next Controller
+    // wake is materialized before the polling Browser Host asks for work again.
+    await this.reconciler.reconcile(result.taskId);
     return result;
   }
 

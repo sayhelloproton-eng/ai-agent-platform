@@ -331,7 +331,17 @@ test("terminal reconciliation records immutable WorkItem and Dispatch cancellati
   assert.equal(workCancelled.payload.triggerEventId !== null, true);
 
   await intake(service, "task-dispatch-cancel-event");
-  const { signal } = await claimAckDispatch(service, "task-dispatch-cancel-event", "cancel-dispatch");
+  const [signal] = (await service.listPendingDispatches()).filter(
+    (item) => item.taskId === "task-dispatch-cancel-event",
+  );
+  assert.ok(signal);
+  await service.claimDispatch({
+    contractVersion: TASK_CONTROL_CONTRACT_VERSION,
+    signalId: signal.signalId,
+    hostId: "host:cancel-dispatch",
+    leaseMs: 60_000,
+    idempotencyKey: "dispatch-claim:cancel-dispatch",
+  });
   claim = await claimController(service, "task-dispatch-cancel-event", "cancel-dispatch");
   await service.submitControllerCommand({
     commandContractVersion: TASK_CONTROL_CONTRACT_VERSION,

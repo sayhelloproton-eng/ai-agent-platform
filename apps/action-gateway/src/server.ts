@@ -143,6 +143,15 @@ function resolveProjectRoot(input: string | undefined): string {
   return resolve(input?.trim() || defaultRoot);
 }
 
+function resolveControllerTargetProfileRef(input: string | undefined): string | undefined {
+  if (input === undefined || input.trim().length === 0) return undefined;
+  const value = input.trim();
+  if (value.length > 256 || /\s/u.test(value)) {
+    throw new Error("Controller target GPT ref must be a non-whitespace provider resource reference no longer than 256 characters.");
+  }
+  return value;
+}
+
 function resolveMobBaseUrl(input: string | undefined): string | null {
   const value = input?.trim();
   if (!value) return null;
@@ -200,6 +209,7 @@ export interface ActionGatewayConfiguration {
   readonly runtimeTimeoutMs: number;
   readonly maxConcurrentTasks: number;
   readonly controllerProfileId: string;
+  readonly controllerTargetProfileRef: string | undefined;
   readonly taskControlStatePath: string;
   readonly controllerIdempotencyStatePath: string;
   readonly phase2IntegrationStatePath: string;
@@ -230,6 +240,9 @@ export function resolveActionGatewayConfiguration(
     ),
     controllerProfileId: resolveControllerProfileId(
       environment.ACTION_GATEWAY_CONTROLLER_PROFILE_ID,
+    ),
+    controllerTargetProfileRef: resolveControllerTargetProfileRef(
+      environment.ACTION_GATEWAY_CONTROLLER_TARGET_GPT_REF,
     ),
     taskControlStatePath: resolveStatePath(
       environment.ACTION_GATEWAY_TASK_CONTROL_STATE_PATH,
@@ -310,6 +323,9 @@ export async function startActionGateway(): Promise<void> {
     const browserHostServer = createBrowserHostServerAdapter(
       taskControlService,
       phase2IntegrationStore,
+      configuration.controllerTargetProfileRef === undefined
+        ? {}
+        : { controllerTargetProfileRef: configuration.controllerTargetProfileRef },
     );
     const localControlClient = createLocalControlProcessClient({
       executable: process.execPath,

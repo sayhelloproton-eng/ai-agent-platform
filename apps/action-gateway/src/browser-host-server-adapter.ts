@@ -10,9 +10,11 @@ import {
   TASK_CONTROL_CONTRACT_VERSION,
   TaskControlError,
   type DispatchSignal,
+  type HostCommandMaterialization,
   type HostDispatchApplicationPort,
   type TaskProjectionApplicationPort,
 } from "@ai-agent-platform/task-control";
+import { createHash } from "node:crypto";
 
 import { Phase2IntegrationStore, Phase2IntegrationStoreError } from "./phase2-integration-store.js";
 
@@ -29,8 +31,9 @@ const HOST_RESULT_STATUSES = new Set([
 ]);
 
 type BrowserHostTaskControl = HostDispatchApplicationPort &
-  Pick<TaskProjectionApplicationPort, "getCurrentDispatch"> & {
+  Pick<TaskProjectionApplicationPort, "getCurrentTask" | "getCurrentDispatch" | "listTaskEvents"> & {
     listPendingDispatches(): Promise<readonly DispatchSignal[]>;
+    getDispatches(taskId: string): Promise<readonly DispatchSignal[]>;
     failDispatch(input: {
       readonly contractVersion: typeof TASK_CONTROL_CONTRACT_VERSION;
       readonly signalId: string;
@@ -42,6 +45,147 @@ type BrowserHostTaskControl = HostDispatchApplicationPort &
       readonly errorSummary?: string;
     }): Promise<DispatchSignal>;
   };
+
+export interface BrowserHostServerAdapterOptions {
+  /**
+   * Provider GPT ref for the platform Controller. This is an adapter/deployment
+   * concern, not Task Control state. A prior Browser Work target can supply the
+   * same route dynamically; this value is the fail-closed fallback needed for
+   * Controller wakes that follow non-browser work.
+   */
+  readonly controllerTargetProfileRef?: string;
+}
+
+interface MaterializedBrowserHostCommand {
+  readonly targetProfileRef: string;
+  readonly conversationRef: string | null;
+  readonly payloadRef: string | null;
+  readonly preconditions: JsonObject;
+}
+
+const PLATFORM_WAKE_VERSION = "0.1.0";
+const PLATFORM_WAKE_ISSUER = "action-gateway";
+const PLATFORM_WAKE_ACTIONS = new Set(["OPEN_OR_RESUME_SESSION", "CONTINUE_ROLE_SESSION"]);
+
+function sha256(value: string): string {
+  return createHash("sha256").update(value, "utf8").digest("hex");
+}
+
+function optionalConfiguredTarget(value: string | undefined): string | undefined {
+  if (value === undefined) return undefined;
+  const normalized = value.trim();
+  if (normalized.length === 0 || normalized.length > 256) {
+    throw new TypeError("controllerTargetProfileRef must be a non-empty provider GPT ref no longer than 256 characters.");
+  }
+  return normalized;
+}
+
+function latestControllerRoute(
+  dispatches: readonly DispatchSignal[],
+  signal: DispatchSignal,
+): DispatchSignal | undefined {
+  const candidates = dispatches.filter((candidate) =>
+    candidate.signalId !== signal.signalId &&
+    candidate.signalType === "ROLE_WORK_WAKE" &&
+    candidate.targetRole === signal.targetRole &&
+    candidate.targetProfileRef !== null &&
+    (signal.conversationRef === null || candidate.conversationRef === signal.conversationRef),
+  );
+  return candidates.sort((left, right) => Date.parse(left.createdAt) - Date.parse(right.createdAt)).at(-1);
+}
+
+async function materializeControllerWake(
+  taskControl: BrowserHostTaskControl,
+  integrationStore: Phase2IntegrationStore,
+  signal: DispatchSignal,
+  command: HostCommandMaterialization,
+  configuredTargetProfileRef: string | undefined,
+): Promise<MaterializedBrowserHostCommand> {
+  if (!PLATFORM_WAKE_ACTIONS.has(command.actionType)) {
+    throw new BrowserHostServerError(
+      "CONTROLLER_WAKE_ACTION_INVALID",
+      `Controller Wake cannot materialize unsupported action ${command.actionType}.`,
+      409,
+    );
+  }
+
+  const dispatches = await taskControl.getDispatches(signal.taskId);
+  const previousRoute = latestControllerRoute(dispatches, signal);
+  const targetProfileRef = command.targetProfileRef ?? previousRoute?.targetProfileRef ?? configuredTargetProfileRef;
+  if (targetProfileRef === undefined || targetProfileRef === null) {
+    throw new BrowserHostServerError(
+      "CONTROLLER_TARGET_NOT_CONFIGURED",
+      "Controller Wake has no provider GPT target. Configure the Controller target or establish a prior Browser Work route.",
+      409,
+    );
+  }
+  const conversationRef = command.conversationRef ?? previousRoute?.conversationRef ?? null;
+
+  const events = await taskControl.listTaskEvents(signal.taskId);
+  const causalEvent = events
+    .filter((event) => event.taskVersion <= signal.createdFromTaskVersion)
+    .at(-1);
+  if (causalEvent === undefined) {
+    throw new BrowserHostServerError(
+      "CONTROLLER_WAKE_CAUSATION_MISSING",
+      "Controller Wake cannot resolve its causal Task event.",
+      409,
+    );
+  }
+
+  const wake = {
+    wake_version: PLATFORM_WAKE_VERSION,
+    task_id: signal.taskId,
+    required_role: signal.targetRole,
+    event_id: causalEvent.eventId,
+    dispatch_ref: signal.signalId,
+    ...(conversationRef === null ? {} : { conversation_ref: conversationRef }),
+    instruction: "请查询最新 Decision Context，确认角色后再 Claim 并继续处理。",
+  } satisfies JsonObject;
+  const wakeText = JSON.stringify(wake);
+  const payloadRef = command.payloadRef ?? `platform-wake-payload:${signal.signalId}`;
+  const payloadValue: JsonObject = command.actionType === "OPEN_OR_RESUME_SESSION"
+    ? {
+        url: `https://chatgpt.com/g/${targetProfileRef}`,
+        wake_text: wakeText,
+        wake,
+      }
+    : { text: wakeText, wake };
+  await integrationStore.putPayload(payloadRef, payloadValue);
+
+  const authorizationRef = `platform-wake-auth:${signal.signalId}`;
+  const attestationBody = JSON.stringify({
+    authorizationRef,
+    taskId: signal.taskId,
+    roleRef: signal.targetRole,
+    gptRef: targetProfileRef,
+    actionType: command.actionType,
+    idempotencyKey: command.idempotencyKey,
+    expiresAt: command.expiresAt,
+  });
+  const preconditions: JsonObject = {
+    ...structuredClone(command.preconditions),
+    authorization_class: "PLATFORM_WAKE",
+    authorization_ref: authorizationRef,
+    platform_wake_authorization: {
+      authorization_version: PLATFORM_WAKE_VERSION,
+      authorization_ref: authorizationRef,
+      issuer: PLATFORM_WAKE_ISSUER,
+      // The Gateway is the authenticated issuer for this MVP. BHR consumes the
+      // verified attestation and never trusts page text/DOM as authorization.
+      signature_ref: `gateway-attestation:sha256:${sha256(attestationBody)}`,
+      signature_verified: true,
+      task_id: signal.taskId,
+      role_ref: signal.targetRole,
+      gpt_ref: targetProfileRef,
+      idempotency_key: command.idempotencyKey,
+      allowed_actions: [command.actionType],
+      expires_at: command.expiresAt,
+    },
+  };
+
+  return { targetProfileRef, conversationRef, payloadRef, preconditions };
+}
 
 export class BrowserHostServerError extends Error {
   constructor(
@@ -197,7 +341,9 @@ export interface BrowserHostServerPort {
 export function createBrowserHostServerAdapter(
   taskControl: BrowserHostTaskControl,
   integrationStore: Phase2IntegrationStore,
+  options: BrowserHostServerAdapterOptions = {},
 ): BrowserHostServerPort {
+  const configuredTargetProfileRef = optionalConfiguredTarget(options.controllerTargetProfileRef);
   return Object.freeze({
     async invoke(request: BrowserHostInvocationV1): Promise<JsonValue> {
       try {
@@ -277,6 +423,27 @@ export function createBrowserHostServerAdapter(
               throw new BrowserHostServerError("CLAIM_TOKEN_INVALID", "Dispatch Claim Token is invalid or expired.", 409);
             }
             const command = await taskControl.materializeHostCommand(dispatchRef);
+            const materialized = signal.signalType === "CONTROLLER_WAKE"
+              ? await materializeControllerWake(
+                  taskControl,
+                  integrationStore,
+                  signal,
+                  command,
+                  configuredTargetProfileRef,
+                )
+              : {
+                  targetProfileRef: command.targetProfileRef,
+                  conversationRef: command.conversationRef,
+                  payloadRef: command.payloadRef,
+                  preconditions: structuredClone(command.preconditions),
+                };
+            if (materialized.targetProfileRef === null) {
+              throw new BrowserHostServerError(
+                "HOST_TARGET_PROFILE_REQUIRED",
+                "Browser Host Command requires an explicit provider GPT target.",
+                409,
+              );
+            }
             return {
               host_command_version: "0.1.0",
               command_id: command.commandId,
@@ -284,14 +451,14 @@ export function createBrowserHostServerAdapter(
               task_id: command.taskId,
               target: {
                 role_ref: command.targetRole,
-                gpt_ref: command.targetProfileRef ?? "gpt:ai-agent-platform-controller",
-                conversation_ref: command.conversationRef,
+                gpt_ref: materialized.targetProfileRef,
+                conversation_ref: materialized.conversationRef,
               },
               action: {
                 type: command.actionType,
-                payload_ref: command.payloadRef,
+                payload_ref: materialized.payloadRef,
               },
-              preconditions: structuredClone(command.preconditions),
+              preconditions: materialized.preconditions,
               approval_ref: command.approvalRef,
               idempotency_key: command.idempotencyKey,
               expires_at: command.expiresAt,

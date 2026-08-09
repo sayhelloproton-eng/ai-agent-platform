@@ -51,7 +51,7 @@ test("register and heartbeat are serialized across HostRegistry instances", asyn
 });
 
 
-test("production Host advertises only the safe Level 2 browser action", async () => {
+test("production Host advertises only the bounded Phase 2 browser actions", async () => {
   const storage = new MemoryStorageArea();
   const registrations = [];
   const gateway = {
@@ -64,7 +64,8 @@ test("production Host advertises only the safe Level 2 browser action", async ()
   await registry.register();
   assert.ok(PRODUCTION_ROUTABLE_CAPABILITIES.includes("OBSERVE_PAGE"));
   assert.equal(PRODUCTION_ROUTABLE_CAPABILITIES.includes("SUBMIT_MESSAGE"), true);
-  assert.equal(PRODUCTION_ROUTABLE_CAPABILITIES.includes("CONTINUE_ROLE_SESSION"), false);
+  assert.equal(PRODUCTION_ROUTABLE_CAPABILITIES.includes("CONTINUE_ROLE_SESSION"), true);
+  assert.equal(PRODUCTION_ROUTABLE_CAPABILITIES.includes("OPEN_OR_RESUME_SESSION"), false);
   assert.deepEqual(registrations[0].capabilities, [...PRODUCTION_ROUTABLE_CAPABILITIES]);
 });
 
