@@ -430,7 +430,20 @@ test("high-risk command prepares Approval Draft and resumes the same command aft
     },
     bindingRegistry: { findForTarget: async () => bound, validateObservation: async (value) => value, get: async () => bound },
     journal,
-    observationCoordinator: observationService(observed),
+    observationCoordinator: {
+      observe: async () => ({
+        observation: claimEpoch <= 1
+          ? observed
+          : {
+              ...observed,
+              interactive_elements: [
+                ...(observed.interactive_elements ?? []),
+                { element_ref: "button:approval-result", role: "button", accessible_name: "Copy", enabled: true, visible: true }
+              ]
+            },
+        local: {}
+      })
+    },
     actionExecutor: {
       execute: async () => { executions += 1; return deliveryExecution(bound); },
       waitForResponse: async () => ({ status: "ACTION_SUCCEEDED", details: { response_completed: true } })

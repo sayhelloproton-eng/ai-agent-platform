@@ -512,6 +512,16 @@ export class RuntimeCoordinator {
           observation: pre.observation,
           preparedAt: priorDraft?.prepared_at ?? null
         });
+        // On Resume, compare the freshly observed stable precondition against the
+        // immutable local Draft before attempting to re-publish it. This turns a
+        // real page/target drift into an explicit fail-closed precondition error,
+        // while benign UI chrome changes remain resumable.
+        if (priorDraft && (
+          priorDraft.action_fingerprint !== draft.action_fingerprint ||
+          priorDraft.page_precondition_hash !== draft.page_precondition_hash
+        )) {
+          throw new BhrError("APPROVAL_PRECONDITION_CHANGED", "The page or planned action changed after the Approval Draft was prepared.");
+        }
         await this.approvalClient.putDraft(draft, claim.claim_token);
         let grant = null;
         if (typeof this.approvalClient.getGrantOrNull === "function") {
@@ -538,12 +548,6 @@ export class RuntimeCoordinator {
           };
         }
         const validated = await validateApprovalGrant({ grant, command, binding, resolved_payload: resolvedPayload, observation: pre.observation });
-        if (priorDraft && (
-          priorDraft.action_fingerprint !== validated.action_fingerprint ||
-          priorDraft.page_precondition_hash !== validated.page_precondition_hash
-        )) {
-          throw new BhrError("APPROVAL_PRECONDITION_CHANGED", "The page or planned action changed after the Approval Draft was prepared.");
-        }
         await this.journal.mark(command.command_id, JOURNAL_STATE.PREPARED, {
           ...preparedDetails,
           approval_draft: draft,

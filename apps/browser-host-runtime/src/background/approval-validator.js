@@ -15,6 +15,12 @@ export async function validateApprovalGrant({ grant, command, binding, resolved_
   if (value.task_id !== command.task_id) throw new BhrError("APPROVAL_TASK_MISMATCH", "Approval task does not match command.");
   if (value.command_id !== command.command_id) throw new BhrError("APPROVAL_COMMAND_MISMATCH", "Approval command does not match.");
   if (value.allowed_action_type !== command.action.type) throw new BhrError("APPROVAL_ACTION_MISMATCH", "Approval does not allow this action type.");
+  // UI catalogs are intentionally excluded from the stable Approval hash because
+  // the Controller conversation necessarily changes while the user reviews and
+  // grants approval. Safety-relevant execution state remains fail-closed here.
+  if (observation.page_state !== "READY" || observation.generation_state !== "IDLE" || (observation.blocking_ui ?? []).length > 0) {
+    throw new BhrError("APPROVAL_PRECONDITION_CHANGED", "Page precondition changed after approval.");
+  }
   const pageHash = await computePagePreconditionHash(observation);
   if (value.page_precondition_hash !== pageHash) throw new BhrError("APPROVAL_PRECONDITION_CHANGED", "Page precondition changed after approval.");
   const actionFingerprint = await computeActionFingerprint({ command, binding_id: binding.binding_id, resolved_payload, page_precondition_hash: pageHash });

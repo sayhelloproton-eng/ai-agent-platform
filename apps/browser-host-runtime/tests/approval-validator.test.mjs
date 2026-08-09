@@ -31,6 +31,23 @@ test("approval binds action and page precondition", async () => {
   assert.equal(result.action_fingerprint, fingerprint);
 });
 
+
+test("incidental interactive UI changes do not invalidate an otherwise identical approval target", async () => {
+  const payload = { text: "wake" };
+  const originalHash = await computePagePreconditionHash(observation);
+  const fingerprint = await computeActionFingerprint({ command, binding_id: "binding", resolved_payload: payload, page_precondition_hash: originalHash });
+  const grant = { approval_ref: "approval", grant_id: "grant", action_fingerprint: fingerprint, binding_id: "binding", task_id: "task", command_id: "cmd", allowed_action_type: "SUBMIT_MESSAGE", page_precondition_hash: originalHash, single_use: true, expires_at: "2030-01-01T00:00:00.000Z", consumed_at: null };
+  const changedChrome = {
+    ...observation,
+    interactive_elements: [
+      { element_ref: "button:copy", role: "button", accessible_name: "Copy", enabled: true, visible: true },
+      { element_ref: "button:menu", role: "button", accessible_name: "More", enabled: true, visible: true }
+    ]
+  };
+  const result = await validateApprovalGrant({ grant, command, binding, resolved_payload: payload, observation: changedChrome, now: new Date("2026-08-05T00:00:00.000Z") });
+  assert.equal(result.page_precondition_hash, originalHash);
+});
+
 test("changed page invalidates approval", async () => {
   const payload = { text: "wake" };
   const originalHash = await computePagePreconditionHash(observation);
