@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.0.0-lab.5
+
+EF-1 single-service hardening and verification support:
+
+- managed `restart --json` now emits exactly one machine-readable JSON document instead of two concatenated JSON payloads;
+- lifecycle internals are split into reusable start/stop operations without changing public CLI semantics;
+- `createExecutionFlowServer` accepts an optional injected `RuntimeEnvironment` for isolated service-level tests while production/default startup still builds the normal environment;
+- service tests now cover a pure deterministic HTTP flow, an injected Fixture Inference HTTP flow, and the default fixed-command HTTP flow;
+- lifecycle tests now cover start, status, singleton second start, restart identity rotation, normal stop, final stopped status, and the existing unverified-PID protection.
+
 ## 0.0.0-lab.4
 
 - Reserved `$ref` as protocol syntax: any object containing a `$ref` key must validate as an exact `BindingRef`; malformed or mixed `$ref` objects are rejected.

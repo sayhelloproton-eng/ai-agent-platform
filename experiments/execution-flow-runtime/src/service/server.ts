@@ -2,11 +2,13 @@ import http from "node:http";
 import { randomUUID } from "node:crypto";
 import { runExecutionFlow } from "../runtime/run-flow.js";
 import { createRuntimeEnvironment } from "../runtime/environment.js";
+import type { RuntimeEnvironment } from "../runtime/environment.js";
 import type { ExecutionRun, RuntimeConfig } from "../types.js";
 
 export interface ExecutionFlowServerOptions {
   config: RuntimeConfig;
   instanceId?: string;
+  runtimeEnvironment?: RuntimeEnvironment;
 }
 
 async function readJson(req: http.IncomingMessage, maxBytes = 1024 * 1024): Promise<unknown> {
@@ -40,11 +42,12 @@ function sendJson(
 export async function createExecutionFlowServer({
   config,
   instanceId = randomUUID(),
+  runtimeEnvironment,
 }: ExecutionFlowServerOptions) {
   if (!["127.0.0.1", "::1", "localhost"].includes(config.host)) {
     throw new Error("Lab HTTP service is loopback-only during the current lab stage.");
   }
-  const runtime = await createRuntimeEnvironment(config);
+  const runtime = runtimeEnvironment ?? await createRuntimeEnvironment(config);
 
   const server = http.createServer(async (req, res) => {
     const url = new URL(

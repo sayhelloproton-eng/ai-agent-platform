@@ -33,8 +33,22 @@ function runCli(runtimeHome: string, args: string[]) {
       EXECUTION_FLOW_RUNTIME_HOME: runtimeHome,
     },
     encoding: "utf8",
-    timeout: 12_000,
+    timeout: 15_000,
   });
+}
+
+function parseJson(result: ReturnType<typeof runCli>) {
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  return JSON.parse(result.stdout) as Record<string, any>;
+}
+
+function pidAlive(pid: number): boolean {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 async function prepareRuntimeHome(runtimeHome: string, port: number): Promise<void> {
@@ -54,30 +68,68 @@ async function prepareRuntimeHome(runtimeHome: string, port: number): Promise<vo
   );
 }
 
-test("managed CLI start is singleton/idempotent per runtime home", async () => {
+test("managed service lifecycle is singleton, restartable, and cleanly stoppable", async () => {
   const runtimeHome = await fs.mkdtemp(path.join(os.tmpdir(), "exec-flow-runtime-home-"));
   await prepareRuntimeHome(runtimeHome, await freePort());
 
+  let currentPid: number | undefined;
   try {
-    const first = runCli(runtimeHome, ["start", "--json"]);
-    assert.equal(first.status, 0, first.stderr || first.stdout);
-    const firstBody = JSON.parse(first.stdout) as {
-      status: string;
-      state: { pid: number; instance_id: string };
-    };
-    assert.equal(firstBody.status, "started");
+    const first = parseJson(runCli(runtimeHome, ["start", "--json"]));
+    assert.equal(first.status, "started");
+    assert.equal(typeof first.state.pid, "number");
+    assert.equal(typeof first.state.instance_id, "string");
+    assert.ok(first.state.instance_id);
+    currentPid = first.state.pid;
+    const firstPid = first.state.pid as number;
+    const firstInstance = first.state.instance_id as string;
+    assert.equal(pidAlive(firstPid), true);
 
-    const second = runCli(runtimeHome, ["start", "--json"]);
-    assert.equal(second.status, 0, second.stderr || second.stdout);
-    const secondBody = JSON.parse(second.stdout) as {
-      status: string;
-      state: { pid: number; instance_id: string };
-    };
-    assert.equal(secondBody.status, "already-running");
-    assert.equal(secondBody.state.pid, firstBody.state.pid);
-    assert.equal(secondBody.state.instance_id, firstBody.state.instance_id);
+    const status = parseJson(runCli(runtimeHome, ["status", "--json"]));
+    assert.equal(status.status, "running");
+    assert.equal(status.pid_alive, true);
+    assert.equal(status.identity_match, true);
+    assert.equal(status.state.pid, firstPid);
+    assert.equal(status.state.instance_id, firstInstance);
+
+    const second = parseJson(runCli(runtimeHome, ["start", "--json"]));
+    assert.equal(second.status, "already-running");
+    assert.equal(second.state.pid, firstPid);
+    assert.equal(second.state.instance_id, firstInstance);
+
+    const restartRaw = runCli(runtimeHome, ["restart", "--json"]);
+    const restart = parseJson(restartRaw);
+    assert.equal(restart.status, "restarted");
+    assert.equal(restart.previous.status, "stopped");
+    assert.equal(restart.previous.pid, firstPid);
+    assert.equal(restart.current.status, "started");
+    assert.equal(typeof restart.current.state.pid, "number");
+    assert.equal(typeof restart.current.state.instance_id, "string");
+    assert.notEqual(restart.current.state.instance_id, firstInstance);
+    assert.notEqual(restart.current.state.pid, firstPid);
+    currentPid = restart.current.state.pid;
+    assert.equal(pidAlive(firstPid), false);
+    assert.equal(pidAlive(currentPid!), true);
+
+    const restartedStatus = parseJson(runCli(runtimeHome, ["status", "--json"]));
+    assert.equal(restartedStatus.status, "running");
+    assert.equal(restartedStatus.state.pid, currentPid);
+    assert.equal(
+      restartedStatus.state.instance_id,
+      restart.current.state.instance_id
+    );
+
+    const stopped = parseJson(runCli(runtimeHome, ["stop", "--json"]));
+    assert.equal(stopped.status, "stopped");
+    assert.equal(stopped.pid, currentPid);
+    assert.equal(pidAlive(currentPid!), false);
+    currentPid = undefined;
+
+    const finalStatus = parseJson(runCli(runtimeHome, ["status", "--json"]));
+    assert.equal(finalStatus.status, "stopped");
   } finally {
-    runCli(runtimeHome, ["stop", "--force", "--json"]);
+    if (currentPid && pidAlive(currentPid)) {
+      runCli(runtimeHome, ["stop", "--force", "--json"]);
+    }
   }
 });
 

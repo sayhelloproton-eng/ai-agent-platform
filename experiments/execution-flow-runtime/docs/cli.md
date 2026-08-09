@@ -43,3 +43,30 @@ Validation never executes capabilities and uses the same published protocol sche
 `aap-execution-flow describe --json`
 
 This is the preferred machine-readable entry point. It describes command names, side-effect class, usage, service endpoints and runtime invariants.
+
+
+## Machine-readable lifecycle
+
+All lifecycle commands support `--json`. In particular, `restart --json` returns one JSON document:
+
+```json
+{
+  "ok": true,
+  "status": "restarted",
+  "previous": {
+    "ok": true,
+    "status": "stopped",
+    "pid": 12345
+  },
+  "current": {
+    "ok": true,
+    "status": "started",
+    "state": {
+      "pid": 12346,
+      "instance_id": "..."
+    }
+  }
+}
+```
+
+Use `EXECUTION_FLOW_RUNTIME_HOME` to isolate a managed service instance during tests.

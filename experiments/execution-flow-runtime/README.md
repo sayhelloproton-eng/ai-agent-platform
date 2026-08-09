@@ -108,3 +108,26 @@ aap-execution-flow docs protocol
 aap-execution-flow docs security
 aap-execution-flow docs integration
 ```
+
+
+## Managed service lifecycle
+
+The runtime is a single managed service per `EXECUTION_FLOW_RUNTIME_HOME`.
+
+```bash
+aap-execution-flow install
+aap-execution-flow start --json
+aap-execution-flow status --json
+aap-execution-flow restart --json
+aap-execution-flow stop --json
+```
+
+`start` is singleton/idempotent for the same runtime home. `restart --json` emits one JSON document containing both the previous stop result and the current start result, which keeps the CLI machine-readable for AI/automation callers.
+
+For isolated tests, set a dedicated runtime home:
+
+```bash
+export EXECUTION_FLOW_RUNTIME_HOME=/tmp/aap-execution-flow-runtime-test
+```
+
+The HTTP service remains the same single runtime process; inference backends are providers inside that service, not separate Execution Flow Runtime services.

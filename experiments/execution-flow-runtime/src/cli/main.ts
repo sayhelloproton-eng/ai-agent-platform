@@ -59,6 +59,7 @@ function helpText(): string {
     "  aap-execution-flow install",
     "  aap-execution-flow start",
     "  aap-execution-flow stop",
+    "  aap-execution-flow restart",
     "  aap-execution-flow status",
     "  aap-execution-flow doctor",
     "  aap-execution-flow run --file <execution-run.json>",
@@ -178,7 +179,19 @@ async function commandServe(): Promise<void> {
   );
 }
 
-async function commandStart(json: boolean): Promise<void> {
+type StartResult =
+  | {
+      ok: true;
+      status: "started";
+      state: NonNullable<Awaited<ReturnType<typeof readState>>>;
+    }
+  | {
+      ok: true;
+      status: "already-running";
+      state: NonNullable<Awaited<ReturnType<typeof readState>>>;
+    };
+
+async function startRuntime(): Promise<StartResult> {
   const config = await ensureRuntimeHome();
   const previous = await readState();
 
@@ -187,8 +200,7 @@ async function commandStart(json: boolean): Promise<void> {
     if (alive) {
       const health = await fetchHealth(previous.host, previous.port);
       if (health?.instance_id === previous.instance_id) {
-        print({ ok: true, status: "already-running", state: previous }, json);
-        return;
+        return { ok: true, status: "already-running", state: previous };
       }
       throw new Error(
         `Stored PID ${previous.pid} is alive but runtime identity is not verified. Refusing to start a second service.`
@@ -210,15 +222,11 @@ async function commandStart(json: boolean): Promise<void> {
           port: existingLock.port,
           started_at: existingLock.started_at,
         });
-        print(
-          {
-            ok: true,
-            status: "already-running",
-            state: await readState(),
-          },
-          json
-        );
-        return;
+        const state = await readState();
+        if (!state) {
+          throw new Error("Runtime state was not restored from the verified singleton lock.");
+        }
+        return { ok: true, status: "already-running", state };
       }
       throw new Error(
         `Runtime lock belongs to live PID ${existingLock.pid}, but identity is not verified. Refusing to start a second service.`
@@ -259,8 +267,7 @@ async function commandStart(json: boolean): Promise<void> {
     ) {
       const health = await fetchHealth(state.host, state.port);
       if (health?.instance_id === instanceId) {
-        print({ ok: true, status: "started", state }, json);
-        return;
+        return { ok: true, status: "started", state };
       }
     }
   }
@@ -283,6 +290,10 @@ async function commandStart(json: boolean): Promise<void> {
     }
   }
   throw new Error(`Service did not become ready. See ${LOG_PATH}`);
+}
+
+async function commandStart(json: boolean): Promise<void> {
+  print(await startRuntime(), json);
 }
 
 async function commandStatus(json: boolean): Promise<void> {
@@ -318,10 +329,19 @@ async function commandStatus(json: boolean): Promise<void> {
   );
 }
 
-async function commandStop(
-  json: boolean,
-  force: boolean
-): Promise<void> {
+type StopResult =
+  | { ok: true; status: "already-stopped" }
+  | { ok: true; status: "stale-state-removed" }
+  | {
+      ok: true;
+      status: "stale-state-removed-unverified-process-left-running";
+      pid: number;
+      killed: false;
+      lock_preserved: boolean;
+    }
+  | { ok: true; status: "stopped"; pid: number };
+
+async function stopRuntime(force: boolean): Promise<StopResult> {
   const state = await readState();
   const lock = await readRuntimeLock();
 
@@ -337,16 +357,14 @@ async function commandStop(
 
   const observed = state ?? lock;
   if (!observed) {
-    print({ ok: true, status: "already-stopped" }, json);
-    return;
+    return { ok: true, status: "already-stopped" };
   }
 
   const alive = pidAlive(observed.pid);
   if (!alive) {
     await removeStateIfOwned(observed.instance_id, observed.pid);
     await releaseRuntimeLock(observed.instance_id, observed.pid);
-    print({ ok: true, status: "stale-state-removed" }, json);
-    return;
+    return { ok: true, status: "stale-state-removed" };
   }
 
   const health = await fetchHealth(observed.host, observed.port);
@@ -355,17 +373,13 @@ async function commandStop(
   if (!identityMatch) {
     if (force) {
       await removeStateIfOwned(observed.instance_id, observed.pid);
-      print(
-        {
-          ok: true,
-          status: "stale-state-removed-unverified-process-left-running",
-          pid: observed.pid,
-          killed: false,
-          lock_preserved: Boolean(lock),
-        },
-        json
-      );
-      return;
+      return {
+        ok: true,
+        status: "stale-state-removed-unverified-process-left-running",
+        pid: observed.pid,
+        killed: false,
+        lock_preserved: Boolean(lock),
+      };
     }
     throw new Error(
       "Stored PID is alive but service identity could not be verified. Refusing to kill it. `stop --force` only clears stale state; it never kills an unverified PID."
@@ -399,7 +413,31 @@ async function commandStop(
 
   await removeStateIfOwned(observed.instance_id, observed.pid);
   await releaseRuntimeLock(observed.instance_id, observed.pid);
-  print({ ok: true, status: "stopped", pid: observed.pid }, json);
+  return { ok: true, status: "stopped", pid: observed.pid };
+}
+
+async function commandStop(
+  json: boolean,
+  force: boolean
+): Promise<void> {
+  print(await stopRuntime(force), json);
+}
+
+async function commandRestart(
+  json: boolean,
+  force: boolean
+): Promise<void> {
+  const previous = await stopRuntime(force);
+  const current = await startRuntime();
+  print(
+    {
+      ok: true,
+      status: "restarted",
+      previous,
+      current,
+    },
+    json
+  );
 }
 
 async function commandDoctor(json: boolean): Promise<void> {
@@ -566,8 +604,7 @@ export async function main(argv: string[]): Promise<void> {
     }
 
     if (command === "restart") {
-      await commandStop(json, hasFlag(args, "--force"));
-      await commandStart(json);
+      await commandRestart(json, hasFlag(args, "--force"));
       return;
     }
 

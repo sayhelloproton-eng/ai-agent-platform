@@ -32,3 +32,10 @@ The same module may later bind different inference backends:
 - cloud model API
 
 Those backends are replaceable infrastructure. They do not change the execution-flow protocol.
+
+
+## RuntimeEnvironment injection for isolated verification
+
+`createExecutionFlowServer` accepts an optional `runtimeEnvironment` only as a programmatic composition seam. It allows service-level tests to inject Fixture capabilities/backends without adding a test backend to the managed production/default service configuration.
+
+Default CLI/service startup does not register the Fixture backend. Real providers continue to be supplied by the normal runtime environment.
