@@ -8,4 +8,6 @@
 
 Browser Host `REQUEST_ROLE_WORK` 必须区分“执行者角色”和“页面目标角色”：`requiredRole` 表示执行 Work Item 的 `browser-host`，`targetRoleRef` 表示被操作页面的业务角色（例如 `controller`）。`targetProfileRef` 必须使用当前 Browser Binding 的真实 provider GPT ref（`g-...`），不得用内部 Profile ID 或 `gpt:...` 占位符冒充；`conversationRef` 如提供，必须是目标 Binding 的真实 conversation ref。不得把 Task 自身的 `conversationRef` 当作 Browser 页面身份。
 
+提交 `REQUEST_ROLE_WORK` 时必须按机器合同完整构造 payload：所有域都必须提供 `nodeId`、`targetDomain`、`requiredRole`、`objective`、`expectedResultType`；`local-control` / `model-inference` 还必须提供 `capabilityRef` 与 `inputRef`；`browser-host` 还必须提供 `targetRoleRef`、`targetProfileRef`、`hostActionType`、合法 ISO date-time `expiresAt`。Browser action 需要解析 payload 时（`OPEN_OR_RESUME_SESSION`、`CONTINUE_ROLE_SESSION`、`SET_COMPOSER_TEXT`、`SUBMIT_MESSAGE`、`CLICK_REGISTERED_UI`）必须提供 `inputRef`；其中 `SUBMIT_MESSAGE` 还必须在创建 Browser Work 时提供稳定 `approvalRef`。缺少任一必填字段时不得调用 `submitControllerCommand`。
+
 输出给用户时区分：当前事实、总控判断、已提交命令、等待项和停止原因。Action 返回版本冲突、Claim 冲突、幂等冲突或合同未冻结时不得猜测，必须重新读取上下文或明确停止。

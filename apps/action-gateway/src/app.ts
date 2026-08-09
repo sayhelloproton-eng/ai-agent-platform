@@ -88,6 +88,13 @@ const TASK_RATE_LIMIT_KEY = "authenticated:/v1/tasks";
 const CONTROLLER_RATE_LIMIT_KEY = "authenticated:/v1/controller";
 const CAPABILITIES_RATE_LIMIT_KEY = "authenticated:/v1/capabilities";
 export const DEFAULT_TASK_RATE_LIMIT = 30;
+function controllerValidationErrorMessage(issues: readonly { path: string; message: string }[]): string {
+  const first = issues[0];
+  if (first === undefined) return "Controller request is invalid.";
+  const location = first.path.length > 0 ? first.path : "request";
+  return `Controller request is invalid at ${location}: ${first.message}`;
+}
+
 export const DEFAULT_CAPABILITIES_RATE_LIMIT = 60;
 export const DEFAULT_RATE_LIMIT_WINDOW_MS = 60_000;
 export const DEFAULT_GATEWAY_MAX_CONCURRENT_TASKS = 2;
@@ -608,28 +615,28 @@ export function createGatewayHandler(options: GatewayOptions): RequestListener {
           if (pathname === CONTROLLER_CONTEXT_ROUTE) {
             const validation = validateGetTaskDecisionContextRequest(parsedBody);
             if (!validation.ok) {
-              writeError(response, 400, requestId, "CONTROLLER_INVALID_REQUEST", "Controller request is invalid.");
+              writeError(response, 400, requestId, "CONTROLLER_INVALID_REQUEST", controllerValidationErrorMessage(validation.issues));
               return;
             }
             result = await taskControl.getDecisionContext(validation.value, identity);
           } else if (pathname === CONTROLLER_CLAIM_ROUTE) {
             const validation = validateClaimControllerTaskRequest(parsedBody);
             if (!validation.ok) {
-              writeError(response, 400, requestId, "CONTROLLER_INVALID_REQUEST", "Controller request is invalid.");
+              writeError(response, 400, requestId, "CONTROLLER_INVALID_REQUEST", controllerValidationErrorMessage(validation.issues));
               return;
             }
             result = await taskControl.claimTask(validation.value, identity);
           } else if (pathname === CONTROLLER_COMMAND_ROUTE) {
             const validation = validateSubmitControllerCommandRequest(parsedBody);
             if (!validation.ok) {
-              writeError(response, 400, requestId, "CONTROLLER_INVALID_REQUEST", "Controller request is invalid.");
+              writeError(response, 400, requestId, "CONTROLLER_INVALID_REQUEST", controllerValidationErrorMessage(validation.issues));
               return;
             }
             result = await taskControl.submitCommand(validation.value, identity);
           } else {
             const validation = validateReleaseControllerTaskRequest(parsedBody);
             if (!validation.ok) {
-              writeError(response, 400, requestId, "CONTROLLER_INVALID_REQUEST", "Controller request is invalid.");
+              writeError(response, 400, requestId, "CONTROLLER_INVALID_REQUEST", controllerValidationErrorMessage(validation.issues));
               return;
             }
             result = await taskControl.releaseTask(validation.value, identity);

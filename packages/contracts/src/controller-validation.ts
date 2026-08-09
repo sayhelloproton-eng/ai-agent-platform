@@ -42,6 +42,14 @@ function issue(
   issues.push({ path, code, message });
 }
 
+const BROWSER_ACTIONS_REQUIRING_PAYLOAD_REF = new Set([
+  "OPEN_OR_RESUME_SESSION",
+  "CONTINUE_ROLE_SESSION",
+  "SET_COMPOSER_TEXT",
+  "SUBMIT_MESSAGE",
+  "CLICK_REGISTERED_UI",
+]);
+
 const SERVER_OWNED_IDENTITY_FIELDS = [
   "profileId",
   "profile_id",
@@ -438,9 +446,21 @@ function validateControllerCommand(
             issue(issues, `command.payload.${field}`, "REQUIRED_FIELD", "Browser Host work requires this field.");
           }
         }
+        if (
+          isNonEmptyString(payload.hostActionType) &&
+          BROWSER_ACTIONS_REQUIRING_PAYLOAD_REF.has(payload.hostActionType) &&
+          !isNonEmptyString(payload.inputRef)
+        ) {
+          valid = false;
+          issue(issues, "command.payload.inputRef", "REQUIRED_FIELD", `${payload.hostActionType} requires inputRef because Browser Host must resolve an action payload.`);
+        }
         if (payload.hostActionType === "SUBMIT_MESSAGE" && !isNonEmptyString(payload.approvalRef)) {
           valid = false;
           issue(issues, "command.payload.approvalRef", "REQUIRED_FIELD", "SUBMIT_MESSAGE requires a stable approvalRef for the production Approval Draft handshake.");
+        }
+        if (isNonEmptyString(payload.expiresAt) && !Number.isFinite(Date.parse(payload.expiresAt))) {
+          valid = false;
+          issue(issues, "command.payload.expiresAt", "INVALID_DATE_TIME", "Browser Host expiresAt must be a valid date-time string.");
         }
       }
       if (payload.targetDomain === "model-inference") {

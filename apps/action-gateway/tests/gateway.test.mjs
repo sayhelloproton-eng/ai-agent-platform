@@ -1617,10 +1617,13 @@ test("Controller Action enforces query-before-claim and server-derived identity"
       },
     );
     assert.equal(forgedContext.status, 400);
+    const forgedContextBody = await forgedContext.json();
     assert.equal(
-      (await forgedContext.json()).error.code,
+      forgedContextBody.error.code,
       "CONTROLLER_INVALID_REQUEST",
     );
+    assert.match(forgedContextBody.error.message, /profileId/u);
+    assert.match(forgedContextBody.error.message, /must not be supplied/u);
   }, controllerGatewayOptions());
 });
 
@@ -1772,4 +1775,3 @@ test("Controller routes require Bearer authentication", async () => {
     assert.equal(response.status, 401);
   }, controllerGatewayOptions());
 });
-

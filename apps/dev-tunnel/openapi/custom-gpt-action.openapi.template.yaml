@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: AI Agent Platform Controller Actions
-  version: 1.3.0
+  version: 1.4.0
   description: Create Phase 2 tasks, query authenticated task context, claim Controller work, submit constrained Controller commands, read Browser Host Approval Drafts, issue single-use Approval Grants, release claims, and query Runtime status through the Action Gateway.
 servers:
   - url: ${DEV_TUNNEL_PUBLIC_BASE_URL}
@@ -404,62 +404,145 @@ components:
         - claimToken
         - idempotencyKey
     ControllerCommand:
+      oneOf:
+        - $ref: "#/components/schemas/CreatePlanControllerCommand"
+        - $ref: "#/components/schemas/RevisePlanControllerCommand"
+        - $ref: "#/components/schemas/AdvancePlanNodeControllerCommand"
+        - $ref: "#/components/schemas/RequestRoleWorkControllerCommand"
+        - $ref: "#/components/schemas/RequestApprovalControllerCommand"
+        - $ref: "#/components/schemas/BlockTaskControllerCommand"
+        - $ref: "#/components/schemas/CompleteTaskControllerCommand"
+      description: Command-discriminated schema. The payload shape is selected by command.type so the model-facing Action contract matches server validation.
+    CreatePlanControllerCommand:
       type: object
       additionalProperties: false
       properties:
         type:
           type: string
-          enum:
-            - CREATE_PLAN
-            - REVISE_PLAN
-            - ADVANCE_PLAN_NODE
-            - REQUEST_ROLE_WORK
-            - REQUEST_APPROVAL
-            - BLOCK_TASK
-            - COMPLETE_TASK
+          const: CREATE_PLAN
         reasonSummary:
           type: string
           minLength: 1
         payload:
-          $ref: "#/components/schemas/ControllerCommandPayload"
-      required:
-        - type
-        - reasonSummary
-        - payload
-    ControllerCommandPayload:
+          $ref: "#/components/schemas/CreatePlanPayload"
+      required: [type, reasonSummary, payload]
+    CreatePlanPayload:
       type: object
       additionalProperties: false
-      description: Command-specific payload. For REQUEST_ROLE_WORK, objective and expectedResultType are required; Local Control additionally requires capabilityRef/inputRef; Browser Host additionally requires targetRoleRef/targetProfileRef/hostActionType/expiresAt.
       properties:
         nodes:
           type: array
+          minItems: 1
           items:
             $ref: "#/components/schemas/PlanNodeDraft"
+      required: [nodes]
+    RevisePlanControllerCommand:
+      type: object
+      additionalProperties: false
+      properties:
+        type:
+          type: string
+          const: REVISE_PLAN
+        reasonSummary:
+          type: string
+          minLength: 1
+        payload:
+          $ref: "#/components/schemas/RevisePlanPayload"
+      required: [type, reasonSummary, payload]
+    RevisePlanPayload:
+      type: object
+      additionalProperties: false
+      properties:
         operations:
           type: array
+          minItems: 1
           items:
             $ref: "#/components/schemas/PlanRevisionOperation"
+      required: [operations]
+    AdvancePlanNodeControllerCommand:
+      type: object
+      additionalProperties: false
+      properties:
+        type:
+          type: string
+          const: ADVANCE_PLAN_NODE
+        reasonSummary:
+          type: string
+          minLength: 1
+        payload:
+          $ref: "#/components/schemas/AdvancePlanNodePayload"
+      required: [type, reasonSummary, payload]
+    AdvancePlanNodePayload:
+      type: object
+      additionalProperties: false
+      properties:
         nodeId:
           type: string
-        requiredRole:
+          minLength: 1
+        resultRefs:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        summary:
           type: string
-          description: Work executor role. For Browser Host work this is browser-host, not the page role.
+          minLength: 1
+      required: [nodeId]
+    RequestRoleWorkControllerCommand:
+      type: object
+      additionalProperties: false
+      properties:
+        type:
+          type: string
+          const: REQUEST_ROLE_WORK
+        reasonSummary:
+          type: string
+          minLength: 1
+        payload:
+          $ref: "#/components/schemas/RequestRoleWorkPayload"
+      required: [type, reasonSummary, payload]
+    RequestRoleWorkPayload:
+      type: object
+      additionalProperties: false
+      description: Role-work request. Browser Host work has structural required fields; SUBMIT_MESSAGE additionally requires inputRef and a stable approvalRef before the Browser Host prepares the Approval Draft.
+      properties:
+        nodeId:
+          type: string
+          minLength: 1
         targetDomain:
           type: string
+          minLength: 1
+        requiredRole:
+          type: string
+          minLength: 1
+          description: Work executor role. For Browser Host work this is browser-host, not the page role.
+        objective:
+          type: string
+          minLength: 1
         capabilityRef:
           type: string
+          minLength: 1
         inputRef:
           type: string
+          minLength: 1
+          description: Reference to an intake payload resource. Required for Local Control, Model Inference, and Browser actions that consume a payload such as SUBMIT_MESSAGE.
         expectedResultType:
           type: string
+          minLength: 1
+        expectedOutputContract:
+          type: string
+          minLength: 1
         targetRoleRef:
           type: string
+          minLength: 1
           description: Browser page target role_ref, for example controller. Required when targetDomain is browser-host.
         targetProfileRef:
           type: string
+          minLength: 1
           description: Browser Binding provider-native GPT ref (g-...), not the internal Controller profile id. Required when targetDomain is browser-host.
         conversationRef:
           type: string
+          minLength: 1
           description: Browser Binding conversation_ref when targeting a specific conversation. It is page identity, not Task conversation context.
         hostActionType:
           type: string
@@ -478,23 +561,146 @@ components:
           additionalProperties: true
         approvalRef:
           type: string
+          minLength: 1
+          description: Stable approval identity used to create/read the production Approval Draft. Required for Browser SUBMIT_MESSAGE.
         expiresAt:
           type: string
           format: date-time
-        grant:
-          $ref: "#/components/schemas/ApprovalGrant"
-        objective:
+      required: [nodeId, targetDomain, requiredRole, objective, expectedResultType]
+      allOf:
+        - if:
+            properties:
+              targetDomain:
+                const: local-control
+            required: [targetDomain]
+          then:
+            required: [capabilityRef, inputRef]
+        - if:
+            properties:
+              targetDomain:
+                const: model-inference
+            required: [targetDomain]
+          then:
+            required: [capabilityRef, inputRef]
+        - if:
+            properties:
+              targetDomain:
+                const: browser-host
+            required: [targetDomain]
+          then:
+            required: [targetRoleRef, targetProfileRef, hostActionType, expiresAt]
+        - if:
+            properties:
+              targetDomain:
+                const: browser-host
+              hostActionType:
+                enum:
+                  - OPEN_OR_RESUME_SESSION
+                  - CONTINUE_ROLE_SESSION
+                  - SET_COMPOSER_TEXT
+                  - SUBMIT_MESSAGE
+                  - CLICK_REGISTERED_UI
+            required: [targetDomain, hostActionType]
+          then:
+            required: [inputRef]
+        - if:
+            properties:
+              targetDomain:
+                const: browser-host
+              hostActionType:
+                const: SUBMIT_MESSAGE
+            required: [targetDomain, hostActionType]
+          then:
+            required: [approvalRef]
+      examples:
+        - nodeId: browser-submit
+          targetDomain: browser-host
+          requiredRole: browser-host
+          objective: Submit the approved message exactly once to the bound Controller conversation.
+          inputRef: payload:browser-submit-example
+          expectedResultType: browser-host-result-v0.1.0
+          targetRoleRef: controller
+          targetProfileRef: g-provider-native-controller-ref
+          conversationRef: conversation-provider-native-ref
+          hostActionType: SUBMIT_MESSAGE
+          approvalRef: approval:browser-submit-example
+          expiresAt: "2030-01-01T00:00:00.000Z"
+    RequestApprovalControllerCommand:
+      type: object
+      additionalProperties: false
+      properties:
+        type:
           type: string
-        expectedOutputContract:
+          const: REQUEST_APPROVAL
+        reasonSummary:
           type: string
+          minLength: 1
+        payload:
+          $ref: "#/components/schemas/RequestApprovalPayload"
+      required: [type, reasonSummary, payload]
+    RequestApprovalPayload:
+      type: object
+      additionalProperties: false
+      properties:
+        nodeId:
+          type: string
+          minLength: 1
         summary:
           type: string
+          minLength: 1
+        approvalRef:
+          type: string
+          minLength: 1
+        grant:
+          $ref: "#/components/schemas/ApprovalGrant"
+      required: [nodeId, summary, approvalRef]
+    BlockTaskControllerCommand:
+      type: object
+      additionalProperties: false
+      properties:
+        type:
+          type: string
+          const: BLOCK_TASK
+        reasonSummary:
+          type: string
+          minLength: 1
+        payload:
+          $ref: "#/components/schemas/BlockTaskPayload"
+      required: [type, reasonSummary, payload]
+    BlockTaskPayload:
+      type: object
+      additionalProperties: false
+      properties:
         reason:
           type: string
+          minLength: 1
+      required: [reason]
+    CompleteTaskControllerCommand:
+      type: object
+      additionalProperties: false
+      properties:
+        type:
+          type: string
+          const: COMPLETE_TASK
+        reasonSummary:
+          type: string
+          minLength: 1
+        payload:
+          $ref: "#/components/schemas/CompleteTaskPayload"
+      required: [type, reasonSummary, payload]
+    CompleteTaskPayload:
+      type: object
+      additionalProperties: false
+      properties:
+        summary:
+          type: string
+          minLength: 1
         resultRefs:
           type: array
           items:
             type: string
+            minLength: 1
+      required: [summary]
     PlanNodeDraft:
       type: object
       additionalProperties: false

@@ -806,15 +806,28 @@ test("SIGINT and SIGTERM are the only managed shutdown signals", () => {
 });
 
 
-test("OpenAPI 1.3.0 preserves explicit Browser Host target identity fields", () => {
+test("OpenAPI 1.4.0 structurally matches Browser REQUEST_ROLE_WORK validation", () => {
   const template = readFileSync(OPENAPI_TEMPLATE, "utf8");
-  assert.match(template, /\n {2}version: 1\.3\.0\n/u);
+  assert.match(template, /\n {2}version: 1\.4\.0\n/u);
+
+  const commandMatch = template.match(
+    /\n {4}ControllerCommand:(?<schema>[\s\S]*?)\n {4}CreatePlanControllerCommand:/u,
+  );
+  assert.notEqual(commandMatch, null);
+  assert.match(commandMatch.groups.schema, /RequestRoleWorkControllerCommand/u);
+  assert.match(commandMatch.groups.schema, /Command-discriminated schema/u);
+
   const payloadMatch = template.match(
-    /\n {4}ControllerCommandPayload:(?<schema>[\s\S]*?)\n {4}PlanNodeDraft:/u,
+    /\n {4}RequestRoleWorkPayload:(?<schema>[\s\S]*?)\n {4}RequestApprovalControllerCommand:/u,
   );
   assert.notEqual(payloadMatch, null);
-  assert.match(payloadMatch.groups.schema, /\n {8}targetRoleRef:\n/u);
-  assert.match(payloadMatch.groups.schema, /\n {8}targetProfileRef:\n/u);
-  assert.match(payloadMatch.groups.schema, /Work executor role/u);
-  assert.match(payloadMatch.groups.schema, /Browser page target role_ref/u);
+  const schema = payloadMatch.groups.schema;
+  assert.match(schema, /required: \[nodeId, targetDomain, requiredRole, objective, expectedResultType\]/u);
+  assert.match(schema, /required: \[targetRoleRef, targetProfileRef, hostActionType, expiresAt\]/u);
+  assert.match(schema, /required: \[inputRef\]/u);
+  assert.match(schema, /required: \[approvalRef\]/u);
+  assert.match(schema, /const: SUBMIT_MESSAGE/u);
+  assert.match(schema, /inputRef: payload:browser-submit-example/u);
+  assert.match(schema, /approvalRef: approval:browser-submit-example/u);
+  assert.match(schema, /format: date-time/u);
 });

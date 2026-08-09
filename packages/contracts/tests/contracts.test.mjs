@@ -418,4 +418,56 @@ test("Browser Host role work separates executor role from page target role", () 
   });
   assert.equal(submitWithoutApprovalRef.ok, false);
   assert.ok(submitWithoutApprovalRef.issues.some((item) => item.path === "command.payload.approvalRef" && item.code === "REQUIRED_FIELD"));
+
+  const submitWithoutInputRef = validateSubmitControllerCommandRequest({
+    taskId: "task-browser-target-001",
+    claimToken: "token-browser-target-001",
+    expectedTaskVersion: 3,
+    expectedPlanVersion: 2,
+    idempotencyKey: "browser-target-submit-no-input",
+    command: {
+      type: "REQUEST_ROLE_WORK",
+      reasonSummary: "Submit one approved message.",
+      payload: {
+        nodeId: "browser-submit",
+        targetDomain: "browser-host",
+        requiredRole: "browser-host",
+        objective: "Submit the approved message exactly once.",
+        expectedResultType: "browser-host-result-v0.1.0",
+        targetRoleRef: "controller",
+        targetProfileRef: "g-controller-real",
+        conversationRef: "conversation-real",
+        hostActionType: "SUBMIT_MESSAGE",
+        approvalRef: "approval:browser-submit",
+        expiresAt: "2030-01-01T00:00:00.000Z",
+      },
+    },
+  });
+  assert.equal(submitWithoutInputRef.ok, false);
+  assert.ok(submitWithoutInputRef.issues.some((item) => item.path === "command.payload.inputRef" && item.code === "REQUIRED_FIELD"));
+
+  const invalidBrowserExpiry = validateSubmitControllerCommandRequest({
+    taskId: "task-browser-target-001",
+    claimToken: "token-browser-target-001",
+    expectedTaskVersion: 3,
+    expectedPlanVersion: 2,
+    idempotencyKey: "browser-target-invalid-expiry",
+    command: {
+      type: "REQUEST_ROLE_WORK",
+      reasonSummary: "Observe the bound Controller page.",
+      payload: {
+        nodeId: "browser-observe",
+        targetDomain: "browser-host",
+        requiredRole: "browser-host",
+        objective: "Observe the bound page without mutating it.",
+        expectedResultType: "browser-host-result-v0.1.0",
+        targetRoleRef: "controller",
+        targetProfileRef: "g-controller-real",
+        hostActionType: "OBSERVE_PAGE",
+        expiresAt: "not-a-date",
+      },
+    },
+  });
+  assert.equal(invalidBrowserExpiry.ok, false);
+  assert.ok(invalidBrowserExpiry.issues.some((item) => item.path === "command.payload.expiresAt" && item.code === "INVALID_DATE_TIME"));
 });
