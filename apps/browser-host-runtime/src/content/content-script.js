@@ -101,6 +101,37 @@
   function findButton(patterns) {
     return buttons().find((button) => patterns.some((pattern) => pattern.test(accessibleName(button))));
   }
+  function isEnabledButton(button) {
+    return Boolean(button) && visible(button) && !button.disabled && button.getAttribute("aria-disabled") !== "true";
+  }
+  function findSendButton() {
+    const candidates = buttons();
+    const structural = candidates.find((button) => {
+      const testId = normalizeText(button.getAttribute("data-testid"));
+      return /^(send-button|composer-submit-button)$/i.test(testId);
+    });
+    if (structural) return structural;
+    return candidates.find((button) => [
+      /send message/i,
+      /^send$/i,
+      /send prompt/i,
+      /submit prompt/i,
+      /发送消息/,
+      /^发送$/,
+      /发送提示/
+    ].some((pattern) => pattern.test(accessibleName(button)))) ?? null;
+  }
+  async function waitForEnabledSendButton(expectedIdentity, { timeoutMs = 3000, pollMs = 50 } = {}) {
+    const deadline = Date.now() + timeoutMs;
+    do {
+      ensureNoUserConflict();
+      ensureExpectedIdentity(expectedIdentity);
+      const send = findSendButton();
+      if (isEnabledButton(send)) return send;
+      if (Date.now() >= deadline) return null;
+      await new Promise((resolve) => setTimeout(resolve, pollMs));
+    } while (true);
+  }
   function generationState() {
     const stop = findButton([/stop generating/i, /停止生成/, /停止回答/, /停止/]);
     return stop ? "RUNNING" : "IDLE";
@@ -388,9 +419,14 @@
     const baseline = responseSnapshot();
     const set = setComposerText(payload.text, payload.expected_identity);
     ensureExpectedIdentity(payload.expected_identity);
-    const send = findButton([/send message/i, /^send$/i, /发送消息/, /^发送$/]);
-    if (!send || send.disabled || send.getAttribute("aria-disabled") === "true") {
-      throw Object.assign(new Error("Enabled ChatGPT send button was not found."), { code: "SEND_BUTTON_NOT_READY" });
+    // ChatGPT enables/replaces the send control asynchronously after an input event.
+    // A synchronous lookup races React and can strand an approved command after the
+    // composer has already been populated. Wait briefly for the exact send control
+    // to become visible/enabled while continuously preserving identity/user-control
+    // guards. Prefer stable data-testid markers, with accessible-name fallbacks.
+    const send = await waitForEnabledSendButton(payload.expected_identity);
+    if (!send) {
+      throw Object.assign(new Error("Enabled ChatGPT send button was not found before the bounded readiness timeout."), { code: "SEND_BUTTON_NOT_READY" });
     }
     send.click();
     const submittedAt = new Date().toISOString();

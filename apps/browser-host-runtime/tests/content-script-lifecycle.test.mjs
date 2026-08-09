@@ -104,7 +104,18 @@ test("reinjection disposes the previous live content-script instance before regi
   assert.equal(secondMarker.state, "ready");
 });
 
-function createComposerHarness({ transform = (value) => value, bodyText = "", extraButtons = [], messageRoles = [], hidden = false, responseLifecycle = null } = {}) {
+function createComposerHarness({
+  transform = (value) => value,
+  bodyText = "",
+  extraButtons = [],
+  messageRoles = [],
+  hidden = false,
+  responseLifecycle = null,
+  sendAriaLabel = "Send",
+  sendTestId = null,
+  sendDisabled = false,
+  sendEnableAfterMs = null
+} = {}) {
   const runtimeListeners = new Set();
   const documentListeners = new Map();
   let sendClicks = 0;
@@ -146,9 +157,15 @@ function createComposerHarness({ transform = (value) => value, bodyText = "", ex
     return node;
   });
   const send = new ElementMock();
-  send.attributes = { "aria-label": "Send" };
-  send.disabled = false;
+  send.attributes = {
+    ...(sendAriaLabel == null ? {} : { "aria-label": sendAriaLabel }),
+    ...(sendTestId == null ? {} : { "data-testid": sendTestId })
+  };
+  send.disabled = sendDisabled;
   send.click = () => { sendClicks += 1; };
+  if (Number.isFinite(sendEnableAfterMs)) {
+    setTimeout(() => { send.disabled = false; }, sendEnableAfterMs);
+  }
 
   const document = {
     documentElement: { scrollHeight: 0, scrollTop: 0, clientHeight: 0, scrollTo() {} },
@@ -409,6 +426,63 @@ test("message submission stops before click when the composer does not contain t
   assert.equal(response.error.code, "COMPOSER_TEXT_MISMATCH");
   assert.equal(response.error.details.expected_chars, "continue task".length);
   assert.equal(response.error.details.actual_chars, "continue tas".length);
+  assert.equal(harness.getSendClicks(), 0);
+});
+
+
+
+test("message submission recognizes the stable ChatGPT send-button test id even without an accessible label", async () => {
+  const harness = createComposerHarness({ sendAriaLabel: null, sendTestId: "send-button" });
+  const listener = [...harness.runtimeListeners][0];
+  const response = await new Promise((resolve) => {
+    listener({
+      type: "BHR_EXECUTE_ACTION",
+      action_type: "SUBMIT_MESSAGE",
+      payload: {
+        text: "continue task",
+        wait_for_response: false,
+        expected_identity: { gpt_ref: "g-test", conversation_ref: "conv" }
+      }
+    }, {}, resolve);
+  });
+  assert.equal(response.ok, true);
+  assert.equal(harness.getSendClicks(), 1);
+});
+
+test("message submission waits for ChatGPT to asynchronously enable the send button after composer input", async () => {
+  const harness = createComposerHarness({ sendDisabled: true, sendEnableAfterMs: 75 });
+  const listener = [...harness.runtimeListeners][0];
+  const response = await new Promise((resolve) => {
+    listener({
+      type: "BHR_EXECUTE_ACTION",
+      action_type: "SUBMIT_MESSAGE",
+      payload: {
+        text: "continue task",
+        wait_for_response: false,
+        expected_identity: { gpt_ref: "g-test", conversation_ref: "conv" }
+      }
+    }, {}, resolve);
+  });
+  assert.equal(response.ok, true);
+  assert.equal(harness.getSendClicks(), 1);
+});
+
+test("message submission never clicks a send button that stays disabled through the bounded readiness wait", async () => {
+  const harness = createComposerHarness({ sendDisabled: true });
+  const listener = [...harness.runtimeListeners][0];
+  const response = await new Promise((resolve) => {
+    listener({
+      type: "BHR_EXECUTE_ACTION",
+      action_type: "SUBMIT_MESSAGE",
+      payload: {
+        text: "continue task",
+        wait_for_response: false,
+        expected_identity: { gpt_ref: "g-test", conversation_ref: "conv" }
+      }
+    }, {}, resolve);
+  });
+  assert.equal(response.ok, false);
+  assert.equal(response.error.code, "SEND_BUTTON_NOT_READY");
   assert.equal(harness.getSendClicks(), 0);
 });
 
