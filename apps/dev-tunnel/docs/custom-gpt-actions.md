@@ -18,7 +18,7 @@ Builder 使用忽略文件 `apps/dev-tunnel/.runtime/custom-gpt-action.openapi.y
 6. 先在 Preview 调用 `getRuntimeStatus` 验证公网链路；
 7. 再调用 `getTaskDecisionContext` 查询 `task-ctl-001`；
 8. 使用最新 Task Version 调用 `claimControllerTask`；
-9. 使用 Claim Token 调用 `submitControllerCommand` 创建最小 Plan。
+9. 使用 `claimControllerTask` 返回的 `data.claimToken` **逐字原样**调用 `submitControllerCommand`；`data.claim.claimId` 仅用于诊断，绝不能作为 `claimToken`。
 
 Schema 暴露五个窄化 Operation：四个 Controller 业务入口和零参数 Runtime Status。不要让 Custom GPT 生成通用内部 `TaskRequest`，也不要让模型提交 `profileId`、`roleId`、Actor、Task 字段 Patch 或 Plan Node 运行状态。Gateway 根据 Builder Bearer Key 绑定具体 Profile 和 Role。
 

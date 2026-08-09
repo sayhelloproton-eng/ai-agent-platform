@@ -114,7 +114,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ControllerSuccessEnvelope"
+                $ref: "#/components/schemas/ControllerClaimSuccessEnvelope"
         "400":
           $ref: "#/components/responses/InvalidRequest"
         "401":
@@ -367,6 +367,7 @@ components:
         claimToken:
           type: string
           minLength: 1
+          description: Copy the exact opaque data.claimToken returned by claimControllerTask. Never use claim.claimId or any claim identifier as this token.
         expectedTaskVersion:
           type: integer
           minimum: 1
@@ -755,6 +756,41 @@ components:
           $ref: "#/components/schemas/PlanNodeDraft"
       required:
         - operation
+    ControllerClaimSuccessEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        ok:
+          type: boolean
+          const: true
+        requestId:
+          type: string
+        data:
+          type: object
+          additionalProperties: true
+          properties:
+            contractVersion:
+              type: string
+            taskId:
+              type: string
+            taskVersion:
+              type: integer
+            claim:
+              type: object
+              additionalProperties: true
+              description: Claim metadata only. claim.claimId is a non-secret diagnostic identifier and must never be passed as claimToken.
+              properties:
+                claimId:
+                  type: string
+                  description: Non-secret claim identifier for diagnostics only. Never use this value as claimToken.
+            claimToken:
+              type: string
+              minLength: 1
+              description: Opaque authorization token. Pass this exact value unchanged as claimToken to submitControllerCommand or releaseControllerTask. Never substitute claim.claimId.
+            idempotentReplay:
+              type: boolean
+          required: [contractVersion, taskId, taskVersion, claim, claimToken, idempotentReplay]
+      required: [ok, requestId, data]
     ControllerSuccessEnvelope:
       type: object
       properties:
