@@ -23,6 +23,25 @@ test("default platform Wake candidate allows only a fully verified allowlisted W
   assert.equal(validatePlatformWakeAuthorization(command, payload).wake.task_id, command.task_id);
 });
 
+test("default platform Wake candidate keeps ordinary SUBMIT_MESSAGE on the human Approval path", () => {
+  const command = {
+    host_command_version: "0.1.0",
+    command_id: "approved-submit",
+    dispatch_ref: "dispatch-approved-submit",
+    task_id: "task-approved-submit",
+    target: { role_ref: "controller", gpt_ref: "g-test", conversation_ref: "conv" },
+    action: { type: "SUBMIT_MESSAGE", payload_ref: "payload" },
+    preconditions: { provider: "chatgpt", pageState: "READY" },
+    approval_ref: "approval:task-approved-submit",
+    idempotency_key: "idem-approved-submit",
+    expires_at: "2030-01-01T00:00:00.000Z"
+  };
+  assert.equal(
+    requiresApproval(command, { mode: "platform_wake_candidate", resolvedPayload: { text: "approved message" } }),
+    true
+  );
+});
+
 test("strict mode still requires Approval for platform Wake", () => {
   const { command, payload } = platformWake();
   assert.equal(requiresApproval(command, { mode: "strict", resolvedPayload: payload }), true);

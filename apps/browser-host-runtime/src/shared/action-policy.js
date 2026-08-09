@@ -93,8 +93,16 @@ export function requiresApproval(commandOrActionType, {
   if (classifyAction(actionType) === "LOW") return false;
 
   if (normalizePolicyMode(mode) === APPROVAL_POLICY_MODE.PLATFORM_WAKE_CANDIDATE && command && PLATFORM_WAKE_ACTIONS.has(actionType)) {
-    validatePlatformWakeAuthorization(command, resolvedPayload, { now });
-    return false;
+    const preconditions = command.preconditions && typeof command.preconditions === "object" && !Array.isArray(command.preconditions)
+      ? command.preconditions
+      : {};
+    // Platform Wake is an optional low-risk bypass, not the default path for every
+    // allowlisted high-risk action. Ordinary SUBMIT_MESSAGE commands without an
+    // explicit PLATFORM_WAKE authorization must remain on the human Approval path.
+    if (preconditions.authorization_class === "PLATFORM_WAKE") {
+      validatePlatformWakeAuthorization(command, resolvedPayload, { now });
+      return false;
+    }
   }
   return true;
 }

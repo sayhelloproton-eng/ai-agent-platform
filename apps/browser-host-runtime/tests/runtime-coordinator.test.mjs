@@ -437,7 +437,7 @@ test("high-risk command prepares Approval Draft and resumes the same command aft
     },
     modelProvider: { analyze: async () => assessment() },
     evidenceStore: {},
-    configProvider: async () => ({ paused: false, emergency_stopped: false, approval_policy_mode: "strict" })
+    configProvider: async () => ({ paused: false, emergency_stopped: false, approval_policy_mode: "platform_wake_candidate" })
   });
 
   const pending = await coordinator.processOne();
