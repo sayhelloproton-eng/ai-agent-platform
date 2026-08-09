@@ -104,7 +104,7 @@ test("reinjection disposes the previous live content-script instance before regi
   assert.equal(secondMarker.state, "ready");
 });
 
-function createComposerHarness({ transform = (value) => value, bodyText = "", extraButtons = [], messageRoles = [], hidden = false } = {}) {
+function createComposerHarness({ transform = (value) => value, bodyText = "", extraButtons = [], messageRoles = [], hidden = false, responseLifecycle = null } = {}) {
   const runtimeListeners = new Set();
   const documentListeners = new Map();
   let sendClicks = 0;
@@ -114,6 +114,10 @@ function createComposerHarness({ transform = (value) => value, bodyText = "", ex
     constructor(tagName = "BUTTON") { this.tagName = tagName; }
     getBoundingClientRect() { return { width: 100, height: 30, x: 0, y: 0 }; }
     getAttribute(name) { return this.attributes?.[name] ?? null; }
+    closest(selector) {
+      if ((this.tagName === "BUTTON" && selector.includes("button")) || (this.getAttribute("role") === "button" && selector.includes('[role="button"]'))) return this;
+      return null;
+    }
     dispatchEvent() { return true; }
     focus() {}
   }
@@ -210,7 +214,7 @@ function createComposerHarness({ transform = (value) => value, bodyText = "", ex
     Promise,
     Map,
     Set,
-    BhrResponseLifecycle: {
+    BhrResponseLifecycle: responseLifecycle ?? {
       waitForSubmissionConfirmation: async ({ snapshot }) => ({
         status: "ACTION_SUCCEEDED",
         details: { submission_confirmed: true, confirmed_snapshot: snapshot() }
@@ -225,6 +229,7 @@ function createComposerHarness({ transform = (value) => value, bodyText = "", ex
     composer,
     getSendClicks: () => sendClicks,
     getExtraButtonClicks: (name) => extraButtonClicks.get(name) ?? 0,
+    getExtraButtonElement: (name) => builtExtraButtons.find((button) => button.attributes?.["aria-label"] === name) ?? null,
     dispatchDocumentEvent: (type, event) => {
       for (const listener of documentListeners.get(type) ?? []) listener(event);
     }
@@ -390,4 +395,53 @@ test("ChatGPT Action allow/deny controls surface ACTION_CONFIRMATION_PENDING", a
   assert.equal(response.ok, true);
   assert.equal(response.data.page_state, "ACTION_CONFIRMATION_PENDING");
   assert.ok(response.data.blocking_ui.some((item) => item.type === "ACTION_CONFIRMATION_PENDING"));
+});
+
+
+test("post-delivery response wait tolerates the explicit ChatGPT Action choice but not later unrelated user activity", async () => {
+  const interruptions = [];
+  const harness = createComposerHarness({
+    extraButtons: ["允许", "拒绝"],
+    responseLifecycle: {
+      waitForSubmissionConfirmation: async ({ snapshot }) => ({
+        status: "ACTION_SUCCEEDED",
+        details: { submission_confirmed: true, confirmed_snapshot: snapshot() }
+      }),
+      waitForCompleteResponse: async ({ isInterrupted }) => {
+        interruptions.push(isInterrupted());
+        return { status: "ACTION_SUCCEEDED", details: { response_completed: true } };
+      }
+    }
+  });
+  const listener = [...harness.runtimeListeners][0];
+  const allow = harness.getExtraButtonElement("允许");
+  assert.ok(allow);
+
+  harness.dispatchDocumentEvent("pointerdown", { isTrusted: true, target: allow });
+  const observed = await new Promise((resolve) => {
+    listener({ type: "BHR_OBSERVE", observation_id: "after-action-choice" }, {}, resolve);
+  });
+  assert.equal(observed.ok, true);
+  assert.equal(observed.data.user_active, true, "pre-execution user-control safety window must remain active");
+
+  const waited = await new Promise((resolve) => {
+    listener({
+      type: "BHR_EXECUTE_ACTION",
+      action_type: "WAIT_FOR_RESPONSE",
+      payload: { expected_identity: { gpt_ref: "g-test", conversation_ref: "conv" } }
+    }, {}, resolve);
+  });
+  assert.equal(waited.ok, true);
+  assert.deepEqual(interruptions, [false], "the explicit Allow/Deny choice is expected during post-delivery response wait");
+
+  harness.dispatchDocumentEvent("keydown", { isTrusted: true, target: harness.composer });
+  const waitedAfterKey = await new Promise((resolve) => {
+    listener({
+      type: "BHR_EXECUTE_ACTION",
+      action_type: "WAIT_FOR_RESPONSE",
+      payload: { expected_identity: { gpt_ref: "g-test", conversation_ref: "conv" } }
+    }, {}, resolve);
+  });
+  assert.equal(waitedAfterKey.ok, true);
+  assert.deepEqual(interruptions, [false, true], "later unrelated user activity must restore the interruption guard");
 });

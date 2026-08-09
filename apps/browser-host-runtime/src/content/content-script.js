@@ -17,6 +17,8 @@
     followLatest: true,
     userReviewing: false,
     userActiveUntil: 0,
+    userActivityEpoch: 0,
+    actionConfirmationChoiceEpoch: -1,
     currentObservationId: null,
     elementCatalogs: new Map(),
     lastProgrammaticScrollAt: 0,
@@ -268,6 +270,24 @@
   function ensureNoUserConflict() {
     if (Date.now() < state.userActiveUntil || state.userReviewing) throw Object.assign(new Error("User is currently controlling or reviewing the page."), { code: "USER_CONTROL_ACTIVE" });
   }
+  function isActionConfirmationChoiceTarget(target) {
+    if (!(target instanceof Element)) return false;
+    const button = typeof target.closest === "function"
+      ? target.closest('button,[role="button"]')
+      : target;
+    if (!(button instanceof Element) || !visible(button)) return false;
+    if (!/^(allow|deny|允许|拒绝)$/iu.test(accessibleName(button))) return false;
+    return blockingUi().some((item) => item.type === "ACTION_CONFIRMATION_PENDING");
+  }
+  function responseWaitInterrupted() {
+    if (state.userReviewing) return true;
+    if (Date.now() >= state.userActiveUntil) return false;
+    // Clicking ChatGPT's explicit Allow/Deny control is an expected part of the
+    // post-delivery response lifecycle. It must not be mistaken for unrelated
+    // user takeover. Any later pointer/key activity advances userActivityEpoch
+    // and immediately restores the normal interruption guard.
+    return state.userActivityEpoch !== state.actionConfirmationChoiceEpoch;
+  }
   function setComposerText(text, expectedIdentity = null) {
     ensureNoUserConflict();
     ensureExpectedIdentity(expectedIdentity);
@@ -307,7 +327,7 @@
       baseline,
       snapshot: responseSnapshot,
       ensureIdentity: ensureExpectedIdentity,
-      isInterrupted: () => state.userReviewing || Date.now() < state.userActiveUntil
+      isInterrupted: responseWaitInterrupted
     });
   }
 
@@ -397,8 +417,19 @@
     }
   }
 
-  function onPointerDown(event) { if (event.isTrusted) state.userActiveUntil = Date.now() + 10000; }
-  function onKeyDown(event) { if (event.isTrusted) state.userActiveUntil = Date.now() + 10000; }
+  function onPointerDown(event) {
+    if (!event.isTrusted) return;
+    state.userActivityEpoch += 1;
+    state.userActiveUntil = Date.now() + 10000;
+    if (isActionConfirmationChoiceTarget(event.target)) {
+      state.actionConfirmationChoiceEpoch = state.userActivityEpoch;
+    }
+  }
+  function onKeyDown(event) {
+    if (!event.isTrusted) return;
+    state.userActivityEpoch += 1;
+    state.userActiveUntil = Date.now() + 10000;
+  }
   function onScroll(event) {
     if (!event.isTrusted || Date.now() - state.lastProgrammaticScrollAt < 300) return;
     const scroller = findScroller();
