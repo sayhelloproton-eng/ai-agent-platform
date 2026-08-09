@@ -62,8 +62,8 @@ test("idempotency key plus logical fingerprint is unique across Command IDs", as
   );
 });
 
-test("non-terminal records are never capacity-pruned and new claims stop at capacity", async () => {
-  let now = Date.parse("2026-08-06T00:00:00.000Z");
+test("terminal history is pressure-pruned while non-terminal records are never capacity-pruned", async () => {
+  const now = Date.parse("2026-08-06T00:00:00.000Z");
   const journal = new CommandJournal(new MemoryStorageArea(), {
     maxEntries: 2,
     terminalRetentionMs: 1000,
@@ -74,13 +74,95 @@ test("non-terminal records are never capacity-pruned and new claims stop at capa
   assert.equal((await journal.capacityStatus()).accepting_new_commands, false);
   await assert.rejects(() => journal.begin(command(3)), (error) => error.code === "JOURNAL_CAPACITY_EXHAUSTED");
   await journal.markReported("cmd-1", { receipt: "done" });
-  assert.equal((await journal.capacityStatus()).accepting_new_commands, false, "retained terminal receipt still consumes capacity");
-  now += 1001;
-  assert.equal((await journal.capacityStatus()).accepting_new_commands, true);
+  assert.equal((await journal.capacityStatus()).accepting_new_commands, true, "oldest terminal receipt is evicted under capacity pressure");
   await journal.begin(command(3));
   const entries = await journal.entries();
+  assert.equal(entries["cmd-1"], undefined);
   assert.equal(entries["cmd-2"].state, JOURNAL_STATE.RECEIVED);
   assert.equal(entries["cmd-3"].state, JOURNAL_STATE.RECEIVED);
+});
+
+test("100 terminal entries are pruned to the low-water mark before dispatch polling", async () => {
+  let now = Date.parse("2026-08-06T00:00:00.000Z");
+  const journal = new CommandJournal(new MemoryStorageArea(), { now: () => now });
+  for (let index = 0; index < 100; index += 1) {
+    await journal.begin(command(`terminal-${index}`));
+    await journal.markReported(`cmd-terminal-${index}`, { receipt: `receipt-${index}` });
+    now += 1;
+  }
+  let listPendingCalls = 0;
+  const coordinator = coordinatorBase({
+    journal,
+    dispatchClient: { listPending: async () => { listPendingCalls += 1; return []; } }
+  });
+
+  const response = await coordinator.processOne();
+  const entries = await journal.entries();
+  assert.equal(response.reason, "NO_DISPATCH");
+  assert.equal(listPendingCalls, 1);
+  assert.equal(Object.keys(entries).length, 80);
+  for (let index = 0; index < 20; index += 1) assert.equal(entries[`cmd-terminal-${index}`], undefined);
+  for (let index = 20; index < 100; index += 1) assert.equal(entries[`cmd-terminal-${index}`].state, JOURNAL_STATE.REPORTED);
+});
+
+test("mixed capacity prunes only the oldest terminal entries and preserves every non-terminal entry", async () => {
+  let now = Date.parse("2026-08-06T00:00:00.000Z");
+  const journal = new CommandJournal(new MemoryStorageArea(), { now: () => now });
+  for (let index = 0; index < 60; index += 1) {
+    await journal.begin(command(`terminal-${index}`));
+    await journal.markReported(`cmd-terminal-${index}`, { receipt: `receipt-${index}` });
+    now += 1;
+  }
+  for (let index = 0; index < 40; index += 1) {
+    await journal.begin(command(`active-${index}`));
+    now += 1;
+  }
+  let listPendingCalls = 0;
+  const coordinator = coordinatorBase({
+    journal,
+    dispatchClient: { listPending: async () => { listPendingCalls += 1; return []; } }
+  });
+
+  const response = await coordinator.processOne();
+  const entries = await journal.entries();
+  assert.equal(response.reason, "NO_DISPATCH");
+  assert.equal(listPendingCalls, 1);
+  assert.equal(Object.keys(entries).length, 80);
+  for (let index = 0; index < 20; index += 1) assert.equal(entries[`cmd-terminal-${index}`], undefined);
+  for (let index = 20; index < 60; index += 1) assert.equal(entries[`cmd-terminal-${index}`].state, JOURNAL_STATE.REPORTED);
+  for (let index = 0; index < 40; index += 1) assert.equal(entries[`cmd-active-${index}`].state, JOURNAL_STATE.RECEIVED);
+});
+
+test("100 non-terminal entries still block before dispatch polling", async () => {
+  const journal = new CommandJournal(new MemoryStorageArea());
+  for (let index = 0; index < 100; index += 1) await journal.begin(command(`active-${index}`));
+  let listPendingCalls = 0;
+  const coordinator = coordinatorBase({
+    journal,
+    dispatchClient: { listPending: async () => { listPendingCalls += 1; return []; } }
+  });
+
+  const response = await coordinator.processOne();
+  assert.equal(response.reason, "JOURNAL_CAPACITY_EXHAUSTED");
+  assert.equal(listPendingCalls, 0);
+  assert.equal(Object.keys(await journal.entries()).length, 100);
+});
+
+test("retained recent terminal entries preserve duplicate suppression after pressure pruning", async () => {
+  let now = Date.parse("2026-08-06T00:00:00.000Z");
+  const journal = new CommandJournal(new MemoryStorageArea(), { now: () => now });
+  for (let index = 0; index < 100; index += 1) {
+    await journal.begin(command(`terminal-${index}`));
+    await journal.markReported(`cmd-terminal-${index}`, { receipt: `receipt-${index}` });
+    now += 1;
+  }
+  await journal.capacityStatus();
+
+  const duplicate = await journal.begin(command("terminal-99"));
+  assert.equal(duplicate.duplicate, true);
+  assert.equal(duplicate.terminal, true);
+  assert.equal(duplicate.entry.command_id, "cmd-terminal-99");
+  assert.equal(Object.keys(await journal.entries()).length, 80);
 });
 
 test("restart uncertainty uses independent Uncertain report and never ordinary dispatch fail", async () => {

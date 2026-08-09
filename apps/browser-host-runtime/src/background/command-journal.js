@@ -4,6 +4,8 @@ import { BhrError } from "../shared/errors.js";
 import { buildHostResult } from "../shared/contracts.js";
 
 const KEY = "bhr.command_journal";
+const DEFAULT_MAX_ENTRIES = 100;
+const DEFAULT_TERMINAL_LOW_WATER_MARK = 80;
 const DEFAULT_RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
 const DEFAULT_RECOVERY_ATTEMPTS = 5;
 const sharedQueues = new WeakMap();
@@ -76,7 +78,8 @@ export async function commandFingerprint(command) {
 
 export class CommandJournal {
   constructor(storage, {
-    maxEntries = 100,
+    maxEntries = DEFAULT_MAX_ENTRIES,
+    terminalLowWaterMark = DEFAULT_TERMINAL_LOW_WATER_MARK,
     terminalRetentionMs = DEFAULT_RETENTION_MS,
     maxRecoveryAttempts = DEFAULT_RECOVERY_ATTEMPTS,
     recoveryBaseDelayMs = 1000,
@@ -84,6 +87,10 @@ export class CommandJournal {
   } = {}) {
     this.storage = storage;
     this.maxEntries = maxEntries;
+    this.terminalLowWaterMark = Math.min(
+      Math.max(0, Math.floor(terminalLowWaterMark)),
+      Math.max(0, maxEntries - 1)
+    );
     this.terminalRetentionMs = terminalRetentionMs;
     this.maxRecoveryAttempts = maxRecoveryAttempts;
     this.recoveryBaseDelayMs = recoveryBaseDelayMs;
@@ -123,6 +130,32 @@ export class CommandJournal {
     return changed;
   }
 
+  _pruneOldestTerminalForCapacity(entries) {
+    const totalEntries = Object.keys(entries).length;
+    if (totalEntries < this.maxEntries) return false;
+
+    const terminalEntries = Object.entries(entries)
+      .filter(([, entry]) => this._isTerminal(entry))
+      .sort(([leftId, left], [rightId, right]) => {
+        const leftAt = Date.parse(left.updated_at ?? left.created_at ?? 0);
+        const rightAt = Date.parse(right.updated_at ?? right.created_at ?? 0);
+        const timestampOrder = (Number.isFinite(leftAt) ? leftAt : 0) - (Number.isFinite(rightAt) ? rightAt : 0);
+        return timestampOrder || leftId.localeCompare(rightId);
+      });
+    const removeCount = Math.min(
+      terminalEntries.length,
+      Math.max(0, totalEntries - this.terminalLowWaterMark)
+    );
+    for (const [commandId] of terminalEntries.slice(0, removeCount)) delete entries[commandId];
+    return removeCount > 0;
+  }
+
+  _maintainCapacity(entries, nowMs) {
+    const expiredChanged = this._pruneExpiredTerminal(entries, nowMs);
+    const pressureChanged = this._pruneOldestTerminalForCapacity(entries);
+    return expiredChanged || pressureChanged;
+  }
+
   _capacity(entries) {
     const values = Object.values(entries);
     const nonTerminalCount = values.filter((entry) => !this._isTerminal(entry)).length;
@@ -146,7 +179,7 @@ export class CommandJournal {
   async capacityStatus() {
     return this._exclusive(async () => {
       const entries = await this._load();
-      const changed = this._pruneExpiredTerminal(entries, this.now());
+      const changed = this._maintainCapacity(entries, this.now());
       if (changed) await this._save(entries);
       return this._capacity(entries);
     });
@@ -187,6 +220,7 @@ export class CommandJournal {
         };
       }
 
+      this._pruneOldestTerminalForCapacity(entries);
       const capacity = this._capacity(entries);
       if (!capacity.accepting_new_commands) {
         await this._save(entries);
