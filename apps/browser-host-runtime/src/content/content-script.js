@@ -16,7 +16,9 @@
   const state = {
     followLatest: true,
     userReviewing: false,
+    reviewInitialized: false,
     userActiveUntil: 0,
+    userScrollIntentUntil: 0,
     userActivityEpoch: 0,
     actionConfirmationChoiceEpoch: -1,
     currentObservationId: null,
@@ -32,6 +34,9 @@
     "OBSERVE_PAGE", "FOLLOW_LATEST", "SET_COMPOSER_TEXT", "SUBMIT_MESSAGE", "CONTINUE_ROLE_SESSION",
     "STOP_GENERATION", "CLICK_REGISTERED_UI", "WAIT_FOR_RESPONSE"
   ]);
+  const USER_ACTIVITY_WINDOW_MS = 10000;
+  const USER_SCROLL_INTENT_WINDOW_MS = 1500;
+  const REVIEW_DISTANCE_PX = 180;
 
   function safeError(code, message, details = null) { return { ok: false, error: { code, message, details } }; }
   function normalizeText(value) { return String(value ?? "").replace(/\s+/g, " ").trim(); }
@@ -158,16 +163,54 @@
     if (composer()) return "READY";
     return document.readyState === "complete" ? "UNKNOWN" : "LOADING";
   }
-  function findScroller() {
-    const candidates = [document.querySelector("main"), document.querySelector('[role="main"]'), document.scrollingElement, document.documentElement]
-      .filter(Boolean);
-    const all = [...document.querySelectorAll("main,section,div")].filter((element) => {
-      const style = getComputedStyle(element);
-      return visible(element) && /(auto|scroll)/.test(style.overflowY) && element.scrollHeight > element.clientHeight + 200;
-    });
-    return [...candidates, ...all].sort((a, b) => (b.scrollHeight - b.clientHeight) - (a.scrollHeight - a.clientHeight))[0] ?? document.scrollingElement;
+  function isScrollable(element) {
+    if (!element) return false;
+    const range = Number(element.scrollHeight ?? 0) - Number(element.clientHeight ?? 0);
+    if (range <= 20) return false;
+    if (element === document.scrollingElement || element === document.documentElement) return true;
+    const style = getComputedStyle(element);
+    return /(auto|scroll|overlay)/.test(String(style?.overflowY ?? ""));
   }
-  function distanceFromBottom(scroller) { return Math.max(0, scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight); }
+  function closestScrollable(element) {
+    let current = element ?? null;
+    while (current) {
+      if (isScrollable(current)) return current;
+      if (current === document.documentElement) break;
+      current = current.parentElement ?? null;
+    }
+    return null;
+  }
+  function findScroller() {
+    // Scope review/follow-latest state to the conversation surface. The previous
+    // global "largest scroll range" heuristic could select the ChatGPT sidebar,
+    // making an unrelated history-list position look like the user was reviewing
+    // the bound conversation forever. Prefer the latest message's scrollable
+    // ancestor, then the composer/main surface, and only then the document scroller.
+    const latestMessage = [...document.querySelectorAll('[data-message-author-role],article')].at(-1) ?? null;
+    const anchors = [
+      latestMessage,
+      composer(),
+      document.querySelector("main"),
+      document.querySelector('[role="main"]')
+    ];
+    for (const anchor of anchors) {
+      const scroller = closestScrollable(anchor);
+      if (scroller) return scroller;
+    }
+    if (document.scrollingElement) return document.scrollingElement;
+    return document.documentElement ?? null;
+  }
+  function distanceFromBottom(scroller) {
+    if (!scroller) return 0;
+    return Math.max(0, Number(scroller.scrollHeight ?? 0) - Number(scroller.scrollTop ?? 0) - Number(scroller.clientHeight ?? 0));
+  }
+  function syncReviewStateFromPosition({ allowEnter = false } = {}) {
+    const scroller = findScroller();
+    if (!scroller) return;
+    const reviewing = distanceFromBottom(scroller) > REVIEW_DISTANCE_PX;
+    if (!reviewing) state.userReviewing = false;
+    else if (allowEnter) state.userReviewing = true;
+  }
   function scrollToBottom() {
     const scroller = findScroller();
     if (!scroller) return false;
@@ -248,7 +291,17 @@
     };
   }
   function observe(observationId) {
-    if (state.followLatest && !state.userReviewing && Date.now() >= state.userActiveUntil) scrollToBottom();
+    // On first contact (including content-script reinjection), preserve a real
+    // human review position instead of blindly snapping to latest. Afterwards,
+    // entering review mode is driven only by explicit user scroll intent; this
+    // prevents ChatGPT/layout-driven scroll events from creating a sticky false
+    // USER_CONTROL_ACTIVE gate.
+    syncReviewStateFromPosition({ allowEnter: !state.reviewInitialized });
+    state.reviewInitialized = true;
+    if (state.followLatest && !state.userReviewing && Date.now() >= state.userActiveUntil) {
+      scrollToBottom();
+      syncReviewStateFromPosition({ allowEnter: false });
+    }
     state.currentObservationId = observationId;
     const page = identifyPage();
     return {
@@ -417,27 +470,65 @@
     }
   }
 
+  function markUserActivity() {
+    state.userActivityEpoch += 1;
+    state.userActiveUntil = Date.now() + USER_ACTIVITY_WINDOW_MS;
+  }
+  function markUserScrollIntent() {
+    state.userScrollIntentUntil = Date.now() + USER_SCROLL_INTENT_WINDOW_MS;
+  }
+  function isEditableTarget(target) {
+    const tagName = String(target?.tagName ?? "").toUpperCase();
+    return tagName === "INPUT" || tagName === "TEXTAREA" || target?.getAttribute?.("contenteditable") === "true";
+  }
+  function isScrollNavigationKey(event) {
+    if (isEditableTarget(event.target)) return false;
+    return new Set(["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "]).has(event.key);
+  }
   function onPointerDown(event) {
     if (!event.isTrusted) return;
-    state.userActivityEpoch += 1;
-    state.userActiveUntil = Date.now() + 10000;
+    markUserActivity();
+    const scroller = findScroller();
+    if (scroller && event.target === scroller) markUserScrollIntent();
     if (isActionConfirmationChoiceTarget(event.target)) {
       state.actionConfirmationChoiceEpoch = state.userActivityEpoch;
     }
   }
   function onKeyDown(event) {
     if (!event.isTrusted) return;
-    state.userActivityEpoch += 1;
-    state.userActiveUntil = Date.now() + 10000;
+    markUserActivity();
+    if (isScrollNavigationKey(event)) markUserScrollIntent();
+  }
+  function onWheel(event) {
+    if (!event.isTrusted) return;
+    markUserActivity();
+    markUserScrollIntent();
+  }
+  function onTouchMove(event) {
+    if (!event.isTrusted) return;
+    markUserActivity();
+    markUserScrollIntent();
   }
   function onScroll(event) {
     if (!event.isTrusted || Date.now() - state.lastProgrammaticScrollAt < 300) return;
     const scroller = findScroller();
-    if (scroller) state.userReviewing = distanceFromBottom(scroller) > 180;
+    if (!scroller) return;
+    const target = event.target ?? null;
+    const isConversationScroll = target === scroller ||
+      (scroller === document.scrollingElement && (target === document || target === document.documentElement));
+    if (!isConversationScroll) return;
+    const reviewing = distanceFromBottom(scroller) > REVIEW_DISTANCE_PX;
+    if (!reviewing) {
+      state.userReviewing = false;
+      return;
+    }
+    if (Date.now() < state.userScrollIntentUntil) state.userReviewing = true;
   }
 
   document.addEventListener("pointerdown", onPointerDown, true);
   document.addEventListener("keydown", onKeyDown, true);
+  document.addEventListener("wheel", onWheel, true);
+  document.addEventListener("touchmove", onTouchMove, true);
   document.addEventListener("scroll", onScroll, true);
 
   let mutationObserver = null;
@@ -452,6 +543,8 @@
     state.elementCatalogs.clear();
     document.removeEventListener("pointerdown", onPointerDown, true);
     document.removeEventListener("keydown", onKeyDown, true);
+    document.removeEventListener("wheel", onWheel, true);
+    document.removeEventListener("touchmove", onTouchMove, true);
     document.removeEventListener("scroll", onScroll, true);
     if (runtimeMessageListener) {
       try { chrome.runtime.onMessage.removeListener(runtimeMessageListener); } catch { /* invalidated extension context */ }

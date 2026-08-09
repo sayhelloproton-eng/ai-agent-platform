@@ -566,6 +566,84 @@ test("approval resume defers trusted user control before consuming Grant and exe
   assert.equal(failures, 0);
 });
 
+
+test("approval resume preserves Grant while user is reviewing and completes once review state clears", async () => {
+  const command = hostCommand();
+  const bound = binding();
+  const observed = observation();
+  const payload = { text: "approved wake" };
+  const journal = new CommandJournal(new MemoryStorageArea());
+  let grant = null;
+  let observeEpoch = 0;
+  let executions = 0;
+  let consumed = 0;
+  const harness = dispatchHarness(command);
+  harness.client.resolvePayload = async () => payload;
+  const coordinator = new RuntimeCoordinator({
+    host_id: "host",
+    dispatchClient: harness.client,
+    approvalClient: {
+      putDraft: async () => ({ status: "PENDING_APPROVAL" }),
+      getGrantOrNull: async () => grant,
+      getGrant: async () => grant,
+      consume: async () => { consumed += 1; }
+    },
+    bindingRegistry: { findForTarget: async () => bound, validateObservation: async (value) => value, get: async () => bound },
+    journal,
+    observationCoordinator: {
+      observe: async () => {
+        observeEpoch += 1;
+        return {
+          observation: observed,
+          local: observeEpoch === 2
+            ? { user_active: false, user_reviewing: true }
+            : { user_active: false, user_reviewing: false }
+        };
+      }
+    },
+    actionExecutor: {
+      execute: async () => { executions += 1; return deliveryExecution(bound); },
+      waitForResponse: async () => ({ status: "ACTION_SUCCEEDED", details: { response_completed: true } })
+    },
+    modelProvider: { analyze: async () => assessment() },
+    evidenceStore: {},
+    configProvider: async () => ({ paused: false, emergency_stopped: false, approval_policy_mode: "platform_wake_candidate" })
+  });
+
+  const pending = await coordinator.processOne();
+  assert.equal(pending.reason, "APPROVAL_PENDING");
+
+  const pageHash = await computePagePreconditionHash(observed);
+  const fingerprint = await computeActionFingerprint({ command, binding_id: bound.binding_id, resolved_payload: payload, page_precondition_hash: pageHash });
+  grant = {
+    approval_ref: command.approval_ref,
+    grant_id: "grant-after-review",
+    action_fingerprint: fingerprint,
+    binding_id: bound.binding_id,
+    task_id: command.task_id,
+    command_id: command.command_id,
+    allowed_action_type: command.action.type,
+    page_precondition_hash: pageHash,
+    single_use: true,
+    expires_at: "2030-01-01T00:00:00.000Z",
+    consumed_at: null
+  };
+
+  const deferred = await coordinator.processOne();
+  assert.equal(deferred.reason, "APPROVAL_PENDING_USER_CONTROL");
+  assert.equal(consumed, 0);
+  assert.equal(executions, 0);
+  const deferredEntry = await journal.get(command.command_id);
+  assert.equal(deferredEntry.details.approval_wait.user_active, false);
+  assert.equal(deferredEntry.details.approval_wait.user_reviewing, true);
+
+  const completed = await coordinator.processOne();
+  assert.equal(completed.result.status, "ACTION_SUCCEEDED");
+  assert.equal(consumed, 1);
+  assert.equal(executions, 1);
+  assert.equal((await journal.get(command.command_id)).state, "REPORTED");
+});
+
 test("USER_CONTROL_ACTIVE race at executor entry is deterministic pre-delivery BLOCKED, not UNCERTAIN", async () => {
   const command = hostCommand();
   const bound = binding();
