@@ -42,7 +42,7 @@ Bindings are explicit objects, not magic strings.
 
 Valid roots are `inputs` and `steps`.
 
-A normal string such as `$PATH` or `$100` remains a normal string. Only an object containing exactly one `$ref` field is interpreted as a binding.
+A normal string such as `$PATH` or `$100` remains a normal string. Only an object containing exactly one `$ref` field is interpreted as a binding. The `$ref` property name is reserved by the protocol: an object that contains `$ref` but is not a valid exact binding reference is rejected rather than treated as ordinary data.
 
 Bindings may appear recursively inside action arguments, inference input and return output. A switch `select` is a binding reference.
 

@@ -8,7 +8,7 @@ function getPath(root: unknown, path: string[]): unknown {
       value === null ||
       value === undefined ||
       typeof value !== "object" ||
-      !(segment in value)
+      !Object.prototype.hasOwnProperty.call(value, segment)
     ) {
       throw new ExecutionFlowError(
         "BINDING_NOT_FOUND",

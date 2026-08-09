@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.0.0-lab.4
+
+- Reserved `$ref` as protocol syntax: any object containing a `$ref` key must validate as an exact `BindingRef`; malformed or mixed `$ref` objects are rejected.
+- Hardened binding traversal to own properties only; inherited/prototype properties such as `constructor`, `toString` and `__proto__` cannot be resolved through bindings.
+- Added regression coverage for malformed `$ref` objects and prototype-chain traversal.
+
 ## 0.0.0-lab.3
 
 - Unified published protocol validation on JSON Schema 2020-12 via Ajv.

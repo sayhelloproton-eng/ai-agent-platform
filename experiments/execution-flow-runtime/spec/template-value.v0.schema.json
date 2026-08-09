@@ -16,11 +16,8 @@
     },
     "templateObject": {
       "type": "object",
-      "not": {
-        "required": ["$ref"],
-        "properties": {
-          "$ref": { "type": "string" }
-        }
+      "propertyNames": {
+        "not": { "const": "$ref" }
       },
       "additionalProperties": { "$ref": "#/$defs/templateValue" }
     },

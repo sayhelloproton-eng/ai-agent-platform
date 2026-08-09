@@ -17,7 +17,7 @@ The AI should produce or consume only structures allowed by the published contra
 Important:
 
 - A flow is supplied by the caller; the inference model does not own flow topology.
-- A binding is explicit: `{ "$ref": "steps.node.output.field" }`. Plain strings are plain strings.
+- A binding is explicit: `{ "$ref": "steps.node.output.field" }`. Plain strings are plain strings. The `$ref` key is reserved; malformed or mixed `$ref` objects are invalid protocol input.
 - An inference node receives an explicit instruction, explicit input and an explicit output schema.
 - An inference output is data. It becomes a host operation only when a flow-defined action node invokes a registered capability.
 - A capability name is not authority. `execution.run.v0.authorization.allowed_capabilities` is checked before invocation.

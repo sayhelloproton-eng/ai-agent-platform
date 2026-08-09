@@ -97,7 +97,7 @@ The goal is that an AI agent can inspect the module before using it instead of r
 
 ## Core rule
 
-The flow defines **what node runs next**. Data binding is explicit with `{ "$ref": "steps.node.output.field" }`; plain strings are never treated as bindings.
+The flow defines **what node runs next**. Data binding is explicit with `{ "$ref": "steps.node.output.field" }`; plain strings are never treated as bindings, and `$ref` is a reserved protocol key that must form a valid exact binding object.
 
 The model does not invent shell commands, filesystem permissions, capabilities, or global task transitions.
 

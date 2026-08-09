@@ -101,3 +101,37 @@ test("Ajv enforces JSON Schema oneOf instead of silently ignoring it", async () 
   assert.equal(result.status, "failed");
   assert.equal(result.error?.code, "SCHEMA_VALIDATION_FAILED");
 });
+
+test("reserved $ref key must always be a valid BindingRef", () => {
+  const run = minimalRun();
+  run.flow.nodes[0] = {
+    id: "done",
+    type: "return",
+    output: { $ref: 123 } as unknown as { $ref: string },
+  };
+
+  assert.throws(
+    () => validateExecutionRun(run),
+    /execution-run validation failed/
+  );
+});
+
+test("binding resolution only traverses own properties", () => {
+  const context = {
+    inputs: {},
+    steps: {},
+  };
+
+  assert.throws(
+    () => resolveBinding({ $ref: "inputs.constructor" }, context),
+    /Binding path not found/
+  );
+  assert.throws(
+    () => resolveBinding({ $ref: "inputs.toString" }, context),
+    /Binding path not found/
+  );
+  assert.throws(
+    () => resolveBinding({ $ref: "inputs.__proto__" }, context),
+    /Binding path not found/
+  );
+});
