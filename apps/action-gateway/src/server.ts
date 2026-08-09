@@ -18,6 +18,8 @@ import {
 import { createConcurrencyGate } from "./concurrency.js";
 import { createBrowserHostServerAdapter } from "./browser-host-server-adapter.js";
 import { createLocalWorkWorker } from "./local-work-worker.js";
+import { createMobileWorkWorker } from "./mobile-work-worker.js";
+import { createMobileInferenceAdapter } from "./mobile-inference-adapter.js";
 import { Phase2IntegrationStore } from "./phase2-integration-store.js";
 import { createPhase2TaskIntakeAdapter } from "./phase2-task-intake.js";
 import { JsonFileControllerIdempotencySnapshotStore } from "./controller-idempotency-store.js";
@@ -35,6 +37,8 @@ const DEFAULT_CONTROLLER_IDEMPOTENCY_STATE_PATH =
 const DEFAULT_PHASE2_INTEGRATION_STATE_PATH =
   ".runtime/task-control/phase2-integration.json";
 const DEFAULT_LOCAL_WORKER_POLL_MS = 1_000;
+const DEFAULT_MOB_WORKER_POLL_MS = 2_000;
+const DEFAULT_MOB_REASON_MAX_TOKENS = 2048;
 const LOOPBACK_HOSTS = new Set(["127.0.0.1", "localhost", "::1"]);
 export const GATEWAY_HEADERS_TIMEOUT_MS = 10_000;
 export const GATEWAY_REQUEST_TIMEOUT_MS = 20_000;
@@ -139,6 +143,44 @@ function resolveProjectRoot(input: string | undefined): string {
   return resolve(input?.trim() || defaultRoot);
 }
 
+function resolveMobBaseUrl(input: string | undefined): string | null {
+  const value = input?.trim();
+  if (!value) return null;
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
+      throw new Error("MOB base URL must use http or https protocol.");
+    }
+    return value;
+  } catch {
+    throw new Error("MOB base URL must be a valid URL.");
+  }
+}
+
+function resolveMobWorkerPollMs(input: string | undefined): number {
+  if (input === undefined) return DEFAULT_MOB_WORKER_POLL_MS;
+  if (!/^\d+$/.test(input)) {
+    throw new Error("MOB Worker poll interval must be an integer from 100 to 60000 ms.");
+  }
+  const value = Number(input);
+  if (!Number.isSafeInteger(value) || value < 100 || value > 60_000) {
+    throw new Error("MOB Worker poll interval must be an integer from 100 to 60000 ms.");
+  }
+  return value;
+}
+
+function resolveMobReasonMaxTokens(input: string | undefined): number {
+  if (input === undefined) return DEFAULT_MOB_REASON_MAX_TOKENS;
+  if (!/^\d+$/.test(input)) {
+    throw new Error("MOB REASON max tokens must be an integer from 1 to 32768.");
+  }
+  const value = Number(input);
+  if (!Number.isSafeInteger(value) || value < 1 || value > 32768) {
+    throw new Error("MOB REASON max tokens must be an integer from 1 to 32768.");
+  }
+  return value;
+}
+
 function resolveControllerProfileId(input: string | undefined): string {
   const value = input ?? DEFAULT_CONTROLLER_PROFILE_ID;
   if (!/^[a-z0-9][a-z0-9._-]{2,127}$/u.test(value)) {
@@ -163,6 +205,9 @@ export interface ActionGatewayConfiguration {
   readonly phase2IntegrationStatePath: string;
   readonly localWorkerPollMs: number;
   readonly projectRoot: string;
+  readonly mobBaseUrl: string | null;
+  readonly mobWorkerPollMs: number;
+  readonly mobReasonMaxTokens: number;
 }
 
 export function resolveActionGatewayConfiguration(
@@ -202,6 +247,15 @@ export function resolveActionGatewayConfiguration(
       environment.ACTION_GATEWAY_LOCAL_WORKER_POLL_MS,
     ),
     projectRoot: resolveProjectRoot(environment.ACTION_GATEWAY_PROJECT_ROOT),
+    mobBaseUrl: resolveMobBaseUrl(
+      environment.ACTION_GATEWAY_MOB_BASE_URL,
+    ),
+    mobWorkerPollMs: resolveMobWorkerPollMs(
+      environment.ACTION_GATEWAY_MOB_WORKER_POLL_MS,
+    ),
+    mobReasonMaxTokens: resolveMobReasonMaxTokens(
+      environment.ACTION_GATEWAY_MOB_REASON_MAX_TOKENS,
+    ),
   };
 }
 
@@ -313,6 +367,36 @@ export async function startActionGateway(): Promise<void> {
         .finally(() => { workerRunning = false; });
     }, configuration.localWorkerPollMs);
     workerTimer.unref();
+
+    // Mobile Inference Worker (only when MOB endpoint is configured)
+    if (configuration.mobBaseUrl !== null) {
+      const mobAdapter = createMobileInferenceAdapter({
+        baseUrl: configuration.mobBaseUrl,
+        reasonMaxTokens: configuration.mobReasonMaxTokens,
+      });
+      const mobileWorkWorker = createMobileWorkWorker({
+        taskControl: taskControlService,
+        integrationStore: phase2IntegrationStore,
+        adapter: mobAdapter,
+      });
+
+      let mobWorkerRunning = false;
+      const mobWorkerTimer = setInterval(() => {
+        if (mobWorkerRunning) return;
+        mobWorkerRunning = true;
+        void mobileWorkWorker.runOnce()
+          .then((result) => {
+            if (result.processed > 0 || result.failed > 0) {
+              console.log(JSON.stringify({ event: "gateway.mob-worker.cycle", ...result }));
+            }
+          })
+          .catch((error: unknown) => {
+            console.error(`Mobile Work Worker cycle failed: ${error instanceof Error ? error.message : "unknown error"}`);
+          })
+          .finally(() => { mobWorkerRunning = false; });
+      }, configuration.mobWorkerPollMs);
+      mobWorkerTimer.unref();
+    }
 
     server.once("error", () => {
       console.error("Action Gateway failed to start.");

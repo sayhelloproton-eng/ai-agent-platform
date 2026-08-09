@@ -1411,3 +1411,9 @@ relations:
 - from: PKG-TASK-CONTROL
   type: implements
   to: SOL-TSK-001
+- from: APP-GATEWAY
+  type: implements
+  to: SOL-MOB-001
+- from: PKG-CONTRACTS
+  type: implements
+  to: SOL-MOB-001

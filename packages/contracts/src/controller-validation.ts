@@ -443,6 +443,14 @@ function validateControllerCommand(
           issue(issues, "command.payload.approvalRef", "REQUIRED_FIELD", "SUBMIT_MESSAGE requires a stable approvalRef for the production Approval Draft handshake.");
         }
       }
+      if (payload.targetDomain === "model-inference") {
+        for (const field of ["capabilityRef", "inputRef"] as const) {
+          if (!isNonEmptyString(payload[field])) {
+            valid = false;
+            issue(issues, `command.payload.${field}`, "REQUIRED_FIELD", "Mobile Inference work requires this field.");
+          }
+        }
+      }
       break;
     }
     case "REQUEST_APPROVAL": {

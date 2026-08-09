@@ -3,6 +3,7 @@ import type {
   ApprovalGrantV1,
   BrowserHostRecordV1,
   JsonValue,
+  MobInferenceResultV1,
 } from "@ai-agent-platform/contracts";
 import type {
   LocalEvidenceSinkPort,
@@ -33,6 +34,16 @@ interface Phase2IntegrationState {
   readonly approvalGrants: Record<string, ApprovalGrantV1>;
   readonly localResults: Record<string, StoredLocalWorkResult>;
   readonly localEvidence: Record<string, StoredLocalEvidenceReferences>;
+  readonly mobResults: Record<string, MobInferenceResultV1>;
+  readonly mobEvidence: Record<string, StoredMobEvidence>;
+}
+
+export interface StoredMobEvidence {
+  readonly resultRef: string;
+  readonly content: string | null;
+  readonly next: unknown;
+  readonly kind: string;
+  readonly error: unknown;
 }
 
 function emptyState(): Phase2IntegrationState {
@@ -43,6 +54,8 @@ function emptyState(): Phase2IntegrationState {
     approvalGrants: {},
     localResults: {},
     localEvidence: {},
+    mobResults: {},
+    mobEvidence: {},
   };
 }
 
@@ -72,6 +85,8 @@ function validateState(value: unknown): Phase2IntegrationState {
     approvalGrants: clone(state.approvalGrants ?? {}),
     localResults: clone(state.localResults ?? {}),
     localEvidence: clone(state.localEvidence ?? {}),
+    mobResults: clone(state.mobResults ?? {}),
+    mobEvidence: clone(state.mobEvidence ?? {}),
   };
 }
 
@@ -324,5 +339,36 @@ export class Phase2IntegrationStore {
 
   async snapshot(): Promise<Phase2IntegrationState> {
     return this.read((state) => clone(state));
+  }
+
+  async putMobResult(resultRef: string, result: MobInferenceResultV1): Promise<void> {
+    assertRef(resultRef, "resultRef");
+    await this.transact((state) => {
+      state.mobResults[resultRef] = clone(result);
+    });
+  }
+
+  async getMobResult(resultRef: string): Promise<MobInferenceResultV1 | null> {
+    assertRef(resultRef, "resultRef");
+    return this.read((state) => clone(state.mobResults[resultRef] ?? null));
+  }
+
+  async putMobEvidence(
+    evidenceRef: string,
+    evidence: StoredMobEvidence,
+  ): Promise<void> {
+    assertRef(evidenceRef, "evidenceRef");
+    await this.transact((state) => {
+      state.mobEvidence[evidenceRef] = clone(evidence);
+    });
+  }
+
+  async getMobEvidence(
+    evidenceRef: string,
+  ): Promise<StoredMobEvidence | null> {
+    assertRef(evidenceRef, "evidenceRef");
+    return this.read((state) =>
+      clone(state.mobEvidence[evidenceRef] ?? null),
+    );
   }
 }

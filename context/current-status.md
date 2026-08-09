@@ -73,6 +73,8 @@ SOL-CTL-001 Controller Agent and Dynamic Context
 SOL-MOB-001 Mobile Single-model Multi-role Inference Provider
 ```
 
+SOL-MOB-001 Runtime Integration 已实现。手机模型互斥，FAST 优先，REASON 后备；`model-inference` targetDomain 接入现有 Task Control / Action Gateway；MOB Endpoint 仅在 `ACTION_GATEWAY_MOB_BASE_URL` 设置时启用。下一轮 Live Gate 才运行真实手机。
+
 手机模型不构成核心四项的完成门槛。页面感知和结构化推理先由 DeepSeek Provider 或测试 Fixture 承担；手机 Provider 以后使用同一合同接入。
 
 ### Cross-domain decisions frozen at design level
@@ -85,7 +87,8 @@ SOL-MOB-001 Mobile Single-model Multi-role Inference Provider
 - 同步 `local.*` 查询不强制创建 Work Item；异步、长时、可交接或副作用工作才进入 Work Item；
 - Controller Claim、Work Item Claim 和 Browser Dispatch Claim 分离；
 - BHR 不修改 Task，不从聊天正文提取正式 Controller Command；
-- DeepSeek / 手机模型属于可替换 Model Inference Provider，不拥有 Task、Approval 或 Browser Action 权限。
+- DeepSeek / 手机模型属于可替换 Model Inference Provider，不拥有 Task、Approval 或 Browser Action 权限；
+- 手机模型 FAST / REASON 互斥，Worker 串行，不建立第二套 Task Controller。
 
 设计合同已经完成跨领域审计。`SOL-CTL-001` 当前形成以下代码候选：
 

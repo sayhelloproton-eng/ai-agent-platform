@@ -61,12 +61,17 @@ MVP-1 Controller Agent and Dynamic Context
 MVP-5 Optional — Mobile Single-model Multi-role Inference Provider
 ```
 
+状态：**Runtime Integration Implemented**
+
+SOL-MOB-001 已将 MLXHub 双 checkpoint（FAST / REASON）作为可选 Model Inference Provider 接入 Phase 2 Task Control / Action Gateway。手机模型互斥，进程内 MOB job 串行；FAST 优先，uncertain / low confidence / explicit conflict 时使用 REASON。MOB Endpoint 仅在 `ACTION_GATEWAY_MOB_BASE_URL` 设置时启用；未配置时现有 Gateway 行为不变。
+
+下一轮 Live Gate 才运行真实手机 Task Context → FAST → mob.next.v1.2 → Local Control → ResultRef / Evidence → FAST verification → Controller 合法推进。
+
 规则：
 
 - 不阻塞核心四项；
 - DeepSeek 先承担页面初判和结果解释；
 - 手机实现同一 Model Inference Contract；
-- 先影子评测，再决定低风险灰度；
 - 未达标或离线时继续使用 DeepSeek。
 
 ### Phase-2 exit gate

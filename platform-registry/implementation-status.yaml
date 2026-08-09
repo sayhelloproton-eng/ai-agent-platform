@@ -109,3 +109,16 @@ capabilities:
   - docs/adr/ADR-003-document-bundles-human-first-ai-lossless.md
   - skills/engineering-document-authoring/references/05-formal-diagram-style.md
   - docs/knowledge/02_基础产品与能力/CAP-001-ChatGPT生态体系与配置全景/README.md
+- id: CAP-MOBILE-INFERENCE
+  status: implemented
+  implemented_by:
+  - APP-GATEWAY
+  - PKG-CONTRACTS
+  evidence:
+  - packages/contracts/tests/mobile-inference.test.mjs
+  - apps/action-gateway/tests/mobile-inference-adapter.test.mjs
+  - apps/action-gateway/tests/mobile-runtime-config.test.mjs
+  - apps/action-gateway/tests/mobile-work-worker.test.mjs
+  - packages/contracts/src/mobile-inference.ts
+  - apps/action-gateway/src/mobile-inference-adapter.ts
+  - apps/action-gateway/src/mobile-work-worker.ts
