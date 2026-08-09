@@ -1,7 +1,7 @@
 import { ExecutionFlowError } from "./errors.js";
 import { resolveBinding } from "./bindings.js";
 import { validateExecutionRun } from "./validate-flow.js";
-import { validateValueAgainstSchema } from "./schema-lite.js";
+import { validatePublishedSchema, validateValueAgainstSchema } from "./schema.js";
 import type {
   ExecutionEvidence,
   ExecutionFailure,
@@ -39,7 +39,9 @@ export async function runExecutionFlow(
   const nodeRuns: ExecutionNodeRun[] = [];
   const evidence: ExecutionEvidence[] = [];
   const correlation =
-    run?.correlation && typeof run.correlation === "object"
+    run?.correlation &&
+    typeof run.correlation === "object" &&
+    !Array.isArray(run.correlation)
       ? structuredClone(run.correlation)
       : {};
 
@@ -152,7 +154,7 @@ export async function runExecutionFlow(
         nodeRuns.push(nodeRun);
         steps[node.id] = { output: structuredClone(output), metadata: {} };
 
-        return {
+        const result: ExecutionResult = {
           contract: "execution.result.v0",
           execution_id: run.execution_id,
           status: "completed",
@@ -162,6 +164,8 @@ export async function runExecutionFlow(
           error: null,
           correlation,
         };
+        validatePublishedSchema("execution-result", result, "INVALID_RESULT");
+        return result;
       }
 
       const nodeRun: ExecutionNodeRun = {
@@ -191,9 +195,12 @@ export async function runExecutionFlow(
     }
   } catch (error) {
     const safe = safeError(error);
-    return {
+    const result: ExecutionResult = {
       contract: "execution.result.v0",
-      execution_id: run?.execution_id ?? "unknown",
+      execution_id:
+        typeof run?.execution_id === "string" && run.execution_id.length > 0
+          ? run.execution_id
+          : "unknown",
       status: safe.code === "APPROVAL_REQUIRED" ? "blocked" : "failed",
       output: null,
       node_runs: nodeRuns,
@@ -201,5 +208,7 @@ export async function runExecutionFlow(
       error: safe,
       correlation,
     };
+    validatePublishedSchema("execution-result", result, "INVALID_RESULT");
+    return result;
   }
 }

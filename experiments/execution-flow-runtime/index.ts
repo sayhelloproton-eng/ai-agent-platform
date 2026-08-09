@@ -1,7 +1,12 @@
 export * from "./src/types.js";
 export { ExecutionFlowError } from "./src/runtime/errors.js";
-export { resolveBinding } from "./src/runtime/bindings.js";
-export { validateValueAgainstSchema } from "./src/runtime/schema-lite.js";
+export { isBindingRef, resolveBinding } from "./src/runtime/bindings.js";
+export {
+  assertValidJsonSchema,
+  getPublishedSchema,
+  validatePublishedSchema,
+  validateValueAgainstSchema,
+} from "./src/runtime/schema.js";
 export { validateExecutionRun, validateFlow } from "./src/runtime/validate-flow.js";
 export { runExecutionFlow } from "./src/runtime/run-flow.js";
 

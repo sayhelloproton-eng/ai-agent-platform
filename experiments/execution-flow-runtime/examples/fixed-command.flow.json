@@ -17,7 +17,7 @@
       {
         "id": "done",
         "type": "return",
-        "output": { "command": "$steps.run-version.output" }
+        "output": { "command": { "$ref": "steps.run-version.output" } }
       }
     ]
   },

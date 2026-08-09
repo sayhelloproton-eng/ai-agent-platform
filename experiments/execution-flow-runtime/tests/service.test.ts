@@ -50,7 +50,7 @@ test("HTTP service exposes health and executes a deterministic fixed-command flo
           {
             id: "done",
             type: "return" as const,
-            output: { version: "$steps.version.output.stdout" },
+            output: { version: { $ref: "steps.version.output.stdout" } },
           },
         ],
       },

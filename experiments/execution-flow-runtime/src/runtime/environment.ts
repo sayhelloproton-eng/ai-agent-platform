@@ -6,6 +6,13 @@ import { InferenceBackendRegistry } from "../inference/registry.js";
 import { MlxHubInferenceBackend } from "../inference/mlxhub-backend.js";
 import type { RuntimeConfig } from "../types.js";
 
+
+function positiveInt(value: string | undefined): number | undefined {
+  if (!value) return undefined;
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
+}
+
 export interface RuntimeEnvironment {
   capabilities: CapabilityRegistry;
   inferenceBackends: InferenceBackendRegistry;
@@ -49,6 +56,20 @@ export async function createRuntimeEnvironment(
         reasoningModel,
         ...(env.EXECUTION_FLOW_MLXHUB_API_KEY
           ? { apiKey: env.EXECUTION_FLOW_MLXHUB_API_KEY }
+          : {}),
+        ...(positiveInt(env.EXECUTION_FLOW_MLXHUB_STANDARD_MAX_TOKENS)
+          ? {
+              standardMaxTokens: positiveInt(
+                env.EXECUTION_FLOW_MLXHUB_STANDARD_MAX_TOKENS
+              )!,
+            }
+          : {}),
+        ...(positiveInt(env.EXECUTION_FLOW_MLXHUB_REASONING_MAX_TOKENS)
+          ? {
+              reasoningMaxTokens: positiveInt(
+                env.EXECUTION_FLOW_MLXHUB_REASONING_MAX_TOKENS
+              )!,
+            }
           : {}),
       })
     );

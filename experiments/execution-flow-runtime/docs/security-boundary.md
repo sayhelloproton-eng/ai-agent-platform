@@ -2,11 +2,15 @@
 
 This runtime is intentionally spec-driven.
 
+Caller authentication (API token/JWT/Gateway identity) is intentionally deferred during the lab stage. Execution safety is not deferred.
+
 ## Model boundary
 
 Inference backends do not receive host tool handles. A model returns structured node output only.
 
-The runtime rejects output that does not match the inference node's output schema.
+The runtime rejects output that does not match the inference node's JSON Schema 2020-12 output contract.
+
+Flow transitions are defined by the flow. The model cannot add hidden `next_node`, `command`, `capability`, shell or filesystem authority outside the declared output schema.
 
 ## Command boundary
 
@@ -20,17 +24,9 @@ It accepts:
 
 The host registry maps that opaque reference to a fixed executable and argv.
 
-The model cannot provide:
+The model/flow cannot provide arbitrary executable, argv, shell line, cwd or environment through this capability. The process is spawned with `shell=false`.
 
-- arbitrary executable
-- arbitrary argv
-- `sh -c`
-- `bash -c`
-- shell operators
-- arbitrary cwd
-- arbitrary environment
-
-The process is spawned with `shell=false`.
+A fixed command is bounded by timeout and output limits. When either limit is exceeded, the child process is terminated before the capability returns the error.
 
 ## File boundary
 
@@ -40,9 +36,10 @@ It denies:
 
 - absolute paths
 - `..` traversal segments
-- realpath escape
+- resolved path escape
 - symlink escape
-- protected patterns such as `.env`, `.git/**`, `**/*.key`
+- protected requested paths such as `.env`, `.git/**`, `**/*.key`
+- symlink aliases that resolve to protected paths inside the workspace
 - files larger than the configured byte limit
 
 There is no generic file write/delete capability in this lab.
@@ -53,11 +50,16 @@ A capability being registered does not authorize it.
 
 Each `execution.run.v0` carries `authorization.allowed_capabilities`. Invocation fails closed when the current capability is not in that list.
 
-This snapshot is deliberately generic. A future Task/Policy/Approval integration may produce the snapshot, but this module does not own those business semantics.
+This is an execution authorization snapshot. This lab does not yet define caller authentication or who is entitled to construct that snapshot.
 
+## Service process boundary
+
+There is one managed Execution Flow Runtime service per runtime home.
+
+`start` is idempotent and refuses to create a second service if a live runtime PID/lock exists but identity cannot be verified.
+
+`stop` kills a PID only after `/health` proves that the stored PID belongs to the stored runtime instance. `stop --force` may SIGKILL only a verified runtime that ignored SIGTERM. For an unverified live PID, `--force` clears stale state only and leaves the process untouched.
 
 ## HTTP service boundary
 
-The lab service is deliberately loopback-only (`127.0.0.1`, `::1`, or `localhost`). It does not yet implement caller authentication, so binding it to a LAN/public interface is rejected.
-
-`authorization.allowed_capabilities` is an execution authorization snapshot, not proof of caller identity. A future platform integration must authenticate the caller before constructing that snapshot.
+The lab service is loopback-only (`127.0.0.1`, `::1`, or `localhost`). Caller token/authentication is deliberately outside the current lab scope.

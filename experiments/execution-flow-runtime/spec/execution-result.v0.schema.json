@@ -3,16 +3,61 @@
   "$id": "https://ai-agent-platform.local/spec/execution-result.v0.schema.json",
   "title": "ExecutionResultV0",
   "type": "object",
-  "required": ["contract", "execution_id", "status", "output", "node_runs", "evidence"],
+  "required": ["contract", "execution_id", "status", "output", "node_runs", "evidence", "error", "correlation"],
   "additionalProperties": false,
   "properties": {
     "contract": { "const": "execution.result.v0" },
     "execution_id": { "type": "string", "minLength": 1 },
     "status": { "enum": ["completed", "blocked", "failed"] },
     "output": {},
-    "node_runs": { "type": "array" },
-    "evidence": { "type": "array" },
-    "error": { "type": ["object", "null"] },
+    "node_runs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["node_id", "type", "status", "duration_ms", "output"],
+        "additionalProperties": false,
+        "properties": {
+          "node_id": { "type": "string", "minLength": 1 },
+          "type": { "enum": ["action", "inference", "switch", "return"] },
+          "status": { "const": "completed" },
+          "duration_ms": { "type": "integer", "minimum": 0 },
+          "output": {},
+          "metadata": { "type": "object" }
+        }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "node_id", "output"],
+        "additionalProperties": false,
+        "properties": {
+          "type": { "enum": ["capability-result", "inference-result"] },
+          "node_id": { "type": "string", "minLength": 1 },
+          "capability": { "type": "string", "minLength": 1 },
+          "backend": { "type": "string", "minLength": 1 },
+          "profile": { "enum": ["standard", "reasoning"] },
+          "output": {},
+          "metadata": { "type": "object" }
+        }
+      }
+    },
+    "error": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "required": ["code", "message"],
+          "additionalProperties": false,
+          "properties": {
+            "code": { "type": "string", "minLength": 1 },
+            "message": { "type": "string", "minLength": 1 },
+            "details": {}
+          }
+        }
+      ]
+    },
     "correlation": { "type": "object" }
   }
 }

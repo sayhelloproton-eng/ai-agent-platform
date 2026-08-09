@@ -51,7 +51,7 @@ test("action -> inference -> switch -> return is flow-defined", async () => {
           backend: "fixture",
           profile: "standard",
           instruction: "classify health",
-          input: "$steps.read.output",
+          input: { $ref: "steps.read.output" },
           output_schema: {
             type: "object",
             properties: {
@@ -65,7 +65,7 @@ test("action -> inference -> switch -> return is flow-defined", async () => {
         {
           id: "branch",
           type: "switch",
-          select: "$steps.judge.output.route",
+          select: { $ref: "steps.judge.output.route" },
           cases: { ok: "done", bad: "bad" },
           default: "bad",
         },

@@ -20,7 +20,7 @@
         "backend": "mlxhub",
         "profile": "standard",
         "instruction": "Classify whether the supplied runtime status is healthy. Return only the declared JSON structure.",
-        "input": { "status": "$steps.read-status.output.json" },
+        "input": { "status": { "$ref": "steps.read-status.output.json" } },
         "output_schema": {
           "type": "object",
           "properties": {
@@ -35,7 +35,7 @@
       {
         "id": "route",
         "type": "switch",
-        "select": "$steps.judge.output.decision",
+        "select": { "$ref": "steps.judge.output.decision" },
         "cases": {
           "healthy": "done",
           "unhealthy": "not-healthy",
@@ -50,8 +50,8 @@
         "profile": "reasoning",
         "instruction": "Resolve the explicit uncertainty using only the supplied status and first assessment. Return only the declared JSON structure.",
         "input": {
-          "status": "$steps.read-status.output.json",
-          "first_assessment": "$steps.judge.output"
+          "status": { "$ref": "steps.read-status.output.json" },
+          "first_assessment": { "$ref": "steps.judge.output" }
         },
         "output_schema": {
           "type": "object",
@@ -67,7 +67,7 @@
       {
         "id": "reason-route",
         "type": "switch",
-        "select": "$steps.reason.output.decision",
+        "select": { "$ref": "steps.reason.output.decision" },
         "cases": {
           "healthy": "done",
           "unhealthy": "not-healthy"
@@ -79,7 +79,7 @@
         "type": "return",
         "output": {
           "healthy": true,
-          "assessment": "$steps.judge.output"
+          "assessment": { "$ref": "steps.judge.output" }
         }
       },
       {

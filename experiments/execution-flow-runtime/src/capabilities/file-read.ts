@@ -98,6 +98,14 @@ export async function createFileReadCapability({
         );
       }
 
+      const realRelativePath = path.relative(realRoot, realTarget);
+      if (matchesProtected(realRelativePath, protectedPatterns)) {
+        throw new ExecutionFlowError(
+          "PROTECTED_PATH",
+          `Protected real target denied: ${realRelativePath}`
+        );
+      }
+
       const stat = await fs.stat(realTarget);
       if (!stat.isFile()) {
         throw new ExecutionFlowError("NOT_A_FILE", "Target is not a regular file.");

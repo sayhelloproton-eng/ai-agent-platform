@@ -17,6 +17,7 @@ const DOCS: Record<string, string> = {
 };
 
 const SPECS: Record<string, string> = {
+  "template-value": "spec/template-value.v0.schema.json",
   "execution-run": "spec/execution-run.v0.schema.json",
   "execution-flow": "spec/execution-flow.v0.schema.json",
   "execution-result": "spec/execution-result.v0.schema.json",

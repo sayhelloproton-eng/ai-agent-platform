@@ -28,8 +28,8 @@ test("STEP 1: minimal return-only flow — contract round-trip", async () => {
         {
           id: "done",
           type: "return",
-          output: { value: "$inputs.value" },
-        } as any,
+          output: { value: { $ref: "inputs.value" } },
+        },
       ],
     },
   };
@@ -93,24 +93,24 @@ test("STEP 2: action → switch → return — no LLM involved", async () => {
           capability: "mock.value.read",
           arguments: { key: "status" },
           next: "route",
-        } as any,
+        },
         {
           id: "route",
           type: "switch",
-          select: "$steps.read.output.value",
+          select: { $ref: "steps.read.output.value" },
           cases: { healthy: "success", unhealthy: "failed" },
           default: "failed",
-        } as any,
+        },
         {
           id: "success",
           type: "return",
           output: { healthy: true },
-        } as any,
+        },
         {
           id: "failed",
           type: "return",
           output: { healthy: false },
-        } as any,
+        },
       ],
     },
   };
@@ -181,14 +181,14 @@ test("STEP 3: action → inference → switch → return — flow decides next n
           capability: "mock.value.read",
           arguments: {},
           next: "judge",
-        } as any,
+        },
         {
           id: "judge",
           type: "inference",
           backend: "fixture",
           profile: "standard",
           instruction: "classify runtime health",
-          input: { status: "$steps.read.output.status" },
+          input: { status: { $ref: "steps.read.output.status" } },
           output_schema: {
             type: "object",
             properties: {
@@ -199,24 +199,24 @@ test("STEP 3: action → inference → switch → return — flow decides next n
             additionalProperties: false,
           },
           next: "route",
-        } as any,
+        },
         {
           id: "route",
           type: "switch",
-          select: "$steps.judge.output.decision",
+          select: { $ref: "steps.judge.output.decision" },
           cases: { healthy: "success", unhealthy: "failed", uncertain: "failed" },
           default: "failed",
-        } as any,
+        },
         {
           id: "success",
           type: "return",
           output: { healthy: true },
-        } as any,
+        },
         {
           id: "failed",
           type: "return",
           output: { healthy: false },
-        } as any,
+        },
       ],
     },
   };

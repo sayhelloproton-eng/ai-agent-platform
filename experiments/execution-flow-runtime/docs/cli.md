@@ -8,7 +8,11 @@ The command line is a first-class public interface and documentation surface.
 
 Creates the runtime home and default configuration. It does **not** install the npm package.
 
-## Service lifecycle
+## One managed service
+
+The lab runs one managed Execution Flow Runtime service per runtime home. Inference backends such as MLXHub are providers inside that service; they are not separate runtime services.
+
+Service lifecycle:
 
 - `aap-execution-flow start`
 - `aap-execution-flow status`
@@ -16,14 +20,16 @@ Creates the runtime home and default configuration. It does **not** install the 
 - `aap-execution-flow restart`
 - `aap-execution-flow serve`
 
-`start` runs the local HTTP service in the background. `serve` runs it in the foreground.
+`start` is idempotent. A singleton lock prevents concurrent managed instances for the same runtime home.
+
+`stop` only signals a PID after runtime identity is verified through health. `stop --force` never kills an unverified PID; for an unverified PID it only removes stale state.
 
 ## Execution
 
 - `aap-execution-flow validate --file run.json`
 - `aap-execution-flow run --file run.json`
 
-Validation never executes capabilities.
+Validation never executes capabilities and uses the same published protocol schemas as runtime execution.
 
 ## Discovery
 

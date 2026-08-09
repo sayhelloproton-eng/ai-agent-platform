@@ -2,19 +2,18 @@ export type JsonPrimitive = string | number | boolean | null;
 export type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue };
 export type JsonObject = { [key: string]: JsonValue };
 
-export type JsonSchema = {
-  type?: string | string[];
-  const?: JsonValue;
-  enum?: JsonValue[];
-  minLength?: number;
-  pattern?: string;
-  minimum?: number;
-  maximum?: number;
-  items?: JsonSchema;
-  required?: string[];
-  properties?: Record<string, JsonSchema>;
-  additionalProperties?: boolean;
-};
+/** JSON Schema 2020-12 object. Runtime validation is delegated to Ajv 2020. */
+export type JsonSchema = Record<string, unknown>;
+
+export interface BindingRef {
+  $ref: string;
+}
+
+export type TemplateValue =
+  | JsonPrimitive
+  | BindingRef
+  | TemplateValue[]
+  | { [key: string]: TemplateValue };
 
 export type ExecutionProfile = "standard" | "reasoning";
 
@@ -50,7 +49,7 @@ export interface BaseNode {
 export interface ActionNode extends BaseNode {
   type: "action";
   capability: string;
-  arguments: unknown;
+  arguments: { [key: string]: TemplateValue };
   next: string;
 }
 
@@ -59,21 +58,21 @@ export interface InferenceNode extends BaseNode {
   backend: string;
   profile: ExecutionProfile;
   instruction: string;
-  input: unknown;
+  input: TemplateValue;
   output_schema: JsonSchema;
   next: string;
 }
 
 export interface SwitchNode extends BaseNode {
   type: "switch";
-  select: string;
+  select: BindingRef;
   cases: Record<string, string>;
   default: string;
 }
 
 export interface ReturnNode extends BaseNode {
   type: "return";
-  output: unknown;
+  output: TemplateValue;
 }
 
 export interface ExecutionNodeRun {
@@ -171,4 +170,8 @@ export interface RuntimeState {
   host: string;
   port: number;
   started_at: string;
+}
+
+export interface RuntimeLock extends RuntimeState {
+  lock_created_at: string;
 }

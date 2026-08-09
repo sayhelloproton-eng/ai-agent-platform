@@ -42,7 +42,7 @@ export async function createExecutionFlowServer({
   instanceId = randomUUID(),
 }: ExecutionFlowServerOptions) {
   if (!["127.0.0.1", "::1", "localhost"].includes(config.host)) {
-    throw new Error("Lab HTTP service is loopback-only because it does not implement caller authentication yet.");
+    throw new Error("Lab HTTP service is loopback-only during the current lab stage.");
   }
   const runtime = await createRuntimeEnvironment(config);
 

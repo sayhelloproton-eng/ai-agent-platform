@@ -17,7 +17,7 @@ export function getCliManifest() {
     },
     {
       command: "start",
-      purpose: "Start the local HTTP service in the background.",
+      purpose: "Start the single managed local HTTP service in the background. Idempotent for the current runtime home.",
       usage: "aap-execution-flow start [--json]",
       side_effect: "process",
       machine_output: true,
@@ -31,7 +31,7 @@ export function getCliManifest() {
     },
     {
       command: "stop",
-      purpose: "Stop the service after verifying the stored instance identity. Use --force only for a stale/unreachable instance.",
+      purpose: "Stop only a verified runtime PID. --force may SIGKILL only a verified runtime; an unverified PID is never killed.",
       usage: "aap-execution-flow stop [--force] [--json]",
       side_effect: "process",
       machine_output: true,
@@ -95,7 +95,7 @@ export function getCliManifest() {
     {
       command: "spec",
       purpose: "List or print a public JSON Schema bundled with the module.",
-      usage: "aap-execution-flow spec [list|execution-run|execution-flow|execution-result|capability|inference-node] [--json]",
+      usage: "aap-execution-flow spec [list|template-value|execution-run|execution-flow|execution-result|capability|inference-node] [--json]",
       side_effect: "none",
       machine_output: true,
     },
@@ -127,10 +127,15 @@ export function getCliManifest() {
     },
     invariants: [
       "The runtime consumes execution-flow protocol, not task-domain semantics.",
+      "There is one managed runtime service per runtime home; inference backends are pluggable providers inside it.",
+      "Published JSON Schemas are the validation source of truth for runtime and CLI.",
+      "Bindings use explicit {$ref: ...} objects; plain strings are never implicit bindings.",
       "Inference nodes cannot directly execute host commands or files.",
       "Action nodes invoke only registered capabilities.",
       "Fixed-command capability uses opaque command_ref and shell=false.",
-      "File read is rooted, relative-path only and blocks traversal/symlink escape.",
+      "File read is rooted, relative-path only and blocks traversal/symlink/protected-path escape.",
+      "Command timeout/output-limit failures terminate the child process before returning.",
+      "stop never kills an unverified PID.",
       "Flow transitions are defined by the flow specification, not invented by the model.",
     ],
   };

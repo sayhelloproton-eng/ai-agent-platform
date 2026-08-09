@@ -1,6 +1,6 @@
 # @ai-agent-platform/execution-flow-runtime
 
-A TypeScript-source-only lab module for running **spec-defined execution flows**.
+A TypeScript-source-only lab module for running **spec-defined execution flows**. The published schemas, runtime validator, CLI validator, documentation and tests live together in this module.
 
 This module is not a Task domain, not a Controller, and not a free-form Agent loop. It accepts a structured execution contract, runs explicit nodes, invokes only registered capabilities, and uses small-model inference only where the flow declares an inference node.
 
@@ -34,6 +34,9 @@ aap-execution-flow install
 ```
 
 ## Service lifecycle
+
+The lab uses **one managed Execution Flow Runtime service per runtime home**. MLXHub/PC/cloud inference implementations are pluggable backends inside this service, not additional runtime services.
+
 
 ```bash
 aap-execution-flow start
@@ -94,7 +97,7 @@ The goal is that an AI agent can inspect the module before using it instead of r
 
 ## Core rule
 
-The flow defines **what node runs next**.
+The flow defines **what node runs next**. Data binding is explicit with `{ "$ref": "steps.node.output.field" }`; plain strings are never treated as bindings.
 
 The model does not invent shell commands, filesystem permissions, capabilities, or global task transitions.
 

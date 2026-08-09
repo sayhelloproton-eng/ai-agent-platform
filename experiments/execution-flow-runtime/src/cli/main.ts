@@ -8,14 +8,18 @@ import { getCliManifest } from "./manifest.js";
 import { listDocTopics, listSpecs, readDocTopic, readSpec } from "./docs.js";
 import {
   CONFIG_PATH,
+  LOCK_PATH,
   LOG_PATH,
   RUNTIME_HOME,
   STATE_PATH,
   ensureRuntimeHome,
   defaultConfig,
   loadConfig,
+  readRuntimeLock,
   readState,
-  removeState,
+  removeStateIfOwned,
+  acquireRuntimeLock,
+  releaseRuntimeLock,
   writeState,
 } from "../service/config.js";
 import { createExecutionFlowServer } from "../service/server.js";
@@ -103,6 +107,7 @@ async function commandInstall(json: boolean): Promise<void> {
       runtime_home: RUNTIME_HOME,
       config_path: CONFIG_PATH,
       state_path: STATE_PATH,
+      lock_path: LOCK_PATH,
       log_path: LOG_PATH,
       config,
     },
@@ -114,25 +119,46 @@ async function commandServe(): Promise<void> {
   const config = await ensureRuntimeHome();
   const instanceId =
     process.env.EXECUTION_FLOW_INSTANCE_ID ?? randomUUID();
-  const service = await createExecutionFlowServer({
-    config,
-    instanceId,
-  });
-
-  await service.listen();
-  await writeState({
+  const startedAt = new Date().toISOString();
+  const lock = {
     instance_id: instanceId,
     pid: process.pid,
     host: config.host,
     port: config.port,
-    started_at: new Date().toISOString(),
-  });
+    started_at: startedAt,
+    lock_created_at: startedAt,
+  };
 
+  await acquireRuntimeLock(lock);
+
+  let service: Awaited<ReturnType<typeof createExecutionFlowServer>> | undefined;
+  try {
+    service = await createExecutionFlowServer({
+      config,
+      instanceId,
+    });
+    await service.listen();
+    await writeState({
+      instance_id: instanceId,
+      pid: process.pid,
+      host: config.host,
+      port: config.port,
+      started_at: startedAt,
+    });
+  } catch (error) {
+    await releaseRuntimeLock(instanceId, process.pid);
+    throw error;
+  }
+
+  let shuttingDown = false;
   const shutdown = async () => {
+    if (shuttingDown) return;
+    shuttingDown = true;
     try {
-      await service.close();
+      await service?.close();
     } finally {
-      await removeState();
+      await removeStateIfOwned(instanceId, process.pid);
+      await releaseRuntimeLock(instanceId, process.pid);
       process.exit(0);
     }
   };
@@ -147,6 +173,7 @@ async function commandServe(): Promise<void> {
       pid: process.pid,
       host: config.host,
       port: config.port,
+      singleton_scope: RUNTIME_HOME,
     }) + "\n"
   );
 }
@@ -155,15 +182,51 @@ async function commandStart(json: boolean): Promise<void> {
   const config = await ensureRuntimeHome();
   const previous = await readState();
 
-  if (previous && pidAlive(previous.pid)) {
-    const health = await fetchHealth(previous.host, previous.port);
-    if (health?.instance_id === previous.instance_id) {
-      print({ ok: true, status: "already-running", state: previous }, json);
-      return;
+  if (previous) {
+    const alive = pidAlive(previous.pid);
+    if (alive) {
+      const health = await fetchHealth(previous.host, previous.port);
+      if (health?.instance_id === previous.instance_id) {
+        print({ ok: true, status: "already-running", state: previous }, json);
+        return;
+      }
+      throw new Error(
+        `Stored PID ${previous.pid} is alive but runtime identity is not verified. Refusing to start a second service.`
+      );
     }
+    await removeStateIfOwned(previous.instance_id, previous.pid);
+    await releaseRuntimeLock(previous.instance_id, previous.pid);
   }
 
-  await removeState();
+  const existingLock = await readRuntimeLock();
+  if (existingLock) {
+    if (pidAlive(existingLock.pid)) {
+      const health = await fetchHealth(existingLock.host, existingLock.port);
+      if (health?.instance_id === existingLock.instance_id) {
+        await writeState({
+          instance_id: existingLock.instance_id,
+          pid: existingLock.pid,
+          host: existingLock.host,
+          port: existingLock.port,
+          started_at: existingLock.started_at,
+        });
+        print(
+          {
+            ok: true,
+            status: "already-running",
+            state: await readState(),
+          },
+          json
+        );
+        return;
+      }
+      throw new Error(
+        `Runtime lock belongs to live PID ${existingLock.pid}, but identity is not verified. Refusing to start a second service.`
+      );
+    }
+    await releaseRuntimeLock(existingLock.instance_id, existingLock.pid);
+  }
+
   const instanceId = randomUUID();
 
   await fs.mkdir(path.dirname(LOG_PATH), { recursive: true });
@@ -203,10 +266,20 @@ async function commandStart(json: boolean): Promise<void> {
   }
 
   if (child.pid) {
-    try {
-      process.kill(child.pid, "SIGTERM");
-    } catch {
-      // ignore
+    const state = await readState();
+    const health = state
+      ? await fetchHealth(state.host, state.port)
+      : undefined;
+    if (
+      state?.instance_id === instanceId &&
+      state.pid === child.pid &&
+      health?.instance_id === instanceId
+    ) {
+      try {
+        process.kill(child.pid, "SIGTERM");
+      } catch {
+        // ignore only after identity was verified
+      }
     }
   }
   throw new Error(`Service did not become ready. See ${LOG_PATH}`);
@@ -214,14 +287,21 @@ async function commandStart(json: boolean): Promise<void> {
 
 async function commandStatus(json: boolean): Promise<void> {
   const state = await readState();
-  if (!state) {
+  const lock = await readRuntimeLock();
+  if (!state && !lock) {
     print({ ok: true, status: "stopped" }, json);
     return;
   }
 
-  const alive = pidAlive(state.pid);
-  const health = await fetchHealth(state.host, state.port);
-  const identityMatch = health?.instance_id === state.instance_id;
+  const observed = state ?? lock;
+  if (!observed) {
+    print({ ok: true, status: "stopped" }, json);
+    return;
+  }
+
+  const alive = pidAlive(observed.pid);
+  const health = await fetchHealth(observed.host, observed.port);
+  const identityMatch = health?.instance_id === observed.instance_id;
 
   print(
     {
@@ -229,8 +309,10 @@ async function commandStatus(json: boolean): Promise<void> {
       status: alive && identityMatch ? "running" : "stale",
       pid_alive: alive,
       identity_match: identityMatch,
-      state,
+      state: state ?? null,
+      lock: lock ?? null,
       health: health ?? null,
+      singleton_scope: RUNTIME_HOME,
     },
     json
   );
@@ -241,40 +323,83 @@ async function commandStop(
   force: boolean
 ): Promise<void> {
   const state = await readState();
-  if (!state) {
+  const lock = await readRuntimeLock();
+
+  if (
+    state &&
+    lock &&
+    (state.instance_id !== lock.instance_id || state.pid !== lock.pid)
+  ) {
+    throw new Error(
+      "Runtime state and singleton lock disagree. Refusing to signal any PID until identity is reconciled."
+    );
+  }
+
+  const observed = state ?? lock;
+  if (!observed) {
     print({ ok: true, status: "already-stopped" }, json);
     return;
   }
 
-  const alive = pidAlive(state.pid);
+  const alive = pidAlive(observed.pid);
   if (!alive) {
-    await removeState();
+    await removeStateIfOwned(observed.instance_id, observed.pid);
+    await releaseRuntimeLock(observed.instance_id, observed.pid);
     print({ ok: true, status: "stale-state-removed" }, json);
     return;
   }
 
-  const health = await fetchHealth(state.host, state.port);
-  const identityMatch = health?.instance_id === state.instance_id;
+  const health = await fetchHealth(observed.host, observed.port);
+  const identityMatch = health?.instance_id === observed.instance_id;
 
-  if (!identityMatch && !force) {
+  if (!identityMatch) {
+    if (force) {
+      await removeStateIfOwned(observed.instance_id, observed.pid);
+      print(
+        {
+          ok: true,
+          status: "stale-state-removed-unverified-process-left-running",
+          pid: observed.pid,
+          killed: false,
+          lock_preserved: Boolean(lock),
+        },
+        json
+      );
+      return;
+    }
     throw new Error(
-      "Stored PID is alive but service identity could not be verified. Refusing to kill it. Retry with `stop --force` only after checking the PID."
+      "Stored PID is alive but service identity could not be verified. Refusing to kill it. `stop --force` only clears stale state; it never kills an unverified PID."
     );
   }
 
-  process.kill(state.pid, "SIGTERM");
+  process.kill(observed.pid, "SIGTERM");
 
   const deadline = Date.now() + 5000;
-  while (Date.now() < deadline && pidAlive(state.pid)) {
+  while (Date.now() < deadline && pidAlive(observed.pid)) {
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
 
-  if (pidAlive(state.pid) && force) {
-    process.kill(state.pid, "SIGKILL");
+  if (pidAlive(observed.pid)) {
+    if (!force) {
+      throw new Error(
+        `Verified service PID ${observed.pid} did not stop within 5000 ms. State is retained. Retry with stop --force to SIGKILL this verified service.`
+      );
+    }
+    process.kill(observed.pid, "SIGKILL");
+    const killDeadline = Date.now() + 2000;
+    while (Date.now() < killDeadline && pidAlive(observed.pid)) {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+    if (pidAlive(observed.pid)) {
+      throw new Error(
+        `Verified service PID ${observed.pid} remained alive after SIGKILL.`
+      );
+    }
   }
 
-  await removeState();
-  print({ ok: true, status: "stopped", pid: state.pid }, json);
+  await removeStateIfOwned(observed.instance_id, observed.pid);
+  await releaseRuntimeLock(observed.instance_id, observed.pid);
+  print({ ok: true, status: "stopped", pid: observed.pid }, json);
 }
 
 async function commandDoctor(json: boolean): Promise<void> {

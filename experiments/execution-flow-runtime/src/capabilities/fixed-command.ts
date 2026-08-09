@@ -1,5 +1,4 @@
 import { spawn } from "node:child_process";
-import type { Readable } from "node:stream";
 import { ExecutionFlowError } from "../runtime/errors.js";
 import type {
   CapabilityDescriptor,
@@ -13,27 +12,121 @@ export interface FixedCommandCapabilityOptions {
   maxOutputBytes?: number;
 }
 
-function collect(stream: Readable, maxBytes: number): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const chunks: Buffer[] = [];
-    let bytes = 0;
+interface CommandResult {
+  command_ref: string;
+  exit_code: number | null;
+  signal: NodeJS.Signals | null;
+  stdout: string;
+  stderr: string;
+}
 
-    stream.on("data", (chunk: Buffer) => {
-      bytes += chunk.length;
-      if (bytes > maxBytes) {
-        reject(
+function runFixedCommand(
+  commandRef: string,
+  definition: FixedCommandDefinition,
+  timeoutMs: number,
+  maxOutputBytes: number
+): Promise<CommandResult> {
+  return new Promise((resolve, reject) => {
+    const child = spawn(definition.executable, definition.args, {
+      ...(definition.cwd ? { cwd: definition.cwd } : {}),
+      ...(definition.env ? { env: definition.env } : {}),
+      shell: false,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+
+    const stdoutChunks: Buffer[] = [];
+    const stderrChunks: Buffer[] = [];
+    let stdoutBytes = 0;
+    let stderrBytes = 0;
+    let terminalError: ExecutionFlowError | undefined;
+
+    const terminate = (error: ExecutionFlowError) => {
+      if (!terminalError) terminalError = error;
+      if (child.exitCode === null && child.signalCode === null) {
+        child.kill("SIGKILL");
+      }
+    };
+
+    child.stdout.on("data", (chunk: Buffer) => {
+      if (terminalError) return;
+      stdoutBytes += chunk.length;
+      if (stdoutBytes > maxOutputBytes) {
+        terminate(
           new ExecutionFlowError(
             "COMMAND_OUTPUT_TOO_LARGE",
-            `Command output exceeded ${maxBytes} bytes.`
+            `Command stdout exceeded ${maxOutputBytes} bytes.`
           )
         );
         return;
       }
-      chunks.push(chunk);
+      stdoutChunks.push(chunk);
     });
 
-    stream.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
-    stream.on("error", reject);
+    child.stderr.on("data", (chunk: Buffer) => {
+      if (terminalError) return;
+      stderrBytes += chunk.length;
+      if (stderrBytes > maxOutputBytes) {
+        terminate(
+          new ExecutionFlowError(
+            "COMMAND_OUTPUT_TOO_LARGE",
+            `Command stderr exceeded ${maxOutputBytes} bytes.`
+          )
+        );
+        return;
+      }
+      stderrChunks.push(chunk);
+    });
+
+    child.stdout.on("error", (error) => {
+      terminate(
+        new ExecutionFlowError(
+          "COMMAND_STREAM_ERROR",
+          `Command stdout failed: ${error.message}`
+        )
+      );
+    });
+
+    child.stderr.on("error", (error) => {
+      terminate(
+        new ExecutionFlowError(
+          "COMMAND_STREAM_ERROR",
+          `Command stderr failed: ${error.message}`
+        )
+      );
+    });
+
+    const timer = setTimeout(() => {
+      terminate(
+        new ExecutionFlowError(
+          "COMMAND_TIMEOUT",
+          `Command exceeded ${timeoutMs} ms.`
+        )
+      );
+    }, timeoutMs);
+
+    child.once("error", (error) => {
+      terminate(
+        new ExecutionFlowError(
+          "COMMAND_SPAWN_FAILED",
+          `Command could not start: ${error.message}`
+        )
+      );
+    });
+
+    child.once("close", (code, signal) => {
+      clearTimeout(timer);
+      if (terminalError) {
+        reject(terminalError);
+        return;
+      }
+      resolve({
+        command_ref: commandRef,
+        exit_code: code,
+        signal,
+        stdout: Buffer.concat(stdoutChunks).toString("utf8"),
+        stderr: Buffer.concat(stderrChunks).toString("utf8"),
+      });
+    });
   });
 }
 
@@ -51,7 +144,8 @@ export function createFixedCommandCapability({
     if (
       !definition ||
       typeof definition.executable !== "string" ||
-      !Array.isArray(definition.args)
+      !Array.isArray(definition.args) ||
+      definition.args.some((arg) => typeof arg !== "string")
     ) {
       throw new ExecutionFlowError(
         "INVALID_COMMAND_DEFINITION",
@@ -95,47 +189,12 @@ export function createFixedCommandCapability({
         );
       }
 
-      const child = spawn(definition.executable, definition.args, {
-        ...(definition.cwd ? { cwd: definition.cwd } : {}),
-        ...(definition.env ? { env: definition.env } : {}),
-        shell: false,
-        stdio: ["ignore", "pipe", "pipe"],
-      });
-
-      const stdoutPromise = collect(child.stdout, maxOutputBytes);
-      const stderrPromise = collect(child.stderr, maxOutputBytes);
-      const closePromise = new Promise<{ code: number | null; signal: NodeJS.Signals | null }>(
-        (resolve, reject) => {
-          child.once("error", reject);
-          child.once("close", (code, signal) => resolve({ code, signal }));
-        }
+      return await runFixedCommand(
+        commandRef,
+        definition,
+        timeoutMs,
+        maxOutputBytes
       );
-
-      const timer = setTimeout(() => child.kill("SIGKILL"), timeoutMs);
-      try {
-        const [stdout, stderr, exit] = await Promise.all([
-          stdoutPromise,
-          stderrPromise,
-          closePromise,
-        ]);
-
-        if (exit.signal === "SIGKILL") {
-          throw new ExecutionFlowError(
-            "COMMAND_TIMEOUT",
-            `Command exceeded ${timeoutMs} ms.`
-          );
-        }
-
-        return {
-          command_ref: commandRef,
-          exit_code: exit.code,
-          signal: exit.signal,
-          stdout,
-          stderr,
-        };
-      } finally {
-        clearTimeout(timer);
-      }
     },
   };
 }

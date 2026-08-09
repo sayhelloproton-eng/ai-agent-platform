@@ -1,4 +1,5 @@
 import { ExecutionFlowError } from "./errors.js";
+import type { BindingRef } from "../types.js";
 
 function getPath(root: unknown, path: string[]): unknown {
   let value: unknown = root;
@@ -19,13 +20,23 @@ function getPath(root: unknown, path: string[]): unknown {
   return value;
 }
 
+export function isBindingRef(value: unknown): value is BindingRef {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const entries = Object.entries(value);
+  return (
+    entries.length === 1 &&
+    entries[0]?.[0] === "$ref" &&
+    typeof entries[0]?.[1] === "string"
+  );
+}
+
 export function resolveBinding(value: unknown, context: unknown): unknown {
-  if (typeof value === "string" && value.startsWith("$")) {
-    const parts = value.slice(1).split(".").filter(Boolean);
-    if (parts.length === 0) {
+  if (isBindingRef(value)) {
+    const parts = value.$ref.split(".").filter(Boolean);
+    if (parts.length < 2 || !["inputs", "steps"].includes(parts[0] ?? "")) {
       throw new ExecutionFlowError(
         "INVALID_BINDING",
-        "Binding reference cannot be empty."
+        `Binding reference must start with inputs. or steps.: ${value.$ref}`
       );
     }
     return structuredClone(getPath(context, parts));

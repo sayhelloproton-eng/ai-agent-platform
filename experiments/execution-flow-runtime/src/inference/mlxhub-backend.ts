@@ -13,6 +13,8 @@ export interface MlxHubInferenceBackendOptions {
   fetchImpl?: typeof fetch;
   timeoutMs?: number;
   apiKey?: string;
+  standardMaxTokens?: number;
+  reasoningMaxTokens?: number;
 }
 
 function stripThinking(content: string): string {
@@ -75,6 +77,8 @@ export class MlxHubInferenceBackend implements InferenceBackend {
   readonly fetchImpl: typeof fetch;
   readonly timeoutMs: number;
   readonly apiKey?: string;
+  readonly standardMaxTokens: number;
+  readonly reasoningMaxTokens: number;
 
   constructor({
     baseUrl,
@@ -83,6 +87,8 @@ export class MlxHubInferenceBackend implements InferenceBackend {
     fetchImpl = fetch,
     timeoutMs = 120_000,
     apiKey,
+    standardMaxTokens = 1024,
+    reasoningMaxTokens = 2048,
   }: MlxHubInferenceBackendOptions) {
     if (!baseUrl || !standardModel || !reasoningModel) {
       throw new ExecutionFlowError(
@@ -96,6 +102,8 @@ export class MlxHubInferenceBackend implements InferenceBackend {
     this.reasoningModel = reasoningModel;
     this.fetchImpl = fetchImpl;
     this.timeoutMs = timeoutMs;
+    this.standardMaxTokens = standardMaxTokens;
+    this.reasoningMaxTokens = reasoningMaxTokens;
     if (apiKey) this.apiKey = apiKey;
   }
 
@@ -132,7 +140,10 @@ export class MlxHubInferenceBackend implements InferenceBackend {
             stream: false,
             temperature: request.profile === "reasoning" ? 0.2 : 0.4,
             top_p: 0.8,
-            max_tokens: request.profile === "reasoning" ? 2048 : 1024,
+            max_tokens:
+              request.profile === "reasoning"
+                ? this.reasoningMaxTokens
+                : this.standardMaxTokens,
             messages: [
               {
                 role: "system",

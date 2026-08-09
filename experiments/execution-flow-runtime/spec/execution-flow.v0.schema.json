@@ -16,7 +16,7 @@
       "items": {
         "oneOf": [
           { "$ref": "#/$defs/actionNode" },
-          { "$ref": "#/$defs/inferenceNode" },
+          { "$ref": "inference-node.v0.schema.json" },
           { "$ref": "#/$defs/switchNode" },
           { "$ref": "#/$defs/returnNode" }
         ]
@@ -24,14 +24,6 @@
     }
   },
   "$defs": {
-    "baseNode": {
-      "type": "object",
-      "required": ["id", "type"],
-      "properties": {
-        "id": { "type": "string", "minLength": 1 },
-        "type": { "type": "string" }
-      }
-    },
     "actionNode": {
       "type": "object",
       "required": ["id", "type", "capability", "arguments", "next"],
@@ -40,12 +32,11 @@
         "id": { "type": "string", "minLength": 1 },
         "type": { "const": "action" },
         "capability": { "type": "string", "minLength": 1 },
-        "arguments": { "type": "object" },
+        "arguments": {
+          "$ref": "template-value.v0.schema.json#/$defs/templateObject"
+        },
         "next": { "type": "string", "minLength": 1 }
       }
-    },
-    "inferenceNode": {
-      "$ref": "inference-node.v0.schema.json"
     },
     "switchNode": {
       "type": "object",
@@ -54,7 +45,9 @@
       "properties": {
         "id": { "type": "string", "minLength": 1 },
         "type": { "const": "switch" },
-        "select": { "type": "string", "pattern": "^\\$" },
+        "select": {
+          "$ref": "template-value.v0.schema.json#/$defs/bindingRef"
+        },
         "cases": {
           "type": "object",
           "minProperties": 1,
@@ -70,7 +63,9 @@
       "properties": {
         "id": { "type": "string", "minLength": 1 },
         "type": { "const": "return" },
-        "output": {}
+        "output": {
+          "$ref": "template-value.v0.schema.json#/$defs/templateValue"
+        }
       }
     }
   }

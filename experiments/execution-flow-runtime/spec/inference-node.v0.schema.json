@@ -11,7 +11,9 @@
     "backend": { "type": "string", "minLength": 1 },
     "profile": { "enum": ["standard", "reasoning"] },
     "instruction": { "type": "string", "minLength": 1 },
-    "input": { "type": "object" },
+    "input": {
+      "$ref": "template-value.v0.schema.json#/$defs/templateValue"
+    },
     "output_schema": { "type": "object" },
     "next": { "type": "string", "minLength": 1 }
   }

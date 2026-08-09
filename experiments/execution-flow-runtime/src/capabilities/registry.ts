@@ -1,5 +1,5 @@
 import { ExecutionFlowError } from "../runtime/errors.js";
-import { validateValueAgainstSchema } from "../runtime/schema-lite.js";
+import { assertValidJsonSchema, validatePublishedSchema, validateValueAgainstSchema } from "../runtime/schema.js";
 import type {
   CapabilityDescriptor,
   CapabilityHandler,
@@ -15,16 +15,8 @@ export class CapabilityRegistry {
   readonly #entries = new Map<string, CapabilityEntry>();
 
   register(descriptor: CapabilityDescriptor, handler: CapabilityHandler): this {
-    if (
-      !descriptor ||
-      descriptor.contract !== "execution.capability.v0" ||
-      !descriptor.name
-    ) {
-      throw new ExecutionFlowError(
-        "INVALID_CAPABILITY",
-        "Capability descriptor is invalid."
-      );
-    }
+    validatePublishedSchema("capability", descriptor, "INVALID_CAPABILITY");
+    assertValidJsonSchema(descriptor.input_schema, `${descriptor.name}.input_schema`);
     if (this.#entries.has(descriptor.name)) {
       throw new ExecutionFlowError(
         "DUPLICATE_CAPABILITY",

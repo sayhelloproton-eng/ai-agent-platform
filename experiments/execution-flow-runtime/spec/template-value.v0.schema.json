@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-agent-platform.local/spec/template-value.v0.schema.json",
+  "title": "ExecutionTemplateValueV0",
+  "$defs": {
+    "bindingRef": {
+      "type": "object",
+      "required": ["$ref"],
+      "additionalProperties": false,
+      "properties": {
+        "$ref": {
+          "type": "string",
+          "pattern": "^(inputs|steps)(\\.[A-Za-z0-9_-]+)+$"
+        }
+      }
+    },
+    "templateObject": {
+      "type": "object",
+      "not": {
+        "required": ["$ref"],
+        "properties": {
+          "$ref": { "type": "string" }
+        }
+      },
+      "additionalProperties": { "$ref": "#/$defs/templateValue" }
+    },
+    "templateValue": {
+      "anyOf": [
+        { "type": ["string", "number", "boolean", "null"] },
+        {
+          "type": "array",
+          "items": { "$ref": "#/$defs/templateValue" }
+        },
+        { "$ref": "#/$defs/bindingRef" },
+        { "$ref": "#/$defs/templateObject" }
+      ]
+    }
+  }
+}
