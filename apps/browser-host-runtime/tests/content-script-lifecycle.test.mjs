@@ -106,6 +106,7 @@ test("reinjection disposes the previous live content-script instance before regi
 
 function createComposerHarness({ transform = (value) => value, bodyText = "", extraButtons = [], messageRoles = [], hidden = false } = {}) {
   const runtimeListeners = new Set();
+  const documentListeners = new Map();
   let sendClicks = 0;
   const extraButtonClicks = new Map();
 
@@ -153,8 +154,14 @@ function createComposerHarness({ transform = (value) => value, bodyText = "", ex
     body: { innerText: bodyText },
     title: "GPT",
     scrollingElement: null,
-    addEventListener() {},
-    removeEventListener() {},
+    addEventListener(type, listener) {
+      const values = documentListeners.get(type) ?? new Set();
+      values.add(listener);
+      documentListeners.set(type, values);
+    },
+    removeEventListener(type, listener) {
+      documentListeners.get(type)?.delete(listener);
+    },
     querySelector(selector) {
       if (["#prompt-textarea", 'textarea[data-id="root"]', "textarea[placeholder]", '[contenteditable="true"][role="textbox"]', '[contenteditable="true"]'].includes(selector)) return composer;
       return null;
@@ -217,9 +224,29 @@ function createComposerHarness({ transform = (value) => value, bodyText = "", ex
     runtimeListeners,
     composer,
     getSendClicks: () => sendClicks,
-    getExtraButtonClicks: (name) => extraButtonClicks.get(name) ?? 0
+    getExtraButtonClicks: (name) => extraButtonClicks.get(name) ?? 0,
+    dispatchDocumentEvent: (type, event) => {
+      for (const listener of documentListeners.get(type) ?? []) listener(event);
+    }
   };
 }
+
+test("trusted user activity blocks SUBMIT_MESSAGE before composer mutation or send click", async () => {
+  const harness = createComposerHarness();
+  harness.dispatchDocumentEvent("pointerdown", { isTrusted: true });
+  const listener = [...harness.runtimeListeners][0];
+  const response = await new Promise((resolve) => {
+    listener({
+      type: "BHR_EXECUTE_ACTION",
+      action_type: "SUBMIT_MESSAGE",
+      payload: { text: "continue task", expected_identity: { gpt_ref: "g-test", conversation_ref: "conv" } }
+    }, {}, resolve);
+  });
+  assert.equal(response.ok, false);
+  assert.equal(response.error.code, "USER_CONTROL_ACTIVE");
+  assert.equal(harness.composer.value, "");
+  assert.equal(harness.getSendClicks(), 0);
+});
 
 test("message submission stops before click when the composer does not contain the requested text exactly enough", async () => {
   const harness = createComposerHarness({ transform: (value) => value.slice(0, Math.max(0, value.length - 1)) });

@@ -75,6 +75,18 @@ function approvalResumeShouldDefer(observation) {
   return (observation.blocking_ui ?? []).some((item) => item?.type === "ACTION_CONFIRMATION_PENDING");
 }
 
+function userControlShouldDefer(localObservation) {
+  return Boolean(localObservation?.user_active || localObservation?.user_reviewing);
+}
+
+function isDefinitelyPreSideEffectExecutorError(error) {
+  // The content script checks USER_CONTROL_ACTIVE before it mutates the composer.
+  // If a trusted pointer/key/scroll races with the background precheck, this error
+  // therefore proves that SUBMIT_MESSAGE did not cross the browser side-effect
+  // boundary and must not be escalated to UNCERTAIN.
+  return error?.code === "USER_CONTROL_ACTIVE";
+}
+
 export class RuntimeCoordinator {
   constructor({ host_id, dispatchClient, approvalClient, bindingRegistry, journal, observationCoordinator, actionExecutor, modelProvider, evidenceStore, configProvider }) {
     Object.assign(this, { host_id, dispatchClient, approvalClient, bindingRegistry, journal, observationCoordinator, actionExecutor, modelProvider, evidenceStore, configProvider });
@@ -588,6 +600,39 @@ export class RuntimeCoordinator {
             dispatch_ref: command.dispatch_ref
           };
         }
+
+        // Human Approval Actions themselves create trusted pointer/keyboard activity
+        // in the bound Controller tab. The content script intentionally refuses to
+        // mutate the composer for ten seconds after such activity (or while the user
+        // is scrolled up reviewing history). Treat that local user-control signal as
+        // a temporary execution gate before consuming the one-time Grant. Otherwise
+        // a perfectly valid Grant is burned and the action is reported UNCERTAIN even
+        // though the content script has not touched the composer.
+        if (userControlShouldDefer(pre.local)) {
+          await this.journal.mark(command.command_id, JOURNAL_STATE.APPROVAL_PENDING, {
+            ...preparedDetails,
+            approval_draft: draft,
+            action_fingerprint: draft.action_fingerprint,
+            page_precondition_hash: draft.page_precondition_hash,
+            claim_token: claim.claim_token,
+            claim_expires_at: claim.expires_at ?? null,
+            approval_wait: {
+              reason: "USER_CONTROL_ACTIVE",
+              user_active: Boolean(pre.local?.user_active),
+              user_reviewing: Boolean(pre.local?.user_reviewing),
+              observed_at: pre.observation.observed_at
+            }
+          });
+          return {
+            processed: true,
+            reason: "APPROVAL_PENDING_USER_CONTROL",
+            approval_pending: true,
+            approval_draft: draft,
+            command_id: command.command_id,
+            dispatch_ref: command.dispatch_ref
+          };
+        }
+
         const validated = await validateApprovalGrant({ grant, command, binding, resolved_payload: resolvedPayload, observation: pre.observation });
         await this.journal.mark(command.command_id, JOURNAL_STATE.PREPARED, {
           ...preparedDetails,
@@ -637,7 +682,10 @@ export class RuntimeCoordinator {
       // crossed the side-effect boundary. Pre-action validation/observation
       // failures are BLOCKED, even if they use an error code that may also occur
       // later during response observation.
-      const sideEffectMayHaveStarted = actionStarted && classifyAction(command.action.type) === "HIGH";
+      const sideEffectMayHaveStarted =
+        actionStarted &&
+        classifyAction(command.action.type) === "HIGH" &&
+        !isDefinitelyPreSideEffectExecutorError(safe);
       const status = sideEffectMayHaveStarted ? HOST_RESULT_STATUS.UNCERTAIN : HOST_RESULT_STATUS.BLOCKED;
       const result = buildHostResult({
         command,

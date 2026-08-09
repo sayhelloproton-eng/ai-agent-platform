@@ -4,6 +4,7 @@ import { RuntimeCoordinator } from "../src/background/runtime-coordinator.js";
 import { CommandJournal } from "../src/background/command-journal.js";
 import { MemoryStorageArea } from "../src/background/storage.js";
 import { computeActionFingerprint, computePagePreconditionHash } from "../src/shared/fingerprints.js";
+import { BhrError } from "../src/shared/errors.js";
 import { binding, hostCommand, observation, platformWake } from "./test-helpers.mjs";
 
 function assessment() {
@@ -481,6 +482,154 @@ test("approval resume defers transient Controller generation and executes once a
   assert.equal(consumed, 1);
   assert.equal(executions, 1);
   assert.equal(failures, 0);
+});
+
+test("approval resume defers trusted user control before consuming Grant and executes after the user is idle", async () => {
+  const command = hostCommand();
+  const bound = binding();
+  const observed = observation();
+  const payload = { text: "approved wake" };
+  const journal = new CommandJournal(new MemoryStorageArea());
+  let grant = null;
+  let observeEpoch = 0;
+  let executions = 0;
+  let consumed = 0;
+  let failures = 0;
+  const harness = dispatchHarness(command);
+  harness.client.resolvePayload = async () => payload;
+  const coordinator = new RuntimeCoordinator({
+    host_id: "host",
+    dispatchClient: {
+      ...harness.client,
+      fail: async (...args) => { failures += 1; return harness.client.fail(...args); }
+    },
+    approvalClient: {
+      putDraft: async () => ({ status: "PENDING_APPROVAL" }),
+      getGrantOrNull: async () => grant,
+      getGrant: async () => grant,
+      consume: async () => { consumed += 1; }
+    },
+    bindingRegistry: { findForTarget: async () => bound, validateObservation: async (value) => value, get: async () => bound },
+    journal,
+    observationCoordinator: {
+      observe: async () => {
+        observeEpoch += 1;
+        return {
+          observation: observed,
+          local: observeEpoch === 2 ? { user_active: true, user_reviewing: false } : { user_active: false, user_reviewing: false }
+        };
+      }
+    },
+    actionExecutor: {
+      execute: async () => { executions += 1; return deliveryExecution(bound); },
+      waitForResponse: async () => ({ status: "ACTION_SUCCEEDED", details: { response_completed: true } })
+    },
+    modelProvider: { analyze: async () => assessment() },
+    evidenceStore: {},
+    configProvider: async () => ({ paused: false, emergency_stopped: false, approval_policy_mode: "platform_wake_candidate" })
+  });
+
+  const pending = await coordinator.processOne();
+  assert.equal(pending.reason, "APPROVAL_PENDING");
+
+  const pageHash = await computePagePreconditionHash(observed);
+  const fingerprint = await computeActionFingerprint({ command, binding_id: bound.binding_id, resolved_payload: payload, page_precondition_hash: pageHash });
+  grant = {
+    approval_ref: command.approval_ref,
+    grant_id: "grant-after-user-approval",
+    action_fingerprint: fingerprint,
+    binding_id: bound.binding_id,
+    task_id: command.task_id,
+    command_id: command.command_id,
+    allowed_action_type: command.action.type,
+    page_precondition_hash: pageHash,
+    single_use: true,
+    expires_at: "2030-01-01T00:00:00.000Z",
+    consumed_at: null
+  };
+
+  const deferred = await coordinator.processOne();
+  assert.equal(deferred.reason, "APPROVAL_PENDING_USER_CONTROL");
+  assert.equal(deferred.approval_pending, true);
+  assert.equal(consumed, 0);
+  assert.equal(executions, 0);
+  assert.equal(failures, 0);
+  const deferredEntry = await journal.get(command.command_id);
+  assert.equal(deferredEntry.state, "APPROVAL_PENDING");
+  assert.equal(deferredEntry.details.approval_wait.reason, "USER_CONTROL_ACTIVE");
+  assert.equal(deferredEntry.details.approval_wait.user_active, true);
+
+  const completed = await coordinator.processOne();
+  assert.equal(completed.result.status, "ACTION_SUCCEEDED");
+  assert.equal(consumed, 1);
+  assert.equal(executions, 1);
+  assert.equal(failures, 0);
+});
+
+test("USER_CONTROL_ACTIVE race at executor entry is deterministic pre-delivery BLOCKED, not UNCERTAIN", async () => {
+  const command = hostCommand();
+  const bound = binding();
+  const observed = observation();
+  const payload = { text: "approved wake" };
+  const pageHash = await computePagePreconditionHash(observed);
+  const fingerprint = await computeActionFingerprint({ command, binding_id: bound.binding_id, resolved_payload: payload, page_precondition_hash: pageHash });
+  const grant = {
+    approval_ref: command.approval_ref,
+    grant_id: "grant-race",
+    action_fingerprint: fingerprint,
+    binding_id: bound.binding_id,
+    task_id: command.task_id,
+    command_id: command.command_id,
+    allowed_action_type: command.action.type,
+    page_precondition_hash: pageHash,
+    single_use: true,
+    expires_at: "2030-01-01T00:00:00.000Z",
+    consumed_at: null
+  };
+  let consumed = 0;
+  let executions = 0;
+  let failures = 0;
+  let uncertainReports = 0;
+  const coordinator = new RuntimeCoordinator({
+    host_id: "host",
+    dispatchClient: {
+      listPending: async () => [{ dispatch_ref: command.dispatch_ref }],
+      claim: async () => ({ claim_token: "claim" }),
+      get: async () => command,
+      resolvePayload: async () => payload,
+      fail: async (_ref, _claim, result) => {
+        failures += 1;
+        assert.equal(result.status, "BLOCKED");
+        assert.equal(result.error.code, "USER_CONTROL_ACTIVE");
+        return { status: "RECORDED" };
+      },
+      uncertain: async () => { uncertainReports += 1; return { status: "RECORDED" }; }
+    },
+    approvalClient: {
+      putDraft: async () => ({ status: "PENDING_APPROVAL" }),
+      getGrant: async () => grant,
+      consume: async () => { consumed += 1; }
+    },
+    bindingRegistry: { findForTarget: async () => bound, validateObservation: async (value) => value },
+    journal: new CommandJournal(new MemoryStorageArea()),
+    observationCoordinator: { observe: async () => ({ observation: observed, local: { user_active: false, user_reviewing: false } }) },
+    actionExecutor: {
+      execute: async () => {
+        executions += 1;
+        throw new BhrError("USER_CONTROL_ACTIVE", "User is currently controlling or reviewing the page.");
+      }
+    },
+    modelProvider: {}, evidenceStore: {},
+    configProvider: async () => ({ paused: false, emergency_stopped: false, approval_policy_mode: "strict" })
+  });
+
+  const response = await coordinator.processOne();
+  assert.equal(response.result.status, "BLOCKED");
+  assert.equal(response.result.error.code, "USER_CONTROL_ACTIVE");
+  assert.equal(consumed, 1);
+  assert.equal(executions, 1);
+  assert.equal(failures, 1);
+  assert.equal(uncertainReports, 0);
 });
 
 test("initial Approval Draft preparation defers while ChatGPT Action confirmation is pending", async () => {
