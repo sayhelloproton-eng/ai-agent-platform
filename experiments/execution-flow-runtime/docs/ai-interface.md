@@ -24,3 +24,13 @@ Important:
 - `process.command.run-fixed` accepts only opaque `command_ref` values registered by the host. It never accepts an arbitrary shell line.
 - `workspace.file.read` is rooted to configured workspace, relative-path-only, and blocks traversal/symlink escape/protected paths.
 - The managed runtime is a single service per runtime home; MLXHub/PC/cloud inference are backends inside that service, not sibling services.
+
+## MLXHub backend discovery
+
+An AI caller must not embed MLXHub host/model details into an Execution Flow. Provider configuration is owned by the Runtime environment. Use:
+
+```bash
+aap-execution-flow providers --json
+```
+
+to discover whether `mlxhub` is registered. A Flow may then reference `backend: "mlxhub"` with `profile: "standard"` or `profile: "reasoning"` while keeping all transition logic in the Flow itself.

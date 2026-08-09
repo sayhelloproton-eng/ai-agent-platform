@@ -68,6 +68,17 @@ function compileSystemPrompt(outputSchema: JsonSchema): string {
   ].join("\n");
 }
 
+function classifyProviderError(providerCode: string, status: number): string {
+  const normalized = providerCode.toLowerCase();
+  if (normalized === "server_paused" || status >= 500) {
+    return "INFERENCE_PROVIDER_UNAVAILABLE";
+  }
+  if (normalized === "model_busy" || status === 429) {
+    return "INFERENCE_PROVIDER_BUSY";
+  }
+  return "INFERENCE_PROVIDER_ERROR";
+}
+
 export class MlxHubInferenceBackend implements InferenceBackend {
   #queue: Promise<void> = Promise.resolve();
 
@@ -78,7 +89,7 @@ export class MlxHubInferenceBackend implements InferenceBackend {
   readonly timeoutMs: number;
   readonly apiKey?: string;
   readonly standardMaxTokens: number;
-  readonly reasoningMaxTokens: number;
+  readonly reasoningMaxTokens?: number;
 
   constructor({
     baseUrl,
@@ -88,7 +99,7 @@ export class MlxHubInferenceBackend implements InferenceBackend {
     timeoutMs = 120_000,
     apiKey,
     standardMaxTokens = 1024,
-    reasoningMaxTokens = 2048,
+    reasoningMaxTokens,
   }: MlxHubInferenceBackendOptions) {
     if (!baseUrl || !standardModel || !reasoningModel) {
       throw new ExecutionFlowError(
@@ -103,7 +114,9 @@ export class MlxHubInferenceBackend implements InferenceBackend {
     this.fetchImpl = fetchImpl;
     this.timeoutMs = timeoutMs;
     this.standardMaxTokens = standardMaxTokens;
-    this.reasoningMaxTokens = reasoningMaxTokens;
+    if (reasoningMaxTokens !== undefined) {
+      this.reasoningMaxTokens = reasoningMaxTokens;
+    }
     if (apiKey) this.apiKey = apiKey;
   }
 
@@ -124,6 +137,34 @@ export class MlxHubInferenceBackend implements InferenceBackend {
     const started = Date.now();
 
     try {
+      const requestBody: Record<string, unknown> = {
+        model,
+        stream: false,
+        temperature: request.profile === "reasoning" ? 0.2 : 0.4,
+        top_p: 0.8,
+        messages: [
+          {
+            role: "system",
+            content: compileSystemPrompt(request.output_schema),
+          },
+          {
+            role: "user",
+            content: JSON.stringify({
+              instruction: request.instruction,
+              input: request.input,
+            }),
+          },
+        ],
+      };
+
+      if (request.profile === "reasoning") {
+        if (this.reasoningMaxTokens !== undefined) {
+          requestBody.max_tokens = this.reasoningMaxTokens;
+        }
+      } else {
+        requestBody.max_tokens = this.standardMaxTokens;
+      }
+
       const response = await this.fetchImpl(
         `${this.baseUrl}/v1/chat/completions`,
         {
@@ -135,29 +176,7 @@ export class MlxHubInferenceBackend implements InferenceBackend {
               : {}),
           },
           signal: controller.signal,
-          body: JSON.stringify({
-            model,
-            stream: false,
-            temperature: request.profile === "reasoning" ? 0.2 : 0.4,
-            top_p: 0.8,
-            max_tokens:
-              request.profile === "reasoning"
-                ? this.reasoningMaxTokens
-                : this.standardMaxTokens,
-            messages: [
-              {
-                role: "system",
-                content: compileSystemPrompt(request.output_schema),
-              },
-              {
-                role: "user",
-                content: JSON.stringify({
-                  instruction: request.instruction,
-                  input: request.input,
-                }),
-              },
-            ],
-          }),
+          body: JSON.stringify(requestBody),
         }
       );
 
@@ -174,9 +193,20 @@ export class MlxHubInferenceBackend implements InferenceBackend {
           body?.error?.message ??
           `MLXHub request failed with HTTP ${response.status}.`;
         throw new ExecutionFlowError(
-          "INFERENCE_PROVIDER_ERROR",
+          classifyProviderError(providerCode, response.status),
           message,
-          { provider_code: providerCode }
+          {
+            provider: "mlxhub",
+            provider_code: providerCode,
+            http_status: response.status,
+            model,
+            profile: request.profile,
+            retryable:
+              response.status === 429 ||
+              response.status >= 500 ||
+              providerCode === "server_paused" ||
+              providerCode === "model_busy",
+          }
         );
       }
 
@@ -201,10 +231,29 @@ export class MlxHubInferenceBackend implements InferenceBackend {
       if (error instanceof Error && error.name === "AbortError") {
         throw new ExecutionFlowError(
           "INFERENCE_TIMEOUT",
-          `MLXHub inference exceeded ${this.timeoutMs} ms.`
+          `MLXHub inference exceeded ${this.timeoutMs} ms.`,
+          {
+            provider: "mlxhub",
+            model,
+            profile: request.profile,
+            timeout_ms: this.timeoutMs,
+            retryable: true,
+          }
         );
       }
-      throw error;
+      if (error instanceof ExecutionFlowError) {
+        throw error;
+      }
+      throw new ExecutionFlowError(
+        "INFERENCE_PROVIDER_UNREACHABLE",
+        error instanceof Error ? error.message : String(error),
+        {
+          provider: "mlxhub",
+          model,
+          profile: request.profile,
+          retryable: true,
+        }
+      );
     } finally {
       clearTimeout(timer);
     }

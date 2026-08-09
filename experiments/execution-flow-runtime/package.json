@@ -1,6 +1,6 @@
 {
   "name": "@ai-agent-platform/execution-flow-runtime",
-  "version": "0.0.0-lab.5",
+  "version": "0.0.0-lab.6",
   "description": "Spec-driven execution-flow runtime with bounded inference and capability execution.",
   "type": "module",
   "main": "./index.ts",

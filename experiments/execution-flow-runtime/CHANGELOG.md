@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.0.0-lab.6
+
+EF-2 MLXHub provider hardening and live pluggability verification:
+
+- normalized MLXHub runtime failures into stable execution errors for unavailable, busy, unreachable and timeout conditions while preserving provider codes/details;
+- kept standard inference bounded at the validated default `max_tokens=1024`; reasoning output budget is no longer frozen to a module default and is only sent when explicitly configured;
+- preserved provider-wide serialized inference so standard/reasoning requests never overlap on the same MLXHub backend instance;
+- added unit coverage for model/profile selection, closed/unclosed `<think>` handling, provider failures, invalid JSON, transport failures and serialized requests;
+- upgraded the MLXHub live test to execute the same `ExecutionFlow` through Fixture and real MLXHub backends via the HTTP service, proving backend replacement without Runtime Core changes.
+
 ## 0.0.0-lab.5
 
 EF-1 single-service hardening and verification support:

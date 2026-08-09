@@ -131,3 +131,26 @@ export EXECUTION_FLOW_RUNTIME_HOME=/tmp/aap-execution-flow-runtime-test
 ```
 
 The HTTP service remains the same single runtime process; inference backends are providers inside that service, not separate Execution Flow Runtime services.
+
+## MLXHub provider lab configuration
+
+MLXHub is one optional inference backend inside the single Execution Flow Runtime service. The execution-flow protocol does not contain phone URLs or model IDs.
+
+Configure the provider through the runtime process environment:
+
+```bash
+export EXECUTION_FLOW_MLXHUB_BASE_URL="http://<phone-lan-host>:8080"
+export EXECUTION_FLOW_MLXHUB_STANDARD_MODEL="<standard-model-id>"
+export EXECUTION_FLOW_MLXHUB_REASONING_MODEL="<reasoning-model-id>"
+```
+
+Optional output budgets:
+
+```bash
+export EXECUTION_FLOW_MLXHUB_STANDARD_MAX_TOKENS=1024
+export EXECUTION_FLOW_MLXHUB_REASONING_MAX_TOKENS=<explicit-budget-if-needed>
+```
+
+`standard` keeps the validated 1024-token default. `reasoning` intentionally has no package-wide default output budget; when the environment variable is absent, the backend omits `max_tokens` and leaves the provider/runtime configuration in control.
+
+The normal test suite keeps the real MLXHub test skipped unless the three required provider variables are present. A configured live run proves that the same Execution Flow can execute first with the Fixture backend and then with MLXHub without changing Runtime Core semantics.
