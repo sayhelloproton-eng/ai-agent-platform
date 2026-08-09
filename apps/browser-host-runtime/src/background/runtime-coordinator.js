@@ -68,6 +68,13 @@ function pageIdentity(observation) {
   };
 }
 
+function approvalResumeShouldDefer(observation) {
+  if (!observation) return false;
+  if (observation.generation_state === "RUNNING") return true;
+  if (observation.page_state === "LOADING" || observation.page_state === "ACTION_CONFIRMATION_PENDING") return true;
+  return (observation.blocking_ui ?? []).some((item) => item?.type === "ACTION_CONFIRMATION_PENDING");
+}
+
 export class RuntimeCoordinator {
   constructor({ host_id, dispatchClient, approvalClient, bindingRegistry, journal, observationCoordinator, actionExecutor, modelProvider, evidenceStore, configProvider }) {
     Object.assign(this, { host_id, dispatchClient, approvalClient, bindingRegistry, journal, observationCoordinator, actionExecutor, modelProvider, evidenceStore, configProvider });
@@ -505,6 +512,40 @@ export class RuntimeCoordinator {
         if (!binding || !pre) throw new BhrError("APPROVAL_BINDING_UNAVAILABLE", "Approval requires a confirmed Binding and page precondition.");
         const currentEntry = await this.journal.get(command.command_id);
         const priorDraft = currentEntry?.details?.approval_draft ?? null;
+
+        // The approval UX itself runs in the bound Controller conversation. While
+        // the user is reading/issuing Approval Actions, ChatGPT can legitimately be
+        // generating or show its own Action confirmation surface. Those are
+        // transient readiness states, not target-identity drift. Failing the WorkItem
+        // here creates a race between the Host claim lease and the human approval
+        // flow. Preserve the immutable Draft (if one already exists), leave any Grant
+        // unconsumed, and retry the same command after the page is stable again.
+        if (approvalResumeShouldDefer(pre.observation)) {
+          await this.journal.mark(command.command_id, JOURNAL_STATE.APPROVAL_PENDING, {
+            ...preparedDetails,
+            approval_draft: priorDraft,
+            action_fingerprint: priorDraft?.action_fingerprint ?? null,
+            page_precondition_hash: priorDraft?.page_precondition_hash ?? null,
+            claim_token: claim.claim_token,
+            claim_expires_at: claim.expires_at ?? null,
+            approval_wait: {
+              reason: "TRANSIENT_PAGE_BUSY",
+              page_state: pre.observation.page_state,
+              generation_state: pre.observation.generation_state,
+              blocking_types: (pre.observation.blocking_ui ?? []).map((item) => item?.type).filter(Boolean),
+              observed_at: pre.observation.observed_at
+            }
+          });
+          return {
+            processed: true,
+            reason: priorDraft ? "APPROVAL_PENDING_PAGE_BUSY" : "APPROVAL_PREPARATION_DEFERRED",
+            approval_pending: true,
+            approval_draft: priorDraft,
+            command_id: command.command_id,
+            dispatch_ref: command.dispatch_ref
+          };
+        }
+
         const draft = await buildApprovalDraft({
           command,
           binding,

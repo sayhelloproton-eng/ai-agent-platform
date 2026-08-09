@@ -405,6 +405,125 @@ test("approval consume failure stays pre-delivery BLOCKED and never becomes UNCE
   assert.equal(uncertainReports, 0);
 });
 
+test("approval resume defers transient Controller generation and executes once after the page is stable", async () => {
+  const command = hostCommand();
+  const bound = binding();
+  const idle = observation();
+  const running = { ...idle, generation_state: "RUNNING" };
+  const payload = { text: "approved wake" };
+  const journal = new CommandJournal(new MemoryStorageArea());
+  let grant = null;
+  let claimEpoch = 0;
+  let executions = 0;
+  let consumed = 0;
+  let failures = 0;
+  const drafts = [];
+  const harness = dispatchHarness(command);
+  harness.client.claim = async () => ({ claim_token: `claim-${++claimEpoch}`, expires_at: "2030-01-01T00:00:00.000Z" });
+  harness.client.resolvePayload = async () => payload;
+  const coordinator = new RuntimeCoordinator({
+    host_id: "host",
+    dispatchClient: {
+      ...harness.client,
+      fail: async (...args) => { failures += 1; return harness.client.fail(...args); }
+    },
+    approvalClient: {
+      putDraft: async (draft) => { drafts.push(structuredClone(draft)); return { status: "PENDING_APPROVAL" }; },
+      getGrantOrNull: async () => grant,
+      getGrant: async () => grant,
+      consume: async () => { consumed += 1; }
+    },
+    bindingRegistry: { findForTarget: async () => bound, validateObservation: async (value) => value, get: async () => bound },
+    journal,
+    observationCoordinator: {
+      observe: async () => ({ observation: claimEpoch === 2 ? running : idle, local: {} })
+    },
+    actionExecutor: {
+      execute: async () => { executions += 1; return deliveryExecution(bound); },
+      waitForResponse: async () => ({ status: "ACTION_SUCCEEDED", details: { response_completed: true } })
+    },
+    modelProvider: { analyze: async () => assessment() },
+    evidenceStore: {},
+    configProvider: async () => ({ paused: false, emergency_stopped: false, approval_policy_mode: "platform_wake_candidate" })
+  });
+
+  const pending = await coordinator.processOne();
+  assert.equal(pending.reason, "APPROVAL_PENDING");
+  assert.equal(drafts.length, 1);
+
+  const pageHash = await computePagePreconditionHash(idle);
+  const fingerprint = await computeActionFingerprint({ command, binding_id: bound.binding_id, resolved_payload: payload, page_precondition_hash: pageHash });
+  grant = {
+    approval_ref: command.approval_ref,
+    grant_id: "grant-after-draft",
+    action_fingerprint: fingerprint,
+    binding_id: bound.binding_id,
+    task_id: command.task_id,
+    command_id: command.command_id,
+    allowed_action_type: command.action.type,
+    page_precondition_hash: pageHash,
+    single_use: true,
+    expires_at: "2030-01-01T00:00:00.000Z",
+    consumed_at: null
+  };
+
+  const busy = await coordinator.processOne();
+  assert.equal(busy.reason, "APPROVAL_PENDING_PAGE_BUSY");
+  assert.equal(busy.approval_pending, true);
+  assert.equal(drafts.length, 1);
+  assert.equal(consumed, 0);
+  assert.equal(executions, 0);
+  assert.equal(failures, 0);
+  assert.equal((await journal.get(command.command_id)).state, "APPROVAL_PENDING");
+
+  const completed = await coordinator.processOne();
+  assert.equal(completed.result.status, "ACTION_SUCCEEDED");
+  assert.equal(consumed, 1);
+  assert.equal(executions, 1);
+  assert.equal(failures, 0);
+});
+
+test("initial Approval Draft preparation defers while ChatGPT Action confirmation is pending", async () => {
+  const command = hostCommand();
+  const bound = binding();
+  const blocked = observation({
+    page_state: "ACTION_CONFIRMATION_PENDING",
+    blocking_ui: [{ type: "ACTION_CONFIRMATION_PENDING", text: "Allow or deny" }]
+  });
+  const journal = new CommandJournal(new MemoryStorageArea());
+  let drafts = 0;
+  let executions = 0;
+  const coordinator = new RuntimeCoordinator({
+    host_id: "host",
+    dispatchClient: {
+      listPending: async () => [{ dispatch_ref: command.dispatch_ref }],
+      claim: async () => ({ claim_token: "claim", expires_at: "2030-01-01T00:00:00.000Z" }),
+      get: async () => command,
+      resolvePayload: async () => ({ text: "wake" }),
+      fail: async () => { throw new Error("transient approval UI must not fail the dispatch"); }
+    },
+    approvalClient: {
+      putDraft: async () => { drafts += 1; return { status: "PENDING_APPROVAL" }; },
+      getGrantOrNull: async () => null
+    },
+    bindingRegistry: { findForTarget: async () => bound, validateObservation: async (value) => value },
+    journal,
+    observationCoordinator: observationService(blocked),
+    actionExecutor: { execute: async () => { executions += 1; } },
+    modelProvider: {},
+    evidenceStore: {},
+    configProvider: async () => ({ paused: false, emergency_stopped: false, approval_policy_mode: "platform_wake_candidate" })
+  });
+
+  const response = await coordinator.processOne();
+  assert.equal(response.reason, "APPROVAL_PREPARATION_DEFERRED");
+  assert.equal(response.approval_pending, true);
+  assert.equal(response.approval_draft, null);
+  assert.equal(drafts, 0);
+  assert.equal(executions, 0);
+  assert.equal((await journal.get(command.command_id)).state, "APPROVAL_PENDING");
+});
+
 test("high-risk command prepares Approval Draft and resumes the same command after Grant is issued", async () => {
   const command = hostCommand();
   const bound = binding();
