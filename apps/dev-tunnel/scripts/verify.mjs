@@ -12,10 +12,12 @@ try {
   const local = await verifyGateway(
     GATEWAY_URL,
     config.GATEWAY_CLIENT_API_KEY,
+    { scope: "local", maxAttempts: 1 },
   );
   const publicResult = await verifyGateway(
     config.DEV_TUNNEL_PUBLIC_BASE_URL,
     config.GATEWAY_CLIENT_API_KEY,
+    { scope: "public", maxAttempts: 3, retryDelayMs: 250 },
   );
   writeState({
     ...state,
@@ -33,5 +35,13 @@ try {
   console.log(`public_task_id: ${publicResult.taskId}`);
 } catch (error) {
   console.error(`verify: FAIL (${error.code ?? "UNKNOWN"})`);
+  if (error.verifyScope || error.verifyStep) {
+    console.error(
+      `step: ${[error.verifyScope, error.verifyStep].filter(Boolean).join(".")}`,
+    );
+  }
+  if (Number.isSafeInteger(error.verifyAttempts)) {
+    console.error(`attempts: ${error.verifyAttempts}`);
+  }
   process.exitCode = 1;
 }

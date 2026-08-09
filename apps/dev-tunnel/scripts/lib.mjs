@@ -81,6 +81,9 @@ const FORBIDDEN_CHILD_ENVIRONMENT_NAME =
 const MAX_VERIFY_RESPONSE_BYTES = 65_536;
 const DEFAULT_VERIFY_REQUEST_TIMEOUT_MS = 5_000;
 const DEFAULT_VERIFY_TOTAL_TIMEOUT_MS = 30_000;
+const DEFAULT_VERIFY_MAX_ATTEMPTS = 1;
+const DEFAULT_VERIFY_RETRY_DELAY_MS = 250;
+const TRANSIENT_VERIFY_HTTP_STATUSES = new Set([429, 502, 503, 504]);
 
 export class DevTunnelError extends Error {
   constructor(code, message = code) {
@@ -723,6 +726,25 @@ export function calculateVerifyRequestBudget(
   );
 }
 
+function annotateVerifyError(error, { scope, step, attempts }) {
+  const annotated =
+    error instanceof DevTunnelError
+      ? error
+      : new DevTunnelError("VERIFY_FETCH_FAILED");
+  annotated.verifyScope = scope;
+  annotated.verifyStep = step;
+  annotated.verifyAttempts = attempts;
+  return annotated;
+}
+
+function isTransientVerifyError(error) {
+  return (
+    error?.code === "VERIFY_TIMEOUT" ||
+    error?.code === "VERIFY_FETCH_FAILED" ||
+    error?.code === "VERIFY_TRANSIENT_HTTP_STATUS"
+  );
+}
+
 async function boundedJsonFetch(
   url,
   options,
@@ -756,6 +778,13 @@ async function boundedJsonFetch(
     if (response.status >= 300 && response.status <= 399) {
       throw new DevTunnelError("VERIFY_REDIRECT_NOT_ALLOWED");
     }
+    if (TRANSIENT_VERIFY_HTTP_STATUSES.has(response.status)) {
+      await response.body?.cancel?.();
+      throw new DevTunnelError(
+        "VERIFY_TRANSIENT_HTTP_STATUS",
+        `HTTP ${response.status}`,
+      );
+    }
     const body = await readBoundedJson(response);
     return { response, body };
   } catch (error) {
@@ -772,6 +801,67 @@ async function boundedJsonFetch(
   }
 }
 
+async function verifyFetchStep(
+  step,
+  url,
+  options,
+  {
+    deadline,
+    fetchImpl,
+    now,
+    requestTimeoutMs,
+    maxAttempts,
+    retryDelayMs,
+    sleep,
+    scope,
+  },
+) {
+  let attempt = 0;
+  while (attempt < maxAttempts) {
+    attempt += 1;
+    try {
+      return {
+        ...(await boundedJsonFetch(
+          url,
+          options,
+          { deadline, fetchImpl, now, requestTimeoutMs },
+        )),
+        attempts: attempt,
+      };
+    } catch (error) {
+      const annotated = annotateVerifyError(error, {
+        scope,
+        step,
+        attempts: attempt,
+      });
+      if (!isTransientVerifyError(annotated) || attempt >= maxAttempts) {
+        throw annotated;
+      }
+      const remainingMs = deadline - now();
+      if (remainingMs <= 0) {
+        throw annotateVerifyError(new DevTunnelError("VERIFY_TIMEOUT"), {
+          scope,
+          step,
+          attempts: attempt,
+        });
+      }
+      const delayMs = Math.min(retryDelayMs, remainingMs);
+      if (delayMs > 0) await sleep(delayMs);
+    }
+  }
+  throw annotateVerifyError(new DevTunnelError("VERIFY_TIMEOUT"), {
+    scope,
+    step,
+    attempts: attempt,
+  });
+}
+
+function assertVerifyStep(condition, code, metadata) {
+  if (!condition) {
+    throw annotateVerifyError(new DevTunnelError(code), metadata);
+  }
+}
+
 export async function verifyGateway(
   baseUrl,
   apiKey,
@@ -780,25 +870,55 @@ export async function verifyGateway(
     now = Date.now,
     requestTimeoutMs = DEFAULT_VERIFY_REQUEST_TIMEOUT_MS,
     totalTimeoutMs = DEFAULT_VERIFY_TOTAL_TIMEOUT_MS,
+    maxAttempts = DEFAULT_VERIFY_MAX_ATTEMPTS,
+    retryDelayMs = DEFAULT_VERIFY_RETRY_DELAY_MS,
+    sleep = (delayMs) =>
+      new Promise((resolveDelay) => setTimeout(resolveDelay, delayMs)),
+    scope = "gateway",
   } = {},
 ) {
+  const boundedMaxAttempts = Math.max(1, Math.min(3, maxAttempts));
+  const boundedRetryDelayMs = Math.max(0, Math.min(1_000, retryDelayMs));
   const deadline =
     now() + Math.min(DEFAULT_VERIFY_TOTAL_TIMEOUT_MS, totalTimeoutMs);
   const commonHeaders = {
     accept: "application/json",
     "x-tunnel-skip-antiphishing-page": "true",
   };
-  const healthResult = await boundedJsonFetch(
+  const dependencies = {
+    deadline,
+    fetchImpl,
+    now,
+    requestTimeoutMs,
+    maxAttempts: boundedMaxAttempts,
+    retryDelayMs: boundedRetryDelayMs,
+    sleep,
+    scope,
+  };
+  const healthResult = await verifyFetchStep(
+    "health",
     `${baseUrl}/health`,
     { headers: commonHeaders },
-    { deadline, fetchImpl, now, requestTimeoutMs },
+    dependencies,
   );
-  const unauthenticatedResult = await boundedJsonFetch(
+  assertVerifyStep(healthResult.response.status === 200, "CHAIN_VERIFICATION_FAILED", {
+    scope, step: "health", attempts: healthResult.attempts,
+  });
+
+  const unauthenticatedResult = await verifyFetchStep(
+    "capabilities_unauthenticated",
     `${baseUrl}/v1/capabilities`,
     { headers: commonHeaders },
-    { deadline, fetchImpl, now, requestTimeoutMs },
+    dependencies,
   );
-  const authenticatedResult = await boundedJsonFetch(
+  assertVerifyStep(
+    unauthenticatedResult.response.status === 401,
+    "CHAIN_VERIFICATION_FAILED",
+    { scope, step: "capabilities_unauthenticated", attempts: unauthenticatedResult.attempts },
+  );
+
+  const authenticatedResult = await verifyFetchStep(
+    "capabilities_authenticated",
     `${baseUrl}/v1/capabilities`,
     {
       headers: {
@@ -806,9 +926,17 @@ export async function verifyGateway(
         authorization: `Bearer ${apiKey}`,
       },
     },
-    { deadline, fetchImpl, now, requestTimeoutMs },
+    dependencies,
   );
-  const taskResult = await boundedJsonFetch(
+  assertVerifyStep(
+    authenticatedResult.response.status === 200 &&
+      authenticatedResult.body?.data?.capabilities?.includes("runtime.status"),
+    "CHAIN_VERIFICATION_FAILED",
+    { scope, step: "capabilities_authenticated", attempts: authenticatedResult.attempts },
+  );
+
+  const taskResult = await verifyFetchStep(
+    "runtime_status",
     `${baseUrl}/v1/runtime/status`,
     {
       method: "POST",
@@ -817,12 +945,8 @@ export async function verifyGateway(
         authorization: `Bearer ${apiKey}`,
       },
     },
-    { deadline, fetchImpl, now, requestTimeoutMs },
+    dependencies,
   );
-  const health = healthResult.response;
-  const unauthenticated = unauthenticatedResult.response;
-  const authenticated = authenticatedResult.response;
-  const capabilitiesBody = authenticatedResult.body;
   const task = taskResult.response;
   const taskBody = taskResult.body;
   const taskId = taskBody?.taskId;
@@ -831,24 +955,24 @@ export async function verifyGateway(
     !taskId.startsWith("custom-gpt-runtime-status-") ||
     taskId.length === "custom-gpt-runtime-status-".length
   ) {
-    throw new DevTunnelError("VERIFY_TASK_ID_MISMATCH");
+    throw annotateVerifyError(new DevTunnelError("VERIFY_TASK_ID_MISMATCH"), {
+      scope, step: "runtime_status", attempts: taskResult.attempts,
+    });
   }
-  const passed =
-    health.status === 200 &&
-    unauthenticated.status === 401 &&
-    authenticated.status === 200 &&
-    capabilitiesBody?.data?.capabilities?.includes("runtime.status") &&
+  assertVerifyStep(
     task.status === 200 &&
-    taskBody?.status === "succeeded" &&
-    taskBody?.output?.runtime === "local-runtime" &&
-    taskBody?.output?.status === "ready" &&
-    Array.isArray(taskBody?.output?.capabilities) &&
-    taskBody.output.capabilities.includes("runtime.status");
-  if (!passed) throw new DevTunnelError("CHAIN_VERIFICATION_FAILED");
+      taskBody?.status === "succeeded" &&
+      taskBody?.output?.runtime === "local-runtime" &&
+      taskBody?.output?.status === "ready" &&
+      Array.isArray(taskBody?.output?.capabilities) &&
+      taskBody.output.capabilities.includes("runtime.status"),
+    "CHAIN_VERIFICATION_FAILED",
+    { scope, step: "runtime_status", attempts: taskResult.attempts },
+  );
   return {
-    healthStatus: health.status,
-    unauthenticatedStatus: unauthenticated.status,
-    authenticatedStatus: authenticated.status,
+    healthStatus: healthResult.response.status,
+    unauthenticatedStatus: unauthenticatedResult.response.status,
+    authenticatedStatus: authenticatedResult.response.status,
     taskStatus: task.status,
     taskId,
   };

@@ -423,6 +423,144 @@ test("local and public unauthenticated 401 plus runtime.status succeed", async (
   );
 });
 
+test("verify retries transient public fetch failures within the bounded window", async () => {
+  const calls = [];
+  const sleeps = [];
+  let failedHealthOnce = false;
+  const fakeFetch = async (url, options = {}) => {
+    calls.push(url);
+    if (url.endsWith("/health") && !failedHealthOnce) {
+      failedHealthOnce = true;
+      throw new Error("temporary network failure");
+    }
+    if (url.endsWith("/health")) return response(200);
+    if (url.endsWith("/v1/capabilities") && !options.headers.authorization) {
+      return response(401);
+    }
+    if (url.endsWith("/v1/capabilities")) {
+      return response(200, { data: { capabilities: ["runtime.status"] } });
+    }
+    return response(200, {
+      taskId: "custom-gpt-runtime-status-retry-test",
+      status: "succeeded",
+      output: {
+        runtime: "local-runtime",
+        status: "ready",
+        capabilities: ["runtime.status"],
+      },
+    });
+  };
+  const result = await verifyGateway(
+    "https://example-8787.region.devtunnels.ms",
+    "k".repeat(64),
+    {
+      fetchImpl: fakeFetch,
+      maxAttempts: 3,
+      retryDelayMs: 25,
+      sleep: async (delayMs) => sleeps.push(delayMs),
+      scope: "public",
+    },
+  );
+  assert.equal(result.taskStatus, 200);
+  assert.equal(calls.filter((url) => url.endsWith("/health")).length, 2);
+  assert.deepEqual(sleeps, [25]);
+});
+
+test("verify retries transient gateway HTTP statuses before parsing their body", async () => {
+  let healthAttempts = 0;
+  const fakeFetch = async (url, options = {}) => {
+    if (url.endsWith("/health")) {
+      healthAttempts += 1;
+      if (healthAttempts === 1) {
+        return response(503, "temporarily unavailable", {
+          raw: true,
+          contentType: "text/html",
+        });
+      }
+      return response(200);
+    }
+    if (url.endsWith("/v1/capabilities") && !options.headers.authorization) {
+      return response(401);
+    }
+    if (url.endsWith("/v1/capabilities")) {
+      return response(200, { data: { capabilities: ["runtime.status"] } });
+    }
+    return response(200, {
+      taskId: "custom-gpt-runtime-status-http-retry-test",
+      status: "succeeded",
+      output: {
+        runtime: "local-runtime",
+        status: "ready",
+        capabilities: ["runtime.status"],
+      },
+    });
+  };
+  await verifyGateway(
+    "https://example-8787.region.devtunnels.ms",
+    "k".repeat(64),
+    {
+      fetchImpl: fakeFetch,
+      maxAttempts: 3,
+      retryDelayMs: 0,
+      scope: "public",
+    },
+  );
+  assert.equal(healthAttempts, 2);
+});
+
+test("verify reports the failing scope, step, and exhausted retry count", async () => {
+  const sleeps = [];
+  await assert.rejects(
+    verifyGateway(
+      "https://example-8787.region.devtunnels.ms",
+      "k".repeat(64),
+      {
+        fetchImpl: async () => {
+          throw new Error("temporary network failure");
+        },
+        maxAttempts: 3,
+        retryDelayMs: 10,
+        sleep: async (delayMs) => sleeps.push(delayMs),
+        scope: "public",
+      },
+    ),
+    (error) => {
+      assert.equal(error.code, "VERIFY_FETCH_FAILED");
+      assert.equal(error.verifyScope, "public");
+      assert.equal(error.verifyStep, "health");
+      assert.equal(error.verifyAttempts, 3);
+      return true;
+    },
+  );
+  assert.deepEqual(sleeps, [10, 10]);
+});
+
+test("verify does not retry deterministic invalid JSON failures", async () => {
+  let calls = 0;
+  await assert.rejects(
+    verifyGateway(
+      "https://example-8787.region.devtunnels.ms",
+      "k".repeat(64),
+      {
+        fetchImpl: async () => {
+          calls += 1;
+          return response(200, "{broken", { raw: true });
+        },
+        maxAttempts: 3,
+        retryDelayMs: 0,
+        scope: "public",
+      },
+    ),
+    (error) => {
+      assert.equal(error.code, "VERIFY_INVALID_JSON");
+      assert.equal(error.verifyStep, "health");
+      assert.equal(error.verifyAttempts, 1);
+      return true;
+    },
+  );
+  assert.equal(calls, 1);
+});
+
 test("verify enforces a bounded per-request timeout", async () => {
   const hangingFetch = async (_url, options) =>
     new Promise((_, reject) => {
