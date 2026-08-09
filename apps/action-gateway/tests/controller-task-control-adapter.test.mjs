@@ -624,3 +624,100 @@ test("externally created Task can immediately enter Controller Claim and Decisio
   assert.equal(result.task.taskId, "task-intake-boundary-001");
   assert.equal(result.task.plan.currentNodeId, "inspect-context");
 });
+
+
+test("formal Decision Context does not advertise role work or approval for a blocked current node", async () => {
+  const taskId = "task-blocked-command-filter-001";
+  const { adapter, service } = await harness({ taskId });
+  let context = await adapter.getDecisionContext({ taskId }, identityA);
+  let claim = await adapter.claimTask(
+    {
+      taskId,
+      expectedTaskVersion: context.task.taskVersion,
+      idempotencyKey: "blocked-filter-create-plan-claim",
+    },
+    identityA,
+  );
+  const created = await adapter.submitCommand(
+    {
+      taskId,
+      claimToken: claim.claimToken,
+      expectedTaskVersion: claim.taskVersion,
+      expectedPlanVersion: null,
+      idempotencyKey: "blocked-filter-create-plan",
+      command: {
+        type: "CREATE_PLAN",
+        reasonSummary: "Create one Browser Host node.",
+        payload: {
+          nodes: [
+            {
+              nodeId: "browser-submit",
+              title: "Submit one message",
+              kind: "WORK",
+              requiredRole: "browser-host",
+            },
+          ],
+        },
+      },
+    },
+    identityA,
+  );
+
+  context = await adapter.getDecisionContext({ taskId }, identityA);
+  const work = await adapter.submitCommand(
+    {
+      taskId,
+      claimToken: claim.claimToken,
+      expectedTaskVersion: created.task.taskVersion,
+      expectedPlanVersion: created.task.plan.planVersion,
+      idempotencyKey: "blocked-filter-request-work",
+      command: {
+        type: "REQUEST_ROLE_WORK",
+        reasonSummary: "Create Browser Host work.",
+        payload: {
+          nodeId: "browser-submit",
+          targetDomain: "browser-host",
+          requiredRole: "browser-host",
+          objective: "Submit one message.",
+          inputRef: "payload:blocked-filter",
+          expectedResultType: "browser-host-result-v0.1.0",
+          targetRoleRef: "controller",
+          targetProfileRef: "g-controller",
+          conversationRef: "conversation-controller",
+          hostActionType: "SUBMIT_MESSAGE",
+          approvalRef: "approval:blocked-filter",
+          expiresAt: "2026-08-06T01:00:00.000Z",
+        },
+      },
+    },
+    identityA,
+  );
+  const dispatchId = work.createdRefs.find((ref) => ref.startsWith("dispatch-"));
+  assert.ok(dispatchId);
+  const claimed = await service.claimDispatch({
+    contractVersion: TASK_CONTROL_CONTRACT_VERSION,
+    signalId: dispatchId,
+    hostId: "browser-host-runtime",
+    leaseMs: 60_000,
+    idempotencyKey: "blocked-filter-dispatch-claim",
+  });
+  await service.reportUncertainHostResult({
+    contractVersion: TASK_CONTROL_CONTRACT_VERSION,
+    signalId: dispatchId,
+    claimToken: claimed.dispatch.claim.claimToken,
+    stage: "EXECUTING",
+    commandFingerprint: "sha256:blocked-filter",
+    summary: "User control made execution outcome uncertain.",
+    evidenceRefs: ["evidence:blocked-filter"],
+    idempotencyKey: "blocked-filter-uncertain",
+    producerRef: "browser-host-runtime",
+  });
+
+  context = await adapter.getDecisionContext({ taskId }, identityA);
+  assert.equal(context.task.lifecycleStatus, "ACTIVE");
+  assert.match(context.task.blockingReason, /^UNCERTAIN_SIDE_EFFECT:/);
+  assert.equal(context.task.plan.nodes[0].status, "WAITING");
+  assert.equal(context.allowedControllerCommands.includes("REQUEST_ROLE_WORK"), false);
+  assert.equal(context.allowedControllerCommands.includes("REQUEST_APPROVAL"), false);
+  assert.equal(context.allowedControllerCommands.includes("REVISE_PLAN"), true);
+});

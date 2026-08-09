@@ -447,6 +447,17 @@ function observationKey(identity: ControllerIdentity, taskId: string): string {
   return `${identity.profileId}:${taskId}`;
 }
 
+function currentPlanNodeIsExecutable(task: TaskAggregate): boolean {
+  const plan = task.plan;
+  if (plan === null || plan.currentNodeId === null) return false;
+  const node = plan.nodes.find((item) => item.nodeId === plan.currentNodeId);
+  if (node === undefined || !["READY", "IN_PROGRESS"].includes(node.status)) return false;
+  return node.dependsOn.every((dependencyId) => {
+    const dependency = plan.nodes.find((item) => item.nodeId === dependencyId);
+    return dependency?.status === "COMPLETED" || dependency?.status === "SKIPPED";
+  });
+}
+
 export function createTaskControlControllerAdapter(
   service: ControllerTaskControlService,
   options: TaskControlControllerAdapterOptions,
@@ -547,11 +558,18 @@ export function createTaskControlControllerAdapter(
         context.task.taskVersion,
       );
       const cursor = Math.min(request.eventCursor ?? 0, events.length);
+      const currentNodeExecutable = currentPlanNodeIsExecutable(context.task);
       const commands =
         identity.roleId === context.task.requiredRole
           ? context.allowedControllerCommands.filter(
-              (command): command is ControllerCommandType =>
-                FORMAL_ADAPTER_COMMANDS.has(command as ControllerCommandType),
+              (command): command is ControllerCommandType => {
+                if (!FORMAL_ADAPTER_COMMANDS.has(command as ControllerCommandType)) return false;
+                if (
+                  (command === "REQUEST_ROLE_WORK" || command === "REQUEST_APPROVAL") &&
+                  !currentNodeExecutable
+                ) return false;
+                return true;
+              },
             )
           : [];
       const requirementRef =
