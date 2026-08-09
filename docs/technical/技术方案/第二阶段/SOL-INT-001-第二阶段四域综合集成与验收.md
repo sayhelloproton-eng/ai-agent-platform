@@ -201,3 +201,13 @@ Intake → CTL Request Local Work → LCL Result
 7. 模拟刷新、断网或页面不确定状态，确认不会盲目重试。
 
 完成以上项目后，第二阶段才能从“自动化集成通过”升级为“真实浏览器端到端验收通过”。
+
+
+## 十、Phase 2 MVP 收口不变量（2026-08-09）
+
+为避免真实 Browser 验收继续承担调试职责，Phase 2 MVP 在进入最终 Level 3 前冻结以下两条运行不变量：
+
+1. `inputRef` / `payloadRef` 等 Payload Registry 引用属于 opaque identity。Controller 必须逐字复制正式引用；Action Gateway 在创建 WorkItem / Dispatch 前必须验证引用真实存在。不存在的引用属于确定性的 pre-dispatch contract failure，不得下沉到 Browser Host。
+2. `CONTROLLER_WAKE` 的 pre-delivery 失败不得由 Reconciler 自动生成新的逻辑 Wake。失败后 Task 必须稳定进入显式恢复态，禁止 polling 周期造成无界 Dispatch / Task Version 放大。Binding 自动恢复、退避与高级重试策略属于 Phase 2.1；Phase 2 MVP 只要求 fail closed、无 blind retry。
+
+因此最终 Happy Path 的自动化门禁至少应证明：正确 Payload Ref 能贯穿 Intake → Controller Command → Dispatch；错误 Ref 在 WorkItem 创建前被拒绝；Controller Wake 失败后重复 reconcile / poll 不产生新的 Wake；正确环境下仍可完成 `Host Result → Controller Wake → Controller continuation → Task COMPLETED`。

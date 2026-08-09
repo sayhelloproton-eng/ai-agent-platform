@@ -138,11 +138,16 @@ export interface ApprovalGrantRegistrar {
   putApprovalGrant(grant: import("@ai-agent-platform/contracts").ApprovalGrantV1): Promise<void>;
 }
 
+export interface PayloadReferenceReader {
+  getPayload(payloadRef: string): Promise<import("@ai-agent-platform/contracts").JsonValue | null>;
+}
+
 export interface TaskControlControllerAdapterOptions {
   readonly projectId?: string;
   readonly claimTtlMs?: number;
   readonly idempotencyStore: ControllerIdempotencySnapshotStore;
   readonly approvalGrantRegistrar?: ApprovalGrantRegistrar;
+  readonly payloadReferenceReader?: PayloadReferenceReader;
 }
 
 function clone<T>(value: T): T {
@@ -983,6 +988,20 @@ export function createTaskControlControllerAdapter(
         await options.approvalGrantRegistrar?.putApprovalGrant(request.command.payload.grant);
       }
       return remember(scope, inputFingerprint, recovered);
+    }
+
+    if (request.command.type === "REQUEST_ROLE_WORK") {
+      const inputRef = request.command.payload.inputRef;
+      if (inputRef !== undefined && options.payloadReferenceReader !== undefined) {
+        const payload = await options.payloadReferenceReader.getPayload(inputRef);
+        if (payload === null) {
+          throw new ControllerTaskControlError(
+            "CONTROLLER_INVALID_REQUEST",
+            `REQUEST_ROLE_WORK inputRef ${inputRef} was not found in the Payload Registry. Treat payload/input refs as opaque exact-copy values from Task Intake; do not rewrite or reformat them.`,
+            422,
+          );
+        }
+      }
     }
 
     const mappedCommand = await taskControlCall(() => mapCommand(request, identity));

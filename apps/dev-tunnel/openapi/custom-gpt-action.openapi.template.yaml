@@ -526,7 +526,7 @@ components:
         inputRef:
           type: string
           minLength: 1
-          description: Reference to an intake payload resource. Required for Local Control, Model Inference, and Browser actions that consume a payload such as SUBMIT_MESSAGE.
+          description: Opaque exact-copy reference to an intake payload resource. Copy the original value byte-for-byte from Task Intake, Decision Context, or a prior Action response; never insert separators, reformat dates, change case, or regenerate the ref. Required for Local Control, Model Inference, and Browser actions that consume a payload such as SUBMIT_MESSAGE.
         expectedResultType:
           type: string
           minLength: 1

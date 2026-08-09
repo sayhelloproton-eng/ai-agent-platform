@@ -523,10 +523,11 @@ test("Work Claim receipt remains CLAIMED after Start changes current WorkItem", 
   assert.equal((await service.getCurrentWorkItem(item.workItemId)).status, "RUNNING");
 });
 
-test("Delivery Fail receipt stays FAILED after Reconciler creates replacement Dispatch", async () => {
+test("Controller Wake Delivery Fail receipt stays FAILED without blind replacement", async () => {
   const { service } = harness();
   await intake(service, "task-dispatch-fail-receipt");
   const [signal] = await service.listPendingDispatches();
+  assert.equal(signal.signalType, "CONTROLLER_WAKE");
   const claim = await service.claimDispatch({
     contractVersion: TASK_CONTROL_CONTRACT_VERSION,
     signalId: signal.signalId,
@@ -545,8 +546,12 @@ test("Delivery Fail receipt stays FAILED after Reconciler creates replacement Di
   const failed = await service.failDispatch(failInput);
   assert.equal(failed.status, "FAILED");
   assert.deepEqual(await service.failDispatch(failInput), failed);
+  const task = await service.getTask(signal.taskId);
+  assert.equal(task.status, "BLOCKED");
+  assert.equal(task.blockedReason, `CONTROLLER_WAKE_DELIVERY_FAILED:${signal.signalId}`);
   const dispatches = await service.getDispatches(signal.taskId);
-  assert.ok(dispatches.some((item) => item.signalId !== signal.signalId && item.status === "PENDING"));
+  assert.equal(dispatches.length, 1);
+  assert.equal(dispatches[0].status, "FAILED");
 });
 
 test("Approval Resolution receipt remains immutable after Controller reclaims Task", async () => {

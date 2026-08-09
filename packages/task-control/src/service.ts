@@ -2396,20 +2396,33 @@ export class TaskControlService implements TaskIntakeApplicationPort, WorkItemAp
           );
         }
       }
+      const controllerWakeDeliveryFailed =
+        signal.signalType === "CONTROLLER_WAKE" && signal.workItemId === null;
       let task: TaskAggregate = setOperationalStatus({
         ...current,
         taskVersion: current.taskVersion + 1,
         plan,
-        blockedReason: null,
+        blockedReason: controllerWakeDeliveryFailed
+          ? `CONTROLLER_WAKE_DELIVERY_FAILED:${signal.signalId}`
+          : null,
         updatedAt: now,
-      }, signal.workItemId === null ? current.status : "READY_FOR_CONTROLLER");
+      }, controllerWakeDeliveryFailed
+        ? "BLOCKED"
+        : signal.workItemId === null
+          ? current.status
+          : "READY_FOR_CONTROLLER");
       let causationId = current.latestEventId;
       const event = appendEvent(
         state,
         task,
         "HOST_DISPATCH_FAILED",
         input.producerRef,
-        { signalId: signal.signalId, errorSummary: updatedSignal.lastError! },
+        {
+          signalId: signal.signalId,
+          errorSummary: updatedSignal.lastError!,
+          autoRetryAllowed: !controllerWakeDeliveryFailed,
+          recoveryRequired: controllerWakeDeliveryFailed ? "CONTROLLER_OR_OPERATOR" : null,
+        },
         now,
         this.ids,
         input.correlationId ?? null,

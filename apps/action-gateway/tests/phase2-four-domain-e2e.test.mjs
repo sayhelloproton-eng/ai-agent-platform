@@ -63,6 +63,7 @@ async function startHarness({ controllerTargetProfileRef = "g-controller-e2e" } 
     claimTtlMs: 60_000,
     idempotencyStore: new InMemoryControllerIdempotencySnapshotStore(),
     approvalGrantRegistrar: integrationStore,
+    payloadReferenceReader: integrationStore,
   });
   const taskIntake = createPhase2TaskIntakeAdapter(taskControl, integrationStore);
   const browserHostServer = createBrowserHostServerAdapter(

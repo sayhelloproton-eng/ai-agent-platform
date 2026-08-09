@@ -81,6 +81,9 @@ async function harness(options = {}) {
     projectId: "ai-agent-platform",
     claimTtlMs: options.claimTtlMs ?? 60_000,
     idempotencyStore,
+    ...(options.payloadReferenceReader === undefined
+      ? {}
+      : { payloadReferenceReader: options.payloadReferenceReader }),
   });
   return { adapter, clock, service, idempotencyStore };
 }
@@ -625,6 +628,88 @@ test("externally created Task can immediately enter Controller Claim and Decisio
   assert.equal(result.task.plan.currentNodeId, "inspect-context");
 });
 
+
+test("REQUEST_ROLE_WORK rejects an unknown inputRef before creating WorkItem or Dispatch", async () => {
+  const taskId = "task-missing-payload-ref-001";
+  const payloadReferenceReader = {
+    async getPayload(payloadRef) {
+      assert.equal(payloadRef, "payload:missing-exact-ref");
+      return null;
+    },
+  };
+  const { adapter, service } = await harness({ taskId, payloadReferenceReader });
+  let context = await adapter.getDecisionContext({ taskId }, identityA);
+  const claim = await adapter.claimTask(
+    {
+      taskId,
+      expectedTaskVersion: context.task.taskVersion,
+      idempotencyKey: "missing-ref-create-plan-claim",
+    },
+    identityA,
+  );
+  const created = await adapter.submitCommand(
+    {
+      taskId,
+      claimToken: claim.claimToken,
+      expectedTaskVersion: claim.taskVersion,
+      expectedPlanVersion: null,
+      idempotencyKey: "missing-ref-create-plan",
+      command: {
+        type: "CREATE_PLAN",
+        reasonSummary: "Create one Browser Host node.",
+        payload: {
+          nodes: [
+            {
+              nodeId: "browser-submit",
+              title: "Submit one message",
+              kind: "WORK",
+              requiredRole: "browser-host",
+            },
+          ],
+        },
+      },
+    },
+    identityA,
+  );
+
+  await assert.rejects(
+    adapter.submitCommand(
+      {
+        taskId,
+        claimToken: claim.claimToken,
+        expectedTaskVersion: created.task.taskVersion,
+        expectedPlanVersion: created.task.plan.planVersion,
+        idempotencyKey: "missing-ref-request-work",
+        command: {
+          type: "REQUEST_ROLE_WORK",
+          reasonSummary: "Reject rewritten opaque payload ref.",
+          payload: {
+            nodeId: "browser-submit",
+            targetDomain: "browser-host",
+            requiredRole: "browser-host",
+            objective: "Submit one message.",
+            inputRef: "payload:missing-exact-ref",
+            expectedResultType: "browser-host-result-v0.1.0",
+            targetRoleRef: "controller",
+            targetProfileRef: "g-controller",
+            conversationRef: "conversation-controller",
+            hostActionType: "SUBMIT_MESSAGE",
+            approvalRef: "approval:missing-exact-ref",
+            expiresAt: "2026-08-06T01:00:00.000Z",
+          },
+        },
+      },
+      identityA,
+    ),
+    (error) =>
+      error instanceof ControllerTaskControlError &&
+      error.code === "CONTROLLER_INVALID_REQUEST" &&
+      /opaque exact-copy/.test(error.message),
+  );
+
+  assert.equal((await service.getWorkItems(taskId)).length, 0);
+  assert.equal((await service.getDispatches(taskId)).filter((item) => item.signalType === "ROLE_WORK_WAKE").length, 0);
+});
 
 test("formal Decision Context does not advertise role work or approval for a blocked current node", async () => {
   const taskId = "task-blocked-command-filter-001";

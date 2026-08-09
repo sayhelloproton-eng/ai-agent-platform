@@ -314,6 +314,7 @@ export async function startActionGateway(): Promise<void> {
         projectId: "ai-agent-platform",
         idempotencyStore: controllerIdempotencyStore,
         approvalGrantRegistrar: phase2IntegrationStore,
+        payloadReferenceReader: phase2IntegrationStore,
       },
     );
     const phase2TaskIntake = createPhase2TaskIntakeAdapter(

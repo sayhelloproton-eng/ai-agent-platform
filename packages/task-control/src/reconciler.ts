@@ -60,6 +60,12 @@ function activeControllerDispatch(
   );
 }
 
+function controllerWakeRecoveryRequired(task: TaskAggregate): boolean {
+  return task.status === "BLOCKED" &&
+    typeof task.blockedReason === "string" &&
+    task.blockedReason.startsWith("CONTROLLER_WAKE_DELIVERY_FAILED:");
+}
+
 function createControllerDispatch(
   state: TaskControlState,
   task: TaskAggregate,
@@ -464,6 +470,7 @@ export class TaskReconciler {
         task.status !== "PAUSED" &&
         task.controllerClaim === null &&
         ["PLAN_REQUIRED", "READY_FOR_CONTROLLER", "BLOCKED"].includes(task.status) &&
+        !controllerWakeRecoveryRequired(task) &&
         activeControllerDispatch(state, taskId) === undefined;
 
       if (changed || shouldCreateControllerDispatch) {

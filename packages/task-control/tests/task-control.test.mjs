@@ -271,10 +271,11 @@ test("Browser Host delivery changes Dispatch facts but not Task business status"
   assert.ok(after.taskVersion > task.taskVersion);
 });
 
-test("failed Host delivery is retried without marking Task failed", async () => {
+test("failed Controller Wake delivery blocks without blind recreation", async () => {
   const { service } = harness();
   const task = await createTask(service);
   const [signal] = await service.listPendingDispatches();
+  assert.equal(signal.signalType, "CONTROLLER_WAKE");
   const claimed = await service.claimDispatch({
     contractVersion: TASK_CONTROL_CONTRACT_VERSION,
     signalId: signal.signalId,
@@ -291,10 +292,18 @@ test("failed Host delivery is retried without marking Task failed", async () => 
     errorSummary: "ChatGPT page unavailable",
   });
   const current = await service.getTask(task.taskId);
-  assert.equal(current.status, "READY_FOR_CONTROLLER");
+  assert.equal(current.status, "BLOCKED");
+  assert.equal(current.blockedReason, `CONTROLLER_WAKE_DELIVERY_FAILED:${signal.signalId}`);
   const dispatches = await service.getDispatches(task.taskId);
   assert.equal(dispatches.filter((item) => item.status === "FAILED").length, 1);
-  assert.equal(dispatches.filter((item) => item.status === "PENDING").length, 1);
+  assert.equal(dispatches.filter((item) => item.status === "PENDING").length, 0);
+
+  const stableVersion = current.taskVersion;
+  for (let index = 0; index < 10; index += 1) {
+    await service.reconcile(task.taskId);
+    assert.equal((await service.getTask(task.taskId)).taskVersion, stableVersion);
+  }
+  assert.equal((await service.getDispatches(task.taskId)).length, 1);
 });
 
 test("expired Controller Claim can be safely taken over and stale token is rejected", async () => {

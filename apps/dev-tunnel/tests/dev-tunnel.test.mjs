@@ -965,6 +965,7 @@ test("OpenAPI 1.4.0 structurally matches Browser REQUEST_ROLE_WORK validation", 
   assert.match(schema, /required: \[inputRef\]/u);
   assert.match(schema, /required: \[approvalRef\]/u);
   assert.match(schema, /const: SUBMIT_MESSAGE/u);
+  assert.match(schema, /Opaque exact-copy reference/u);
   assert.match(schema, /inputRef: payload:browser-submit-example/u);
   assert.match(schema, /approvalRef: approval:browser-submit-example/u);
   assert.match(schema, /format: date-time/u);
