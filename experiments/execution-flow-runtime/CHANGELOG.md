@@ -1,3 +1,15 @@
+# Changelog
+
+## 0.0.0-lab.8
+
+EF-3 explicit FAST -> REASON escalation verification:
+
+- proved that `fast` and `reason` are distinct inference roles, not a thinking-mode toggle;
+- added a Flow-owned escalation example where FAST returns structured uncertainty, `switch` selects the REASON node, and REASON receives its own instruction/input/output schema;
+- added unit coverage proving determinate FAST output does not invoke REASON and uncertain FAST output invokes REASON only because the Flow switch selects it;
+- added a managed-service real-phone live gate that executes exactly one FAST inference followed by one REASON inference through the configured MLXHub backend and verifies the two concrete model mappings;
+- kept existing provider serialization, schema validation and `<think>` fail-closed behavior unchanged; EF-3 required no Runtime Core topology changes.
+
 ## 0.0.0-lab.7
 
 - replaced generic `standard/reasoning profile` semantics with explicit `fast/reason` inference roles;
@@ -7,8 +19,6 @@
 - added `GET /v1/inference-backends`;
 - moved the real-phone live gate out of the normal unit suite into explicit `npm run test:mlxhub-live`;
 - added regression coverage for persisted provider config plus managed-service CLI execution.
-
-# Changelog
 
 ## 0.0.0-lab.6
 

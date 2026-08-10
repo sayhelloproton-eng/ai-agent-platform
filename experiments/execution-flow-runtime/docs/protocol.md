@@ -59,6 +59,8 @@ An inference node declares:
 
 `fast` and `reason` are semantic execution roles, not a thinking-mode toggle. The provider decides which concrete model implements each role.
 
+A Flow may explicitly escalate between them. The FAST node can emit a schema-bounded state such as `uncertain`; a following `switch` node owns the branch to a separate REASON node. The REASON node may have a different instruction, different input projection and different output schema. The inference backend never decides to escalate itself.
+
 The runtime validates model output against the declared JSON Schema 2020-12 document before the next node can use it.
 
 The model output is data. It does not own the flow topology and cannot invent a next node unless a future protocol version explicitly defines such behavior.

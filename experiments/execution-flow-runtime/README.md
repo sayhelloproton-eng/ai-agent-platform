@@ -156,10 +156,11 @@ The mapping is persisted under Runtime Home `config.json`; normal `start`, `rest
 
 `fast` is the high-frequency no-think execution judgement role and defaults to `max_tokens=1024`. `reason` is a different low-frequency escalation role backed by the original thinking model; it intentionally has no package-wide default `max_tokens` unless explicitly configured with `--reason-max-tokens`.
 
-The normal unit suite never calls the real phone. After configuration, the explicit live gate is:
+The normal unit suite never calls the real phone. After configuration, the explicit live gates are:
 
 ```bash
 npm run test:mlxhub-live
+npm run test:mlxhub-roles-live
 ```
 
-That live gate proves the same Execution Flow can execute first with Fixture inference and then with the MLXHub `fast` role without changing Runtime Core semantics.
+`test:mlxhub-live` is the EF-2 backend-pluggability gate. `test:mlxhub-roles-live` is the EF-3 gate: the already-running managed service executes one `fast` inference, the Flow switch explicitly escalates structured uncertainty, and a separate `reason` node runs the original thinking model. This is a role/flow correctness gate, not a performance benchmark.

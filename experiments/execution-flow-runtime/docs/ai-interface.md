@@ -37,3 +37,8 @@ to discover whether `mlxhub` is registered. A Flow may then reference `backend: 
 
 
 Operational rule: configure providers with `aap-execution-flow config ...`, start one managed service, then use `run`, `capabilities`, and `providers` as clients of that service. Automation must not spawn parallel Runtime instances.
+
+## FAST -> REASON escalation rule
+
+An AI authoring a Flow must encode escalation explicitly. Use a FAST inference node to produce a schema-bounded state, a `switch` node to branch on that state, and a distinct REASON inference node only on the escalation branch. Do not ask either model to choose `next_node`, switch its own role, or invent a capability.
+

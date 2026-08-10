@@ -24,4 +24,11 @@ test("CLI publishes an AI-readable command manifest", () => {
   ]) {
     assert.equal(names.has(required), true, required);
   }
+
+  assert.equal(
+    manifest.invariants.some((item) =>
+      item.includes("FAST-to-REASON escalation is explicit Flow topology")
+    ),
+    true
+  );
 });

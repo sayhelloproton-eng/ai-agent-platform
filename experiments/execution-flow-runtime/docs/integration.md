@@ -62,3 +62,22 @@ These errors are execution-runtime failures, not Task-domain states.
 Normal CLI execution is service-oriented: `run`, `capabilities` and `providers` talk to the verified managed service. They do not create a second in-process Runtime. Programmatic library APIs remain available for embedding/tests, but the CLI operational model is one managed service per Runtime Home.
 
 Provider configuration is persisted through `aap-execution-flow config ...`; provider/model mapping is not expected to be re-exported in the terminal for every command. Fixed host commands remain Runtime-owned `command_ref` definitions and are never model-generated shell strings.
+
+## EF-3 explicit role escalation
+
+FAST and REASON are separate Flow-declared responsibilities. A valid escalation shape is:
+
+```text
+FAST inference
+    -> structured state
+    -> Flow switch
+       -> determinate: return/continue
+       -> uncertain: REASON inference
+```
+
+The backend does not promote a request from FAST to REASON and the model does not select its own next node. The REASON node is a different node with its own bounded instruction, input projection and output schema.
+
+The MLXHub backend remains serialized across both roles so the phone never receives overlapping FAST/REASON requests from one backend instance. Closed `<think>...</think>` content from the REASON model is removed before JSON parsing; an unclosed thinking block fails closed.
+
+The explicit real-device gate is `npm run test:mlxhub-roles-live`. It talks to the already-running managed Execution Flow Runtime service and performs one FAST call followed by one REASON call; it does not create a second managed service and is not a performance benchmark.
+

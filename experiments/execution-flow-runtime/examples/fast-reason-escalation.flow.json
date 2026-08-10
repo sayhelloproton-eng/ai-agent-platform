@@ -1,0 +1,89 @@
+{
+  "contract": "execution.run.v0",
+  "execution_id": "example-fast-reason-escalation",
+  "flow": {
+    "contract": "execution.flow.v0",
+    "flow_id": "fast-reason-escalation",
+    "version": 1,
+    "entry_node": "fast_assess",
+    "nodes": [
+      {
+        "id": "fast_assess",
+        "type": "inference",
+        "backend": "mlxhub",
+        "role": "fast",
+        "instruction": "Compare primary.status and secondary.status. If equal, return state=determinate and that decision. If they differ, return state=uncertain and decision=unknown.",
+        "input": {
+          "primary": { "$ref": "inputs.primary" },
+          "secondary": { "$ref": "inputs.secondary" }
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "state": { "enum": ["determinate", "uncertain"] },
+            "decision": { "enum": ["healthy", "unhealthy", "unknown"] }
+          },
+          "required": ["state", "decision"],
+          "additionalProperties": false
+        },
+        "next": "escalate"
+      },
+      {
+        "id": "escalate",
+        "type": "switch",
+        "select": { "$ref": "steps.fast_assess.output.state" },
+        "cases": {
+          "determinate": "fast_done",
+          "uncertain": "reason_resolve"
+        },
+        "default": "reason_resolve"
+      },
+      {
+        "id": "reason_resolve",
+        "type": "inference",
+        "backend": "mlxhub",
+        "role": "reason",
+        "instruction": "Resolve the explicit conflict using resolution_policy. Return the authoritative decision and resolution=primary_authoritative.",
+        "input": {
+          "primary": { "$ref": "inputs.primary" },
+          "secondary": { "$ref": "inputs.secondary" },
+          "resolution_policy": { "$ref": "inputs.resolution_policy" },
+          "fast_result": { "$ref": "steps.fast_assess.output" }
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "decision": { "enum": ["healthy", "unhealthy"] },
+            "resolution": { "const": "primary_authoritative" }
+          },
+          "required": ["decision", "resolution"],
+          "additionalProperties": false
+        },
+        "next": "reason_done"
+      },
+      {
+        "id": "fast_done",
+        "type": "return",
+        "output": {
+          "decision": { "$ref": "steps.fast_assess.output.decision" },
+          "resolved_by": "fast"
+        }
+      },
+      {
+        "id": "reason_done",
+        "type": "return",
+        "output": {
+          "decision": { "$ref": "steps.reason_resolve.output.decision" },
+          "resolved_by": "reason"
+        }
+      }
+    ]
+  },
+  "inputs": {
+    "primary": { "source": "runtime-health", "status": "healthy" },
+    "secondary": { "source": "cached-observer", "status": "unhealthy" },
+    "resolution_policy": "primary source is authoritative when the two sources conflict"
+  },
+  "authorization": { "allowed_capabilities": [] },
+  "max_node_runs": 8
+}

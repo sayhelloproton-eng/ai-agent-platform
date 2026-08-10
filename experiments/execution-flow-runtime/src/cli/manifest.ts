@@ -42,6 +42,7 @@ export function getCliManifest() {
       "There is one managed runtime service per runtime home; normal CLI execution submits to that service instead of starting a second in-process runtime.",
       "Inference backends are pluggable providers inside the service.",
       "Inference nodes use semantic roles fast|reason; the concrete model mapping belongs to the provider config.",
+      "FAST-to-REASON escalation is explicit Flow topology: FAST emits structured data, switch owns the branch, and REASON is a separate inference node.",
       "Published JSON Schemas are the validation source of truth for runtime and CLI.",
       "Bindings use explicit {$ref: ...} objects; plain strings are never implicit bindings.",
       "Inference nodes cannot directly execute host commands or files.",
