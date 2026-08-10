@@ -12,6 +12,7 @@ import {
 } from "../../execution-flow-runtime/index.js";
 
 import type { ExecutionReferenceStore } from "./reference-store.js";
+import type { ExecutionRuntimePort } from "./execution-runtime-client.js";
 
 export const EXECUTION_TARGET_DOMAIN = "execution-flow-runtime";
 export const EXECUTION_WORKER_ROLE = "execution-worker";
@@ -21,6 +22,7 @@ export interface TaskRuntimeWorkerDependencies {
   references: ExecutionReferenceStore;
   capabilities: CapabilityRegistry;
   inferenceBackends: InferenceBackendRegistry;
+  runtime?: ExecutionRuntimePort;
   claimantId?: string;
   leaseMs?: number;
 }
@@ -48,6 +50,7 @@ export class TaskRuntimeWorker {
   readonly #references: ExecutionReferenceStore;
   readonly #capabilities: CapabilityRegistry;
   readonly #inferenceBackends: InferenceBackendRegistry;
+  readonly #runtime: ExecutionRuntimePort | undefined;
   readonly #claimantId: string;
   readonly #leaseMs: number;
 
@@ -56,6 +59,7 @@ export class TaskRuntimeWorker {
     this.#references = dependencies.references;
     this.#capabilities = dependencies.capabilities;
     this.#inferenceBackends = dependencies.inferenceBackends;
+    this.#runtime = dependencies.runtime;
     this.#claimantId = dependencies.claimantId ?? "phase3-runtime-worker";
     this.#leaseMs = dependencies.leaseMs ?? 60_000;
   }
@@ -89,29 +93,29 @@ export class TaskRuntimeWorker {
 
     const payload = this.#references.getExecutionPayload(requireInputRef(pending));
     const executionId = `execution:${pending.workItemId}:${pending.attempt}`;
-    const result = await runExecutionFlow(
-      {
-        contract: "execution.run.v0",
-        execution_id: executionId,
-        flow: structuredClone(payload.flow),
-        inputs: structuredClone(payload.inputs),
-        authorization: {
-          allowed_capabilities: [...payload.allowed_capabilities],
-        },
-        ...(payload.max_node_runs === undefined
-          ? {}
-          : { max_node_runs: payload.max_node_runs }),
-        correlation: {
-          task_id: pending.taskId,
-          work_item_id: pending.workItemId,
-          plan_node_id: pending.planNodeId,
-        },
+    const run = {
+      contract: "execution.run.v0" as const,
+      execution_id: executionId,
+      flow: structuredClone(payload.flow),
+      inputs: structuredClone(payload.inputs),
+      authorization: {
+        allowed_capabilities: [...payload.allowed_capabilities],
       },
-      {
-        capabilities: this.#capabilities,
-        inferenceBackends: this.#inferenceBackends,
+      ...(payload.max_node_runs === undefined
+        ? {}
+        : { max_node_runs: payload.max_node_runs }),
+      correlation: {
+        task_id: pending.taskId,
+        work_item_id: pending.workItemId,
+        plan_node_id: pending.planNodeId,
       },
-    );
+    };
+    const result = this.#runtime
+      ? await this.#runtime.execute(run)
+      : await runExecutionFlow(run, {
+          capabilities: this.#capabilities,
+          inferenceBackends: this.#inferenceBackends,
+        });
     const resultRef = this.#references.putExecutionResult(result);
 
     task = await this.#taskControl.getCurrentTask(pending.taskId);
