@@ -11,6 +11,7 @@ This module is not a Task domain, not a Controller, and not a free-form Agent lo
 - No `dist/`, `lib/`, transpiled JavaScript, compatibility wrapper, CJS build, or generated declarations.
 - Intended runtime during the lab stage: Node 20 + `tsx`.
 - Package shape is already suitable for a future npm package, but compatibility packaging is intentionally deferred.
+- The source-package manifest keeps specs, docs, examples, fixtures, unit tests, live-test sources and `tsconfig.json` together so the frozen lab remains auditable/re-runnable as one module.
 
 ## Package / deployment boundary
 
@@ -126,6 +127,12 @@ export EXECUTION_FLOW_RUNTIME_HOME=/tmp/aap-execution-flow-runtime-test
 ```
 
 The HTTP service remains the same single runtime process; inference backends are providers inside that service, not separate Execution Flow Runtime services.
+
+`POST /v1/executions` returns the stable `execution.result.v0` envelope over
+HTTP 200 once a request is syntactically accepted. Execution failures are
+reported through `status` / `error`; they are not mislabeled as HTTP 422 input
+errors. The CLI `run` path does not impose a shorter fixed timeout than the
+Runtime's bounded backend/capability operations.
 
 ## MLXHub provider lab configuration
 

@@ -102,7 +102,11 @@ export async function createExecutionFlowServer({
           body.max_node_runs = config.max_node_runs;
         }
         const result = await runExecutionFlow(body, runtime);
-        sendJson(res, result.status === "completed" ? 200 : 422, result);
+        // A syntactically valid execution request always returns the stable
+        // execution.result.v0 envelope over HTTP 200. Runtime/provider/action
+        // failures are represented by result.status + result.error; they are
+        // not HTTP request-validation failures.
+        sendJson(res, 200, result);
         return;
       }
 

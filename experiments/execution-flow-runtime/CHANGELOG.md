@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.0-lab.13
+
+EF-5 freeze-candidate transport/error-model hardening after the full module audit:
+
+- keep `execution.result.v0` as the application-level source of truth: a syntactically accepted `POST /v1/executions` now returns HTTP 200 for completed/blocked/failed runtime outcomes instead of misclassifying provider/action failures as HTTP 422 input errors;
+- remove the CLI `run` path's fixed 130-second transport timeout so a valid long REASON or multi-node execution is not aborted before Runtime-owned bounded providers/capabilities complete;
+- keep short management/discovery calls bounded separately; v0 client interruption is explicitly not a remote execution-cancel contract;
+- add HTTP failure-envelope regression coverage and freeze the transport semantics in README/protocol/integration/CLI manifest;
+- make the source-package manifest actually self-contained for freeze audit by including `tests/`, `live-tests/`, `fixtures/` and `tsconfig.json`; add malformed-JSON/undefined-route transport regression coverage;
+- no Flow, capability, inference role, deployment-requirements, Phase 2, or MLXHub scheduling semantics changed.
+
 ## 0.0.0-lab.12.1
 
 Rebased EF-4 deterministic-authority fix on the latest user source baseline `f0e08caa`:

@@ -116,12 +116,17 @@ async function requireRunningState() {
 
 async function requestManagedService(
   pathname: string,
-  init?: RequestInit
+  init?: RequestInit,
+  options: { timeoutMs?: number | null } = {}
 ): Promise<{ status: number; body: unknown }> {
   const state = await requireRunningState();
+  const timeoutMs = options.timeoutMs === undefined ? 10_000 : options.timeoutMs;
+  const signal =
+    init?.signal ??
+    (timeoutMs === null ? undefined : AbortSignal.timeout(timeoutMs));
   const response = await fetch(`http://${state.host}:${state.port}${pathname}`, {
     ...init,
-    signal: init?.signal ?? AbortSignal.timeout(130_000),
+    ...(signal ? { signal } : {}),
   });
   const body = await response.json().catch(() => undefined);
   return { status: response.status, body };
@@ -626,11 +631,19 @@ async function readRunFile(args: string[]): Promise<ExecutionRun> {
 
 async function commandRun(args: string[], json: boolean): Promise<void> {
   const run = await readRunFile(args);
-  const response = await requestManagedService("/v1/executions", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(run),
-  });
+  const response = await requestManagedService(
+    "/v1/executions",
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(run),
+    },
+    // Execution duration is owned by the Flow's bounded capabilities/backends.
+    // The CLI must not impose a shorter transport timeout than a valid REASON
+    // or multi-node execution. Ctrl-C stops the client only; v0 has no remote
+    // execution-cancel contract.
+    { timeoutMs: null }
+  );
   print(response.body, true || json);
   if (response.status < 200 || response.status >= 300) process.exitCode = 2;
 }

@@ -88,6 +88,12 @@ The runtime resolves bindings, validates capability input schema, checks executi
 
 The runtime validates its own returned result against the published execution-result schema.
 
+For the HTTP service, a syntactically accepted `POST /v1/executions` returns
+this envelope over HTTP `200` regardless of whether `status` is `completed`,
+`blocked`, or `failed`. Runtime failure semantics live in the protocol result,
+not in an overloaded HTTP `422` status. Malformed HTTP/JSON requests remain
+transport errors.
+
 ## Production-shaped composition
 
 The v0 protocol already composes real execution and bounded inference without another node type. A production-shaped sequence can use existing nodes only:

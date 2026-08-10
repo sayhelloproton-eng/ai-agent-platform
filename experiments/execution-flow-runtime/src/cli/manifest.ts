@@ -60,6 +60,8 @@ export function getCliManifest() {
       "stop never kills an unverified PID.",
       "Flow transitions are defined by the flow specification, not invented by the model.",
       "Production-shaped flows may compose rooted read -> FAST -> switch -> fixed command_ref -> readback -> FAST verification -> optional Flow-owned REASON escalation without changing Runtime Core.",
+      "POST /v1/executions returns execution.result.v0 over HTTP 200 for completed/blocked/failed application results; transport 4xx is reserved for malformed/undefined HTTP requests.",
+      "CLI run does not impose an independent fixed execution transport timeout; backend/capability bounds remain authoritative and v0 client interruption is not remote cancellation.",
     ],
   };
 }

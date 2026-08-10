@@ -300,3 +300,97 @@ test("HTTP service still executes a deterministic fixed-command flow with defaul
     }
   );
 });
+
+
+test("HTTP execution endpoint returns execution.result.v0 over 200 even when runtime execution fails", async () => {
+  const workspace = await fs.mkdtemp(path.join(os.tmpdir(), "exec-flow-service-failed-result-"));
+
+  await withService(
+    {
+      config: {
+        host: "127.0.0.1",
+        port: 0,
+        workspace_root: workspace,
+        max_node_runs: 8,
+      },
+      instanceId: "service-failed-result",
+    },
+    async (baseUrl) => {
+      const run = {
+        contract: "execution.run.v0",
+        execution_id: "http-failed-result-run",
+        flow: {
+          contract: "execution.flow.v0",
+          flow_id: "http-failed-result-flow",
+          version: 1,
+          entry_node: "missing-backend",
+          nodes: [
+            {
+              id: "missing-backend",
+              type: "inference",
+              backend: "not-registered",
+              role: "fast",
+              instruction: "return a bounded status",
+              input: {},
+              output_schema: {
+                type: "object",
+                properties: { status: { type: "string" } },
+                required: ["status"],
+                additionalProperties: false,
+              },
+              next: "done",
+            },
+            { id: "done", type: "return", output: { ok: true } },
+          ],
+        },
+        inputs: {},
+        authorization: { allowed_capabilities: [] },
+      };
+
+      const response = await fetch(`${baseUrl}/v1/executions`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(run),
+      });
+      const result = await response.json() as any;
+
+      assert.equal(response.status, 200);
+      assert.equal(result.contract, "execution.result.v0");
+      assert.equal(result.status, "failed");
+      assert.equal(result.error.code, "INFERENCE_BACKEND_NOT_FOUND");
+    }
+  );
+});
+
+test("HTTP transport errors stay outside execution.result.v0", async () => {
+  const workspace = await fs.mkdtemp(path.join(os.tmpdir(), "exec-flow-service-transport-errors-"));
+
+  await withService(
+    {
+      config: {
+        host: "127.0.0.1",
+        port: 0,
+        workspace_root: workspace,
+        max_node_runs: 8,
+      },
+      instanceId: "service-transport-errors",
+    },
+    async (baseUrl) => {
+      const malformed = await fetch(`${baseUrl}/v1/executions`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: "{not-json",
+      });
+      const malformedBody = await malformed.json() as any;
+      assert.equal(malformed.status, 400);
+      assert.equal(malformedBody.error.code, "BAD_REQUEST");
+      assert.equal(malformedBody.contract, undefined);
+
+      const missing = await fetch(`${baseUrl}/v1/not-defined`);
+      const missingBody = await missing.json() as any;
+      assert.equal(missing.status, 404);
+      assert.equal(missingBody.error.code, "NOT_FOUND");
+      assert.equal(missingBody.contract, undefined);
+    }
+  );
+});

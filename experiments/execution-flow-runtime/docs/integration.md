@@ -57,6 +57,24 @@ Provider failures are normalized for Runtime callers while retaining the provide
 
 These errors are execution-runtime failures, not Task-domain states.
 
+## HTTP execution result semantics
+
+`POST /v1/executions` uses the stable `execution.result.v0` envelope as the
+application-level result contract. Once the HTTP request is syntactically
+accepted, the service returns HTTP `200` for `completed`, `blocked`, and
+`failed` execution results; callers must read `result.status` and
+`result.error.code`. HTTP `4xx` is reserved for transport/request problems such
+as malformed JSON or an undefined route, rather than provider/action runtime
+failures.
+
+The CLI `run` command deliberately does not impose an independent fixed
+transport timeout on a valid execution. A Flow may legitimately contain a
+long-running REASON inference or multiple bounded nodes whose total duration
+exceeds one provider timeout. Node/provider/capability boundaries own their
+respective execution timeouts. Interrupting the CLI client is not a v0 remote
+execution-cancel signal; cancellation semantics are deferred to a future
+protocol version.
+
 ## Single managed service usage
 
 Normal CLI execution is service-oriented: `run`, `capabilities` and `providers` talk to the verified managed service. They do not create a second in-process Runtime. Programmatic library APIs remain available for embedding/tests, but the CLI operational model is one managed service per Runtime Home.

@@ -1,6 +1,6 @@
 {
   "name": "@ai-agent-platform/execution-flow-runtime",
-  "version": "0.0.0-lab.12.1",
+  "version": "0.0.0-lab.13",
   "description": "Spec-driven execution-flow runtime with bounded inference and capability execution.",
   "type": "module",
   "main": "./index.ts",
@@ -19,7 +19,11 @@
     "docs/**/*.md",
     "examples/**/*.json",
     "CHANGELOG.md",
-    "README.md"
+    "README.md",
+    "tests/**/*.ts",
+    "live-tests/**/*.ts",
+    "fixtures/**/*.json",
+    "tsconfig.json"
   ],
   "scripts": {
     "check": "tsc -p tsconfig.json --noEmit",
