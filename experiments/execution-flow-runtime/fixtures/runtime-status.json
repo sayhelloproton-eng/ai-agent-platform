@@ -1,4 +1,6 @@
 {
   "service": "execution-flow-runtime-lab",
-  "status": "healthy"
+  "reported_status": "healthy",
+  "verification_required": true,
+  "expected_node_major": 20
 }

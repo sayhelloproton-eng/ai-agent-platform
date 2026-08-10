@@ -87,3 +87,25 @@ The runtime resolves bindings, validates capability input schema, checks executi
 - opaque correlation metadata
 
 The runtime validates its own returned result against the published execution-result schema.
+
+## Production-shaped composition
+
+The v0 protocol already composes real execution and bounded inference without another node type. A production-shaped sequence can use existing nodes only:
+
+```text
+action -> inference -> switch -> action -> action(readback)
+-> inference -> switch -> [return | inference(reason) -> return]
+```
+
+This composition preserves the authority split: action nodes own registered host capability invocation, inference nodes return schema-bounded data, switch nodes own transitions, and return nodes finish the run. Evidence is accumulated from every capability and inference node while `max_node_runs` bounds the whole sequence.
+
+## REASON escalation context
+
+A REASON node is a separate Flow node, not a thinking switch on FAST. When Flow
+escalates, its explicit `input` projection should contain enough bounded context
+for independent review: relevant original input, the evidence that caused the
+uncertainty, complete FAST structured outputs, the escalation trigger, and
+applicable constraints. FAST output is assessment/evidence, not truth.
+
+Runtime does not secretly inject global state; Flow declares the projection with
+normal explicit `{$ref: ...}` bindings.

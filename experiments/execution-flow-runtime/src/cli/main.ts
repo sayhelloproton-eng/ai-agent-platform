@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
 import { spawn } from "node:child_process";
 import { getCliManifest } from "./manifest.js";
+import { getDeploymentRequirements } from "../deployment/requirements.js";
 import { listDocTopics, listSpecs, readDocTopic, readSpec } from "./docs.js";
 import {
   CONFIG_PATH,
@@ -12,7 +13,6 @@ import {
   LOG_PATH,
   RUNTIME_HOME,
   STATE_PATH,
-  ensureRuntimeHome,
   loadConfig,
   readRuntimeLock,
   readState,
@@ -54,7 +54,7 @@ function helpText(): string {
     "TypeScript source-only execution-flow runtime.",
     "",
     "Primary commands:",
-    "  aap-execution-flow install",
+    "  aap-execution-flow deployment requirements --json",
     "  aap-execution-flow start",
     "  aap-execution-flow stop",
     "  aap-execution-flow restart",
@@ -69,7 +69,11 @@ function helpText(): string {
     "  aap-execution-flow spec <name>",
     "  aap-execution-flow describe --json",
     "",
-    "AI entry:",
+    "Platform deployment discovery:",
+    "  aap-execution-flow deployment requirements --json",
+    "  This command is read-only. A platform Deployment Planner aggregates all module descriptors.",
+    "",
+    "AI runtime discovery:",
     "  aap-execution-flow describe --json",
     "  aap-execution-flow docs ai --json",
     "",
@@ -133,27 +137,20 @@ function positiveOption(args: string[], name: string): number | undefined {
   return parsed;
 }
 
-async function commandInstall(json: boolean): Promise<void> {
-  const config = await ensureRuntimeHome();
-  print(
-    {
-      ok: true,
-      action: "runtime-home-initialized",
-      package_install:
-        "npm install @ai-agent-platform/execution-flow-runtime",
-      runtime_home: RUNTIME_HOME,
-      config_path: CONFIG_PATH,
-      state_path: STATE_PATH,
-      lock_path: LOCK_PATH,
-      log_path: LOG_PATH,
-      config,
-    },
-    json
-  );
+async function commandDeployment(args: string[], json: boolean): Promise<void> {
+  const action = args.find((arg) => !arg.startsWith("-")) ?? "requirements";
+  if (action !== "requirements") {
+    throw new Error(
+      "Usage: aap-execution-flow deployment requirements [--json]"
+    );
+  }
+  print(getDeploymentRequirements(), true || json);
 }
 
 async function commandServe(): Promise<void> {
-  const config = await ensureRuntimeHome();
+  const config = await loadConfig().catch(() => {
+    throw new Error("Execution Flow Runtime configuration is missing. Platform deployment must resolve module requirements and provision runtime config before start.");
+  });
   const instanceId =
     process.env.EXECUTION_FLOW_INSTANCE_ID ?? randomUUID();
   const startedAt = new Date().toISOString();
@@ -228,7 +225,9 @@ type StartResult =
     };
 
 async function startRuntime(): Promise<StartResult> {
-  const config = await ensureRuntimeHome();
+  const config = await loadConfig().catch(() => {
+    throw new Error("Execution Flow Runtime configuration is missing. Platform deployment must provision runtime config before start.");
+  });
   const previous = await readState();
 
   if (previous) {
@@ -528,7 +527,7 @@ async function commandConfig(args: string[], json: boolean): Promise<void> {
         ok: true,
         runtime_home: RUNTIME_HOME,
         config_path: CONFIG_PATH,
-        config: await ensureRuntimeHome(),
+        config: await loadConfig(),
       },
       true || json
     );
@@ -544,7 +543,7 @@ async function commandConfig(args: string[], json: boolean): Promise<void> {
   const mlxhubIndex = args.indexOf("mlxhub");
   const action = args.slice(mlxhubIndex + 1).find((arg) => !arg.startsWith("-"));
   if (action === "clear") {
-    const config = await ensureRuntimeHome();
+    const config = await loadConfig();
     if (config.inference?.mlxhub) {
       const next = structuredClone(config);
       if (next.inference) {
@@ -583,7 +582,7 @@ async function commandConfig(args: string[], json: boolean): Promise<void> {
   const fastMaxTokens = positiveOption(args, "--fast-max-tokens");
   const reasonMaxTokens = positiveOption(args, "--reason-max-tokens");
   const timeoutMs = positiveOption(args, "--timeout-ms");
-  const config = await ensureRuntimeHome();
+  const config = await loadConfig();
   const next = structuredClone(config);
   next.inference = {
     ...(next.inference ?? {}),
@@ -704,8 +703,8 @@ export async function main(argv: string[]): Promise<void> {
       return;
     }
 
-    if (command === "install") {
-      await commandInstall(json);
+    if (command === "deployment") {
+      await commandDeployment(args, json);
       return;
     }
 

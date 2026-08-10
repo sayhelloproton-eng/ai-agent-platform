@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.0.0-lab.11
+
+EF-4B deployment-boundary correction and resource-scheduling hardening:
+
+- replace the rejected module-owned `INSTALL.md` / `install plan` / `install apply` direction with a read-only `deployment requirements --json` descriptor (`aap.deployment.requirements.v0`);
+- keep deployment topology, cross-module dependency aggregation, dynamic whole-platform `INSTALL.md`, user confirmation, and apply in a future platform-level Deployment Planner/Executor;
+- expose module identity/version, Node/runtime requirements, logical external dependency refs, candidate discovery sources, verification hints, config slots, listener/storage/runtime-home resources, lifecycle commands, provided service interfaces, and potential deployment effects without creating Runtime Home or writing config;
+- keep MLXHub FAST and REASON on one FIFO Promise-chain provider lane (`concurrency=1`) with failure recovery so one rejected inference does not poison later jobs;
+- keep REASON escalation context explicit and Flow-projected: original relevant input, concrete execution evidence, full FAST assessment/verification, escalation trigger, and fail-closed constraints;
+- retain the EF-4 production-shaped rooted read -> FAST -> fixed command_ref -> readback -> FAST verify -> optional REASON flow and its real-phone live gate.
+
+## 0.0.0-lab.10
+
+Internal EF-4B candidate, superseded before acceptance by lab.11:
+
+- introduced the serial MLXHub Promise-chain lane and explicit rich REASON escalation context that are retained in lab.11;
+- experimented with a module-owned `INSTALL.md` and `install plan/apply` confirmation flow; that deployment ownership was rejected and removed before acceptance because whole-platform deployment must be dynamically assembled above individual modules.
+
+
+## 0.0.0-lab.9
+
+EF-4 production-shaped execution + small inference verification:
+
+- evolved the runtime-health example into a real bounded execution flow: rooted file read -> FAST assessment -> Flow switch -> Runtime-owned fixed `node.version` command -> rooted readback -> FAST verification -> optional Flow-owned REASON escalation -> structured return;
+- kept host execution behind registered capabilities only; the model never receives arbitrary shell authority and the command remains the opaque Runtime-owned `command_ref=node.version`;
+- added real-capability unit coverage using an actual temporary UTF-8 file and the actual Node executable, including the normal FAST path, explicit post-command REASON fallback, evidence ordering, and `max_node_runs` bounding;
+- added a managed-service real-phone EF-4 live gate that reuses the same public example Flow and validates real workspace read/readback, fixed command execution, FAST model mapping, structured verification, and optional REASON fallback;
+- required no Execution Flow protocol or Runtime Core topology changes.
+
 ## 0.0.0-lab.8
 
 EF-3 explicit FAST -> REASON escalation verification:

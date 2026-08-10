@@ -2,11 +2,13 @@
 
 The command line is a first-class public interface and documentation surface.
 
-## Bootstrap
+## Deployment requirements
 
-`aap-execution-flow install`
+```bash
+aap-execution-flow deployment requirements --json
+```
 
-Creates the runtime home and default configuration. It does **not** install the npm package.
+This is the module's deployment-discovery entry. It is read-only and returns `aap.deployment.requirements.v0`. The module does not build the whole-platform plan or apply deployment; a platform-level planner aggregates this output with other selected modules.
 
 ## One managed service
 
@@ -80,3 +82,9 @@ aap-execution-flow config mlxhub clear --json
 ```
 
 The provider/model mapping is persisted in Runtime Home config. `run`, `capabilities`, and `providers` communicate with the single managed service and do not instantiate a second Runtime.
+
+## Platform deployment boundary
+
+The CLI intentionally has no module-owned `install plan/apply` workflow. The module only describes its requirements. A platform Deployment Planner is responsible for dependency graph construction, concrete resolution/verification, dynamic deployment-manual generation, user confirmation, and apply.
+
+Operational commands such as `config`, `start`, `stop`, and `doctor` are lifecycle/configuration primitives that may be invoked by a confirmed platform deployment executor; they are not a deployment planner.

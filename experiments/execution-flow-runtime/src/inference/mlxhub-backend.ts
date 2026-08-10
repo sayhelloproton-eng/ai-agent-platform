@@ -1,4 +1,5 @@
 import { ExecutionFlowError } from "../runtime/errors.js";
+import { SerialPromiseScheduler } from "./serial-scheduler.js";
 import type {
   InferenceBackend,
   InferenceRequest,
@@ -86,7 +87,7 @@ function classifyProviderError(providerCode: string, status: number): string {
 }
 
 export class MlxHubInferenceBackend implements InferenceBackend {
-  #queue: Promise<void> = Promise.resolve();
+  readonly #scheduler = new SerialPromiseScheduler();
 
   readonly baseUrl: string;
   readonly fastModel: string;
@@ -127,9 +128,7 @@ export class MlxHubInferenceBackend implements InferenceBackend {
   }
 
   infer(request: InferenceRequest): Promise<InferenceResponse> {
-    const operation = this.#queue.then(() => this.#inferOnce(request));
-    this.#queue = operation.then(() => undefined, () => undefined);
-    return operation;
+    return this.#scheduler.enqueue(() => this.#inferOnce(request));
   }
 
   async #inferOnce(request: InferenceRequest): Promise<InferenceResponse> {

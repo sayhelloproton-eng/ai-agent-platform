@@ -21,3 +21,5 @@ export { MlxHubInferenceBackend } from "./src/inference/mlxhub-backend.js";
 export { createRuntimeEnvironment } from "./src/runtime/environment.js";
 export { createExecutionFlowServer } from "./src/service/server.js";
 export { getCliManifest } from "./src/cli/manifest.js";
+
+export { getDeploymentRequirements } from "./src/deployment/requirements.js";

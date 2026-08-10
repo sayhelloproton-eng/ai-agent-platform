@@ -81,3 +81,30 @@ The MLXHub backend remains serialized across both roles so the phone never recei
 
 The explicit real-device gate is `npm run test:mlxhub-roles-live`. It talks to the already-running managed Execution Flow Runtime service and performs one FAST call followed by one REASON call; it does not create a second managed service and is not a performance benchmark.
 
+
+## EF-4 production-shaped execution boundary
+
+EF-4 keeps the same public protocol and service topology. A caller can submit one bounded Flow that combines real registered capabilities with schema-bounded small inference:
+
+```text
+real rooted file read
+  -> FAST judgement
+  -> Flow-owned branch
+  -> Runtime-owned fixed command_ref
+  -> real rooted readback
+  -> FAST verification
+  -> optional Flow-owned REASON escalation
+  -> execution.result.v0 + evidence
+```
+
+This is still not Task orchestration. The Runtime does not know Task/Plan/Claim/Approval semantics, and EF-4 does not connect CTL/TSK/LCL/BHR/Gateway. Capability results and inference results remain execution evidence only.
+
+The fixed command remains host-registered (`node.version`) and cannot be replaced by model-generated executable/argv/shell data. The readback uses the same rooted `workspace.file.read` boundary, so file traversal, protected paths and symlink escape rules remain unchanged.
+
+## Independent deployment / dependency boundary
+
+The runtime is a deployable module, not a source-level extension of CTL/TSK/LCL/BHR. Its deployment dependencies are exposed by the read-only `deployment requirements --json` descriptor and later resolved by a platform-level Deployment Planner into Runtime-owned configuration/composition roots. A Flow must not contain physical service endpoints, filesystem roots, executable paths, or imports of another module's internal implementation.
+
+Current built-in file/command executors are one deployment choice. Future remote
+capability adapters must implement versioned public contracts and be selected by
+configuration without changing the Execution Flow protocol.

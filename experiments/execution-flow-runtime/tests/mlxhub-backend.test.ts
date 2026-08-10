@@ -207,7 +207,7 @@ test("MLXHub provider rejects invalid JSON and unclosed thinking", async () => {
   );
 });
 
-test("MLXHub backend serializes concurrent FAST/REASON role requests", async () => {
+test("MLXHub backend serializes concurrent FAST/FAST/REASON requests on one provider lane", async () => {
   let active = 0;
   let maxActive = 0;
   const order: string[] = [];
@@ -232,14 +232,64 @@ test("MLXHub backend serializes concurrent FAST/REASON role requests", async () 
 
   await Promise.all([
     backend.infer(baseRequest),
-    backend.infer({ ...baseRequest, role: "reason" }),
+    backend.infer({ ...baseRequest, node_id: "judge-2" }),
+    backend.infer({ ...baseRequest, role: "reason", node_id: "reason" }),
   ]);
 
   assert.equal(maxActive, 1);
   assert.deepEqual(order, [
     "start:fast-model",
     "end:fast-model",
+    "start:fast-model",
+    "end:fast-model",
     "start:reason-model",
     "end:reason-model",
+  ]);
+});
+
+test("MLXHub serial queue recovers after a failed job without poisoning later work", async () => {
+  let active = 0;
+  let maxActive = 0;
+  let call = 0;
+  const order: string[] = [];
+
+  const backend = new MlxHubInferenceBackend({
+    baseUrl: "http://mlxhub.local:8080",
+    fastModel: "fast-model",
+    reasonModel: "reason-model",
+    fetchImpl: async (_input, init) => {
+      const body = JSON.parse(String(init?.body));
+      const current = ++call;
+      active += 1;
+      maxActive = Math.max(maxActive, active);
+      order.push(`start:${current}:${body.model}`);
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      order.push(`end:${current}:${body.model}`);
+      active -= 1;
+
+      if (current === 1) {
+        return jsonResponse(
+          { error: { code: "model_busy", message: "first job failed" } },
+          429
+        );
+      }
+      return jsonResponse({
+        choices: [{ message: { content: '{"status":"healthy"}' } }],
+      });
+    },
+  });
+
+  const first = backend.infer(baseRequest);
+  const second = backend.infer({ ...baseRequest, role: "reason" });
+  const [firstResult, secondResult] = await Promise.allSettled([first, second]);
+
+  assert.equal(firstResult.status, "rejected");
+  assert.equal(secondResult.status, "fulfilled");
+  assert.equal(maxActive, 1);
+  assert.deepEqual(order, [
+    "start:1:fast-model",
+    "end:1:fast-model",
+    "start:2:reason-model",
+    "end:2:reason-model",
   ]);
 });

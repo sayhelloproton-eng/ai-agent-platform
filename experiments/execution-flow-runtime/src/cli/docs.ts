@@ -23,6 +23,7 @@ const SPECS: Record<string, string> = {
   "execution-result": "spec/execution-result.v0.schema.json",
   capability: "spec/capability.v0.schema.json",
   "inference-node": "spec/inference-node.v0.schema.json",
+  "deployment-requirements": "spec/deployment-requirements.v0.schema.json",
 };
 
 export function listDocTopics(): string[] {

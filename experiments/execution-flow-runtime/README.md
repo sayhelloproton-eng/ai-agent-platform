@@ -12,26 +12,22 @@ This module is not a Task domain, not a Controller, and not a free-form Agent lo
 - Intended runtime during the lab stage: Node 20 + `tsx`.
 - Package shape is already suitable for a future npm package, but compatibility packaging is intentionally deferred.
 
-## Install
+## Package / deployment boundary
 
-Package installation after publication:
-
-```bash
-npm install @ai-agent-platform/execution-flow-runtime
-```
-
-Lab/local source:
+Package installation after publication may use the platform-selected package mechanism. During the lab, local dependencies are installed from this directory:
 
 ```bash
 cd experiments/execution-flow-runtime
 npm install
 ```
 
-Initialize runtime home/config:
+The module does **not** plan or apply its own deployment. Instead it exposes a read-only, machine-readable requirements descriptor:
 
 ```bash
-aap-execution-flow install
+aap-execution-flow deployment requirements --json
 ```
+
+A future platform-level Deployment Planner aggregates this descriptor with all selected modules, resolves the cross-module dependency graph, and dynamically generates the deployment-specific `INSTALL.md`/plan presented to AI and the user.
 
 ## Service lifecycle
 
@@ -115,7 +111,6 @@ aap-execution-flow docs integration
 The runtime is a single managed service per `EXECUTION_FLOW_RUNTIME_HOME`.
 
 ```bash
-aap-execution-flow install
 aap-execution-flow start --json
 aap-execution-flow status --json
 aap-execution-flow restart --json
@@ -164,3 +159,56 @@ npm run test:mlxhub-roles-live
 ```
 
 `test:mlxhub-live` is the EF-2 backend-pluggability gate. `test:mlxhub-roles-live` is the EF-3 gate: the already-running managed service executes one `fast` inference, the Flow switch explicitly escalates structured uncertainty, and a separate `reason` node runs the original thinking model. This is a role/flow correctness gate, not a performance benchmark.
+
+## EF-4 production-shaped execution gate
+
+The `examples/runtime-health.flow.json` example now exercises a production-shaped bounded sequence while remaining independent from Task Control, Local Control, Browser Host and Gateway:
+
+```text
+workspace.file.read
+  -> FAST assessment
+  -> Flow switch
+  -> process.command.run-fixed(command_ref=node.version)
+  -> workspace.file.read readback
+  -> FAST verification
+  -> Flow switch
+     -> verified: return
+     -> uncertain: REASON inference -> return
+```
+
+The command is Runtime-owned and uses `shell=false`; inference never supplies an executable, argv, cwd or shell line. The second file read is an explicit readback/evidence step after the host command.
+
+The normal unit suite uses real local file/process capabilities with Fixture inference. The explicit phone gate uses the already-running managed service and configured MLXHub backend:
+
+```bash
+npm run test:mlxhub-production-live
+```
+
+It is a single execution-flow correctness gate, not a benchmark. REASON is invoked only if the post-command FAST verification returns structured uncertainty.
+
+## Platform-aggregated deployment requirements (lab.11)
+
+This module is self-describing but not self-deploying. Its deployment contract is exposed only through:
+
+```bash
+aap-execution-flow deployment requirements --json
+```
+
+The descriptor reports module identity/version, Node/runtime requirements, logical external dependencies, candidate discovery sources, verification hints, config slots, listener/storage/runtime-home resources, provided service interfaces, lifecycle commands, and potential deployment effects. The command is read-only and must not create Runtime Home, write config, start processes, ask the user for confirmation, or choose another module's physical address.
+
+Platform deployment owns the larger sequence:
+
+```text
+module requirements discovery
+  -> aggregate selected modules
+  -> build dependency graph
+  -> resolve / verify concrete values
+  -> dynamically generate whole-platform INSTALL.md / deployment plan
+  -> AI presents one confirmation
+  -> platform executor applies config/start
+  -> per-module health + cross-module acceptance
+```
+
+Flow specifications continue to contain only logical backend/capability/command references; physical endpoints and roots are injected through Runtime-owned configuration after the platform plan is confirmed.
+
+MLXHub remains one exclusive provider lane. FAST and REASON share one FIFO promise chain (`concurrency=1`); a rejected job fails only that job and cannot poison the next queued inference.

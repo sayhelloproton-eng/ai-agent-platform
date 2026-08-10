@@ -42,3 +42,27 @@ Operational rule: configure providers with `aap-execution-flow config ...`, star
 
 An AI authoring a Flow must encode escalation explicitly. Use a FAST inference node to produce a schema-bounded state, a `switch` node to branch on that state, and a distinct REASON inference node only on the escalation branch. Do not ask either model to choose `next_node`, switch its own role, or invent a capability.
 
+
+## Production-shaped Flow authoring rule
+
+For execution + small-inference flows, keep authority explicit in topology:
+
+```text
+action(read) -> inference(fast) -> switch -> action(fixed command)
+-> action(readback) -> inference(fast verify) -> switch
+-> return OR inference(reason) -> return
+```
+
+Inference output may select only among Flow-declared branches. It must never contain an executable, shell line, arbitrary filesystem path outside a registered capability contract, or a self-selected next node. Post-action verification should consume concrete capability evidence/readback, and REASON should appear only on a Flow-declared uncertainty branch.
+
+## Deployment discovery
+
+For deployment discovery, call:
+
+```bash
+aap-execution-flow deployment requirements --json
+```
+
+Treat the returned `aap.deployment.requirements.v0` document as one module descriptor only. Do **not** ask the user to confirm this module in isolation and do not apply configuration from this command. The platform Deployment Planner must aggregate all selected module descriptors, resolve provider/consumer links and physical values, dynamically generate the whole-platform deployment `INSTALL.md`/plan, and only then present one confirmation to the user.
+
+The module descriptor may tell the planner where candidate values can be discovered and how they can be verified, but it never selects topology or hard-codes another module's endpoint.

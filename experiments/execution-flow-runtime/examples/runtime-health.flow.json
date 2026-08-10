@@ -3,31 +3,52 @@
   "execution_id": "exec-runtime-health-example",
   "flow": {
     "contract": "execution.flow.v0",
-    "flow_id": "runtime-health-check",
-    "version": 1,
+    "flow_id": "runtime-health-production-shaped-check",
+    "version": 3,
     "entry_node": "read-status",
     "nodes": [
       {
         "id": "read-status",
         "type": "action",
         "capability": "workspace.file.read",
-        "arguments": { "path": "fixtures/runtime-status.json" },
-        "next": "judge"
+        "arguments": {
+          "path": "fixtures/runtime-status.json"
+        },
+        "next": "fast-assess"
       },
       {
-        "id": "judge",
+        "id": "fast-assess",
         "type": "inference",
         "backend": "mlxhub",
         "role": "fast",
-        "instruction": "Classify whether the supplied runtime status is healthy. Return only the declared JSON structure.",
-        "input": { "status": { "$ref": "steps.read-status.output.json" } },
+        "instruction": "Apply only this policy to the supplied status document: if reported_status is unhealthy, return route=stop_unhealthy; otherwise if verification_required is true, return route=run_runtime_check; otherwise return route=return_healthy. Copy a recognized reported_status into observed_status, otherwise use unknown. Return only the declared JSON structure.",
+        "input": {
+          "status": {
+            "$ref": "steps.read-status.output.json"
+          }
+        },
         "output_schema": {
           "type": "object",
           "properties": {
-            "decision": { "enum": ["healthy", "unhealthy", "uncertain"] },
-            "confidence": { "type": "integer", "minimum": 0, "maximum": 100 }
+            "route": {
+              "enum": [
+                "run_runtime_check",
+                "return_healthy",
+                "stop_unhealthy"
+              ]
+            },
+            "observed_status": {
+              "enum": [
+                "healthy",
+                "unhealthy",
+                "unknown"
+              ]
+            }
           },
-          "required": ["decision", "confidence"],
+          "required": [
+            "route",
+            "observed_status"
+          ],
           "additionalProperties": false
         },
         "next": "route"
@@ -35,66 +56,270 @@
       {
         "id": "route",
         "type": "switch",
-        "select": { "$ref": "steps.judge.output.decision" },
-        "cases": {
-          "healthy": "done",
-          "unhealthy": "not-healthy",
-          "uncertain": "reason"
+        "select": {
+          "$ref": "steps.fast-assess.output.route"
         },
-        "default": "not-healthy"
+        "cases": {
+          "run_runtime_check": "run-node-version",
+          "return_healthy": "fast-no-command",
+          "stop_unhealthy": "unhealthy-initial"
+        },
+        "default": "unhealthy-initial"
       },
       {
-        "id": "reason",
+        "id": "run-node-version",
+        "type": "action",
+        "capability": "process.command.run-fixed",
+        "arguments": {
+          "command_ref": "node.version"
+        },
+        "next": "readback-status"
+      },
+      {
+        "id": "readback-status",
+        "type": "action",
+        "capability": "workspace.file.read",
+        "arguments": {
+          "path": "fixtures/runtime-status.json"
+        },
+        "next": "fast-verify"
+      },
+      {
+        "id": "fast-verify",
         "type": "inference",
         "backend": "mlxhub",
-        "role": "reason",
-        "instruction": "Resolve the explicit uncertainty using only the supplied status and first assessment. Return only the declared JSON structure.",
+        "role": "fast",
+        "instruction": "Verify only the supplied evidence. If command.exit_code is 0, command.stdout is a Node version whose major equals readback.expected_node_major, and readback.reported_status is healthy, return state=verified, decision=healthy, and the parsed integer major. If the evidence clearly shows a mismatched major, nonzero exit code, or unhealthy readback, return state=unhealthy and decision=unhealthy. Only when the supplied evidence cannot be interpreted deterministically return state=uncertain, decision=unknown, observed_node_major=null. Return only the declared JSON structure.",
         "input": {
-          "status": { "$ref": "steps.read-status.output.json" },
-          "first_assessment": { "$ref": "steps.judge.output" }
+          "initial_status": {
+            "$ref": "steps.read-status.output.json"
+          },
+          "readback": {
+            "$ref": "steps.readback-status.output.json"
+          },
+          "command": {
+            "$ref": "steps.run-node-version.output"
+          },
+          "first_assessment": {
+            "$ref": "steps.fast-assess.output"
+          }
         },
         "output_schema": {
           "type": "object",
           "properties": {
-            "decision": { "enum": ["healthy", "unhealthy"] },
-            "confidence": { "type": "integer", "minimum": 0, "maximum": 100 }
+            "state": {
+              "enum": [
+                "verified",
+                "unhealthy",
+                "uncertain"
+              ]
+            },
+            "decision": {
+              "enum": [
+                "healthy",
+                "unhealthy",
+                "unknown"
+              ]
+            },
+            "observed_node_major": {
+              "oneOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
           },
-          "required": ["decision", "confidence"],
+          "required": [
+            "state",
+            "decision",
+            "observed_node_major"
+          ],
           "additionalProperties": false
         },
-        "next": "reason-route"
+        "next": "verification-route"
       },
       {
-        "id": "reason-route",
+        "id": "verification-route",
         "type": "switch",
-        "select": { "$ref": "steps.reason.output.decision" },
-        "cases": {
-          "healthy": "done",
-          "unhealthy": "not-healthy"
+        "select": {
+          "$ref": "steps.fast-verify.output.state"
         },
-        "default": "not-healthy"
+        "cases": {
+          "verified": "fast-done",
+          "unhealthy": "unhealthy-after-command",
+          "uncertain": "reason-resolve"
+        },
+        "default": "reason-resolve"
       },
       {
-        "id": "done",
+        "id": "reason-resolve",
+        "type": "inference",
+        "backend": "mlxhub",
+        "role": "reason",
+        "instruction": "Independently resolve the supplied escalation context. Treat FAST outputs as assessments, not truth. Use the original request context plus all supplied execution evidence and FAST uncertainty details. If the command successfully reports a Node major equal to readback.expected_node_major and readback.reported_status is healthy, return decision=healthy and resolution=command_matches_expected. If there is a clear mismatch or unhealthy evidence, return decision=unhealthy and resolution=command_mismatch. If the evidence remains insufficient, fail closed with decision=unhealthy and resolution=insufficient_evidence. Return only the declared JSON structure.",
+        "input": {
+          "escalation_context": {
+            "trigger": "fast_verification_uncertain",
+            "original_input": {
+              "$ref": "inputs.request"
+            },
+            "objective": "resolve runtime-health verification uncertainty without changing the Flow or executing new capabilities",
+            "constraints": {
+              "fast_output_is_not_truth": true,
+              "use_supplied_evidence_only": true,
+              "fail_closed_if_insufficient": true
+            },
+            "evidence": {
+              "initial_status": {
+                "$ref": "steps.read-status.output.json"
+              },
+              "command": {
+                "$ref": "steps.run-node-version.output"
+              },
+              "readback": {
+                "$ref": "steps.readback-status.output.json"
+              }
+            },
+            "fast": {
+              "assessment": {
+                "$ref": "steps.fast-assess.output"
+              },
+              "verification": {
+                "$ref": "steps.fast-verify.output"
+              }
+            }
+          }
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "decision": {
+              "enum": [
+                "healthy",
+                "unhealthy"
+              ]
+            },
+            "resolution": {
+              "enum": [
+                "command_matches_expected",
+                "command_mismatch",
+                "insufficient_evidence"
+              ]
+            }
+          },
+          "required": [
+            "decision",
+            "resolution"
+          ],
+          "additionalProperties": false
+        },
+        "next": "reason-done"
+      },
+      {
+        "id": "fast-no-command",
         "type": "return",
         "output": {
-          "healthy": true,
-          "assessment": { "$ref": "steps.judge.output" }
+          "decision": "healthy",
+          "resolved_by": "fast_assess",
+          "command_executed": false,
+          "assessment": {
+            "$ref": "steps.fast-assess.output"
+          }
         }
       },
       {
-        "id": "not-healthy",
+        "id": "fast-done",
         "type": "return",
-        "output": { "healthy": false }
+        "output": {
+          "decision": {
+            "$ref": "steps.fast-verify.output.decision"
+          },
+          "resolved_by": "fast",
+          "command_executed": true,
+          "verification": {
+            "$ref": "steps.fast-verify.output"
+          },
+          "command": {
+            "$ref": "steps.run-node-version.output"
+          },
+          "readback": {
+            "$ref": "steps.readback-status.output.json"
+          }
+        }
+      },
+      {
+        "id": "reason-done",
+        "type": "return",
+        "output": {
+          "decision": {
+            "$ref": "steps.reason-resolve.output.decision"
+          },
+          "resolved_by": "reason",
+          "command_executed": true,
+          "resolution": {
+            "$ref": "steps.reason-resolve.output.resolution"
+          },
+          "command": {
+            "$ref": "steps.run-node-version.output"
+          },
+          "readback": {
+            "$ref": "steps.readback-status.output.json"
+          }
+        }
+      },
+      {
+        "id": "unhealthy-initial",
+        "type": "return",
+        "output": {
+          "decision": "unhealthy",
+          "resolved_by": "flow",
+          "command_executed": false,
+          "assessment": {
+            "$ref": "steps.fast-assess.output"
+          }
+        }
+      },
+      {
+        "id": "unhealthy-after-command",
+        "type": "return",
+        "output": {
+          "decision": "unhealthy",
+          "resolved_by": "fast",
+          "command_executed": true,
+          "verification": {
+            "$ref": "steps.fast-verify.output"
+          },
+          "command": {
+            "$ref": "steps.run-node-version.output"
+          },
+          "readback": {
+            "$ref": "steps.readback-status.output.json"
+          }
+        }
       }
     ]
   },
-  "inputs": {},
-  "authorization": {
-    "allowed_capabilities": ["workspace.file.read"]
+  "inputs": {
+    "request": {
+      "objective": "verify the configured runtime status and Node major using declared evidence only",
+      "expected_runtime": "node20",
+      "verification_policy": "fail closed when evidence remains insufficient"
+    }
   },
+  "authorization": {
+    "allowed_capabilities": [
+      "workspace.file.read",
+      "process.command.run-fixed"
+    ]
+  },
+  "max_node_runs": 12,
   "correlation": {
     "source": "example",
-    "external_ref": "opaque-demo-ref"
+    "gate": "EF-4",
+    "external_ref": "opaque-production-shaped-runtime-check"
   }
 }

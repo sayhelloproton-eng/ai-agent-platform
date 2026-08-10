@@ -118,19 +118,6 @@ export async function writeConfig(config: RuntimeConfig): Promise<void> {
   await fs.rename(temp, CONFIG_PATH);
 }
 
-export async function ensureRuntimeHome(cwd = process.cwd()): Promise<RuntimeConfig> {
-  await fs.mkdir(RUNTIME_HOME, { recursive: true });
-
-  try {
-    return await loadConfig();
-  } catch {
-    const config = defaultConfig(cwd);
-    await fs.writeFile(CONFIG_PATH, JSON.stringify(config, null, 2) + "\n", {
-      flag: "wx",
-    }).catch(() => undefined);
-    return await loadConfig();
-  }
-}
 
 export async function loadConfig(): Promise<RuntimeConfig> {
   const content = await fs.readFile(CONFIG_PATH, "utf8");

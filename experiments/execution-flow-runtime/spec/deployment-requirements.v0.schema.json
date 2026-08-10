@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-agent-platform.local/spec/deployment-requirements.v0.schema.json",
+  "title": "AAP Module Deployment Requirements v0",
+  "type": "object",
+  "required": [
+    "contract",
+    "module",
+    "runtime_requirements",
+    "dependencies",
+    "resources",
+    "config_slots",
+    "provides",
+    "lifecycle",
+    "effects",
+    "invariants"
+  ],
+  "properties": {
+    "contract": { "const": "aap.deployment.requirements.v0" },
+    "module": {
+      "type": "object",
+      "required": ["id", "package", "version", "deployment_unit"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "package": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "deployment_unit": { "const": "service" }
+      },
+      "additionalProperties": false
+    },
+    "runtime_requirements": { "type": "array", "items": { "type": "object" } },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "kind", "logical_ref", "required", "candidate_sources", "verify", "config_keys"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "kind": { "type": "string", "minLength": 1 },
+          "logical_ref": { "type": "string", "minLength": 1 },
+          "required": { "type": "boolean" },
+          "required_when": { "type": "string" },
+          "constraints": { "type": "object" },
+          "candidate_sources": { "type": "array", "minItems": 1, "items": { "type": "object" } },
+          "verify": { "type": "object" },
+          "config_keys": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": false
+      }
+    },
+    "resources": { "type": "object" },
+    "config_slots": { "type": "array", "items": { "type": "object" } },
+    "provides": { "type": "array", "items": { "type": "object" } },
+    "lifecycle": { "type": "object" },
+    "effects": { "type": "object" },
+    "invariants": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": false
+}
