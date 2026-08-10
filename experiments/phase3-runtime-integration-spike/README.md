@@ -1,47 +1,44 @@
 # Phase 3 Runtime Integration Spike
 
-Status: `0.0.0-spike.1` — intentionally temporary integration evidence.
-
-This experiment collapses the next Phase 3 step to the smallest executable seam:
-
-```text
-Task WorkItem
-→ TaskRuntimeWorker
-→ execution.run.v0
-→ frozen Execution Flow Runtime lab.13
-→ CapabilityRegistry
-→ fixture capability OR Local Control public API
-→ execution.result.v0
-→ WorkItem SUCCEEDED / FAILED
-```
+Minimal executable evidence for the Phase 3 Task -> Execution Flow Runtime integration boundary.
 
 ## Scope
 
-This spike does **not** change the frozen `experiments/execution-flow-runtime` implementation and does not migrate it into `packages/`.
-It does not reopen Phase 2 CTL/BHR/Gateway integration.
+This experiment does not redefine Task Control, Local Control or the frozen Execution Flow Runtime. It provides the thinnest adapters needed to prove the public integration path.
 
-It proves only three things:
+Current spike evidence:
 
-1. a Task `WorkItem` can be projected into an `ExecutionRun` without leaking Task internals into Runtime;
-2. an external capability provider can be adapted behind Runtime `CapabilityRegistry` without putting physical deployment data into Flow;
-3. `ExecutionResult` can be durably projected back into Task Control as WorkItem success/failure.
+1. Task WorkItem -> frozen Runtime -> fixture capability -> `execution.result.v0` -> WorkItem `SUCCEEDED`.
+2. Task WorkItem -> frozen Runtime -> Local Control public `local.health.read` -> WorkItem `SUCCEEDED`.
+3. Runtime `CAPABILITY_NOT_FOUND` -> durable WorkItem `FAILED` / `ROLE_WORK_FAILED` mapping.
+4. One explicit live gate: Task WorkItem -> frozen Runtime -> real Local Control public API -> MLXHub FAST -> `execution.result.v0` -> WorkItem `SUCCEEDED`.
 
-## Explicitly deferred
+## Frozen boundaries
 
-- Browser Host
-- Approval Grant token format
-- cancellation/progress protocol
-- MLXHub inference in this spike (already proven by EF-4)
-- Common Result/Error redesign
-- deployment planner / dynamic INSTALL.md
-- formal Runtime migration to `packages/`
+- Runtime receives Task identifiers only as opaque correlation metadata.
+- Runtime does not own Task state, Claim, Approval, Controller decisions or durable Task transitions.
+- Local Control is reached through its public API adapter; its internal handlers/stores are not imported into Runtime.
+- The live Flow uses the logical inference backend name `mlxhub`; physical endpoint/model configuration is injected by the test harness and is not embedded in the Flow.
+- FAST is one bounded inference node. The Flow and capability execution remain deterministic outside inference.
+- This spike does not add Browser Host, Approval Grant, cancellation/progress, Deployment Planner, dynamic INSTALL generation or formal package migration.
 
-## Validation
+## Commands
 
-The test suite is intentionally only three tests:
+```bash
+npm run check
+npm test
+```
 
-- fixture capability success;
-- real Local Control `local.health.read` success;
-- Runtime failure mapped to Task WorkItem failure.
+The normal suite is offline and must not call MLXHub.
 
-If these pass, the next validation adds one real FAST inference path rather than another design round.
+The single live FAST gate is opt-in:
+
+```bash
+MLXHUB_BASE_URL=http://<mlxhub-host>:<port> \
+MLXHUB_FAST_MODEL=<fast-model> \
+MLXHUB_REASON_MODEL=<reason-model> \
+MLXHUB_TIMEOUT_MS=180000 \
+npm run test:mlxhub-live
+```
+
+`MLXHUB_REASON_MODEL` is required by the frozen MLXHub backend constructor even though this live gate invokes only the FAST role.
