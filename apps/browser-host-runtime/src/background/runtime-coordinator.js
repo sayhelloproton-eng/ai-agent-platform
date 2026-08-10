@@ -508,6 +508,28 @@ export class RuntimeCoordinator {
         }
       }
 
+      // A Controller Wake is a platform-generated continuation, not a user request
+      // to overwrite the composer while ChatGPT is still producing the current turn.
+      // Intake can create a CONTROLLER_WAKE before the already-active Controller turn
+      // has finished its own Decision Context / Claim flow. If the Host claims that
+      // Wake during generation (or while ChatGPT is showing its own Action-choice
+      // surface), defer without reporting a failure and without leaving a retained
+      // journal entry. No browser side effect has started, so the server claim may
+      // safely expire or be consumed by the explicit Controller Claim. A later
+      // re-offer will be evaluated again against a fresh page observation.
+      if (command.action.type === ACTION_TYPES.CONTINUE_ROLE_SESSION && approvalResumeShouldDefer(pre?.observation)) {
+        await this.journal.discardPreSideEffect(command.command_id);
+        return {
+          processed: true,
+          reason: "CONTROLLER_WAKE_PAGE_BUSY",
+          deferred: true,
+          command_id: command.command_id,
+          dispatch_ref: command.dispatch_ref,
+          page_state: pre?.observation?.page_state ?? null,
+          generation_state: pre?.observation?.generation_state ?? null
+        };
+      }
+
       const approvalRequired = requiresApproval(command, {
         mode: config.approval_policy_mode,
         resolvedPayload

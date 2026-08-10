@@ -37,3 +37,18 @@ test("executed result remains reportable after restart", async () => {
   assert.deepEqual(recovered.reportable, ["cmd-1"]);
   assert.deepEqual((await journal.get("cmd-1")).result, result);
 });
+
+test("pre-side-effect busy deferral may discard only RECEIVED/CLAIMED journal entries", async () => {
+  const journal = new CommandJournal(new MemoryStorageArea());
+  await journal.begin(command);
+  await journal.mark(command.command_id, JOURNAL_STATE.CLAIMED, { claim_token: "claim" });
+  assert.equal(await journal.discardPreSideEffect(command.command_id), true);
+  assert.equal(await journal.get(command.command_id), null);
+
+  await journal.begin(command);
+  await journal.mark(command.command_id, JOURNAL_STATE.EXECUTING);
+  await assert.rejects(
+    () => journal.discardPreSideEffect(command.command_id),
+    (error) => error.code === "JOURNAL_DISCARD_UNSAFE"
+  );
+});

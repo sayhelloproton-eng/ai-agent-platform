@@ -176,6 +176,31 @@ export class CommandJournal {
     return this._exclusive(async () => (await this._load())[command_id] ?? null);
   }
 
+  async discardPreSideEffect(command_id) {
+    return this._exclusive(async () => {
+      const entries = await this._load();
+      const entry = entries[command_id];
+      if (!entry) return false;
+      if (![JOURNAL_STATE.RECEIVED, JOURNAL_STATE.CLAIMED].includes(entry.state)) {
+        throw new BhrError(
+          "JOURNAL_DISCARD_UNSAFE",
+          `Command Journal entry ${command_id} cannot be discarded after browser execution preparation has started.`,
+          { state: entry.state }
+        );
+      }
+      if (entry.delivery || entry.delivery_ack || entry.pending_report || entry.result) {
+        throw new BhrError(
+          "JOURNAL_DISCARD_UNSAFE",
+          `Command Journal entry ${command_id} contains delivery/result state and cannot be discarded.`,
+          { state: entry.state }
+        );
+      }
+      delete entries[command_id];
+      await this._save(entries);
+      return true;
+    });
+  }
+
   async capacityStatus() {
     return this._exclusive(async () => {
       const entries = await this._load();

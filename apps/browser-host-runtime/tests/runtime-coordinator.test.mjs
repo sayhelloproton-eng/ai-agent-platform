@@ -864,3 +864,86 @@ test("emergency stop flushes report-only recovery but never resumes browser obse
   assert.equal(observations, 0);
   assert.equal((await journal.get(command.command_id)).state, "DELIVERY_ACKED");
 });
+
+test("Controller Wake defers while the bound ChatGPT conversation is still generating without failing or retaining the command", async () => {
+  const { command, payload } = platformWake({ action_type: "CONTINUE_ROLE_SESSION", conversation_ref: "conv" });
+  const bound = binding();
+  const busy = observation({ generation_state: "RUNNING" });
+  const journal = new CommandJournal(new MemoryStorageArea());
+  let executions = 0;
+  let failures = 0;
+  let uncertain = 0;
+  const coordinator = new RuntimeCoordinator({
+    host_id: "host",
+    dispatchClient: {
+      listPending: async () => [{ dispatch_ref: command.dispatch_ref }],
+      claim: async () => ({ claim_token: "claim", expires_at: "2030-01-01T00:00:00.000Z" }),
+      get: async () => command,
+      resolvePayload: async () => payload,
+      fail: async () => { failures += 1; return { status: "RECORDED" }; },
+      uncertain: async () => { uncertain += 1; return { status: "RECORDED" }; }
+    },
+    approvalClient: {},
+    bindingRegistry: { findForTarget: async () => bound, validateObservation: async (value) => value },
+    journal,
+    observationCoordinator: observationService(busy),
+    actionExecutor: { execute: async () => { executions += 1; } },
+    modelProvider: {}, evidenceStore: {},
+    configProvider: async () => ({ paused: false, emergency_stopped: false, approval_policy_mode: "platform_wake_candidate" })
+  });
+
+  const response = await coordinator.processOne();
+  assert.equal(response.processed, true);
+  assert.equal(response.deferred, true);
+  assert.equal(response.reason, "CONTROLLER_WAKE_PAGE_BUSY");
+  assert.equal(response.generation_state, "RUNNING");
+  assert.equal(executions, 0);
+  assert.equal(failures, 0);
+  assert.equal(uncertain, 0);
+  assert.equal(await journal.get(command.command_id), null, "no non-terminal local journal record may leak while the Wake is only deferred");
+});
+
+test("deferred Controller Wake is re-evaluated from a fresh observation and executes exactly once after the page becomes idle", async () => {
+  const { command, payload } = platformWake({ action_type: "CONTINUE_ROLE_SESSION", conversation_ref: "conv" });
+  const bound = binding();
+  let currentObservation = observation({ generation_state: "RUNNING" });
+  const journal = new CommandJournal(new MemoryStorageArea());
+  const calls = [];
+  let pending = true;
+  let executions = 0;
+  const coordinator = new RuntimeCoordinator({
+    host_id: "host",
+    dispatchClient: {
+      listPending: async () => pending ? [{ dispatch_ref: command.dispatch_ref }] : [],
+      claim: async () => ({ claim_token: `claim-${calls.filter((item) => item === "claim").length + 1}`, expires_at: "2030-01-01T00:00:00.000Z" }),
+      get: async () => command,
+      resolvePayload: async () => payload,
+      deliveryAck: async () => { calls.push("ack"); return { delivery_receipt: "receipt", report_token: "report-token" }; },
+      hostResult: async () => { calls.push("result"); pending = false; return { status: "RECORDED" }; },
+      fail: async () => { throw new Error("page-busy deferral must not fail the dispatch"); },
+      uncertain: async () => { throw new Error("page-busy deferral must never become uncertain"); }
+    },
+    approvalClient: {},
+    bindingRegistry: { findForTarget: async () => bound, validateObservation: async (value) => value, get: async () => bound },
+    journal,
+    observationCoordinator: { observe: async () => ({ observation: currentObservation, local: {} }) },
+    actionExecutor: {
+      execute: async () => { executions += 1; return deliveryExecution(bound); },
+      waitForResponse: async () => ({ status: "ACTION_SUCCEEDED", details: { response_completed: true } })
+    },
+    modelProvider: { analyze: async () => assessment() }, evidenceStore: {},
+    configProvider: async () => ({ paused: false, emergency_stopped: false, approval_policy_mode: "platform_wake_candidate" })
+  });
+
+  const deferred = await coordinator.processOne();
+  assert.equal(deferred.reason, "CONTROLLER_WAKE_PAGE_BUSY");
+  assert.equal(executions, 0);
+  assert.equal(await journal.get(command.command_id), null);
+
+  currentObservation = observation({ generation_state: "IDLE" });
+  const completed = await coordinator.processOne();
+  assert.equal(completed.result.status, "ACTION_SUCCEEDED");
+  assert.equal(executions, 1);
+  assert.deepEqual(calls, ["ack", "result"]);
+  assert.equal((await journal.get(command.command_id)).state, "REPORTED");
+});
