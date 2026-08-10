@@ -4,7 +4,7 @@
   "flow": {
     "contract": "execution.flow.v0",
     "flow_id": "runtime-health-production-shaped-check",
-    "version": 3,
+    "version": 4,
     "entry_node": "read-status",
     "nodes": [
       {
@@ -14,55 +14,29 @@
         "arguments": {
           "path": "fixtures/runtime-status.json"
         },
-        "next": "fast-assess"
+        "next": "status-route"
       },
       {
-        "id": "fast-assess",
-        "type": "inference",
-        "backend": "mlxhub",
-        "role": "fast",
-        "instruction": "Apply only this policy to the supplied status document: if reported_status is unhealthy, return route=stop_unhealthy; otherwise if verification_required is true, return route=run_runtime_check; otherwise return route=return_healthy. Copy a recognized reported_status into observed_status, otherwise use unknown. Return only the declared JSON structure.",
-        "input": {
-          "status": {
-            "$ref": "steps.read-status.output.json"
-          }
-        },
-        "output_schema": {
-          "type": "object",
-          "properties": {
-            "route": {
-              "enum": [
-                "run_runtime_check",
-                "return_healthy",
-                "stop_unhealthy"
-              ]
-            },
-            "observed_status": {
-              "enum": [
-                "healthy",
-                "unhealthy",
-                "unknown"
-              ]
-            }
-          },
-          "required": [
-            "route",
-            "observed_status"
-          ],
-          "additionalProperties": false
-        },
-        "next": "route"
-      },
-      {
-        "id": "route",
+        "id": "status-route",
         "type": "switch",
         "select": {
-          "$ref": "steps.fast-assess.output.route"
+          "$ref": "steps.read-status.output.json.reported_status"
         },
         "cases": {
-          "run_runtime_check": "run-node-version",
-          "return_healthy": "fast-no-command",
-          "stop_unhealthy": "unhealthy-initial"
+          "healthy": "verification-required-route",
+          "unhealthy": "unhealthy-initial"
+        },
+        "default": "unhealthy-initial"
+      },
+      {
+        "id": "verification-required-route",
+        "type": "switch",
+        "select": {
+          "$ref": "steps.read-status.output.json.verification_required"
+        },
+        "cases": {
+          "true": "run-node-version",
+          "false": "healthy-no-command"
         },
         "default": "unhealthy-initial"
       },
@@ -99,9 +73,6 @@
           },
           "command": {
             "$ref": "steps.run-node-version.output"
-          },
-          "first_assessment": {
-            "$ref": "steps.fast-assess.output"
           }
         },
         "output_schema": {
@@ -185,9 +156,6 @@
               }
             },
             "fast": {
-              "assessment": {
-                "$ref": "steps.fast-assess.output"
-              },
               "verification": {
                 "$ref": "steps.fast-verify.output"
               }
@@ -220,15 +188,12 @@
         "next": "reason-done"
       },
       {
-        "id": "fast-no-command",
+        "id": "healthy-no-command",
         "type": "return",
         "output": {
           "decision": "healthy",
-          "resolved_by": "fast_assess",
-          "command_executed": false,
-          "assessment": {
-            "$ref": "steps.fast-assess.output"
-          }
+          "resolved_by": "flow",
+          "command_executed": false
         }
       },
       {
@@ -277,10 +242,7 @@
         "output": {
           "decision": "unhealthy",
           "resolved_by": "flow",
-          "command_executed": false,
-          "assessment": {
-            "$ref": "steps.fast-assess.output"
-          }
+          "command_executed": false
         }
       },
       {

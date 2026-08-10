@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.0.0-lab.12.1
+
+Rebased EF-4 deterministic-authority fix on the latest user source baseline `f0e08caa`:
+
+- preserve the user-validated lab.11 TypeScript fixes (`Ajv2020` named import and explicit test output narrowing);
+- retain the lab.12 deterministic routing correction without changing Runtime Core topology;
+- keep deployment requirements read-only, MLXHub inference globally serial, and REASON context Flow-projected.
+
+## 0.0.0-lab.12
+
+EF-4 deterministic-authority correction after the first real-phone production-flow failure:
+
+- fix the live-gate root cause: `command_executed=false` was not a missing model field; the first FAST assessment selected the no-command branch even though `verification_required=true`;
+- move deterministic `reported_status` / `verification_required` routing out of inference and into explicit Flow `switch` nodes, so model output cannot bypass a required host command;
+- keep inference only where semantic judgement is actually needed: post-command FAST verification with optional Flow-owned REASON escalation;
+- keep `command_executed` and command evidence derived from actual Flow/capability execution rather than model claims;
+- retain the lab.11 serial MLXHub lane, rich REASON context, and read-only deployment-requirements boundary;
+- add a regression proving `verification_required=true` reaches `command_ref=node.version` before any inference can affect that decision.
+
 ## 0.0.0-lab.11
 
 EF-4B deployment-boundary correction and resource-scheduling hardening:

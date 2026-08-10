@@ -166,8 +166,7 @@ The `examples/runtime-health.flow.json` example now exercises a production-shape
 
 ```text
 workspace.file.read
-  -> FAST assessment
-  -> Flow switch
+  -> deterministic Flow switch on reported_status / verification_required
   -> process.command.run-fixed(command_ref=node.version)
   -> workspace.file.read readback
   -> FAST verification
@@ -176,7 +175,7 @@ workspace.file.read
      -> uncertain: REASON inference -> return
 ```
 
-The command is Runtime-owned and uses `shell=false`; inference never supplies an executable, argv, cwd or shell line. The second file read is an explicit readback/evidence step after the host command.
+The command is Runtime-owned and uses `shell=false`; inference never supplies an executable, argv, cwd or shell line. Deterministic structured preconditions such as `reported_status` and `verification_required` are Flow-owned and are never delegated to inference. The second file read is an explicit readback/evidence step after the host command.
 
 The normal unit suite uses real local file/process capabilities with Fixture inference. The explicit phone gate uses the already-running managed service and configured MLXHub backend:
 
@@ -186,7 +185,7 @@ npm run test:mlxhub-production-live
 
 It is a single execution-flow correctness gate, not a benchmark. REASON is invoked only if the post-command FAST verification returns structured uncertainty.
 
-## Platform-aggregated deployment requirements (lab.11)
+## Platform-aggregated deployment requirements
 
 This module is self-describing but not self-deploying. Its deployment contract is exposed only through:
 

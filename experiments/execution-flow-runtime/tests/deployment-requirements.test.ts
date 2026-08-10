@@ -34,7 +34,7 @@ test("deployment requirements is a schema-valid module descriptor, not a deploym
 
   assert.equal(descriptor.contract, "aap.deployment.requirements.v0");
   assert.equal(descriptor.module.id, "execution-flow-runtime");
-  assert.equal(descriptor.module.version, "0.0.0-lab.11");
+  assert.equal(descriptor.module.version, "0.0.0-lab.12.1");
   assert.equal(descriptor.dependencies[0]?.logical_ref, "inference.backend");
   assert.equal(descriptor.dependencies[0]?.constraints?.max_concurrency, 1);
   assert.equal(descriptor.lifecycle.singleton_scope, "runtime_home");

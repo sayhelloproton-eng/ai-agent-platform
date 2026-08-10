@@ -50,7 +50,6 @@ test("EF-4 live: managed service runs real file -> FAST -> fixed command -> read
   assert.ok(["fast", "reason"].includes(result.output.resolved_by));
 
   const byNode = new Map(result.node_runs.map((node: any) => [node.node_id, node]));
-  assert.equal(byNode.get("fast-assess")?.output?.route, "run_runtime_check");
   assert.equal(byNode.get("run-node-version")?.output?.command_ref, "node.version");
   assert.equal(byNode.get("run-node-version")?.output?.exit_code, 0);
   assert.match(byNode.get("run-node-version")?.output?.stdout ?? "", /^v20\./);
@@ -63,8 +62,8 @@ test("EF-4 live: managed service runs real file -> FAST -> fixed command -> read
 
   const expectedFastPath = [
     "read-status",
-    "fast-assess",
-    "route",
+    "status-route",
+    "verification-required-route",
     "run-node-version",
     "readback-status",
     "fast-verify",
@@ -73,8 +72,8 @@ test("EF-4 live: managed service runs real file -> FAST -> fixed command -> read
   ];
   const expectedReasonPath = [
     "read-status",
-    "fast-assess",
-    "route",
+    "status-route",
+    "verification-required-route",
     "run-node-version",
     "readback-status",
     "fast-verify",
@@ -105,19 +104,15 @@ test("EF-4 live: managed service runs real file -> FAST -> fixed command -> read
     (item: any) => item.type === "inference-result"
   );
   const roles = inferenceEvidence.map((item: any) => item.role);
-  assert.deepEqual(roles.slice(0, 2), ["fast", "fast"]);
+  assert.equal(roles[0], "fast");
   assert.equal(
     inferenceEvidence[0]?.metadata?.model,
     "sayhelloproton/Qwen3.5-4B-MLX-4bit-no-think"
   );
-  assert.equal(
-    inferenceEvidence[1]?.metadata?.model,
-    "sayhelloproton/Qwen3.5-4B-MLX-4bit-no-think"
-  );
-  if (roles.length === 3) {
-    assert.equal(roles[2], "reason");
+  if (roles.length === 2) {
+    assert.equal(roles[1], "reason");
     assert.equal(
-      inferenceEvidence[2]?.metadata?.model,
+      inferenceEvidence[1]?.metadata?.model,
       "mlx-community/Qwen3.5-4B-MLX-4bit"
     );
   }

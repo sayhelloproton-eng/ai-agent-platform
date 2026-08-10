@@ -27,9 +27,6 @@ test("REASON escalation receives explicit original context, evidence, and full F
   environment.inferenceBackends.register(
     "mlxhub",
     new FixtureInferenceBackend((request) => {
-      if (request.node_id === "fast-assess") {
-        return { route: "run_runtime_check", observed_status: "healthy" };
-      }
       if (request.node_id === "fast-verify") {
         return { state: "uncertain", decision: "unknown", observed_node_major: null };
       }
@@ -55,10 +52,6 @@ test("REASON escalation receives explicit original context, evidence, and full F
   assert.equal(context.evidence.initial_status.reported_status, "healthy");
   assert.equal(context.evidence.readback.expected_node_major, 20);
   assert.match(context.evidence.command.stdout, /^v\d+\./);
-  assert.deepEqual(context.fast.assessment, {
-    route: "run_runtime_check",
-    observed_status: "healthy",
-  });
   assert.deepEqual(context.fast.verification, {
     state: "uncertain",
     decision: "unknown",

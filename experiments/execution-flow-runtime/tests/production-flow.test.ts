@@ -63,13 +63,6 @@ async function createRealEnvironment(options?: { verifierUncertain?: boolean }) 
     new FixtureInferenceBackend((request) => {
       calls.push(request);
 
-      if (request.node_id === "fast-assess") {
-        return {
-          route: "run_runtime_check",
-          observed_status: "healthy",
-        };
-      }
-
       if (request.node_id === "fast-verify") {
         if (options?.verifierUncertain) {
           return {
@@ -129,20 +122,19 @@ test("EF-4: real file -> FAST -> fixed command -> readback -> FAST verification 
 
     assert.deepEqual(result.node_runs.map((node) => node.node_id), [
       "read-status",
-      "fast-assess",
-      "route",
+      "status-route",
+      "verification-required-route",
       "run-node-version",
       "readback-status",
       "fast-verify",
       "verification-route",
       "fast-done",
     ]);
-    assert.deepEqual(env.calls.map((call) => call.role), ["fast", "fast"]);
+    assert.deepEqual(env.calls.map((call) => call.role), ["fast"]);
     assert.deepEqual(
       result.evidence.map((item) => [item.type, item.node_id]),
       [
         ["capability-result", "read-status"],
-        ["inference-result", "fast-assess"],
         ["capability-result", "run-node-version"],
         ["capability-result", "readback-status"],
         ["inference-result", "fast-verify"],
@@ -162,11 +154,11 @@ test("EF-4: only Flow switch escalates uncertain post-command verification to RE
     assert.equal((result.output as any).decision, "healthy");
     assert.equal((result.output as any).resolved_by, "reason");
     assert.equal((result.output as any).resolution, "command_matches_expected");
-    assert.deepEqual(env.calls.map((call) => call.role), ["fast", "fast", "reason"]);
+    assert.deepEqual(env.calls.map((call) => call.role), ["fast", "reason"]);
     assert.deepEqual(result.node_runs.map((node) => node.node_id), [
       "read-status",
-      "fast-assess",
-      "route",
+      "status-route",
+      "verification-required-route",
       "run-node-version",
       "readback-status",
       "fast-verify",
@@ -189,11 +181,11 @@ test("EF-4: production-shaped flow remains bounded by max_node_runs", async () =
     assert.equal(result.error?.code, "STEP_LIMIT");
     assert.deepEqual(result.node_runs.map((node) => node.node_id), [
       "read-status",
-      "fast-assess",
-      "route",
+      "status-route",
+      "verification-required-route",
       "run-node-version",
     ]);
-    assert.deepEqual(env.calls.map((call) => call.role), ["fast"]);
+    assert.deepEqual(env.calls.map((call) => call.role), []);
   } finally {
     await fs.rm(env.workspace, { recursive: true, force: true });
   }
