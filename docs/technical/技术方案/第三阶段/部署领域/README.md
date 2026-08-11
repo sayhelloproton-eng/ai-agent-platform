@@ -1,7 +1,7 @@
 # 部署领域（Deployment Domain）
 
-> 状态：DRAFT / REVIEW  
-> 领域类型：支撑领域（Supporting Domain）  
+> 状态：DRAFT / REVIEW
+> 领域类型：支撑领域（Supporting Domain）
 > 本文描述 Phase 3 部署领域的领域定位、子领域、限界上下文、模块组成和统一部署协议。当前用于持续讨论和实现约束，尚未冻结。
 
 ---
@@ -104,8 +104,8 @@ npm package
 
 > **智能在 AI，确定性在 CLI。**
 
-AI 负责理解和调用。  
-CLI 承担确定性作用。  
+AI 负责理解和调用。
+CLI 承担确定性作用。
 模块负责自身部署子闭环。
 
 ---
