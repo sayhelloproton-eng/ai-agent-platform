@@ -1,0 +1,109 @@
+{
+  "project": "学习 / ai-agent-platform Phase 3",
+  "domain": "Execution Domain",
+  "status": "FROZEN_v1_P0",
+  "frozenAt": "2026-08-11",
+  "coverage": "60/60 current key decisions",
+  "files": [
+    {
+      "name": "00-完整技术方案与上下文真源.md",
+      "bytes": 22710,
+      "sha256": "ac5fde7f2e37625350ec56e7fa281c2f9365ec087b69700c6b4eaefc48e7d205"
+    },
+    {
+      "name": "01-领域职责边界与非目标.md",
+      "bytes": 2805,
+      "sha256": "22a278ece4d0658130a09e0c1b612a246da01aaf255ddd765319ec40ff634373"
+    },
+    {
+      "name": "02-总体架构-包-服务-运行拓扑.md",
+      "bytes": 3551,
+      "sha256": "1055e7b6536c6a5386de484c5a95f7757377f9f79f234ccfd5f09bc3498c64dc"
+    },
+    {
+      "name": "03-execution-runtime-详细技术方案.md",
+      "bytes": 4323,
+      "sha256": "28b726abd5350d114c26663367e1d3523dd3ed11d0b6538386d249c1b7db68ab"
+    },
+    {
+      "name": "04-execution-browser-extension-详细技术方案.md",
+      "bytes": 8152,
+      "sha256": "1704411910325f7497d7403ffd016f50b0f829f1d379cb628679be46daf76bd7"
+    },
+    {
+      "name": "05-execution-local-详细技术方案.md",
+      "bytes": 5177,
+      "sha256": "8dfe4de6814ecaeaf3582fc797c7ac63f001ba472d0bbef1d293b974e2d5d25e"
+    },
+    {
+      "name": "06-Public-Contract与TypeScript类型规范.md",
+      "bytes": 5504,
+      "sha256": "76e370b5610c7abc3675608ae5b9a06669ff9189030af6297db9718b83ae6614"
+    },
+    {
+      "name": "07-Execution-Record-持久化-幂等-状态.md",
+      "bytes": 4338,
+      "sha256": "898cafbf246222c25f9f3c5879bfec6856002d834c7114ce20699727cdb24419"
+    },
+    {
+      "name": "08-Policy-FAST-REASON-Human-Effect-Approval.md",
+      "bytes": 2292,
+      "sha256": "3c11ff8ba10b5812a0897bcb4e36ee1025df8324f6f0ea7a0b6a85929d10437b"
+    },
+    {
+      "name": "09-Result-Evidence-UNKNOWN与恢复.md",
+      "bytes": 2764,
+      "sha256": "027eec6f92485ddd5117c8416db6d4a33a74809265b41a30bd520071be271bc8"
+    },
+    {
+      "name": "10-Side-Panel-System-Observer-日志可观测性.md",
+      "bytes": 3841,
+      "sha256": "1130117f9506f9eac828fca205df3aeeced01c93099b85b0ac1a735bd1263826"
+    },
+    {
+      "name": "11-跨领域接口依赖矩阵.md",
+      "bytes": 2660,
+      "sha256": "caf6e11d0f972c0b73c055cbddda859602382bfaa67daa5ff2a3f2f86c2c102f"
+    },
+    {
+      "name": "12-测试验收-E2E-故障注入.md",
+      "bytes": 3356,
+      "sha256": "ed74bea1745eb234ee367a87b32b12584b2c7767043c05e86587a73f0edcb421"
+    },
+    {
+      "name": "13-TypeScript-Node20-工程约束.md",
+      "bytes": 1908,
+      "sha256": "33eedc62dd9249eeb55335c3918481231aa9840e8cc9b7344bf85680dff05c1e"
+    },
+    {
+      "name": "14-新仓库实现顺序与停止门.md",
+      "bytes": 2893,
+      "sha256": "87c3223ea31ed0e0a14940f3fb2580c42d4a98156fc9cdf930c0dca3635eddf1"
+    },
+    {
+      "name": "90-决策演进与覆盖清单.md",
+      "bytes": 4273,
+      "sha256": "ecbcd49110133e089dab897f623100bd16ea643a9396b35573ec6a02e6e9ed3b"
+    },
+    {
+      "name": "91-聊天讨论主题索引与结论映射.md",
+      "bytes": 5701,
+      "sha256": "a702effc4f64acd570912a6114ce3a09d355ddae15c92888ccb03a9a28a744e5"
+    },
+    {
+      "name": "92-冻结结论覆盖检查表.md",
+      "bytes": 4119,
+      "sha256": "157ef4a0cac8d01cee5c3b456a0c5eb7ca6b376d8429b381b5d97ba93475a12c"
+    },
+    {
+      "name": "99-下一Chat交接上下文.md",
+      "bytes": 3509,
+      "sha256": "8a4eb9f2ad852bfe3fd84c54d7cee8421e19dad65cd19aa667413e858a49bed7"
+    },
+    {
+      "name": "README.md",
+      "bytes": 4973,
+      "sha256": "b78bc0d72a00106569be25c63d434fc9497bd16792de63f68837ce27e103a54a"
+    }
+  ]
+}
