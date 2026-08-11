@@ -50,13 +50,13 @@ test("EF-4 live: managed service runs real file -> FAST -> fixed command -> read
   assert.ok(["fast", "reason"].includes(result.output.resolved_by));
 
   const byNode = new Map(result.node_runs.map((node: any) => [node.node_id, node]));
-  assert.equal(byNode.get("run-node-version")?.output?.command_ref, "node.version");
-  assert.equal(byNode.get("run-node-version")?.output?.exit_code, 0);
-  assert.match(byNode.get("run-node-version")?.output?.stdout ?? "", /^v20\./);
-  assert.equal(byNode.get("readback-status")?.output?.json?.expected_node_major, 20);
-  assert.equal(byNode.get("readback-status")?.output?.json?.reported_status, "healthy");
+  assert.equal((byNode.get("run-node-version") as any)?.output?.command_ref, "node.version");
+  assert.equal((byNode.get("run-node-version") as any)?.output?.exit_code, 0);
+  assert.match((byNode.get("run-node-version") as any)?.output?.stdout ?? "", /^v20\./);
+  assert.equal((byNode.get("readback-status") as any)?.output?.json?.expected_node_major, 20);
+  assert.equal((byNode.get("readback-status") as any)?.output?.json?.reported_status, "healthy");
 
-  const fastVerification = byNode.get("fast-verify")?.output;
+  const fastVerification = (byNode.get("fast-verify") as any)?.output;
   assert.ok(fastVerification);
   assert.ok(["verified", "uncertain"].includes(fastVerification.state));
 

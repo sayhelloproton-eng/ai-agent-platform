@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.0.0-lab.13.2
+
+Mobile capability live-gate harness correction only; Runtime/Flow/provider semantics remain unchanged:
+
+- fixes the test-generated inference-node binding template to use schema-valid per-field refs (`inputs.<field>`) instead of the invalid root ref `{"$ref":"inputs"}`;
+- adds an explicit `validateExecutionRun(...)` harness preflight before any real MLXHub call so fixture/schema failures fail locally and are not misreported as phone-model failures;
+- keeps the same mock Task/Approval/Script/Vision capability scenarios and acceptance thresholds.
+
+## 0.0.0-lab.13.1
+
+Post-freeze mobile capability-evaluation supplement; Runtime/Flow/provider semantics remain unchanged:
+
+- add an explicit real-MLXHub FAST live gate for mock platform judgement scenarios: Task/WorkItem flow candidate decisions, immutable approval-result feedback, allow-listed script selection with fail-closed `NO_MATCH`, and Vision approval-boundary classification;
+- run ten cases twice by default with a 5-second request cooldown, requiring exact expected structured output, repeat consistency, zero approval false-negatives and zero invented script refs;
+- keep text cases inside `execution.flow.v0`; probe Vision directly through MLXHub `image_url` because the frozen v0 Runtime inference input is JSON/text-only rather than silently widening the protocol;
+- bundle two mock PNG UI fixtures and include `live-tests/**/*.ts` in TypeScript checking plus all fixture types in the source package;
+- no Browser Host, Gateway, real Approval, Task persistence, Local Control integration, tool execution, or platform deployment is exercised by this capability gate.
+
 ## 0.0.0-lab.13
 
 EF-5 freeze-candidate transport/error-model hardening after the full module audit:

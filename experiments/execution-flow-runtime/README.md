@@ -192,6 +192,26 @@ npm run test:mlxhub-production-live
 
 It is a single execution-flow correctness gate, not a benchmark. REASON is invoked only if the post-command FAST verification returns structured uncertainty.
 
+
+## Mobile platform-capability live evaluation
+
+The frozen Runtime semantics are also exercised against a small set of **mock platform inputs with the real configured MLXHub FAST model**. This gate is about whether the phone model is competent for bounded platform judgement tasks; it is not a Browser Host, Gateway, Approval, Task persistence, or Local Control integration test.
+
+```bash
+npm run test:mlxhub-capabilities-live
+```
+
+The live evaluation runs ten mock cases twice with a default 5-second cooldown between model requests:
+
+- Task/WorkItem candidate flow judgement: advance, retry, or block from supplied status/evidence facts;
+- approval-result feedback: continue only for a valid unexpired/unconsumed scoped grant, otherwise stop;
+- allow-listed script selection: return an exact `script_ref` / executable / argv tuple or fail closed with `NO_MATCH`;
+- Vision approval boundary: classify two bundled mock UI screenshots, requiring approval for external `SUBMIT_MESSAGE` and allowing read-only `OBSERVE_PAGE`.
+
+Text scenarios run through `execution.flow.v0` + the configured `mlxhub` inference backend. The Vision cases intentionally probe MLXHub `image_url` directly because the current frozen `execution.flow.v0` inference input is JSON/text-only; this test does **not** silently extend the Runtime protocol. A future multimodal Runtime contract, if needed, must be separately versioned.
+
+Acceptance is strict: every repeated result must match the expected structured output, both repeats of each case must be identical, approval false-negatives must be zero, no script reference may be invented, and every request must use the configured FAST model. `MLXHUB_CAPABILITY_EVAL_REPEATS` (1..3) and `MLXHUB_CAPABILITY_EVAL_COOLDOWN_MS` (0..30000) exist only for test control; defaults are 2 repeats and 5000 ms.
+
 ## Platform-aggregated deployment requirements
 
 This module is self-describing but not self-deploying. Its deployment contract is exposed only through:
