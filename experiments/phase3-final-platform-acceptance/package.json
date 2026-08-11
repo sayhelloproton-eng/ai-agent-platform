@@ -1,0 +1,25 @@
+{
+  "name": "@ai-agent-platform/phase3-final-platform-acceptance",
+  "version": "0.0.0-acceptance.1",
+  "private": true,
+  "type": "module",
+  "description": "Final Phase 3 acceptance harness: one durable Task crosses frozen Runtime/LCL/FAST and then real Browser Host human Approval before durable completion.",
+  "scripts": {
+    "check": "tsc -p tsconfig.json --noEmit",
+    "prepare:live": "tsx src/acceptance.ts prepare",
+    "approve:live": "tsx src/acceptance.ts approve",
+    "inspect": "tsx src/acceptance.ts inspect",
+    "clean": "tsx src/acceptance.ts clean"
+  },
+  "engines": {
+    "node": ">=20 <21",
+    "npm": ">=10 <11"
+  },
+  "dependencies": {
+    "tsx": "^4.19.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "typescript": "^5.9.3"
+  }
+}
