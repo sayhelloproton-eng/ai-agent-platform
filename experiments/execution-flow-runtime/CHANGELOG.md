@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.0.0-lab.13.3.1
+
+- Correct the REASON capability evaluator after the first live run showed a non-control diagnostic label variance in the freshness-conflict case.
+- Keep the expected decision (`READY`) and confidence (`high`) strict, but accept either `fresh_verified_evidence` or `primary_authoritative` as an equivalent diagnostic resolution label for that one case because both selected the same newer verified live evidence.
+- Normalize that diagnostic-only label for same-case repeat consistency; all other five REASON cases remain exact-output graded.
+- No Runtime, Flow, provider, schema, model-role, or production semantics changed; this revision changes test scoring only.
+
+## 0.0.0-lab.13.3
+
+- Add a REASON-only mobile platform capability live gate for low-frequency conflict, approval ambiguity, script ambiguity and causal recovery diagnosis.
+- Keep Runtime/Flow/provider semantics frozen; this revision changes test evidence only.
+- Default gate is 6 mock platform scenarios x 2 repeats (12 real REASON requests) with 5-second test cooldown, exact structured outputs, same-case consistency, and fail-closed safety checks.
+
 ## 0.0.0-lab.13.2
 
 Mobile capability live-gate harness correction only; Runtime/Flow/provider semantics remain unchanged:

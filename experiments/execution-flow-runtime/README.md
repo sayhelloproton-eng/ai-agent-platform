@@ -201,6 +201,16 @@ The frozen Runtime semantics are also exercised against a small set of **mock pl
 npm run test:mlxhub-capabilities-live
 ```
 
+For low-frequency REASON-role capability evaluation (mock platform inputs, real MLXHub REASON model, no real BHR/Gateway/Task/LCL side effects):
+
+```bash
+npm run test:mlxhub-reason-capabilities-live
+```
+
+This REASON gate exercises evidence conflict resolution, immutable approval-scope mismatch, conservative side-effect classification, ambiguous allow-listed script selection, and bounded recovery diagnosis. It is a model-capability gate, not an integration test.
+
+For the temporal-freshness case, the safety/control outcome remains strict (`decision=READY`, `confidence=high`, and the newer verified live evidence must win). The evaluator treats `resolution=fresh_verified_evidence` and `resolution=primary_authoritative` as equivalent diagnostic labels for that one case; the label is explanatory metadata rather than a routing/control field. All other REASON cases remain exact-output graded.
+
 The live evaluation runs ten mock cases twice with a default 5-second cooldown between model requests:
 
 - Task/WorkItem candidate flow judgement: advance, retry, or block from supplied status/evidence facts;

@@ -1,6 +1,6 @@
 {
   "name": "@ai-agent-platform/execution-flow-runtime",
-  "version": "0.0.0-lab.13.2",
+  "version": "0.0.0-lab.13.3.1",
   "description": "Spec-driven execution-flow runtime with bounded inference and capability execution.",
   "type": "module",
   "main": "./index.ts",
@@ -40,7 +40,8 @@
     "test:mlxhub-roles-live": "tsx --test live-tests/mlxhub-role-escalation-live.test.ts",
     "test:mlxhub-production-live": "tsx --test live-tests/mlxhub-production-flow-live.test.ts",
     "deployment:requirements": "tsx cli.ts deployment requirements --json",
-    "test:mlxhub-capabilities-live": "tsx --test live-tests/mlxhub-platform-capability-live.test.ts"
+    "test:mlxhub-capabilities-live": "tsx --test live-tests/mlxhub-platform-capability-live.test.ts",
+    "test:mlxhub-reason-capabilities-live": "tsx --test live-tests/mlxhub-reason-capability-live.test.ts"
   },
   "engines": {
     "node": ">=20 <21"
