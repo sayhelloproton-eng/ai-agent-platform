@@ -1,0 +1,94 @@
+{
+  "archive": "mobile-model-research-selection-testing-validation",
+  "generated_date": "2026-08-12",
+  "target_root": "docs/technical/技术方案/端侧模型/手机模型调研选型测试与验证全景归档",
+  "claim_classes": [
+    "FROZEN",
+    "VALIDATED",
+    "ACCEPTED",
+    "HISTORICAL",
+    "SUPERSEDED",
+    "INVALID-AS-VERDICT",
+    "OPEN"
+  ],
+  "primary_git_sources": [
+    "docs/technical/技术方案/端侧模型/端侧模型节点与单模型多角色服务构想与验证方案.md",
+    "docs/technical/技术方案/第二阶段/SOL-MOB-001-手机端单模型多角色服务MVP.md",
+    "docs/technical/技术方案/第三阶段/06-SOL-P3-MOB-001-端侧模型Provider接入边界.md",
+    "experiments/execution-flow-runtime/"
+  ],
+  "primary_evidence_assets": [
+    "EXP-MOB-001-手机端模型服务能力验证与实验记录-20260809.md",
+    "mob-tsk-context-vision-benchmark-v1-result.*",
+    "mob-production-candidate-validation-v3-result.*",
+    "mob-fast-sustained-freeze-v1-result.*",
+    "mob-fast-sustainable-freeze-v2-result.*",
+    "mob-fast-output-budget-benchmark-v1-result.*",
+    "mob-fast-output-budget-refine-v2-result.*",
+    "mob-reason-switch-benchmark-v1-result.*",
+    "mob-reason-compact-validation-v2-result.*",
+    "mob-entry-isolation-adapter-gate-v1-result.*",
+    "opencode-mlxhub-pure-crud-v2-result.*",
+    "mlxhub-full-result-20260809-134236.*",
+    "mlxhub-qwen35-official-capability-result-20260809-152116.*"
+  ],
+  "confirmed_primary_chats": [
+    {
+      "date": "2026-08-04~05",
+      "title": "SOL-MOB-001-手机端单模型多角色服务MVP"
+    },
+    {
+      "date": "2026-08-06",
+      "title": "SOL-MOB-001 继续"
+    },
+    {
+      "date": "2026-08-08",
+      "title": "Chat｜手机模型 Tool Calling、OpenCode 执行权限与 Browser Host 驱动边界"
+    },
+    {
+      "date": "2026-08-09",
+      "title": "Chat｜手机模型 Tool Calling、OpenCode 执行权限与 Browser Host 驱动边界-继续"
+    },
+    {
+      "date": "2026-08-10",
+      "title": "第三阶段的总纲"
+    },
+    {
+      "date": "2026-08-11",
+      "title": "第三阶段的总纲｜续接 01"
+    },
+    {
+      "date": "2026-08-11~12",
+      "title": "当前续接 Chat｜Execution Flow Runtime 手机能力收口与归档"
+    }
+  ],
+  "current_frozen": {
+    "runtime": "MLXHub LAN Server",
+    "device": "iPhone 17 Pro",
+    "fast": "sayhelloproton/Qwen3.5-4B-MLX-4bit-no-think",
+    "reason": "mlx-community/Qwen3.5-4B-MLX-4bit",
+    "execution_flow_runtime_version": "0.0.0-lab.13.3.1",
+    "finalization_commit_short": "47d5871",
+    "inference_concurrency": 1
+  },
+  "privacy": {
+    "secrets_included": false,
+    "lab_endpoint_values_treated_as_non_contract": true,
+    "raw_chat_export_claimed_complete": false
+  },
+  "bundle_documents": [
+    "01-研究路线与选型时间线.md",
+    "02-运行时与模型选型.md",
+    "03-API-Vision-Context-性能与稳定性验证.md",
+    "04-语义合同-Approval边界与安全验证.md",
+    "05-Tool-Proposal-OpenCode与执行权限.md",
+    "06-FAST-REASON角色与调度.md",
+    "07-Execution-Flow-Runtime手机能力验证.md",
+    "08-失败-误报-被替代结论与经验.md",
+    "09-实验资产与证据索引.md",
+    "10-Chat与记忆来源索引.md",
+    "11-当前冻结基线与后续使用约束.md",
+    "12-关键结论证据矩阵.md",
+    "README.md"
+  ]
+}
