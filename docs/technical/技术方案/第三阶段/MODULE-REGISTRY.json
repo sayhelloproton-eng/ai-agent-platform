@@ -1,0 +1,536 @@
+[
+  {
+    "moduleRef": "task-orchestration",
+    "domain": "task-orchestration",
+    "boundedContext": "task-orchestration",
+    "kind": "library/in-process runtime",
+    "purpose": "负责 Task/TaskGroup/Node/TaskRoleBinding/TaskDocument 的 Domain/Application Services。",
+    "subdomains": [
+      "task-lifecycle",
+      "task-chain",
+      "node-workflow",
+      "task-documents",
+      "message-event-audit"
+    ],
+    "provides": [],
+    "requires": [],
+    "capabilityBindingStatus": "NOT_FROZEN",
+    "packageRefs": [
+      "@ai-agent-platform/task-orchestration"
+    ],
+    "serviceRefs": [],
+    "processRefs": [],
+    "deploymentUnitRefs": [],
+    "externalResourceRefs": [],
+    "contractRefs": [
+      "TASK-ORCHESTRATION-TECH-TASK-ORCHESTRATION",
+      "TASK-DOC-02-01",
+      "TASK-DOC-02-02"
+    ],
+    "docs": "任务与编排领域/04-模块/task-orchestration/README.md",
+    "engineeringStatus": "DESIGNED"
+  },
+  {
+    "moduleRef": "task-store-sqlite",
+    "domain": "task-orchestration",
+    "boundedContext": "task-orchestration",
+    "kind": "library",
+    "purpose": "负责 Task Domain SQLite repository/store、transaction、version/idempotency 持久化；不拥有业务状态机定义。",
+    "subdomains": [
+      "task-lifecycle",
+      "task-chain",
+      "node-workflow",
+      "task-documents",
+      "message-event-audit"
+    ],
+    "provides": [],
+    "requires": [],
+    "capabilityBindingStatus": "NOT_FROZEN",
+    "packageRefs": [
+      "@ai-agent-platform/task-store-sqlite"
+    ],
+    "serviceRefs": [],
+    "processRefs": [],
+    "deploymentUnitRefs": [],
+    "externalResourceRefs": [],
+    "contractRefs": [
+      "TASK-ORCHESTRATION-TECH-TASK-STORE-SQLITE",
+      "TASK-DOC-03-03",
+      "TASK-DOC-03-02"
+    ],
+    "docs": "任务与编排领域/04-模块/task-store-sqlite/README.md",
+    "engineeringStatus": "DESIGNED"
+  },
+  {
+    "moduleRef": "task-migration-runner",
+    "domain": "task-orchestration",
+    "boundedContext": "task-orchestration",
+    "kind": "cli/library",
+    "purpose": "负责 schema migration discovery/order/version/re-entry/verification；不承担 Task runtime。",
+    "subdomains": [],
+    "provides": [],
+    "requires": [],
+    "capabilityBindingStatus": "NOT_FROZEN",
+    "packageRefs": [
+      "@ai-agent-platform/task-migration-runner"
+    ],
+    "serviceRefs": [],
+    "processRefs": [],
+    "deploymentUnitRefs": [],
+    "externalResourceRefs": [],
+    "contractRefs": [
+      "TASK-ORCHESTRATION-TECH-TASK-MIGRATION-RUNNER",
+      "TASK-DOC-05-02"
+    ],
+    "docs": "任务与编排领域/04-模块/task-migration-runner/README.md",
+    "engineeringStatus": "DESIGNED"
+  },
+  {
+    "moduleRef": "agent-runtime",
+    "domain": "agent-runtime-collaboration",
+    "boundedContext": "agent-runtime-collaboration",
+    "kind": "library/in-process runtime",
+    "purpose": "platform-host 进程内装配的 Agent Domain runtime，承载 Role Registry、Role credential domain service、Collaboration Message Center 与 Agent Public API。",
+    "subdomains": [],
+    "provides": [],
+    "requires": [],
+    "capabilityBindingStatus": "NOT_FROZEN",
+    "packageRefs": [
+      "@ai-agent-platform/agent-runtime"
+    ],
+    "serviceRefs": [],
+    "processRefs": [],
+    "deploymentUnitRefs": [],
+    "externalResourceRefs": [],
+    "contractRefs": [
+      "AGENT-RUNTIME-COLLABORATION-TECH-AGENT-RUNTIME",
+      "AGENT-DOC-02-01",
+      "AGENT-DOC-03-01",
+      "AGENT-DOC-03-03",
+      "AGENT-DOC-03-05"
+    ],
+    "docs": "智能体运行与协作领域/04-模块/agent-runtime/README.md",
+    "engineeringStatus": "DESIGNED"
+  },
+  {
+    "moduleRef": "agent-gateway",
+    "domain": "agent-runtime-collaboration",
+    "boundedContext": "agent-runtime-collaboration",
+    "kind": "service",
+    "purpose": "负责 Custom GPT Action public ingress、authentication、role identity、request/schema validation、Action routing、protocol adaptation 与 result normalization；不拥有下游领域业务。",
+    "subdomains": [],
+    "provides": [],
+    "requires": [],
+    "capabilityBindingStatus": "NOT_FROZEN",
+    "packageRefs": [
+      "@ai-agent-platform/agent-gateway"
+    ],
+    "serviceRefs": [
+      "agent-gateway"
+    ],
+    "processRefs": [
+      "agent-gateway-process"
+    ],
+    "deploymentUnitRefs": [],
+    "externalResourceRefs": [
+      "dev-tunnel"
+    ],
+    "contractRefs": [
+      "AGENT-AGENT-GATEWAY-TECH-DESIGN",
+      "AGENT-DOC-02-01",
+      "AGENT-DOC-02-02"
+    ],
+    "docs": "智能体运行与协作领域/04-模块/agent-gateway/README.md",
+    "engineeringStatus": "DESIGNED"
+  },
+  {
+    "moduleRef": "agent-product",
+    "domain": "agent-runtime-collaboration",
+    "boundedContext": "agent-runtime-collaboration",
+    "kind": "agent-package",
+    "purpose": "产品 Role Agent Package；包含 Custom GPT 创建材料、Instructions/Knowledge/Actions requirements 与 role registration 管理。",
+    "subdomains": [],
+    "provides": [],
+    "requires": [],
+    "capabilityBindingStatus": "NOT_FROZEN",
+    "packageRefs": [
+      "@ai-agent-platform/agent-product"
+    ],
+    "serviceRefs": [],
+    "processRefs": [],
+    "deploymentUnitRefs": [],
+    "externalResourceRefs": [
+      "chatgpt-carrier"
+    ],
+    "contractRefs": [
+      "AGENT-RUNTIME-COLLABORATION-TECH-AGENT-PRODUCT",
+      "AGENT-DOC-02-03"
+    ],
+    "docs": "智能体运行与协作领域/04-模块/agent-product/README.md",
+    "engineeringStatus": "DESIGNED"
+  },
+  {
+    "moduleRef": "agent-controller-dev",
+    "domain": "agent-runtime-collaboration",
+    "boundedContext": "agent-runtime-collaboration",
+    "kind": "agent-package",
+    "purpose": "总控/研发 Role Agent Package；载体与权限要求由 Agent Package/Action matrix 约束。",
+    "subdomains": [],
+    "provides": [],
+    "requires": [],
+    "capabilityBindingStatus": "NOT_FROZEN",
+    "packageRefs": [
+      "@ai-agent-platform/agent-controller-dev"
+    ],
+    "serviceRefs": [],
+    "processRefs": [],
+    "deploymentUnitRefs": [],
+    "externalResourceRefs": [
+      "chatgpt-carrier"
+    ],
+    "contractRefs": [
+      "AGENT-RUNTIME-COLLABORATION-TECH-AGENT-CONTROLLER-DEV",
+      "AGENT-DOC-02-03"
+    ],
+    "docs": "智能体运行与协作领域/04-模块/agent-controller-dev/README.md",
+    "engineeringStatus": "DESIGNED"
+  },
+  {
+    "moduleRef": "agent-test-ops",
+    "domain": "agent-runtime-collaboration",
+    "boundedContext": "agent-runtime-collaboration",
+    "kind": "agent-package",
+    "purpose": "测试/运维 Role Agent Package；载体与权限要求由 Agent Package/Action matrix 约束。",
+    "subdomains": [],
+    "provides": [],
+    "requires": [],
+    "capabilityBindingStatus": "NOT_FROZEN",
+    "packageRefs": [
+      "@ai-agent-platform/agent-test-ops"
+    ],
+    "serviceRefs": [],
+    "processRefs": [],
+    "deploymentUnitRefs": [],
+    "externalResourceRefs": [
+      "chatgpt-carrier"
+    ],
+    "contractRefs": [
+      "AGENT-RUNTIME-COLLABORATION-TECH-AGENT-TEST-OPS",
+      "AGENT-DOC-02-03"
+    ],
+    "docs": "智能体运行与协作领域/04-模块/agent-test-ops/README.md",
+    "engineeringStatus": "DESIGNED"
+  },
+  {
+    "moduleRef": "execution-contracts",
+    "domain": "execution",
+    "boundedContext": "execution",
+    "kind": "library",
+    "purpose": "薄 Public Contract Module，只包含 TS DTO/schema/error/ref/version 等公共合同，不承担 Runtime。",
+    "subdomains": [],
+    "provides": [],
+    "requires": [],
+    "capabilityBindingStatus": "NOT_FROZEN",
+    "packageRefs": [
+      "@ai-agent-platform/execution-contracts"
+    ],
+    "serviceRefs": [],
+    "processRefs": [],
+    "deploymentUnitRefs": [],
+    "externalResourceRefs": [],
+    "contractRefs": [
+      "EXECUTION-TECH-EXECUTION-CONTRACTS",
+      "EXECUTION-DOC-02-01",
+      "EXECUTION-DOC-02-02"
+    ],
+    "docs": "执行领域/04-模块/execution-contracts/README.md",
+    "engineeringStatus": "DESIGNED"
+  },
+  {
+    "moduleRef": "execution-runtime",
+    "domain": "execution",
+    "boundedContext": "execution",
+    "kind": "service",
+    "purpose": "Execution Domain 唯一后端服务与控制真源，负责受控执行决策、Execution 生命周期持久化、Executor 调度与结果收敛。",
+    "subdomains": [],
+    "provides": [],
+    "requires": [],
+    "capabilityBindingStatus": "NOT_FROZEN",
+    "packageRefs": [
+      "@ai-agent-platform/execution-runtime"
+    ],
+    "serviceRefs": [
+      "execution-runtime"
+    ],
+    "processRefs": [
+      "execution-runtime-process"
+    ],
+    "deploymentUnitRefs": [],
+    "externalResourceRefs": [],
+    "contractRefs": [
+      "EXECUTION-EXECUTION-RUNTIME-TECH-DESIGN",
+      "EXECUTION-DOC-02-01",
+      "EXECUTION-DOC-02-02",
+      "EXECUTION-DOC-03-01",
+      "EXECUTION-DOC-03-03"
+    ],
+    "docs": "执行领域/04-模块/execution-runtime/README.md",
+    "engineeringStatus": "DESIGNED"
+  },
+  {
+    "moduleRef": "execution-local",
+    "domain": "execution",
+    "boundedContext": "execution",
+    "kind": "library",
+    "purpose": "本机真实 Executor，v1 作为 npm library 被 execution-runtime 同进程加载；不拥有 Policy/Approval/Task/Model 业务逻辑。",
+    "subdomains": [],
+    "provides": [],
+    "requires": [],
+    "capabilityBindingStatus": "NOT_FROZEN",
+    "packageRefs": [
+      "@ai-agent-platform/execution-local"
+    ],
+    "serviceRefs": [],
+    "processRefs": [],
+    "deploymentUnitRefs": [],
+    "externalResourceRefs": [],
+    "contractRefs": [
+      "EXECUTION-EXECUTION-LOCAL-TECH-DESIGN",
+      "EXECUTION-DOC-02-01"
+    ],
+    "docs": "执行领域/04-模块/execution-local/README.md",
+    "engineeringStatus": "DESIGNED"
+  },
+  {
+    "moduleRef": "execution-browser-extension",
+    "domain": "execution",
+    "boundedContext": "execution",
+    "kind": "browser-extension",
+    "purpose": "Execution Domain 的 Browser Executor、Evidence Provider、Task Driver carrier coordinator 与 P0 Side Panel；不是 Task/Agent 业务真源。",
+    "subdomains": [],
+    "provides": [],
+    "requires": [],
+    "capabilityBindingStatus": "NOT_FROZEN",
+    "packageRefs": [
+      "@ai-agent-platform/execution-browser-extension"
+    ],
+    "serviceRefs": [],
+    "processRefs": [],
+    "deploymentUnitRefs": [
+      "chrome-extension"
+    ],
+    "externalResourceRefs": [
+      "chrome-runtime",
+      "chatgpt-carrier"
+    ],
+    "contractRefs": [
+      "EXECUTION-EXECUTION-BROWSER-EXTENSION-TECH-DESIGN",
+      "EXECUTION-DOC-02-01",
+      "EXECUTION-DOC-02-02"
+    ],
+    "docs": "执行领域/04-模块/execution-browser-extension/README.md",
+    "engineeringStatus": "DESIGNED"
+  },
+  {
+    "moduleRef": "model-contracts",
+    "domain": "model-reasoning",
+    "boundedContext": "model-reasoning",
+    "kind": "library",
+    "purpose": "薄 Public Contract Module，定义 infer/getRuntimeStatus 及 typed Reasoning/health DTO，不承担 provider/runtime。",
+    "subdomains": [],
+    "provides": [],
+    "requires": [],
+    "capabilityBindingStatus": "NOT_FROZEN",
+    "packageRefs": [
+      "@ai-agent-platform/model-contracts"
+    ],
+    "serviceRefs": [],
+    "processRefs": [],
+    "deploymentUnitRefs": [],
+    "externalResourceRefs": [],
+    "contractRefs": [
+      "MODEL-REASONING-TECH-MODEL-CONTRACTS",
+      "MODEL-DOC-02-01",
+      "MODEL-DOC-02-02"
+    ],
+    "docs": "模型与推理领域/04-模块/model-contracts/README.md",
+    "engineeringStatus": "DESIGNED"
+  },
+  {
+    "moduleRef": "model-runtime",
+    "domain": "model-reasoning",
+    "boundedContext": "model-reasoning",
+    "kind": "service",
+    "purpose": "Model Domain 唯一服务，对外提供受规范约束的 inference 能力与 runtime status；不是 Agent 或 Workflow Engine。",
+    "subdomains": [],
+    "provides": [],
+    "requires": [
+      "model.provider.api"
+    ],
+    "capabilityBindingStatus": "FROZEN",
+    "packageRefs": [
+      "@ai-agent-platform/model-runtime"
+    ],
+    "serviceRefs": [
+      "model-runtime"
+    ],
+    "processRefs": [
+      "model-runtime-process"
+    ],
+    "deploymentUnitRefs": [],
+    "externalResourceRefs": [
+      "model-provider-api"
+    ],
+    "contractRefs": [
+      "MODEL-MODEL-RUNTIME-TECH-DESIGN",
+      "MODEL-DOC-02-01",
+      "MODEL-DOC-02-02"
+    ],
+    "docs": "模型与推理领域/04-模块/model-runtime/README.md",
+    "engineeringStatus": "DESIGNED"
+  },
+  {
+    "moduleRef": "module-contract",
+    "domain": "deployment-governance",
+    "boundedContext": "deployment-governance",
+    "kind": "library",
+    "purpose": "用最少类型描述平台如何治理一个 Module；不承载部署执行逻辑，不做动态 Registry Service。",
+    "subdomains": [],
+    "provides": [],
+    "requires": [],
+    "capabilityBindingStatus": "NOT_FROZEN",
+    "packageRefs": [
+      "@ai-agent-platform/module-contract"
+    ],
+    "serviceRefs": [],
+    "processRefs": [],
+    "deploymentUnitRefs": [],
+    "externalResourceRefs": [],
+    "contractRefs": [
+      "DEPLOYMENT-MODULE-CONTRACT-TECH-DESIGN"
+    ],
+    "docs": "部署领域/04-模块/module-contract/README.md",
+    "engineeringStatus": "DESIGNED"
+  },
+  {
+    "moduleRef": "module-template",
+    "domain": "deployment-governance",
+    "boundedContext": "deployment-governance",
+    "kind": "library",
+    "purpose": "所有新 Module 的标准工程起点与已有 Module 的持续治理版本基线。",
+    "subdomains": [],
+    "provides": [],
+    "requires": [],
+    "capabilityBindingStatus": "NOT_FROZEN",
+    "packageRefs": [
+      "@ai-agent-platform/module-template"
+    ],
+    "serviceRefs": [],
+    "processRefs": [],
+    "deploymentUnitRefs": [],
+    "externalResourceRefs": [],
+    "contractRefs": [
+      "DEPLOYMENT-MODULE-TEMPLATE-TECH-DESIGN"
+    ],
+    "docs": "部署领域/04-模块/module-template/README.md",
+    "engineeringStatus": "DESIGNED"
+  },
+  {
+    "moduleRef": "deployment-conformance",
+    "domain": "deployment-governance",
+    "boundedContext": "deployment-governance",
+    "kind": "library/cli",
+    "purpose": "验证 Module 是否可被平台以统一、稳定、可升级的方式管理；不替代领域业务测试。",
+    "subdomains": [],
+    "provides": [],
+    "requires": [],
+    "capabilityBindingStatus": "NOT_FROZEN",
+    "packageRefs": [
+      "@ai-agent-platform/deployment-conformance"
+    ],
+    "serviceRefs": [],
+    "processRefs": [],
+    "deploymentUnitRefs": [],
+    "externalResourceRefs": [],
+    "contractRefs": [
+      "DEPLOYMENT-DEPLOYMENT-CONFORMANCE-TECH-DESIGN"
+    ],
+    "docs": "部署领域/04-模块/deployment-conformance/README.md",
+    "engineeringStatus": "DESIGNED"
+  },
+  {
+    "moduleRef": "platform-cli",
+    "domain": "deployment-governance",
+    "boundedContext": "deployment-governance",
+    "kind": "cli-app",
+    "purpose": "Deployment Domain 唯一平台级确定性应用，只理解 Module Contract 与公开 lifecycle/verification contract。",
+    "subdomains": [],
+    "provides": [],
+    "requires": [],
+    "capabilityBindingStatus": "NOT_FROZEN",
+    "packageRefs": [
+      "@ai-agent-platform/platform-cli"
+    ],
+    "serviceRefs": [],
+    "processRefs": [],
+    "deploymentUnitRefs": [],
+    "externalResourceRefs": [],
+    "contractRefs": [
+      "DEPLOYMENT-PLATFORM-CLI-TECH-DESIGN",
+      "DEPLOYMENT-DOC-02-01"
+    ],
+    "docs": "部署领域/04-模块/platform-cli/README.md",
+    "engineeringStatus": "DESIGNED"
+  },
+  {
+    "moduleRef": "module-skill",
+    "domain": "deployment-governance",
+    "boundedContext": "deployment-governance",
+    "kind": "agent-skill",
+    "purpose": "AI 开发辅助 Module/Skill，用 Contract/Template/Conformance 帮助创建与升级 Module；不是 Runtime 或部署控制面。",
+    "subdomains": [],
+    "provides": [],
+    "requires": [],
+    "capabilityBindingStatus": "NOT_FROZEN",
+    "packageRefs": [
+      "@ai-agent-platform/module-skill"
+    ],
+    "serviceRefs": [],
+    "processRefs": [],
+    "deploymentUnitRefs": [],
+    "externalResourceRefs": [],
+    "contractRefs": [
+      "DEPLOYMENT-GOVERNANCE-TECH-MODULE-SKILL"
+    ],
+    "docs": "部署领域/04-模块/module-skill/README.md",
+    "engineeringStatus": "DESIGNED"
+  },
+  {
+    "moduleRef": "platform-host",
+    "domain": "platform",
+    "boundedContext": null,
+    "kind": "application-composition-root",
+    "purpose": "本地 Application Composition Root：装配独立 Task/Agent package，注入 Execution/Model client，提供本地 transport、startup/shutdown 与轻量 health aggregation。",
+    "subdomains": [],
+    "provides": [],
+    "requires": [],
+    "capabilityBindingStatus": "NOT_FROZEN",
+    "packageRefs": [
+      "@ai-agent-platform/platform-host"
+    ],
+    "serviceRefs": [
+      "platform-host"
+    ],
+    "processRefs": [
+      "platform-host-process"
+    ],
+    "deploymentUnitRefs": [],
+    "externalResourceRefs": [],
+    "contractRefs": [
+      "PLATFORM-HOST-TECH-DESIGN",
+      "PLATFORM-HOST-COMPOSITION-ROOT"
+    ],
+    "docs": "平台架构与公共约定/05-平台模块/platform-host/README.md",
+    "engineeringStatus": "DESIGNED"
+  }
+]

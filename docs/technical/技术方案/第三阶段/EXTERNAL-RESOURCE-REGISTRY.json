@@ -1,0 +1,64 @@
+[
+  {
+    "moduleRef": "chatgpt-carrier",
+    "kind": "external-resource",
+    "owner": "deployment-governance",
+    "consumers": [
+      "agent-product",
+      "agent-controller-dev",
+      "agent-test-ops",
+      "execution-browser-extension"
+    ],
+    "provides": [],
+    "capabilityBindingStatus": "NOT_FROZEN",
+    "contractRefs": [
+      "PLATFORM-EXTERNAL-RESOURCE-MODULES",
+      "DEPLOYMENT-DOC-04"
+    ]
+  },
+  {
+    "moduleRef": "chrome-runtime",
+    "kind": "external-resource",
+    "owner": "deployment-governance",
+    "consumers": [
+      "execution-browser-extension"
+    ],
+    "provides": [],
+    "capabilityBindingStatus": "NOT_FROZEN",
+    "contractRefs": [
+      "PLATFORM-EXTERNAL-RESOURCE-MODULES",
+      "DEPLOYMENT-DOC-04"
+    ]
+  },
+  {
+    "moduleRef": "dev-tunnel",
+    "kind": "external-resource",
+    "owner": "deployment-governance",
+    "consumers": [
+      "agent-gateway"
+    ],
+    "provides": [],
+    "capabilityBindingStatus": "NOT_FROZEN",
+    "contractRefs": [
+      "PLATFORM-EXTERNAL-RESOURCE-MODULES",
+      "DEPLOYMENT-DOC-04"
+    ]
+  },
+  {
+    "moduleRef": "model-provider-api",
+    "kind": "external-resource",
+    "owner": "deployment-governance",
+    "consumers": [
+      "model-runtime"
+    ],
+    "provides": [
+      "model.provider.api"
+    ],
+    "capabilityBindingStatus": "FROZEN",
+    "contractRefs": [
+      "PLATFORM-EXTERNAL-RESOURCE-MODULES",
+      "DEPLOYMENT-DOC-04",
+      "MODEL-MODEL-RUNTIME-TECH-DESIGN"
+    ]
+  }
+]
