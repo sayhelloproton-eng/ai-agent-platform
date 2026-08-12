@@ -29,20 +29,19 @@ module-skill
 - Deployment v1 不使用 SQLite；repo-local files 足够；
 - persisted state 不能冒充 runtime reality；
 - 不建设 Workflow Engine、Marketplace、K8s、自动 rollback、Vault；
-- Composition Root 仍必须在五领域最终总纲裁决。
+- Composition Root 已由 ALIGN 冻结为 `@ai-agent-platform/platform-host`；本条原 handoff 已完成。
 
-## 3. 下一步
+## 3. 下一步（POST-ALIGNMENT）
 
-进入 Phase 3 五领域最终总纲：
+> 原“进入五领域最终总纲 / 冻结 Composition Root”步骤已经 COMPLETED，不得在后续 Chat 重开。
 
-1. 汇总五领域 Package/Service/Deployment Unit；
-2. 冻结 Application Composition Root；
-3. 冻结真实本地进程/端口/公开入口拓扑；
-4. 完成 Provides/Requires 全局矩阵；
-5. 将全部内部与外部资源映射为 Module Graph；
-6. 生成新仓库 monorepo/package layout；
-7. 生成第一版 platform deployment target set；
-8. 制定新仓库实现顺序与跨领域 E2E Gate。
+当前下一步：
+
+1. 以 ALIGN-001～250 修复后的五领域文档作为唯一 normative design baseline；
+2. 生成/落地新仓库 monorepo package layout，保持所有领域应用能力独立 npm package；
+3. 由 Deployment Module Graph 物化第一版 target set 与 configSlots/moduleRef；
+4. 按 package/module scope 实施，并通过 Domain Test + Conformance + 受影响 Cross-domain E2E；
+5. OpenAI Carrier 未验证能力继续按 `PENDING_SPIKE` 管理。
 
 ## 4. 真源
 

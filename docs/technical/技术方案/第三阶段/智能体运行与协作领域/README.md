@@ -25,7 +25,7 @@
 
 # 1. 一句话领域定义
 
-> **智能体运行与协作领域负责 Agent Package、部署后的 Role/认证、具体 Worker 的 Carrier 身份语义、Custom GPT 公网 Gateway、跨角色 Collaboration，以及驱动这些能力所需的 Browser/Dev Tunnel 独立适配单元；Task Workflow 与真实执行副作用仍由对应领域拥有。**
+> **智能体运行与协作领域负责 Agent Package、Role/认证、Worker/Conversation identity、Custom GPT 公网 Gateway 与 logical Collaboration。Browser Extension 唯一归 Execution；Dev Tunnel 归 Deployment External Resource Module（ALIGN-008/029）。**
 
 ---
 
@@ -86,7 +86,7 @@ Task B → Product-B / Dev-B / Test-B
 用户主动进入新的 Product GPT Conversation
 → 充分沟通
 → 形成需求
-→ 通过 Carrier Context Action 获取当前 worker identity（具体 c-id/url 机制需真实 E2E）
+→ 获取当前 worker identity；Carrier Context Action 是优先 PENDING_SPIKE 路径，当前不得假设 Action 能提供稳定 c-id/url，可靠来源由 Browser/Carrier E2E 证明
 → listRegisteredRoles
 → 按 agentPackageRef 找 product/dev/test roleRef
 → createTask(product role+worker, dev role, test role, requirement...)
@@ -202,7 +202,7 @@ Agent Runtime、Task、Execution、Browser bridge、SQLite、Local Resource API 
 
 ---
 
-# 10. 七个独立发布/部署单元
+# 10. [DEPRECATED OWNERSHIP / Superseded by ALIGN-008/029] 原七个独立发布/部署单元
 
 ```text
 agent-runtime
@@ -314,8 +314,8 @@ Browser real side effects/Delivery/Receipt
 
 ```text
 Task-level roleBindings / binding API
-Task approval→dev/test bind→formal execution exact sequence
-startNode↔NODE_READY exactly-once
+Task authorization→dev/test provisioning/bind→startTask→startNode→WAKE exact sequence
+startNode↔NODE_READY idempotent/effectively-once（不承诺端到端 exactly-once）
 Product current c-id/url Carrier E2E
 Execution Local Resource contract
 Package lifecycle common contract

@@ -98,3 +98,11 @@ required dependency/verify/runtime 失败。
 ## 7. 禁止假 READY
 
 历史 state、上次 heartbeat、上次 verify 不能替代当前 reality。Manifest/status 必须明确 freshness/observedAt。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：Platform READY
+
+Platform READY = required modules 已安装/配置 + logical dependencies resolved + required runtimes 当前 READY + installed version verify PASS + cross-module verification PASS + blocking ACTION_REQUIRED=0。Deployment state.json/last-online 绝不冒充 current reality；Gateway ONLINE 也不等于 Platform READY。

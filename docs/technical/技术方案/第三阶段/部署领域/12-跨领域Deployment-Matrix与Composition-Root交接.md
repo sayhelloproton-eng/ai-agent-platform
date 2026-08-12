@@ -56,16 +56,25 @@ Provider 可是同一个 API，也可以两个不同 API；Deployment 管实例�
 
 其他进入平台运行链的外部资源也必须按同规则成为 Module。
 
-## 6. Application Composition Root（留给五领域总纲）
+## 6. Application Composition Root（RESOLVED by ALIGN）
 
-尚未由单领域擅自冻结：
+> **Historical handoff：** 本节原问题“哪个本地应用进程承载 in-process libraries”已由 ALIGN-022～030/223/230 关闭，不再是待裁决项。
 
-> 哪个本地应用进程装配 Task、Agent、Execution 等 in-process libraries，并作为真正 Deployment Unit 运行？
+正式结论：
 
-必须在五领域总纲中统一裁决，因为它跨越多个领域的物理进程边界。
+- `@ai-agent-platform/platform-host` = Application Composition Root / Local Platform Host；
+- 不为方便自动创建 `task-service / agent-service`；
+- Task Runtime、Agent Runtime 等仍是独立 npm package，由 host in-process 装配；
+- platform-host 作为普通 service Module/Deployment Unit 被 Deployment 治理；
+- Execution Runtime、Model Runtime、Agent Gateway 保持独立 Process/Deployment Unit；
+- library Module 继续保持 library 身份，不伪造 start/stop。
 
-Deployment 的约束：
+---
 
-- 不为方便自动创建 task-service/agent-service；
-- 总纲一旦冻结 Composition Root，Deployment 将其作为普通 service Module/Deployment Unit 管理；
-- 原本 in-process libraries 继续保持 library Module 身份。
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 最终 Composition Root 裁决回填
+
+Application Composition Root 正式冻结为独立 npm package `@ai-agent-platform/platform-host`：只 instantiate / dependency injection / local transport / startup-shutdown / light health aggregation；不拥有任何业务状态。Task Runtime 与 Agent Runtime 各自仍是独立 npm package并由 host in-process 装配；Execution Runtime、Model Runtime、Agent Gateway 保持独立 Process/Deployment Unit。任何领域 package 不得反向依赖 platform-host。
+
+v1 概念运行拓扑：External Resources → model-runtime/execution-runtime → platform-host → agent-gateway → browser-extension/carrier verification；实际并行启动由 Requires/Provides 图计算，不硬编码脚本。

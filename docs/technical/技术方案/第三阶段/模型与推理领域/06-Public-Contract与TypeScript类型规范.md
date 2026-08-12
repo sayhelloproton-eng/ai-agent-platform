@@ -147,3 +147,11 @@ specRef
 ```
 
 不会退化为 `data: Record<string, unknown>` 的全平台弱合同。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：Public Contract
+
+核心 Public API 冻结为 `infer()` + `getRuntimeStatus()`；历史 `judgeFast/judgeReason/visionJudge` 等名称如仍出现仅视为旧实验/非 normative。Contract name/version/error envelope/runtime validation 与平台公共约定一致。Capability Proposal 最多一个，只能从 caller allowlist 选择，不是 Tool Call/Execution authorization。

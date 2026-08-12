@@ -75,3 +75,11 @@ v1 不建设 metrics DB。
 ## 7. [DEFERRED] 管理 UI
 
 Model Domain 定义 RuntimeStatus；最终是否在管理控制台或 Browser Side Panel 显示，由总纲/Deployment 决定，不新增 Model UI 服务。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：fresh health / no global status
+
+READY/DEGRADED/UNAVAILABLE 必须来自当前可验证 runtime/provider reality；持久化 last-ready 不冒充 current health。Model status 只属于 Model，不映射为 Task/Execution/Platform 全局万能 Status；Deployment 只聚合 verify 结果。

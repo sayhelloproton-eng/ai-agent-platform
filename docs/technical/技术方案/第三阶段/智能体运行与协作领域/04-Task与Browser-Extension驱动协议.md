@@ -1,7 +1,7 @@
 # 智能体运行与协作领域｜Task 与 Browser Extension 驱动协议
 
-> 文档状态：**v0.2 CONFIRMED BUSINESS FLOW / EXACT TASK OPS REQUIRE CROSS-DOMAIN AUDIT**  
-> Browser Extension 是 Driver/Adapter，不拥有 Task Workflow。
+> 文档状态：**v0.2 / HISTORICAL CARRIER FLOW + POST-ALIGNMENT EXECUTION OWNERSHIP**  
+> **Superseded ownership rule：** Browser Extension 唯一归 Execution Domain；本文件保留 Agent 侧 Worker/Carrier 协作历史细节。Extension 本体只连接 Execution Runtime；涉及 Task/Agent Public Contract 的 Task Driver/Delivery coordination 由 Execution Runtime/application flow 完成，Extension 不直接连接 Task/Agent Store。
 
 ---
 
@@ -188,7 +188,7 @@ Task Domain 判定 Node READY 后，Extension：
 → 读取 Task role binding 得到原 workerRef
 → getRegisteredRole(roleRef)
 → 打开/恢复正确 Conversation
-→ 以 exactly-once/幂等语义投递 NODE_READY
+→ 以 idempotent / effectively-once 边界投递 NODE_READY；不承诺端到端 exactly-once
 ```
 
 Worker 可以：
@@ -284,7 +284,7 @@ Collaboration Message Center
 MUST NOT 创建 Worker
 ```
 
-Worker 创建只能来自 Task-driven Browser Extension 的执行初始化流程。
+Worker 的真实 Conversation CREATE 只能来自 Execution-owned Browser provisioning flow；Agent 校验 Worker identity，Task 通过 Public Contract 固化 TaskRoleBinding。
 
 ---
 
@@ -306,7 +306,20 @@ COMPLETED / TERMINATED / 其他 Task Domain 终态
 ```text
 Browser Extension
 → local-platform-token
-→ local Agent Runtime / Task / Browser bridge
+→ Execution Runtime Browser protocol surface
+→ Execution Runtime 通过 Public Contract/client 协调 Task / Agent
 ```
 
 不使用 Role Bearer Key。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：Browser 已转交 Execution Domain
+
+> 文件保留，因为其中包含已确认的 Product/Dev/Test Worker 主链与 Carrier 现实细节；但从本补丁起，历史正文中的 “Browser Extension” **一律按 Execution Domain browser path 理解**，不再属于 Agent Domain package ownership。Extension 本体只对接 Execution Runtime；跨域 Task/Agent 调用发生在 runtime/application layer。
+
+正式 provisioning：Task authorization → Execution Browser CREATE/识别 c-id → Agent 接受/校验 Worker identity → Task `bindTaskWorker` 写 TaskRoleBinding → required bindings 齐全后 startTask。CREATE 成功不等于 Task binding 成功。
+
+WAKE 只代表恢复既有 Worker Conversation 并注入最小 trigger/identity；不代表 Node/Action/Effect 已成功。Task 状态推进始终通过 Task Public API。

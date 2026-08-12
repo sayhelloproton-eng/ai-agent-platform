@@ -62,6 +62,7 @@ STOP：若 sqlite driver 在当前 Mac 不可稳定安装，不继续 Task 实�
 - [ ] task_groups
 - [ ] tasks
 - [ ] nodes
+- [ ] task_role_bindings
 - [ ] node_execution_history
 - [ ] task_documents
 - [ ] task_messages
@@ -74,6 +75,7 @@ Repositories：
 - [ ] TaskGroupRepository
 - [ ] TaskRepository
 - [ ] NodeRepository
+- [ ] TaskRoleBindingRepository
 - [ ] NodeExecutionHistoryRepository
 - [ ] TaskDocumentRepository
 - [ ] TaskMessageRepository
@@ -89,6 +91,8 @@ Repositories：
 - [ ] createTaskGroup
 - [ ] startTaskGroup
 - [ ] createTask
+- [ ] authorizeTask
+- [ ] bindTaskWorker
 - [ ] startTask
 - [ ] pauseTask
 - [ ] resumeTask
@@ -252,9 +256,9 @@ Task1 PAUSED → Task2 cannot start
 
 # 15. P1｜Agent Domain Integration
 
-Agent Domain 根据 `requiredRoleRef` 选择具体 `workerRef`；Task Domain 用 `startNode` 记录 workerRef。
+Worker provisioning 按冻结主链执行：Execution Browser 真实 CREATE/RESTORE Conversation → Agent 校验 Worker identity → Task `bindTaskWorker` 写稳定 TaskRoleBinding → `startNode` 自动解析该 binding 的 `workerRef`。
 
-验证：Role 不是全局锁；同 Role 的不同 Worker 可以处理不同 Task；Task 不读取 Agent Session 内部状态。
+验证：Role 不是全局锁；同 Role 的不同 Worker 可以处理不同 Task；Task 不读取 Agent Conversation / Registry 内部状态。
 
 ---
 
@@ -319,3 +323,11 @@ WebSocket push
 复杂 RBAC
 复杂 Document Version Service
 ```
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：新增实施/验收门
+
+在既有 TODO 基础上增加：TaskRoleBinding schema/API、PENDING→human authorization→READY→startTask 主链、startNode binding resolution、platform-host in-process composition、provider/consumer contract tests、跨领域 Worker provisioning 与 reopen E2E。任何触及 Public Contract/状态语义的实现必须运行受影响跨域 E2E。

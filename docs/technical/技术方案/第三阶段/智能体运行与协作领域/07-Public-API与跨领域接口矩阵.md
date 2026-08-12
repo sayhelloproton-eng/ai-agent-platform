@@ -313,7 +313,7 @@ Agent Domain 不实现这些底层动作。
 
 # 9. Agent Domain Requires：Deployment Domain
 
-Agent Domain 已冻结七个独立发布单元，并要求每个包自己形成 setup/config/account/login/bind/lifecycle/verify 闭环。
+**Superseded by ALIGN-008/029：** 原七单元 ownership 已拆分；Agent 自有 packages、Execution Browser Module、Deployment External Resource Module 分别进入统一 Module Governance。
 
 Deployment Domain 需要提供统一的 **Package Lifecycle Protocol / Platform CLI orchestration**：
 
@@ -349,35 +349,38 @@ Custom GPT Web setup implementation
 
 ---
 
-# 10. Agent Domain ↔ Browser Extension
+# 10. Agent Domain ↔ Execution-owned Browser path
 
-## Agent provides to Extension
+> **Superseded transport boundary：** Browser Extension 本体只连接 Execution Runtime Browser protocol surface；下列 Agent/Task Public Contract 由 Execution Runtime 的 Task Driver / Browser coordination flow 调用，Extension 不直接连接 Task/Agent Store 或 runtime internals。
+
+## Agent provides to Execution Runtime / application flow
 
 ```text
-getRegisteredRole
+getRegisteredRole / Worker identity validation
 listPendingCollaborationMessages
-reportCollaborationDelivery
+logical delivery state update from Execution result
 ```
 
-## Task provides to Extension
+## Task provides to Execution Task Driver / application flow
 
 ```text
 listTasks / drive projection
+authorizeTask（独立 Task 的 human authorization）
 startTask
-bindTaskWorker (change)
+bindTaskWorker
 getTask
 startNode
 ```
 
-## Extension reports / produces
+## Browser Extension reports to Execution Runtime
 
 ```text
-workerRef discovered from Conversation URL
-Browser delivery result
+workerRef/c-id observed from Conversation URL
+Browser effect/delivery evidence
 current role/worker page observation / Carrier Context support（仅在真实 E2E 需要时）
 ```
 
-Extension 不拥有领域状态。
+Extension 不拥有领域状态，也不直接写 Task/Agent 业务事实。
 
 ---
 
@@ -386,7 +389,7 @@ Extension 不拥有领域状态。
 ```text
 User ↔ new Product Custom GPT Conversation
 → full requirement discussion
-→ getCurrentCarrierContext/current-link Action capability
+→ current Carrier identity capability（Action = preferred PENDING_SPIKE；Browser/Carrier observation = current reliable evidence path）
 → listRegisteredRoles (Agent)
 → select roles by agentPackageRef
 → createTask (Task)
@@ -394,7 +397,7 @@ User ↔ new Product Custom GPT Conversation
 
 产品 Worker 在 Task 前已经存在，**不由 Task-driven Extension 创建**。
 
-产品 `workerRef/c-id` 的可靠来源必须通过真实 Carrier E2E 冻结：优先满足“产品 GPT 通过 Action 获取当前链接/Carrier context”的需求；不能把“Action 请求一定自动携带 c-id”当作无证据前提，也不能为了取得产品 identity 先创建 Task。
+产品 `workerRef/c-id` 的可靠来源必须通过真实 Carrier E2E 冻结：Action/current-link 是希望验证的轻量路径，但**不是当前平台保证**；当前不得假设 Action 请求自动携带 c-id。若 Action 无可靠来源，使用 Execution Browser / Carrier observation 取得并验证；也不能为了取得产品 identity 先创建 Task。
 
 若未来需要 Browser Extension 提供页面身份，也只能是 Carrier Context 的被动技术提供者，不得把产品前置工作流改造成 Task Scheduler 流程；是否需要该 fallback 由真实测试裁决。
 
@@ -412,3 +415,14 @@ workerRef → request + Task binding validation
 `actorRef` 可以由 Gateway根据 authenticated role + validated worker 派生/规范化，而不是让模型自由伪造任意 actor string。
 
 总纲应统一 actorRef 表达与平台各领域 opaque ref 规则。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：Public API ownership
+
+- Agent Provides：Role Registry、Worker identity validation/resolution、Collaboration logical API。
+- 旧的 Extension Collaboration Delivery API 若直接操作 Browser/Delivery，标记 `Deprecated / Superseded by ALIGN-008/016/079`；物理 delivery 改调用 Execution Public API，Agent 只接收 execution/delivery result。
+- Task binding 只通过 Task Public `bindTaskWorker/getTask(roleBindings)`；Agent 不持久化第二份 binding。
+- 跨域请求/响应遵守统一 contract/version/error envelope 与 runtime validation；Ref 只 opaque 透传。

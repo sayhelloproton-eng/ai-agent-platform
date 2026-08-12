@@ -168,3 +168,11 @@ Runtime 启动后扫描非终态：
 - `SUCCEEDED/FAILED`：只读，不 replay。
 
 Browser 需要等待 extension reconnect；Local 根据 capability-specific reality verifier 恢复。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：effectively-once 与 crash windows
+
+平台不承诺端到端 exactly-once。Execution 通过 persist-before-effect、idempotency fingerprint、sideEffectState、persist-after-effect、reality verification 达成边界内 effectively-once。正式覆盖 crash windows：before effect / during effect / after effect before persist / after persist before response。Duplicate browser delivery 无法确认时进入 UNKNOWN，禁止 blind submit。

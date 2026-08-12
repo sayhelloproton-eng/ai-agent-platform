@@ -14,7 +14,7 @@ Custom GPT Action 列表
 Browser Extension API
 ```
 
-Gateway 可以将多个领域动作聚合成更少的 GPT Actions。
+Gateway 可以将多个领域动作聚合成更少的 GPT Actions。Browser Extension 本体只连接 Execution Runtime 的 Browser protocol surface；本文出现的 `Execution Task Driver` 指 Execution-owned runtime/application flow 对 Task Public Contract 的调用，不表示 Extension 直接连接 Task Store/API。
 
 ---
 
@@ -24,25 +24,32 @@ Gateway 可以将多个领域动作聚合成更少的 GPT Actions。
 
 ```json
 {
-  "contractVersion": "task-orchestration.v1",
+  "contract": "task-orchestration",
+  "contractVersion": "1.0.0",
+  "ok": true,
   "data": {}
 }
 ```
 
 | 字段 | 类型 | 含义 |
 |---|---|---|
-| `contractVersion` | string | Contract 主版本标识 |
+| `contract` | string | 稳定 Contract 名称 |
+| `contractVersion` | string | SemVer Contract 版本 |
+| `ok` | boolean | 成功为 `true` |
 | `data` | object | 当前操作成功结果 |
 
 ## 2.2 失败
 
 ```json
 {
-  "contractVersion": "task-orchestration.v1",
+  "contract": "task-orchestration",
+  "contractVersion": "1.0.0",
+  "ok": false,
   "error": {
     "code": "TASK_VERSION_CONFLICT",
     "message": "Task version does not match.",
     "retryable": true,
+    "correlationId": "corr-...",
     "details": {}
   }
 }
@@ -74,26 +81,28 @@ Gateway 可以将多个领域动作聚合成更少的 GPT Actions。
 | # | API | 主要调用者 | 修改状态 |
 |---:|---|---|---:|
 | 1 | `createTaskGroup` | 产品 / 总控 | 是 |
-| 2 | `getTaskGroup` | 扩展 / 总控 | 否 |
-| 3 | `startTaskGroup` | 人工 / 扩展 | 是 |
+| 2 | `getTaskGroup` | Execution Task Driver / 总控 | 否 |
+| 3 | `startTaskGroup` | 人工 / Execution Task Driver | 是 |
 | 4 | `createTask` | 产品 / 总控 | 是 |
-| 5 | `listTasks` | Browser Extension | 否 |
+| 5 | `listTasks` | Execution Task Driver | 否 |
 | 6 | `getTask` | 总控 / 管理端 | 否 |
-| 7 | `startTask` | 人工 / 扩展 | 是 |
+| 7 | `startTask` | Execution Task Driver / platform-host | 是 |
 | 8 | `pauseTask` | 人工 / 总控 | 是 |
 | 9 | `resumeTask` | 人工 / 总控 | 是 |
 | 10 | `terminateTask` | 人工 / 总控 | 是 |
 | 11 | `getNodeContext` | Worker | 否 |
-| 12 | `startNode` | 扩展 / Agent Domain | 是 |
+| 12 | `startNode` | Execution Task Driver / Worker flow | 是 |
 | 13 | `completeNode` | Worker | 是 |
-| 14 | `waitNode` | Worker / Execution / Extension | 是 |
+| 14 | `waitNode` | Worker / Execution | 是 |
 | 15 | `failNode` | Worker / Execution | 是 |
 | 16 | `reopenNode` | 总控 | 是 |
 | 17 | `putTaskDocument` | Worker | 是 |
 | 18 | `getTaskDocument` | Worker / 总控 | 否 |
-| 19 | `listPendingMessages` | 扩展 / 总控 | 否 |
+| 19 | `listPendingMessages` | Execution Task Driver / 总控 | 否 |
 | 20 | `acknowledgeMessage` | 人工 / 总控 | 是 |
 | 21 | `listTaskEvents` | 管理 / 审计 | 否 |
+| 22 | `authorizeTask` | 人工（独立 Task） | 是 |
+| 23 | `bindTaskWorker` | platform-host / Worker provisioning flow | 是 |
 
 ---
 
@@ -237,6 +246,11 @@ Gateway 可以将多个领域动作聚合成更少的 GPT Actions。
       "content": "# 用户批准后的正式需求"
     }
   ],
+  "roleBindings": [
+    {"roleRef": "role:ops-product", "workerRef": "worker:conversation:aaa"},
+    {"roleRef": "role:controller-dev", "workerRef": null},
+    {"roleRef": "role:test-ops", "workerRef": null}
+  ],
   "actorRef": "worker:ops-product:xxx",
   "idempotencyKey": "idem:create-task-001"
 }
@@ -257,6 +271,9 @@ Gateway 可以将多个领域动作聚合成更少的 GPT Actions。
 | `inputDocuments` | string[] | 是 | Node 上下文必须读取的文档类型 |
 | `outputDocuments` | string[] | 是 | Node 成功前必须存在的输出文档类型 |
 | `initialDocuments` | array | 否 | 创建 Task 时写入的 Markdown |
+| `roleBindings` | array | 否 | Task-level role→worker binding 声明；产品可带已有 workerRef，研发/测试可先为 null |
+| `roleBindings[].roleRef` | string | 条件 | Agent Role opaque ref |
+| `roleBindings[].workerRef` | string \| null | 条件 | 已有 Worker opaque ref；未 provisioning 时为 null |
 | `actorRef` | string | 是 | 创建者 |
 | `idempotencyKey` | string | 是 | 幂等键 |
 
@@ -269,11 +286,92 @@ Gateway 可以将多个领域动作聚合成更少的 GPT Actions。
   "status": "PENDING",
   "version": 1,
   "planVersion": 1,
-  "currentNodeId": null
+  "currentNodeId": null,
+  "authorizedByRef": null,
+  "authorizedAt": null,
+  "roleBindings": [
+    {"roleRef": "role:ops-product", "workerRef": "worker:conversation:aaa"},
+    {"roleRef": "role:controller-dev", "workerRef": null},
+    {"roleRef": "role:test-ops", "workerRef": null}
+  ]
 }
 ```
 
 v1 不需要独立 `planId`。
+
+## 6.1A authorizeTask
+
+用途：记录独立 Task 的 human execution authorization，使 Task 在前置条件满足后具备进入 READY 的资格。已由人工启动的 TaskGroup 可以作为其成员 Task 的 authorization source，不要求用户逐 Task 重复点击批准。
+
+请求：
+
+```json
+{
+  "taskId": "task-001",
+  "expectedTaskVersion": 1,
+  "actorRef": "human:operator",
+  "idempotencyKey": "idem:authorize-task-001"
+}
+```
+
+语义：
+
+- 只由 Task Domain 修改授权事实；不创建独立 Approval entity/table；
+- 写入 `authorizedByRef / authorizedAt`（TaskGroup 成员若使用 group-level authorization，可由 Task Owner 依据 ACTIVE TaskGroup 判定授权已满足）；
+- 若授权与 Task 前置条件均已满足，则 `PENDING → READY`；否则保持 `PENDING`，待前置条件满足后由 Task Owner 计算 READY；
+- 同一幂等意图重复提交返回原结果；version conflict 必须重新读取后再决定；
+- authorization 只允许 Task 进入执行初始化，**不等于**任何 Execution Effect Approval。
+
+响应：
+
+```json
+{
+  "taskId": "task-001",
+  "status": "READY",
+  "version": 2,
+  "authorizedByRef": "human:operator",
+  "authorizedAt": "2026-08-12T00:00:00.000Z"
+}
+```
+
+## 6.1B bindTaskWorker
+
+用途：把 Agent 已校验的 Worker identity 固化为 Task Owner 的稳定 `TaskRoleBinding`。真实 Conversation CREATE/RESTORE 由 Execution Browser 完成，Agent 只拥有/校验 Worker identity；两者都不能直接写 Task binding。
+
+请求：
+
+```json
+{
+  "taskId": "task-001",
+  "roleRef": "role:controller-dev",
+  "workerRef": "worker:conversation:bbb",
+  "expectedTaskVersion": 2,
+  "actorRef": "platform-host:worker-provisioning",
+  "idempotencyKey": "idem:bind-task-001-controller-dev"
+}
+```
+
+语义：
+
+- `(taskId, roleRef)` one-time + idempotent；
+- 空 binding 可写入；同 workerRef 重放返回原结果；
+- 尝试覆盖为不同 workerRef 返回 `TASK_ROLE_BINDING_CONFLICT`；
+- roleRef 必须已属于该 Task 的 required/declared roles，否则拒绝；
+- terminal Task 默认拒绝修改；
+- reopen 不删除 TaskRoleBinding。
+
+响应：
+
+```json
+{
+  "taskId": "task-001",
+  "version": 3,
+  "roleBinding": {
+    "roleRef": "role:controller-dev",
+    "workerRef": "worker:conversation:bbb"
+  }
+}
+```
 
 ## 6.2 listTasks
 
@@ -308,7 +406,7 @@ v1 不需要独立 `planId`。
 }
 ```
 
-`canStart / blockedReason` 由 Task Domain 计算，扩展不自行推断前置 Task。
+`canStart / blockedReason` 由 Task Domain 计算；Execution Task Driver 不自行推断前置 Task或 required binding 是否满足。
 
 ## 6.3 getTask
 
@@ -331,6 +429,13 @@ v1 不需要独立 `planId`。
   "version": 8,
   "planVersion": 1,
   "currentNodeId": "node-dev",
+  "authorizedByRef": "human:operator",
+  "authorizedAt": "2026-08-12T00:00:00.000Z",
+  "roleBindings": [
+    {"roleRef": "role:ops-product", "workerRef": "worker:conversation:aaa"},
+    {"roleRef": "role:controller-dev", "workerRef": "worker:conversation:bbb"},
+    {"roleRef": "role:test-ops", "workerRef": "worker:conversation:ccc"}
+  ],
   "nodes": [
     {
       "nodeId": "node-product",
@@ -365,12 +470,12 @@ v1 不需要独立 `planId`。
 {
   "taskId": "task-001",
   "expectedTaskVersion": 4,
-  "actorRef": "browser-extension",
+  "actorRef": "execution-runtime:task-driver",
   "idempotencyKey": "idem:start-task-001"
 }
 ```
 
-校验：Task == READY；若属于 TaskGroup，TaskGroup == ACTIVE；前序 Task 已满足。
+校验：Task == READY；若属于 TaskGroup，TaskGroup == ACTIVE；前序 Task 已满足；所有当前执行所需 `TaskRoleBinding.workerRef` 已补齐。
 
 效果：Task READY → ACTIVE；第一 Node PENDING → READY；`currentNodeId = firstNode`。
 
@@ -498,7 +603,7 @@ v1 不需要独立 `planId`。
   "workerRef": "worker:conversation:abc",
   "expectedTaskVersion": 8,
   "expectedNodeVersion": 2,
-  "actorRef": "browser-extension",
+  "actorRef": "execution-runtime:task-driver",
   "idempotencyKey": "idem:start-node-dev:run-1"
 }
 ```
@@ -507,13 +612,13 @@ v1 不需要独立 `planId`。
 |---|---|
 | `taskId` | 所属 Task |
 | `nodeId` | 当前 Node |
-| `workerRef` | Agent Domain 选中的具体 Worker opaque ref |
+| `workerRef` | **Deprecated in startNode request（Superseded by ALIGN-006）**；Task 依据 TaskRoleBinding 自动解析 |
 | `expectedTaskVersion` | 防旧 Task 写 |
 | `expectedNodeVersion` | 防重复 / 旧 Node 写 |
 | `actorRef` | 谁发起启动 |
-| `idempotencyKey` | exactly-once 业务意图 |
+| `idempotencyKey` | 幂等业务意图；不承诺端到端 exactly-once |
 
-效果：workerRef = xxx，READY → IN_PROGRESS，startedAt = now。
+**Superseded by ALIGN-006：** `Node.workerRef = TaskRoleBinding.workerRef`，READY → IN_PROGRESS，startedAt = now。
 
 响应：
 
@@ -601,12 +706,12 @@ Task Service 自动检查 Node.outputDocuments。缺失返回 `NODE_OUTPUT_MISSI
 {
   "taskId": "task-001",
   "nodeId": "node-dev",
-  "errorCode": "BROWSER_HOST_UNAVAILABLE",
-  "errorMessage": "Browser Host is unavailable.",
+  "errorCode": "EXECUTION_BROWSER_UNAVAILABLE",
+  "errorMessage": "Execution Browser runtime is unavailable.",
   "retryable": true,
   "expectedTaskVersion": 9,
   "expectedNodeVersion": 3,
-  "actorRef": "browser-extension",
+  "actorRef": "execution-runtime:task-driver",
   "idempotencyKey": "idem:fail-node-dev:run-1"
 }
 ```
@@ -774,7 +879,7 @@ Task Service 自动检查 Node.outputDocuments。缺失返回 `NODE_OUTPUT_MISSI
       "taskId": "task-001",
       "nodeId": "node-dev",
       "eventType": "NODE_STARTED",
-      "actorRef": "browser-extension",
+      "actorRef": "execution-runtime:task-driver",
       "taskVersion": 9,
       "nodeVersion": 3,
       "payload": {
@@ -812,6 +917,10 @@ IDEMPOTENCY_CONFLICT
 NODE_OUTPUT_MISSING
 WORKER_MISMATCH
 ROLE_NOT_ELIGIBLE
+TASK_NOT_AUTHORIZED
+TASK_ROLE_BINDING_REQUIRED
+TASK_ROLE_BINDING_NOT_FOUND
+TASK_ROLE_BINDING_CONFLICT
 
 DOCUMENT_TYPE_NOT_ALLOWED
 DOCUMENT_NOT_FOUND
@@ -846,3 +955,19 @@ activatePlan
 ```
 
 如果实现阶段发现“必须加”，先回领域文档说明真实需求。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：Task Public Contract
+
+> 本节是对 v0.1 Contract 的原位增量修复；未在本节覆盖的既有 API、字段解释、错误示例继续保留。冲突处以本节为准（ALIGN-005/006/011/012/018/019/035～040/071～075/091～110）。
+
+1. `createTask` 创建新 Task 后的初始业务状态统一为 `PENDING`。Human authorization 之后才允许进入 `READY`；`startTask` 只负责 `READY → ACTIVE`。
+2. Task 正式拥有 `TaskRoleBinding`。`createTask` 可携带产品已有 `product roleRef + workerRef` 以及研发/测试 `roleRef` 空绑定；授权后由 provisioning 流程补齐研发/测试 workerRef。
+3. `bindTaskWorker(taskId, roleRef, workerRef, expectedTaskVersion, actorRef, idempotencyKey)` 冻结为 one-time + idempotent Task Command：空绑定可写入；相同 workerRef 重放返回原结果；不同 workerRef 覆盖返回冲突。Task terminal 后默认拒绝修改。
+4. `getTask` / 必要 projection 返回 `roleBindings[]`。其他领域只能把 `roleRef/workerRef` 当 opaque ref。
+5. `startNode` **删除调用方选择任意 `workerRef` 的语义**。旧请求示例中的 `workerRef` 字段标记为 `Deprecated / Superseded by ALIGN-006`；新语义由 Task 根据 `Node.requiredRoleRef → TaskRoleBinding.workerRef` 自动解析并绑定当前 run。
+6. 所有 Public Command 遵守 `unknown → runtime validation → typed DTO`、领域内 idempotency、必要 `expectedVersion` 与统一错误 envelope。`contract` 与 SemVer `contractVersion` 分离。
+7. Gateway / Browser / Execution 不得直接修改 Task SQLite；所有 workflow transition 必须回到 Task Public Command。

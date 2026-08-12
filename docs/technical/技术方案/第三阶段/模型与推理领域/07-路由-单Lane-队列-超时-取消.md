@@ -88,3 +88,11 @@ INFERENCE_TIMEOUT
 内存 queue / active inference 直接丢失并失败；调用方重新发起。
 
 不建设恢复队列或 inference database。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：低并发确定性
+
+v1 继续单 inference lane，business/background 轻量优先级；queue timeout 与 inference timeout 分离。显式 FAST/REASON 不暗换模型角色；AUTO 只按 ReasoningSpec 执行升级规则。retry 仅限确认未开始的安全 transport retry，结构化输出 repair 最多一次。

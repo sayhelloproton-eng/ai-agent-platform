@@ -272,7 +272,7 @@ user approves Task execution
 → formal first Node execution
 ```
 
-Task Domain 需要与 Browser Extension 联合决定 `startTask` 的精确调用位置，但必须保证：
+Task Domain 与 Execution Task Driver/application flow 共同对齐 `startTask` 的精确调用位置，但必须保证：
 
 - 两个 Worker 未绑定完成前不得产生正式 Node work；
 - Dev success/Test failure 时只补 Test，不重复 Dev；
@@ -292,7 +292,7 @@ Browser Extension 是 v1 主驱动 Adapter，当前新的强依赖必须进入�
 
 产品 Worker 在 Task 创建时必须写入自己的 `workerRef`，但它是用户主动创建的 pre-Task Conversation，**不由 Task-driven Extension 创建或调度**。
 
-业务方向已经确认：产品 GPT 通过 Action 获取当前链接/Carrier Context。必须真实验证 Custom GPT Action 是否能获得稳定 `g-id/c-id/conversationUrl`。
+原业务偏好是尽量通过 Action 获取当前链接/Carrier Context；ALIGN/OpenAI audit 后该实现路径降为 `PENDING_SPIKE`。平台当前合同只要求可靠取得/验证 `roleRef + workerRef(c-id)`，不得假设 Custom GPT Action 能提供稳定 `g-id/c-id/conversationUrl`。
 
 如果原生 Action metadata 不足，Browser Extension 可以作为候选的**被动 Carrier page-context provider**，但是否采用必须 E2E 后冻结，并且不得把产品流程改造成：
 
@@ -499,9 +499,9 @@ Agent 只表达 Action Intent。
 
 # 5. Deployment Domain｜MUST AUDIT
 
-## DEP-CHANGE-01｜Agent Domain 七个独立发布/部署单元
+## DEP-CHANGE-01｜[RESOLVED / SUPERSEDED] 原 Agent Domain 七个独立发布/部署单元
 
-必须独立管理：
+**Historical proposal（已由 ALIGN-008/029/111～130 改写 ownership）：** 原提案要求以下七个单元独立管理：
 
 ```text
 agent-runtime
@@ -665,10 +665,10 @@ workerRef = real Conversation c-id
 |---|---|---|---|
 | 产品 Worker | Agent | `listRegisteredRoles` | Agent owns Role Registry |
 | 产品 Worker | Task | `createTask` | Task owns Task/role binding |
-| Extension | Task | `listTasks/getTask/startTask/startNode/bindTaskWorker` | Task owns drive eligibility |
-| Extension | Agent | `getRegisteredRole` | Agent owns role→carrier |
-| Extension | Agent | pending Collaboration | Agent owns messages |
-| Extension | Execution Browser | real page injection/delivery | Execution owns side effect facts |
+| Execution Task Driver/application flow | Task | `listTasks/getTask/authorizeTask/startTask/startNode/bindTaskWorker` | Task owns drive eligibility；Extension 不直连 Task |
+| Execution Runtime/application flow | Agent | `getRegisteredRole` / Worker identity | Agent owns role→carrier |
+| Execution Runtime/application flow | Agent | pending Collaboration | Agent owns logical messages |
+| Browser Extension | Execution Runtime | page observation/effect protocol | Execution owns side effect facts |
 | Worker | Task | context/document/node commands | Task owns workflow |
 | Worker | Agent | ask/reply | Agent owns collaboration |
 | Worker | Execution | local/tool/browser capabilities | Execution owns real actions |
@@ -698,3 +698,11 @@ opaque ref transitional decision
 ```
 
 未审计前，Agent Domain 实现不得直接跨域修改对方内部代码/数据库来“先跑起来”。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## 2026-08-12 总纲裁决回填
+
+本文件原列出的 Cross-domain CHANGE 已经由 ALIGN-001～250 完成裁决。Task roleBindings/bindTaskWorker/startNode worker resolution、Browser ownership、Dev Tunnel ownership、platform-host、Deployment Module Governance、Collaboration physical delivery ownership 等不再是开放问题；实施时以最终 ALIGN traceability 为准。本文件继续保留作为“提案如何被裁决”的历史证据。

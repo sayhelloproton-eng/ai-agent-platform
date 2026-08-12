@@ -70,9 +70,9 @@ MAY 产生 Event
 命名应体现业务意图：
 
 ```text
-claimWork
-submitExecution
-approveExecution
+authorizeTask
+bindTaskWorker
+executeCapability
 resumeTask
 ```
 
@@ -96,7 +96,7 @@ Public Contract 可以通过：
 HTTP
 in-process Port
 Message Bus
-MCP
+MCP（future / non-v1 adapter only）
 A2A
 CLI Adapter
 ```
@@ -137,8 +137,8 @@ Human Approval
 
 ```text
 executionRef
-workItemRef
-agentRunRef
+taskId + nodeId + runNo
+collaborationMessageRef
 ```
 
 之后通过：
@@ -263,12 +263,10 @@ consumer checkpoint
 下列操作默认必须设计幂等：
 
 ```text
-Task Intake
-Work Request
-Execution Submit
-Approval Submit
-External Delivery Report
-Host Result Report
+Task create / authorize / bind / Node write command
+Execution capability submit / Effect Approval
+Collaboration message / physical delivery report
+External result report
 Deployment Apply
 ```
 
@@ -355,7 +353,7 @@ UNKNOWN / UNCERTAIN
 
 ```text
 TASK_VERSION_CONFLICT
-AGENT_SESSION_NOT_FOUND
+AGENT_WORKER_NOT_FOUND
 EXECUTION_DELIVERY_UNCERTAIN
 INFERENCE_PROVIDER_UNAVAILABLE
 DEPLOYMENT_MODULE_NOT_FOUND
@@ -461,7 +459,7 @@ Wake / Signal / Notification：
 
 # 16. Human Approval
 
-Approval 若作为执行准入的一部分：
+Approval **不是独立 Domain**。Task authorization 归 Task；真实 Effect Approval 归 Execution；其他领域只传递 owner-defined `approvalRef`。若某个 Owner 的 Approval 作为准入的一部分：
 
 ```text
 必须拥有稳定 approvalRef
@@ -499,7 +497,7 @@ Public API 新增字段、修改 enum、修改错误、修改事件，是否兼�
 
 # 18. 外部协议适配
 
-MCP / A2A / AG-UI 等协议：
+MCP（future / non-v1）/ A2A / AG-UI 等外部协议：
 
 ```text
 由 Adapter 把外部协议映射到领域 Public Contract
@@ -513,3 +511,11 @@ MCP / A2A / AG-UI 等协议：
 ```
 
 协议适配层保护领域语义不被外部协议绑死。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：不建设 Global Event Bus
+
+v1 不建设全局 Event Bus/Event Domain。TaskEvent、CollaborationMessage、Execution Result 各归 Owner；主链优先 Public API + 明确 wake/poll/delivery。既有事件约定继续适用于某领域确实公开的 immutable fact，但不得据此强制所有跨域协作事件化。

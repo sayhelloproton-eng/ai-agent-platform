@@ -6,17 +6,18 @@
 
 # 1. 表清单
 
-业务表 8 张：
+业务表 9 张：
 
 ```text
 1. task_groups
 2. tasks
 3. nodes
-4. node_execution_history
-5. task_documents
-6. task_messages
-7. task_events
-8. idempotency_records
+4. task_role_bindings
+5. node_execution_history
+6. task_documents
+7. task_messages
+8. task_events
+9. idempotency_records
 ```
 
 基础设施表：`schema_migrations`。
@@ -84,6 +85,8 @@ CREATE TABLE tasks (
   plan_version        INTEGER NOT NULL DEFAULT 1,
   current_node_id     TEXT,
   created_by_ref      TEXT NOT NULL,
+  authorized_by_ref   TEXT,
+  authorized_at       TEXT,
   created_at          TEXT NOT NULL,
   started_at          TEXT,
   completed_at        TEXT,
@@ -105,6 +108,8 @@ CREATE TABLE tasks (
 | `plan_version` | 当前 Plan version；v1 通常为 1 |
 | `current_node_id` | 当前流程位置 |
 | `created_by_ref` | 创建者 |
+| `authorized_by_ref` | 独立 Task 的 human authorization actor；TaskGroup 成员可由 group-level authorization 满足，不强制重复写入 |
+| `authorized_at` | 独立 Task execution authorization 时间；不是 Execution Effect Approval |
 | `started_at` | 首次 ACTIVE |
 | `completed_at` | SUCCEEDED / TERMINATED 时间 |
 | `updated_at` | 最近修改 |
@@ -258,6 +263,7 @@ Event 是审计，不是状态真源。
 
 ```text
 TASK_CREATED
+TASK_AUTHORIZED
 TASK_READY
 TASK_STARTED
 TASK_WAITING
@@ -355,3 +361,32 @@ TaskDocument path 必须位于平台允许的 workspace
 同 taskId + documentType 只有一个当前文档索引
 Event 不反向成为状态真源
 ```
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：TaskRoleBinding 与表清单
+
+> 原有 DDL 不删除；本节新增表属于 Phase 3 五领域总纲对齐后的必要 schema patch（ALIGN-005/006/007/073～075）。
+
+新增业务表：`task_role_bindings`。
+
+```sql
+CREATE TABLE task_role_bindings (
+  task_id TEXT NOT NULL,
+  role_ref TEXT NOT NULL,
+  worker_ref TEXT,
+  version INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  PRIMARY KEY (task_id, role_ref),
+  FOREIGN KEY (task_id) REFERENCES tasks(id)
+);
+```
+
+约束：
+- `role_ref / worker_ref` 为 Agent Domain opaque ref；Task 不解析 Conversation URL。
+- 同一 Task + roleRef 只有一个当前稳定 binding。
+- reopen 不删除该 binding；只重置 Node run-level workerRef。
+- `bindTaskWorker` 使用 Task transaction + expectedTaskVersion + idempotency；相同绑定幂等，不允许静默覆盖为另一个 workerRef。

@@ -131,11 +131,11 @@ no tombstone
 ```text
 User ↔ new Product GPT Conversation
 → full requirement discussion
-→ get current carrier context / workerRef via Action capability
+→ get current carrier identity / workerRef via verified Carrier path（Action = PENDING_SPIKE）
 → listRegisteredRoles
 → resolve product/dev/test by agentPackageRef
 → createTask(product role+worker, dev role, test role, requirement...)
-→ wait for execution approval
+→ wait for Task human authorization
 ```
 
 当前 page URL / c-id 的可靠获取机制必须真实 Carrier E2E。
@@ -221,7 +221,7 @@ browser-extension
 
 ```text
 Task polling
-execution approval UI
+Task authorization UI
 Dev/Test Worker create/bind
 Conversation resolve/reopen
 WORKER_BIND / NODE_READY / REOPEN
@@ -262,7 +262,7 @@ verify/doctor
 
 ---
 
-# 七个独立发布单元
+# [PARTIALLY SUPERSEDED by ALIGN-008/029] 原七个独立发布单元
 
 ```text
 agent-runtime
@@ -320,7 +320,7 @@ runtime dynamic Action schema
 
 ```text
 Custom GPT → Gateway = one Role one Bearer Key
-Browser Extension → local services = local-platform-token
+Browser Extension → Execution Runtime Browser surface = local-platform-token
 ```
 
 Role Key 可以 rotate，不改变 roleRef。
@@ -356,7 +356,7 @@ Worker complete context
 ```text
 Task exact API/schema
 Task execution-init/startTask exact order
-startNode ↔ NODE_READY exactly-once order
+startNode ↔ NODE_READY idempotent/effectively-once order（no end-to-end exactly-once claim）
 Product current c-id/url carrier mechanism
 Browser c-id creation/restore E2E
 Execution Local Resource exact contracts
@@ -365,3 +365,11 @@ Dev Tunnel/Gateway real E2E
 ```
 
 详见 `18-未决项与总纲裁决点.md`。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复
+
+Agent Requires Task Public binding/context、Execution Public browser/local effect、Model infer（仅在需要认知时）、Deployment External Resources。Browser Extension 与 Dev Tunnel 从 Agent-owned modules 移出；`agent-runtime` 由 platform-host in-process 装配，`agent-gateway` 继续独立公网 ingress。

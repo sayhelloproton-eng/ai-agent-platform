@@ -29,6 +29,8 @@ Task:
 createTask
 listTasks
 getTask
+authorizeTask
+bindTaskWorker
 startTask
 pauseTask
 resumeTask
@@ -80,6 +82,7 @@ TaskDocumentService
 task_groups
 tasks
 nodes
+task_role_bindings
 node_execution_history
 task_documents
 task_messages
@@ -137,3 +140,11 @@ reopen 不覆盖历史
 PAUSED 不逐个改 Node
 WAITING 停整个 Task
 ```
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复
+
+新增 Provides：TaskRoleBinding query/command；新增 Runtime composition requirement：由 `@ai-agent-platform/platform-host` in-process 装配。Requires 只能指向 Agent/Execution/Model Public Contract；禁止依赖其内部 package/Store/Adapter。

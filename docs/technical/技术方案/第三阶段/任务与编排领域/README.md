@@ -69,10 +69,10 @@ P1-2 部署领域
 = 工作是什么、做到哪里、是否允许推进
 
 智能体运行与协作
-= 哪个智能主体 / Role / Worker / Session 来处理
+= 哪个 Role / Worker / Custom GPT Conversation 来处理
 
 执行
-= Browser / Local / MCP / Shell 等真实动作做了什么
+= Browser / Local / typed capability / controlled Shell 等真实动作做了什么（MCP 仅为 future/non-v1 adapter 例）
 
 模型与推理
 = 模型调用、FAST / REASON、Provider、Inference
@@ -165,7 +165,7 @@ Idempotency Record
 
 ```text
 Agent / Role 定义正文
-Agent Session / Memory / Prompt
+Agent Worker / Conversation Context / Memory / Prompt
 Worker Pool / Worker availability
 模型 Provider / Inference Route
 Browser DOM / Browser lifecycle
@@ -231,7 +231,7 @@ ORM
 3. 测试 + 运维
 ```
 
-Task Domain 不拥有这些 Role 的定义，只在 Node 中保存 `requiredRoleRef`；Agent Domain 选择具体 Worker / Conversation 后，Task Domain 保存 `workerRef`。
+Task Domain 不拥有这些 Role / Worker 的身份定义；Task 只保存 opaque `requiredRoleRef/workerRef`，并唯一拥有 TaskRoleBinding。Execution Browser 真实 CREATE/RESTORE Conversation，Agent 校验 Worker identity，Task 通过 `bindTaskWorker` 固化 TaskRoleBinding；`startNode` 只从该 binding 自动解析当前 run 的 `workerRef`。
 
 ---
 

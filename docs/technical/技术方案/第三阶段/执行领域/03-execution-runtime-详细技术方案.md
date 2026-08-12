@@ -194,3 +194,14 @@ Secret 必须 redaction。
 - model loading/queue；
 - Deployment lifecycle；
 - general workflow engine。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：调用、重试与故障隔离
+
+- identity/scope/schema/hard rules → policy → model（需要时）→ human（需要时）→ effect 顺序冻结。
+- Model proposal 不扩大 scope、不直接授权；Execution 可调用 Model Public `infer()`，但 deterministic DENY/mandatory approval 永远优先。
+- 只有明确 NOT_STARTED 的 Effect 才允许安全 retry；STARTED/APPLIED/UNKNOWN 先 reality check/reconcile。
+- timeout 不自动等于 FAILED；跨域依赖不可用返回明确 dependency state，不能拖垮整个进程拓扑。

@@ -348,3 +348,14 @@ currentNodeId
 如果 Worker 真正需要暂停当前 Node，另行使用 Task Domain 正式意图，例如 `waitNode`。
 
 协作和 Workflow 是两套不同业务语义。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：logical collaboration vs physical delivery
+
+- Agent owns CollaborationThread/CollaborationMessage 与 logical delivery intent/state。
+- 把消息真实提交到目标 GPT Conversation 是 Execution Browser Effect；Agent 必须依据 Execution typed result/evidence 更新 logical delivery state。
+- `askPeer/replyPeer` 成功不等于页面已收到；严格串行规则保持：reply 必须物理 DELIVERED 后才能开启下一问。
+- CollaborationMessage 与 TaskMessage 不合并；不建设全局 Message/Event Bus。

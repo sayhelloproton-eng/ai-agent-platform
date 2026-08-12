@@ -52,21 +52,21 @@ Local Resource APIs
 
 ---
 
-# 3. Microsoft Dev Tunnels
+# 3. Microsoft Dev Tunnels（MOVED TO DEPLOYMENT）
 
-Microsoft Dev Tunnels 适配/管理能力属于 Agent Domain 的 Public Ingress / Carrier connectivity 层，并且必须独立 npm 化：
+**Superseded by ALIGN-029：** Microsoft Dev Tunnels 是 Deployment-owned External Resource Module，不属于 Agent Domain package ownership。Agent Gateway 只声明/消费稳定的 public-ingress logical capability / `moduleRef`，不拥有 tunnel account/login/lifecycle：
 
 ```text
-dev-tunnel package
-→ account/login guidance
-→ configure
-→ bind Gateway
-→ start/stop/status
-→ public URL
-→ verify/doctor
+Deployment External Resource Module (Dev Tunnel adapter)
+→ account/login/configure/start/stop/status/verify/doctor（仅暴露现实支持的 lifecycle）
+→ provides public-ingress capability / current public URL
+
+Agent Gateway
+→ requires public-ingress moduleRef / logical capability
+→ owns only Gateway local listener + Carrier ingress protocol
 ```
 
-Gateway 不把 Microsoft CLI 细节写进业务代码；Gateway 只需要自己的 local listener/public base URL 配置。
+Gateway 不把 Microsoft CLI 细节写进业务代码，也不把 Dev Tunnel 保存为 Agent-owned deployment unit。
 
 ---
 
@@ -266,3 +266,14 @@ authorization
 ```
 
 Agent 可以请求动作，Execution 决定动作能否真实执行。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：Gateway / Execution / Deployment
+
+- Gateway 是 Custom GPT Actions 公网 Anti-Corruption Layer，不拥有下游业务状态，不直接触达 Local/Browser Effect。
+- Dev Tunnel 改由 Deployment External Resource Module 管理；Gateway 只 Requires 一个满足 public ingress capability 的 moduleRef/逻辑能力。
+- 本地/浏览器真实能力统一通过 Execution Public Contract；Gateway 不 import execution-local/browser internal implementation。
+- GPT-facing transport 的 OpenAI 特有限制与 File Bridge 进入 Agent Carrier conformance；未验证项保持 PENDING_SPIKE。

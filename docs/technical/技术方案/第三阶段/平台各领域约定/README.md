@@ -131,11 +131,11 @@ Business State
 
 | 领域 | 唯一拥有的主要事实 |
 |---|---|
-| 任务与编排 | Task / Plan / Node / WorkItem / Claim / Business Wait / Workflow Progress |
-| 智能体运行与协作 | Agent / Role / Agent Run / Session / Context / Memory / Agent Message / Delegation / Handoff |
-| 执行 | Execution / Attempt / Dispatch / Delivery / Result / Receipt / Workspace / Sandbox / Execution Admission |
-| 模型与推理 | Model / Provider / Inference Request / Inference Result / Route / Provider Health |
-| 部署 | Module Installation / Configuration / Runtime Status / Installed Version / Verification Record / Manifest |
+| 任务与编排 | Task / Plan / Node / TaskRoleBinding / TaskDocument / TaskMessage / TaskEvent / Business Wait / Workflow Progress |
+| 智能体运行与协作 | Role / Worker / Conversation Identity / Role Registry / Collaboration Thread / Collaboration Message / Agent Package 定义 |
+| 执行 | Execution Record / Effect / SideEffectState / Result / Evidence / Browser Delivery / Workspace Scope / Execution Admission |
+| 模型与推理 | Model / Provider / Inference Request / Inference Result / ReasoningSpec / Route / Provider Health |
+| 部署 | Module Installation / Configuration / Installed Version / Deployment Plan / ACTION_REQUIRED / Verification Record / Manifest |
 
 规则：
 
@@ -202,7 +202,7 @@ Management Backend
 CLI
 ChatGPT Adapter
 AG-UI Adapter
-MCP Adapter
+MCP Adapter（future / non-v1；Execution v1 不使用 MCP 主执行链）
 A2A Adapter
 Browser Adapter
 Local Adapter
@@ -410,3 +410,11 @@ Machine-readable Schema / Conformance / CI Gate
 ```
 
 但自动化只能实现已经验证稳定的约定，不能反过来替代领域建模。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## 2026-08-12 五领域总纲对齐状态
+
+ALIGN-001～250 已完成并冻结为本轮修复目标。平台约定不构成第六领域；`platform-host` 仅是 Composition Root package。后续阶段从“继续设计”切换为文档原位修复 → semantic diff/coverage 审计 → Codex 实施 → 真环境 E2E。

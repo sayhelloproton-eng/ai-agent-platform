@@ -99,3 +99,11 @@ Deployment 的 package/install/config 操作通常可通过现场重检确定状
 ## 8. 并发
 
 v1 同 workspace 同时只允许一个 apply。使用简单 file lock；不设计 distributed lock。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：resume / recovery
+
+同一 planRef 重新 apply 时先观察现实，已满足 step 跳过；ACTION_REQUIRED 是正式 resumable boundary，但不演化为 job/lease/worker engine。Upgrade failure = STOP + verify/doctor；rollback 通过新的目标版本 Plan，不做自动事务式 rollback。

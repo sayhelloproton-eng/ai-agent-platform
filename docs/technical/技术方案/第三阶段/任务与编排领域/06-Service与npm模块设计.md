@@ -8,7 +8,7 @@
 
 > **3 个逻辑 Service，1 个领域业务 npm 包；模块化不等于多进程。**
 
-Task Domain 可以被现有 Gateway / Runtime in-process 加载。未来若需要独立 HTTP service，可复用相同 Public Contract 和 Service 层。
+Task Domain v1 由独立 npm package 提供，并由 `@ai-agent-platform/platform-host` 作为 Application Composition Root **in-process 装配**。Task 不单独建立 `task-service` daemon；若未来出现真实独立部署需求，再复用相同 Public Contract 和 Service 层。
 
 ---
 
@@ -32,6 +32,8 @@ TaskDocumentService
 createTaskGroup
 startTaskGroup
 createTask
+authorizeTask
+bindTaskWorker
 startTask
 pauseTask
 resumeTask
@@ -263,3 +265,14 @@ Task Service 直接调用模型
 Task Service 直接执行 Shell
 Task Migration Runner 拥有跨领域 migration SQL
 ```
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：package / host / dependency boundary
+
+- `@ai-agent-platform/task-orchestration`、`task-store-sqlite`、`task-migration-runner` 继续保持独立 npm package；不得把 Task 源码直接内嵌到 `platform-host`。
+- `platform-host` 只 instantiate / DI / local transport / startup-shutdown；Task package 不得反向依赖 platform-host。
+- 跨领域只能依赖对方 Public Contract / client；禁止深路径 import、共享 SQLite、直接 import Adapter。
+- 同进程调用使用公开 TypeScript interface；只有真实跨进程边界才增加 transport client。

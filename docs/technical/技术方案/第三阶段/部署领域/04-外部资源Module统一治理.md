@@ -73,3 +73,11 @@ Platform CLI 不假定所有外部资源都可自动升级。
 ## 7. Bootstrap 例外
 
 最小 Node/npm/OS 是 Platform CLI 启动根。初始 bootstrap 完成后，它们可以继续被对应 External Resource Module 纳入状态/验证治理。这个例外只解决“CLI 尚未存在时谁部署 CLI”的无限递归，不允许成为永久旁路。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：统一外部依赖
+
+Dev Tunnel、Chrome Runtime、ChatGPT Carrier、Model Provider API 全部必须作为 External Resource Module 纳入同一 Module Graph。External adapter 只暴露现实可观测/可配置/可验证 lifecycle，不伪造无法控制的 start/stop。FAST/REASON 不作为 Provider Module identity；Provider 只提供通用 `model.provider.api` capability。

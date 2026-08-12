@@ -112,3 +112,11 @@ approvalRef
 ```
 
 不把完整 model chain-of-thought 当日志要求；只记录可审计结构化结论。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：Approval 分层
+
+Task authorization、Execution Effect Approval、ChatGPT Carrier confirmation 是三个不同层次。Execution Approval 必须绑定具体 effect fingerprint/scope/target/precondition，不能作为长期通用权限。OpenAI `x-openai-isConsequential` 暂不改写 Execution approval 语义，由 Agent Carrier Spike 后对齐。

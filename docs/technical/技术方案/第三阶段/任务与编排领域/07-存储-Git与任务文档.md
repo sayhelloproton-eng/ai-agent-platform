@@ -158,7 +158,7 @@ CodeGraph 不是 Task Domain 真源。
 
 # 14. CodeGraph 未来归属
 
-若后续采用，更适合归入智能体运行与协作领域 / 研发工具能力 / MCP Tool。Task Domain 不直接依赖。
+若后续采用，更适合归入智能体运行与协作领域 / 研发工具能力；若未来采用 MCP，也只能是 future / non-v1 adapter/tool 形态。Task Domain 不直接依赖。
 
 ---
 
@@ -167,3 +167,14 @@ CodeGraph 不是 Task Domain 真源。
 当前 `/Users/agent/Desktop/ai-agent-platform` 既是现阶段源码所在 Git 仓库，也是未来 Task Domain 完成后可以拿来真实 dogfooding 的目标仓库。
 
 Phase 3 正式技术方案仍写入当前源码目录正常的 `docs/technical/技术方案/第三阶段/**`；Task Runtime 运行中产生的 Task-scoped working documents / state 遵循 `.ai-agent-platform/**`。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：Document / Artifact / Context 边界
+
+- TaskDocument 仍是 Task 唯一业务文档真源；Markdown/Git + Task metadata 的原设计保持。
+- Execution 生成的 patch/stdout/download/screenshot 首先是 Execution output/artifact/evidence；只有通过 Task Public Contract 显式接收后才成为 TaskDocument。
+- `getNodeContext` 只组合 Task 已拥有/引用的任务事实与文档，不升级为全平台 Context Aggregator。
+- 大型输出优先传 `documentRef/outputRef/evidenceRef`；OpenAI File Bridge 属于 Agent Carrier 专项，未验证前不改变 TaskDocument 真源。

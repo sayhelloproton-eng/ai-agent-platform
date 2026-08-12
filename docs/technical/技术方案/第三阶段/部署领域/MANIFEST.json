@@ -6,9 +6,9 @@
   "files": [
     {
       "name": "00-完整技术方案与上下文真源.md",
-      "sha256": "8f837bde6c74a629f52bfa27714e3f8d5c49def15e356f69278812b379dec2dc",
-      "bytes": 13233,
-      "lines": 513
+      "sha256": "f5d7a8dc5d98761c08308d8cccad824c5418d05d0dbaaecc70fc75ddad496aae",
+      "bytes": 14003,
+      "lines": 522
     },
     {
       "name": "01-领域宪章与边界.md",
@@ -24,15 +24,15 @@
     },
     {
       "name": "03-module-contract-详细技术方案.md",
-      "sha256": "0f6a87852117bbad5ae4e78c379b3ba19cae56cfae13da366497a31cb6edb860",
-      "bytes": 3547,
-      "lines": 182
+      "sha256": "410a75a9865ebdf535d4eadd6dfb8236415301323b0f277b36ace81046432e9a",
+      "bytes": 4011,
+      "lines": 191
     },
     {
       "name": "04-外部资源Module统一治理.md",
-      "sha256": "c2a4df544153fbb1a43f1b4a61817f2c80ca9fc476e527d025783b7d45130f1b",
-      "bytes": 2481,
-      "lines": 75
+      "sha256": "6c95d3d9673cde08afe98f7bfc81cb6f1e1d9ae34856c6df9aa46482ecb27d64",
+      "bytes": 2936,
+      "lines": 83
     },
     {
       "name": "05-module-template-详细技术方案.md",
@@ -48,15 +48,15 @@
     },
     {
       "name": "07-platform-cli-详细技术方案.md",
-      "sha256": "ee9e0793095a87dbca808d539cb1d796e36f732cd669b0842c8f1b77a144c8e3",
-      "bytes": 2462,
-      "lines": 111
+      "sha256": "8401ebcd9b5c75cdd6012b423e679e767e3fd46908d9cc420f2f997f3d05e861",
+      "bytes": 2900,
+      "lines": 119
     },
     {
       "name": "08-Deployment-Plan-Apply-ACTION_REQUIRED与恢复.md",
-      "sha256": "ce1c8544087c1fe98c530cc1f4026f4ee4542e3d83f62a18d2f78ebb4ee31137",
-      "bytes": 2171,
-      "lines": 101
+      "sha256": "2237176607772ecef6a9c50e8c0dd6ba608f14c31d0a4ec0721fa3352c107dea",
+      "bytes": 2543,
+      "lines": 109
     },
     {
       "name": "09-版本-升级-兼容性-模板迁移.md",
@@ -66,21 +66,21 @@
     },
     {
       "name": "10-Verify-Doctor-Manifest与Platform-READY.md",
-      "sha256": "8189fb233fd4773fb9c9a45e2cb5618481fc0f26bd9211ed634e4baaba98a8da",
-      "bytes": 2064,
-      "lines": 100
+      "sha256": "23b4a1f040dcc83f5851fb208a4d94395c2e05edb82295b3e61460521c1e92f5",
+      "bytes": 2478,
+      "lines": 108
     },
     {
       "name": "11-部署状态-目录-Secret与安全.md",
-      "sha256": "b30611b7561e4d0866438c32d9fa4cc8d372bc31ce3bbc3d90b2a0cb0c05ee00",
-      "bytes": 2028,
-      "lines": 99
+      "sha256": "ace23d75bde53fae312898dfef3df0db2a64c55f9cfb84167710d198a7788ff7",
+      "bytes": 2486,
+      "lines": 107
     },
     {
       "name": "12-跨领域Deployment-Matrix与Composition-Root交接.md",
-      "sha256": "4612ce18a2dee27702b09013893202dce86aa1280bbb765ceab1402cf6d4277f",
-      "bytes": 3044,
-      "lines": 71
+      "sha256": "0f153a358dae1ea2f33d6076020ca94b48f2568c412705b8f19505ce394957cf",
+      "bytes": 4004,
+      "lines": 80
     },
     {
       "name": "13-INSTALL与AI-native部署.md",
@@ -90,9 +90,9 @@
     },
     {
       "name": "14-测试门禁与真实验收.md",
-      "sha256": "29c2e08ca920c054107747f92a35b518c73dba06637d5c9d32a0951a2ed47ecb",
-      "bytes": 1942,
-      "lines": 90
+      "sha256": "fe75f7ae5c6dcbc776eb5063d422f3a88964b0053d40ce6b5db8622a287915a0",
+      "bytes": 2400,
+      "lines": 98
     },
     {
       "name": "15-新仓库实施顺序-停止门与非目标.md",
@@ -108,21 +108,21 @@
     },
     {
       "name": "91-聊天讨论主题索引与结论映射.md",
-      "sha256": "e91b082d014936315a992aa5fff8eafcc9520656df20d86a790fad2dfb589d28",
-      "bytes": 1867,
+      "sha256": "374514db53478af9daf4a0b0018f3c39232e24e93c5c0c4b7dc4bf90ed87b689",
+      "bytes": 1898,
       "lines": 32
     },
     {
       "name": "92-冻结结论覆盖检查表.md",
-      "sha256": "fbae7593909595ec3f7f7df645a3afbd213b49c873ef0a078cbfdf96583f761a",
-      "bytes": 5087,
+      "sha256": "b90f69b1f9af5a3e8efb6f66f856fed11618186d437836b8eb687f2a48b9c878",
+      "bytes": 5152,
       "lines": 82
     },
     {
       "name": "99-下一Chat交接上下文.md",
-      "sha256": "2d05b032747ab42036786df8db257541684b7530d24f48c462100d98ddaf74c4",
-      "bytes": 1848,
-      "lines": 49
+      "sha256": "eedae6d7a82de384e4d59dcf892e41dc5214a34c8fcfeea469ddbd7ab83b988a",
+      "bytes": 2063,
+      "lines": 48
     },
     {
       "name": "README.md",
@@ -143,6 +143,6 @@
   "notes": [
     "External resources MUST be managed as Modules via Module Adapter/Package.",
     "Deployment v1 does not use SQLite.",
-    "Application Composition Root remains a five-domain final-architecture decision."
+    "@ai-agent-platform/platform-host is the frozen Application Composition Root; Task/Agent runtimes remain independent npm packages and Execution/Model/Gateway remain separate processes where frozen."
   ]
 }

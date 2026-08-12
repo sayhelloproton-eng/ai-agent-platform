@@ -76,9 +76,9 @@ requirement / objective / plan / documents（由 Task Domain Contract 决定）
 
 ---
 
-# 4. Carrier Context Action 需求
+# 4. Carrier Identity 获取需求（Action 路径 = PENDING_SPIKE）
 
-产品 Worker 必须能在创建 Task 前获得自己的 Conversation identity。
+产品 Worker 必须能在创建 Task 前获得自己的 Conversation identity；**平台合同冻结的是“可靠 identity”，不是“必须由 Action 提供”。**
 
 业务期望能力可表达为：
 
@@ -90,9 +90,9 @@ getCurrentCarrierContext()
 → conversationUrl
 ```
 
-这是 Agent/Carrier 侧能力，不是 Task API。
+这是 Agent/Carrier + Execution Browser observation 共同满足的 Carrier identity 边界，不是 Task API。Action 形式只是优先验证的轻量候选。
 
-用户明确希望优先通过 Action 获取“当前链接信息”，避免为了产品前置流程再调度 Task 系统或主动创建 Extension 工作流。
+产品体验仍优先验证“通过 Action 轻量取得当前链接信息”，但在真实 E2E 前仅标 `PENDING_SPIKE`；不得因此建立未经验证的正式依赖。
 
 ---
 
@@ -132,7 +132,7 @@ product workerRef
 
 这是 Task Domain 的正式 Task-level participant/binding fact。
 
-研发/测试则在 Task 获得用户执行批准后，由 Browser Extension 初始化并绑定。
+研发/测试则在 Task 获得用户执行批准后，由 Execution Browser provisioning flow 创建/识别 Conversation，Agent 校验 identity，Task `bindTaskWorker` 绑定。
 
 ---
 
@@ -147,7 +147,7 @@ Dev-A/Test-A
 → askPeer(targetAgentPackageRef = product)
 → Agent Runtime 校验双方都属于同一 Task
 → Message Center
-→ Browser Extension
+→ Execution physical delivery
 → Product-A
 ```
 
@@ -158,3 +158,11 @@ replyPeer(threadId, content)
 ```
 
 回复真实投递回原发问 Worker并 `DELIVERED` 后，同一 thread 才允许下一问。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：Carrier identity 的可靠来源
+
+`workerRef = c-id` 的业务定义保留，但 **不得假设 GPT Action 自动提供稳定 Conversation c-id**。产品 Worker 的当前 c-id 获取继续属于 Carrier E2E 待验证能力；若 Action 无可靠来源，允许使用 Execution Browser 的被动 URL/页面观察取得并验证。Task 只接收最终 opaque product roleRef + workerRef。

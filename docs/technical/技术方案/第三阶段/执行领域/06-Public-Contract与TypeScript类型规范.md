@@ -255,3 +255,11 @@ type BrowserRuntimeMessage =
 ```
 
 不能靠 free-form JSON message。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：统一 contract envelope
+
+Public Contract 的 `contract` 名称与 SemVer `contractVersion` 分离；边界输入严格 `unknown → runtime validation → typed DTO`。跨域 Ref 使用 branded/opaque types但 wire 可为 string。错误统一外壳保留领域 `error.code/retryable/correlationId`，Gateway/host 不得吞成无语义 INTERNAL_ERROR。

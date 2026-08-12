@@ -16,7 +16,8 @@ export type ModuleKind =
   | "external-resource";
 
 export interface ModuleDescriptor {
-  contractVersion: "module.v1";
+  contract: "module";
+  contractVersion: "1.0.0";
   moduleRef: string;
   packageName: string;
   moduleVersion: string;
@@ -180,3 +181,11 @@ External Module：
 ## 10. Runtime Validation
 
 所有来自 CLI、descriptor file、第三方 process、外部 API 的数据先视为 `unknown`，通过 runtime schema 后进入强类型对象。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：ConfigSlot / Module identity
+
+`ConfigSlot` 增加 `moduleRef` 类型，用于引用受 Deployment 管理的 Module，而不是让领域长期保存裸 URL。例如 `fastProviderModuleRef / reasonProviderModuleRef / chromeRuntimeModuleRef / carrierModuleRef / publicIngressModuleRef`。Provides/Requires 仍只表达逻辑 capability，不携带物理 URL/port/process。

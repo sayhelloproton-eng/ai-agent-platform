@@ -344,3 +344,11 @@ Observer 输出报告/建议，不自行点击、修复或推进 Task。
 P0 必须实现，详见 `10`。
 
 它应该成为第一排障入口，而不是漂亮 dashboard。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：唯一 Browser Owner
+
+Execution Browser 唯一拥有 CREATE / RESTORE / WAKE / page runtime state / permission / screenshot / click-type-submit / collaboration physical delivery / recovery。Task Driver 只能通过 Task Public API 读取/推进，不得直接写 Task Store；Role/Worker identity 通过 Agent Public API。WAKE 成功不等于 Node/Action/Effect 成功；大型动态上下文不再默认经 DOM 注入，OpenAI File Bridge 留 Agent Carrier Spike。

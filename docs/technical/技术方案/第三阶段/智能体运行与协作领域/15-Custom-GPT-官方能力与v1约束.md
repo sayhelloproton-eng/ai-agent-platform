@@ -205,7 +205,7 @@ Web Action Schema 是否已更新
 
 # 11. Current page URL / Conversation c-id 不是已冻结的官方 Action metadata
 
-产品 pre-Task Worker 需要在 createTask 前取得自身 `workerRef=c-id`。本项目业务方向已经确认通过 Action 获取当前链接/Carrier Context，但在真实验证完成前：
+产品 pre-Task Worker 需要在 createTask 前取得自身 `workerRef=c-id`。原业务偏好是优先尝试 Action/current-link，但该路径在真实验证完成前只属于 `PENDING_SPIKE`：
 
 ```text
 不得假设 GPT Action HTTP request 天然携带 window.location.href
@@ -216,3 +216,11 @@ Web Action Schema 是否已更新
 必须用真实 Custom GPT + Gateway debug Action 验证可获得的 request metadata，再冻结 Carrier Context 的实现。
 
 若需要本地页面 provider，也不得改变“产品 GPT 是 Task 前用户主动沟通”的业务流程。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## 2026-08-12 OpenAI 官方能力审计增量项
+
+以下不直接升级为 v1 normative contract，统一进入开发测试状态：`openaiFileIdRefs/openaiFileResponse` File Bridge、`x-openai-isConsequential:false` + Always Allow、单 Turn 多 Action、Conversation-native file search、Code Interpreter Context Pack/Patch。状态只能是 `VERIFIED / PENDING_SPIKE / REJECTED_OR_UNSUPPORTED`。已确认的官方硬限制（Actions timeout/payload/auth/file shape 等）可进入 Gateway/Deployment conformance；具体 ChatGPT UI/Conversation 行为必须 Preview/真实 E2E 后冻结。

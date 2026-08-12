@@ -272,21 +272,24 @@ observedWorkerRef == expected workerRef
 
 ---
 
-# 10. Task execution approval 与 Conversation 创建的原子性现实
+# 10. Task human authorization 与 Conversation provisioning 的跨系统现实
 
-用户批准执行、Task 持久状态与两个外部 Web Conversation 的创建不可能形成一个跨系统数据库事务。
+Task human authorization、Task 持久状态与两个外部 Web Conversation 的创建不可能形成一个跨系统数据库事务。
 
 业务顺序已经冻结：
 
 ```text
-user approves execution
-→ create/bind dev
-→ create/bind test
-→ both bound
+user authorizes Task
+→ Execution Browser CREATE/identify dev → Agent validate → Task bindTaskWorker
+→ Execution Browser CREATE/identify test → Agent validate → Task bindTaskWorker
+→ required bindings complete
+→ startTask (READY → ACTIVE)
+→ startNode (Task resolves TaskRoleBinding)
+→ RESTORE/WAKE/NODE_READY
 → formal Node work
 ```
 
-`startTask` API 在这个序列中的精确位置由 Task+Browser 跨域审计冻结，不能为了实现方便提前让 Node work 开始。
+`startTask` 的位置已由 ALIGN 冻结：required bindings 齐全后才能 `startTask`；`startNode` 成功后才允许对对应 Worker 做业务 WAKE。不得提前让 Node work 开始。
 
 每一步必须可查询当前 Task roleBindings，重启后继续缺失步骤：
 
@@ -302,11 +305,9 @@ dev 已绑定 / test 未绑定
 
 ---
 
-# 11. NODE_READY 与 startNode 顺序的总纲待定点
+# 11. [RESOLVED by ALIGN-075～077/090] NODE_READY 与 startNode 顺序
 
-这里故意不假定最终答案。
-
-需要联合 Task/Execution/BHR 实测裁决：
+架构顺序已冻结；真实 Browser E2E 只验证 transport/recovery，不再重开 ownership/order：
 
 ```text
 方案 A：
@@ -336,7 +337,7 @@ Browser prepare/verify target
 - recoverable pending delivery；
 - no blind duplicate submit。
 
-该项必须在 Phase 3 总纲 + Browser/Execution 审计中冻结。
+该架构边界已由 ALIGN 冻结：Worker identity 必须可验证；具体 Carrier provider 只剩实现 E2E/PENDING_SPIKE，不再重开领域 ownership。
 
 
 ---
@@ -345,7 +346,7 @@ Browser prepare/verify target
 
 产品 Worker 已由用户在 Task 前主动创建，Extension 的 Task start `WORKER_BIND` **不负责产品 Worker 创建**。
 
-产品 createTask 前需要通过 Carrier Context Action 取得：
+产品 createTask 前需要可靠取得以下 Carrier identity；Carrier Context Action 只是 `PENDING_SPIKE` 路径：
 
 ```text
 roleRef / g-id
@@ -353,4 +354,12 @@ workerRef / c-id
 conversationUrl
 ```
 
-当前真实页面/Action 是否能原生提供该信息必须 E2E。若未来 Browser Extension 提供被动 page-context provider，也不得把产品流程改造成 Task-driven worker creation。
+当前不得假设 Action 原生提供稳定 c-id。当前可靠证据来源保留 Execution Browser / Carrier observation；Action 若真实 E2E 通过，可升级为更轻 provider，但不得把产品流程改造成 Task-driven worker creation。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：协议 Owner 与 WAKE 边界
+
+本文的 WORKER_BIND/NODE_READY/REOPEN/PEER_MESSAGE 载荷语义保留；实际 Browser protocol 的 Owner 改为 Execution Domain。Agent 只定义其中 Role/Worker/Collaboration 所需的 opaque identity/intent。WAKE 不承担大型 Task Context 传输；OpenAI File Bridge 等替代方案列为 Agent Carrier PENDING_SPIKE。

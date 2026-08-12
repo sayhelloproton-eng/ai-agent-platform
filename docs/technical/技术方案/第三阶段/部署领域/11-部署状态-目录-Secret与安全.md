@@ -97,3 +97,11 @@ summary/evidenceRef
 ```
 
 不建设独立 Logging Domain。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：配置与 Secret
+
+配置材料化统一进入 `.ai-agent-platform/config/`（第三方工具强制格式由对应 External Resource Module Adapter materialize）。raw secret 不进入 manifest/Public DTO/log/evidence/model context；Deployment 负责安全材料化，但 secret 的业务语义归使用领域。Deployment 不拥有其他领域 `.ai-agent-platform` 业务数据。

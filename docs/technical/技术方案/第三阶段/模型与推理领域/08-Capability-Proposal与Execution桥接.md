@@ -94,3 +94,11 @@ STOP / ESCALATE / return unresolved
 ```
 
 具体最终状态归调用领域，不归 Model。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：caller-owned bridge
+
+正式链保持：Model Proposal → caller schema/allowlist/scope/policy/approval → Execution `executeCapability`。Model Runtime 不直接 import/call Execution；一次 infer 最多一个 proposal，caller 控制有限 maxRounds，禁止自主无限 Tool Loop。

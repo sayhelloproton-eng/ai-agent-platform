@@ -68,7 +68,7 @@ runCommand
 release/deploy mutation
 ```
 
-Browser Extension/Task driver负责 Task 启动，不让产品 GPT 自己替用户点击启动。
+Execution Task Driver负责 Task 授权后的 provisioning/start 驱动，不让产品 GPT 自己替用户执行平台启动动作。
 
 ---
 
@@ -335,4 +335,4 @@ no arbitrary external GPT target
 next ask only after previous reply DELIVERED
 ```
 
-Product Agent Package 还需要一个 Carrier Context/current-link 类 Action 能力，用于在 Task 创建前获得自己的 current workerRef；具体 operationId/provider 在真实 Custom GPT E2E 后冻结。
+Product Agent Package 需要在 Task 创建前获得 current workerRef；Carrier Context/current-link Action 只作为 `PENDING_SPIKE` 候选能力，不能预设为稳定 Action。具体来源/operationId 由真实 Custom GPT + Browser Carrier E2E 后冻结。

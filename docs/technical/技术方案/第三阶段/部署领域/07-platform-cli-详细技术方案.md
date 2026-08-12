@@ -109,3 +109,11 @@ platform doctor
 - unresolved ACTION_REQUIRED。
 
 Manifest 不是人工维护真源。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：plan/apply 与状态真实性
+
+Platform CLI 是唯一全局 Deployment Planner/Executor；Module 只声明 requirements/config/provides/requires/lifecycle/verification/effects。`status/verify/doctor` 必须读取当前 reality；doctor 默认只诊断，修改环境必须生成 repair plan。CLI 按需运行，不成为第二 Runtime/长期 workflow engine。

@@ -144,7 +144,7 @@ Role 创建/删除/凭据管理属于本机 package CLI 管理面，不是 GPT A
 
 # 6. getRegisteredRole
 
-Browser Extension / Agent Runtime 需要把 Task 的 opaque `roleRef` 解析为当前 Carrier target 时使用。
+Execution Runtime Browser Driver / Agent Runtime 需要把 Task 的 opaque `roleRef` 解析为当前 Carrier target 时通过 Agent Public Contract 使用。
 
 概念返回：
 
@@ -353,8 +353,18 @@ Browser Extension 是本地平台组件：
 
 ```text
 Browser Extension
-→ local Agent Runtime / Task / local bridge
+→ Execution Runtime Browser protocol surface（通过 runtime/app layer 再走 Public Contract）
 → local-platform-token
 ```
 
 两类身份必须分开，避免把平台组件伪装成某个 Agent Role。
+
+---
+
+<!-- ALIGNMENT-PATCH-20260812 -->
+
+## ALIGN-001～250 增量修复：Auth / Secret / Browser credential
+
+- 一个 Role 一个 Gateway Bearer/API key 的 v1 方向保持；Authentication 与 authorization/policy 分离。
+- Browser Extension 使用独立 local-platform credential，不复用 Role Bearer。
+- raw secret 只由 Deployment 安全材料化；Role Registry 不保存明文 secret，Public DTO/log/evidence/model context 不泄露 secret。
