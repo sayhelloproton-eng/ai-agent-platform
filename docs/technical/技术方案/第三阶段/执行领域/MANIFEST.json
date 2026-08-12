@@ -7,8 +7,8 @@
   "files": [
     {
       "name": "00-完整技术方案与上下文真源.md",
-      "bytes": 24009,
-      "sha256": "1922c2b8e59493c905e603bb1dd7f2fc684775c319a435007bb7ec97aea43cad"
+      "bytes": 24363,
+      "sha256": "6030031a7a988a4a0e335a03405abb76f781203ebfb4741985c9551c3bc3ba4a"
     },
     {
       "name": "01-领域职责边界与非目标.md",
@@ -32,8 +32,8 @@
     },
     {
       "name": "05-execution-local-详细技术方案.md",
-      "bytes": 6265,
-      "sha256": "3a02e73b255273f551b50f7808a117ab26696ddfbb42feffddb53a59a7a3ef7c"
+      "bytes": 7124,
+      "sha256": "f10bf7b977bedecffe08572251275f1a2caf5fdf44ee93c43a4f3a61c7a19047"
     },
     {
       "name": "06-Public-Contract与TypeScript类型规范.md",
@@ -47,8 +47,8 @@
     },
     {
       "name": "08-Policy-FAST-REASON-Human-Effect-Approval.md",
-      "bytes": 2716,
-      "sha256": "6d49db6dfe8729855daed419b03f8d6172184762b7327d8ebc2d986fd4e36105"
+      "bytes": 2990,
+      "sha256": "6f4cf740f55b894361376654b0c40ffec72948edaedc05a7f1a6b1ed767dca82"
     },
     {
       "name": "09-Result-Evidence-UNKNOWN与恢复.md",
@@ -67,8 +67,8 @@
     },
     {
       "name": "12-测试验收-E2E-故障注入.md",
-      "bytes": 4612,
-      "sha256": "d3d90a061fd7d343ecc854dfa4bd8f41d1f9ffbeb6bb0b57f3ee6328283e0fdf"
+      "bytes": 4781,
+      "sha256": "ab8cb3b02cd797e0b22535cc9cc25dab7fb5ef4d41420bebd4fc3c224e75f7f3"
     },
     {
       "name": "13-TypeScript-Node20-工程约束.md",
@@ -92,8 +92,8 @@
     },
     {
       "name": "92-冻结结论覆盖检查表.md",
-      "bytes": 4119,
-      "sha256": "157ef4a0cac8d01cee5c3b456a0c5eb7ca6b376d8429b381b5d97ba93475a12c"
+      "bytes": 4269,
+      "sha256": "b4eac926776c87c10cc9bd821a8390ddf1a6c7fc557d2097f588fc2f3e5f65d5"
     },
     {
       "name": "99-下一Chat交接上下文.md",

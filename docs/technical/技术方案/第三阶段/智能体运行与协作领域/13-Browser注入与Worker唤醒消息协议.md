@@ -389,7 +389,7 @@ Browser **不再默认注入**：
 
 `openaiFileIdRefs` / `openaiFileResponse` 是 Carrier transport；TaskDocument/Execution Artifact ownership 不改变。
 
-一次 WAKE 启动的是一个 Worker Turn，而不是“一个 Action”。同一个 Turn 内可以继续调用多个受控 Action；**Browser 不在每个 Action 之间机械再次 WAKE**。该实际行为进入真实 Carrier E2E；若目标 ChatGPT 环境出现差异，只回退为 bounded control text，不恢复大型 DOM 注入。
+一次 WAKE 启动的是一个 Worker Turn，而不是“一个 Action”。同一个 Turn 内可以继续调用多个受控 Action；**Browser 不在每个 Action 之间机械再次 WAKE**。该实际行为进入真实 Carrier E2E，继续标记为 `PENDING_SPIKE`。若 Multi-Action 在目标环境不稳定或 Spike FAIL，则回退为 **bounded multiple Worker Turns**：每个新 Turn 开始前重新读取 owning Domain 的最新 facts/version/continuation，依据已持久化的 Action/Execution refs 判断前序结果，**不得重放已经成功的 Action 或 Effect**；仅在 Turn 边界按需再次 WAKE。fallback 仍只使用 small control text + File Bridge，不恢复大型 DOM 注入。
 
 File Bridge 对图片是非对称的：平台不能通过 `openaiFileResponse` 返回 image/video，因此 screenshot / Vision 仍由 Execution Browser + Model Vision 路径承担。
 

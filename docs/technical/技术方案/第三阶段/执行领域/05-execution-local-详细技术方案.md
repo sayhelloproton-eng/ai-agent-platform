@@ -287,6 +287,10 @@ secret/log redaction
 
 该 `download_link` 是约 5 分钟的 transient locator，不能持久化为 durable evidence locator。
 
+P0 物理导入预算与 Gateway Config Slot 对齐：单文件最多 `10_000_000` bytes、单次 ingress aggregate 最多 `50_000_000` bytes、每个远端 fetch timeout `15_000ms`。实现采用 streaming → temporary staging，不把全部输入一次性放入内存。`name/mime_type/download_link` 均视为 external-untrusted；filename 不能成为本地路径，MIME 需与实际 bytes/detected type 做校验。Carrier 专用 fetch 仅允许 HTTPS，redirect 需逐跳重验，禁止访问 localhost/private/link-local/metadata endpoint，且不得附带平台 credential。
+
+Fetch timeout / locator expired 只证明 transport/materialization 未完成，不等价于 business Action 未执行；恢复前先查 owning Domain facts 与 idempotency/action/execution result，只有能证明未产生 business mutation 的 transport 才可重试。
+
 当平台需要通过 `openaiFileResponse` URL 方式返回文件时，Execution 只提供/读取现有 artifact/output truth；Gateway 负责生成对 OpenAI 可取的短期 opaque relay。Execution 不因此成为 Gateway transport Owner。
 
 公开互联网 research 不扩展为 Execution 通用 Search capability；Carrier Web Search 处理认知型公开资料检索，Execution Network 保留精确 URL、LAN/localhost、endpoint probe、authenticated engineering request 等确定性能力。

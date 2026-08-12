@@ -6,8 +6,8 @@
   "files": [
     {
       "name": "00-完整技术方案与上下文真源.md",
-      "sha256": "6d113f0a26eb553c648cae09ffaea84bf107a534a77e52329ad9126fd722a081",
-      "bytes": 14556,
+      "sha256": "2293ae6e5f008fdce04a81cb37d74285f35a73f663d944e631de853cc9c52c30",
+      "bytes": 14892,
       "lines": 528
     },
     {
@@ -42,9 +42,9 @@
     },
     {
       "name": "06-deployment-conformance-详细技术方案.md",
-      "sha256": "1064c97d541bd19af19c5cd173175a13113d477288386fd43b4cc10da5ee1d27",
-      "bytes": 3145,
-      "lines": 107
+      "sha256": "291cb731149efe38b0260055617c5d6c1510111763430ac119dccf0a03a8abd4",
+      "bytes": 3907,
+      "lines": 110
     },
     {
       "name": "07-platform-cli-详细技术方案.md",
@@ -90,9 +90,9 @@
     },
     {
       "name": "14-测试门禁与真实验收.md",
-      "sha256": "198c7f4d726cc459e29f3179c9a02d287c54fbb2c66b8b602d14747c224798aa",
-      "bytes": 3000,
-      "lines": 126
+      "sha256": "9dd19acf2701096a7a000f15b562475ead976c73a99d019cad266631c70fa822",
+      "bytes": 4337,
+      "lines": 135
     },
     {
       "name": "15-新仓库实施顺序-停止门与非目标.md",

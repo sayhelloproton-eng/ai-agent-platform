@@ -85,9 +85,9 @@ expiry
 
 ## 7. Browser Carrier Permission
 
-ChatGPT Action Allow popup 与 Effect Approval 分离。
+ChatGPT Action Allow popup 与 Effect Approval 分离。目标环境已经真实验证 `Always Allow` 时，routine non-consequential Action 的 happy path 不需要 Browser click。
 
-允许 auto-Allow 的条件必须同时满足：
+以下 auto-Allow 只属于 **permission fallback**（Always Allow 未验证/失效或异常 prompt 已出现），不是正常主链。fallback 中允许自动处理的条件必须同时满足：
 
 ```text
 managed Worker

@@ -392,6 +392,52 @@ Worker
 ```
 
 Browser WAKE 只传小型 identity/trigger。File Bridge 失败时允许小型 bounded text fallback，但不得重新把完整 PRD/日志/代码包恢复为 DOM 注入主路径。
+## 13.5 P0 File Bridge 安全配置、信任边界与错误语义
+
+这些值是 **ai-agent-platform v1 自身的安全预算**，不是对 OpenAI 输入上限的重新定义；Deployment 以 Config Slots materialize，Gateway/Execution 启动时 runtime validate：
+
+```text
+agentGateway.fileBridge.maxInputFiles          = 10
+agentGateway.fileBridge.maxInputFileBytes      = 10_000_000     # 10 MB / file
+agentGateway.fileBridge.maxAggregateInputBytes = 50_000_000     # 50 MB / Action ingress
+agentGateway.fileBridge.inputFetchTimeoutMs    = 15_000         # per remote fetch
+agentGateway.fileBridge.maxOutputFiles         = 10
+agentGateway.fileBridge.maxOutputFileBytes     = 10_000_000     # OpenAI response hard limit
+agentGateway.fileBridge.relayTtlMs              = 300_000        # 5 min
+agentGateway.actions.maxRequestChars            = 100_000        # exclusive upper bound: serialized request MUST be < this
+agentGateway.actions.maxResponseChars           = 100_000        # exclusive upper bound: serialized response MUST be < this
+```
+
+实现约束：
+
+- `name`、`mime_type`、`download_link` 全部是 **external-untrusted hints**；Gateway/Execution 不把 filename 直接拼成本地路径。
+- filename 只取安全 basename；拒绝 NUL、控制字符、路径分隔符、`..` traversal 和空名称。
+- declared MIME 与实际 bytes/detected MIME 分开记录；对安全相关 mismatch 拒绝并返回 typed error，不能只信 `mime_type`。
+- Carrier file fetch 仅允许 HTTPS；不得携带平台 secret/credential；redirect 每跳重新校验，禁止落到 localhost、loopback、link-local、RFC1918/private network 或 metadata endpoint，避免 SSRF。
+- 下载必须流式进入 temporary staging，不要求把 aggregate bytes 一次性载入内存；超出单文件/aggregate budget 立即停止。
+- relay token 必须 opaque、GET-only、**single-purpose + artifact/outputRef scoped**、TTL bounded；允许 OpenAI 在 TTL 内因 transport retry 再取同一 artifact，但 token 不能列目录、换 artifact 或暴露本地路径。
+- relay 过期只重新生成 transport token；TaskDocument/Execution Artifact canonical truth 不复制到 Gateway durable store。
+
+Gateway/OpenAI adapter 对外冻结以下 typed error codes；底层 Execution error 可作为 cause/evidenceRef 保留，但不能把内部异常栈直接透给 GPT：
+
+| errorCode | 语义 | retry / recovery |
+|---|---|---|
+| `OPENAI_FILE_INPUT_INVALID` | runtime shape / filename / URL 不合法 | 修正输入，不自动 retry |
+| `OPENAI_FILE_COUNT_EXCEEDED` | 输入/输出文件数超过 10 | 缩小集合 |
+| `OPENAI_FILE_TOO_LARGE` | 单文件超过平台/Carrier budget | 缩小或拆分 |
+| `OPENAI_FILE_AGGREGATE_TOO_LARGE` | ingress aggregate 超过 50 MB | 缩小集合 |
+| `OPENAI_FILE_LOCATOR_EXPIRED` | transient input locator 已失效 | 重新取得 fresh file ref；不 replay business mutation |
+| `OPENAI_FILE_FETCH_TIMEOUT` | 受控 fetch 超时且未完成 materialization | 先查 owner facts；仅安全重试 transport |
+| `OPENAI_FILE_FETCH_FAILED` | fetch/network/status/redirect policy 失败 | 按原因重试或重新取得 ref |
+| `OPENAI_FILE_MIME_MISMATCH` | declared/detected MIME 冲突且不允许接受 | 重新提供正确文件 |
+| `OPENAI_FILE_RESPONSE_UNSUPPORTED_MEDIA` | egress image/video 等不支持媒体 | 使用 Browser/Vision 或其他正式路径 |
+| `OPENAI_FILE_RESPONSE_TOO_LARGE` | egress 单文件 >10 MB | 缩小/拆分，不 inline |
+| `OPENAI_ACTION_REQUEST_BUDGET_EXCEEDED` | GPT-facing request 达到/超过 100,000 chars | 在进入 owning Domain 前拒绝；缩小 control payload 或改走 File Bridge |
+| `OPENAI_ACTION_RESPONSE_BUDGET_EXCEEDED` | 最终 GPT-facing JSON 序列化后 >=100,000 chars | inline 自动切 URL relay；仍超限则显式失败 |
+| `OPENAI_FILE_RELAY_EXPIRED` | relay token TTL 结束 | 从 canonical truth 重新生成 relay |
+| `OPENAI_FILE_RELAY_SCOPE_INVALID` | token 与目标 artifact/outputRef 不匹配 | DENY，不 retry |
+
+`openaiFileResponse` serializer 必须对**最终序列化后的 GPT-facing JSON**计算字符预算。Inline base64 如果会使 response 达到或超过 `100,000` chars，必须在发送前切换为 URL relay；若 URL relay response 仍无法满足预算，返回 `OPENAI_ACTION_RESPONSE_BUDGET_EXCEEDED`，禁止把超限 payload 发给 OpenAI 后再依赖 transport failure。
 
 <!-- ALIGNMENT-PATCH-20260812 -->
 

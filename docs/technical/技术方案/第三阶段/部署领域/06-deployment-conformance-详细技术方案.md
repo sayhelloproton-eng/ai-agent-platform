@@ -96,11 +96,14 @@ Conformance 可以用 fake resource 验证 Adapter contract；真实资源可用
 ### Gateway/File Bridge behavior
 
 - runtime validates `openaiFileIdRefs` object shape；
-- transient `download_link` 不持久化；
+- `agentGateway.fileBridge.maxInputFiles=10`、`maxInputFileBytes=10_000_000`、`maxAggregateInputBytes=50_000_000`；
+- `agentGateway.fileBridge.inputFetchTimeoutMs=15_000`、`relayTtlMs=300_000`；
+- transient `download_link` 不持久化；filename/MIME/URL 按 external-untrusted 验证；Carrier fetch 阻断 localhost/private/link-local/metadata SSRF；
 - `openaiFileResponse` <= 10 files、<=10MB/file；
 - image/video response file rejected；
-- URL relay has `Content-Type` + `Content-Disposition`；
-- ordinary text request/response stays under 100k；
+- URL relay has `Content-Type` + `Content-Disposition`，token 必须 opaque、GET-only、single-purpose、artifact/outputRef scoped、bounded TTL；
+- GPT-facing request/response 的**最终序列化字符数**必须 `<100,000`；inline base64 使 response `>=100,000` 时 serializer 必须在发送前切 URL relay，仍超限则返回 typed error；
+- File Bridge typed errors 至少覆盖 invalid/count/size/aggregate/expired/fetch-timeout/fetch-failed/MIME-mismatch/unsupported-media/request-budget/response-budget/relay-expired/relay-scope-invalid；
 - long operation does not rely on >45s blocking request；
 - overload/server errors keep real 429/5xx semantics。
 
