@@ -579,18 +579,22 @@ v1 不需要独立 `planId`。
     {
       "documentType": "REQUIREMENT",
       "path": ".ai-agent-platform/...",
-      "content": "# ..."
+      "contentHash": "sha256:...",
+      "sizeBytes": 12345
     },
     {
       "documentType": "PRD",
       "path": ".ai-agent-platform/...",
-      "content": "# ..."
+      "contentHash": "sha256:...",
+      "sizeBytes": 45678
     }
   ]
 }
 ```
 
 `path` 是服务返回的仓库相对路径；Worker 不需要自行使用该路径读取文件。
+
+`getNodeContext` 的默认跨域 response 只携带 Task/Node 小型结构化事实和文档 metadata，不把完整 Requirement/PRD 正文默认塞入 JSON。需要正文时由调用方按 documentType 调 `getTaskDocument`；Custom GPT Carrier 可由 Gateway 把这些文档序列化为 `openaiFileResponse`。`openaiFileResponse` 不进入 Task Contract。
 
 ## 7.2 startNode
 
@@ -755,7 +759,9 @@ Task Service 自动检查 Node.outputDocuments。缺失返回 `NODE_OUTPUT_MISSI
 }
 ```
 
-规则：Agent 只提交 documentType + content，不能提交任意磁盘绝对路径；TaskDocumentService 决定实际仓库相对路径。
+规则：Agent 只提交 canonical `documentType + content`，不能提交任意磁盘绝对路径；TaskDocumentService 决定实际仓库相对路径。
+
+Custom GPT 若通过 `openaiFileIdRefs` 提交文件，必须先由 Gateway/Execution Carrier adapter 完成临时 URL 获取、MIME/size/hash 校验并转换为 canonical TaskDocument 写入输入；Task API **不直接接收** `download_link` 或 OpenAI file id 作为业务字段。
 
 响应：
 

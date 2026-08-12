@@ -58,7 +58,12 @@ Agent manifest 信息放入 npm `package.json` 的平台命名字段中，避免
           "capabilities": {
             "webSearch": true,
             "imageGeneration": false,
-            "codeInterpreter": false
+            "codeInterpreter": true
+          },
+          "requirements": {
+            "actions": "required",
+            "fileBridge": "required",
+            "apps": "disabled"
           },
           "knowledgeFiles": [
             "context/fixed-context.md",
@@ -189,6 +194,46 @@ runCommand
 
 ---
 
+<!-- OPENAI-CARRIER-ABSORPTION-20260812 -->
+
+## 4.4 OpenAI Carrier requirements 与静态 Schema 约束
+
+`requirements` 是 Agent Package 对 Carrier 的部署要求，不新增 Capability Service。角色可以按职责声明：
+
+```ts
+interface CustomGptCarrierRequirements {
+  actions: "required";
+  fileBridge: "required" | "optional";
+  codeInterpreter: "required" | "optional";
+  webSearch: "required" | "optional";
+  apps: "disabled";
+}
+```
+
+推荐第一版：
+
+```text
+产品：Actions required；File Bridge required；Web Search required；Code Interpreter optional
+总控/研发：Actions required；File Bridge required；Code Interpreter required；Web Search required
+测试/运维：Actions required；File Bridge required；Code Interpreter required；Web Search optional
+```
+
+`recommendedModel` 只作为 setup hint。Role READY 依据 required capabilities + Actions/auth + 真实 E2E，不 pin 精确 ChatGPT model id。
+
+每个 `actions/custom-gpt.openapi.yaml` operation 必须：
+
+```text
+operationId 稳定
+参数窄且 typed
+显式 x-openai-isConsequential
+不依赖 Custom Headers
+遵守 OpenAI description 长度限制
+```
+
+需要 Conversation 文件输入的 operation 才声明 `openaiFileIdRefs`；文件输出使用 response 的 `openaiFileResponse`，不把它设计成新的业务 Action。
+
+Task 动态文档仍禁止上传到永久 Knowledge；应由当前 Worker Conversation 通过 Action/File Bridge 按需取得。
+
 # 5. Custom GPT Web 创建字段映射
 
 CLI 必须逐项对应真实 Web 配置：
@@ -204,6 +249,9 @@ CLI 必须逐项对应真实 Web 配置：
 | 功能开关 | package.json carrier profile | 手工勾选 |
 | Actions Schema | static OpenAPI + current Gateway URL | 粘贴/导入 |
 | Action Auth | role-scoped Bearer key | 注册 Role 后回 Web 填写 |
+| File Bridge | OpenAPI `openaiFileIdRefs/openaiFileResponse` contract | Preview/E2E verify |
+| Code Interpreter / Web Search | carrier profile requirements | 按角色要求启用 |
+| Apps | `disabled`（v1 使用 Actions） | 不与 Actions 同时作为 P0 工具链 |
 
 2026-08-11 当前外部平台事实基线：Custom GPT 创建/编辑通过 ChatGPT GPT editor 完成；Knowledge 是上传文件；Actions 使用 OpenAPI JSON/YAML，并支持 API key / Bearer 等认证。当前设计不依赖未公开的 GPT 管理 API。
 

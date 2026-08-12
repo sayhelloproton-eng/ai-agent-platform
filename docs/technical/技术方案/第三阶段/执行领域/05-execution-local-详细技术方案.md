@@ -265,3 +265,28 @@ stdout/stderr 完整落盘；API 只回 summary + refs。
 - unknown shell external effect → 无法确认则 UNKNOWN。
 
 任何不能证明 NOT_APPLIED 的副作用都不能盲重跑。
+
+<!-- OPENAI-CARRIER-ABSORPTION-20260812 -->
+
+## 17. Carrier File Import / Export 复用现有 File + Network mechanics
+
+Execution 不新增 File Service，也不新增 OpenAI 专用业务实体。
+
+当 Gateway 收到 `openaiFileIdRefs[].download_link` 时，物理获取 bytes 复用现有 Network/File typed capability，并施加：
+
+```text
+caller/target scope
+HTTPS URL validation
+bounded size
+MIME/filename validation
+hash
+timeout
+temporary staging
+secret/log redaction
+```
+
+该 `download_link` 是约 5 分钟的 transient locator，不能持久化为 durable evidence locator。
+
+当平台需要通过 `openaiFileResponse` URL 方式返回文件时，Execution 只提供/读取现有 artifact/output truth；Gateway 负责生成对 OpenAI 可取的短期 opaque relay。Execution 不因此成为 Gateway transport Owner。
+
+公开互联网 research 不扩展为 Execution 通用 Search capability；Carrier Web Search 处理认知型公开资料检索，Execution Network 保留精确 URL、LAN/localhost、endpoint probe、authenticated engineering request 等确定性能力。

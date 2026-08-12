@@ -92,7 +92,7 @@ Worker 无法稳定区分：
 
 - WORKER_BIND 不代表 Node READY；
 - 不调用 completeNode；
-- Worker 可了解 Task 基本背景；
+- Worker 只获得完成身份绑定所需的最小 Task/Role/Worker 背景；大型 Task 文档不通过 WORKER_BIND 注入；
 - Worker 可在上下文不明时主动查询，但不能自行推进 Workflow。
 
 ---
@@ -124,7 +124,7 @@ Worker 无法稳定区分：
 }
 ```
 
-Extension 不需要把所有 Task Markdown 全量塞入消息；Worker 可以按需 `getNodeContext`。
+Extension 不需要把所有 Task Markdown 全量塞入消息；Worker 先按需 `getNodeContext`，Custom GPT Carrier 再优先用 File Bridge 取得对应 TaskDocument。
 
 Task/Node version 是否直接出现在注入正文以及 startNode 的精确顺序，最终由 Task + Browser/Execution 联合合同决定。
 
@@ -358,8 +358,43 @@ conversationUrl
 
 ---
 
+<!-- OPENAI-CARRIER-ABSORPTION-20260812 -->
+
+# 13. Custom GPT 动态上下文传输：Browser 只做小控制面
+
+对于 Custom GPT Carrier，Browser trigger 的职责收敛为：
+
+```text
+taskId
+nodeId（如适用）
+runNo（如适用）
+roleRef
+workerRef
+triggerType
+必要的 expected versions / continuation ref
+极短 instruction
+```
+
+Browser **不再默认注入**：
+
+```text
+完整 Requirement / PRD / Technical Design
+测试报告
+代码包 / patch 全文
+长日志
+大型 JSON/CSV/PDF
+```
+
+大型动态上下文优先由 Worker 调用 Action，从 Task/Execution Public Contract 获取，并由 Gateway 使用 `openaiFileResponse` 放入当前 Conversation。
+
+`openaiFileIdRefs` / `openaiFileResponse` 是 Carrier transport；TaskDocument/Execution Artifact ownership 不改变。
+
+一次 WAKE 启动的是一个 Worker Turn，而不是“一个 Action”。同一个 Turn 内可以继续调用多个受控 Action；**Browser 不在每个 Action 之间机械再次 WAKE**。该实际行为进入真实 Carrier E2E；若目标 ChatGPT 环境出现差异，只回退为 bounded control text，不恢复大型 DOM 注入。
+
+File Bridge 对图片是非对称的：平台不能通过 `openaiFileResponse` 返回 image/video，因此 screenshot / Vision 仍由 Execution Browser + Model Vision 路径承担。
+
 <!-- ALIGNMENT-PATCH-20260812 -->
 
 ## ALIGN-001～250 增量修复：协议 Owner 与 WAKE 边界
 
-本文的 WORKER_BIND/NODE_READY/REOPEN/PEER_MESSAGE 载荷语义保留；实际 Browser protocol 的 Owner 改为 Execution Domain。Agent 只定义其中 Role/Worker/Collaboration 所需的 opaque identity/intent。WAKE 不承担大型 Task Context 传输；OpenAI File Bridge 等替代方案列为 Agent Carrier PENDING_SPIKE。
+本文的 WORKER_BIND/NODE_READY/REOPEN/PEER_MESSAGE 载荷语义保留；实际 Browser protocol 的 Owner 改为 Execution Domain。Agent 只定义其中 Role/Worker/Collaboration 所需的 opaque identity/intent。WAKE 不承担大型 Task Context 传输；GPT Actions File Bridge 已纳入 Custom GPT Carrier transport contract。Conversation-native file search、Code Interpreter Context Pack/Patch、Always Allow 与 Multi-Action Turn 的平台实际稳定性继续按 `PENDING_SPIKE` 验证。

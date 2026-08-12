@@ -107,3 +107,24 @@ v1 同 workspace 同时只允许一个 apply。使用简单 file lock；不设�
 ## ALIGN-001～250 增量修复：resume / recovery
 
 同一 planRef 重新 apply 时先观察现实，已满足 step 跳过；ACTION_REQUIRED 是正式 resumable boundary，但不演化为 job/lease/worker engine。Upgrade failure = STOP + verify/doctor；rollback 通过新的目标版本 Plan，不做自动事务式 rollback。
+
+<!-- OPENAI-CARRIER-ABSORPTION-20260812 -->
+
+## 9. Custom GPT Web-only 配置
+
+Custom GPT create/update 当前仍是 Web 操作。Deployment 不新增第二套状态；继续返回标准：
+
+```text
+status = ACTION_REQUIRED
+actionRequired.kind = WEB
+→ open GPT editor
+→ apply Instructions/Knowledge/Capabilities
+→ install static Actions schema
+→ configure role API-key/Bearer auth
+→ save
+→ Preview/real verify
+```
+
+同一 planRef resume 时先 verify reality，已经满足的 Web step SKIP，不要求用户机械重复。
+
+如果目标环境真实验证 `x-openai-isConsequential:false` + Always Allow 可稳定消除 routine confirmation，可以把“一次选择 Always Allow”列为 Agent Carrier setup/verify 步骤；**在 E2E 通过前不能把该 UI 行为当 Deployment 硬保证。**

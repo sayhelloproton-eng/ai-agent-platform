@@ -76,3 +76,32 @@ Template Migration 后复验
 ## 7. External Resource
 
 Conformance 可以用 fake resource 验证 Adapter contract；真实资源可用性属于 deployment `verify`，不能让 CI 强依赖用户外部账号。
+
+<!-- OPENAI-CARRIER-ABSORPTION-20260812 -->
+
+## 8. Custom GPT / Actions Conformance Profile
+
+当 Module/Agent Package 声明 `custom-gpt` Carrier 时，Static/Behavior Gate 追加：
+
+### Static
+
+- every Action operation has explicit `x-openai-isConsequential`；
+- no unsupported custom request headers；
+- `operationId` unique and role-scoped；
+- endpoint summary/description 与 parameter description 满足 OpenAI 当前长度约束；
+- `openaiFileIdRefs` 只出现在需要 Conversation file ingress 的 operation；
+- response schema 允许规范化 `openaiFileResponse`；
+- Actions 与 Apps 不同时作为该 GPT 的 P0 capability。
+
+### Gateway/File Bridge behavior
+
+- runtime validates `openaiFileIdRefs` object shape；
+- transient `download_link` 不持久化；
+- `openaiFileResponse` <= 10 files、<=10MB/file；
+- image/video response file rejected；
+- URL relay has `Content-Type` + `Content-Disposition`；
+- ordinary text request/response stays under 100k；
+- long operation does not rely on >45s blocking request；
+- overload/server errors keep real 429/5xx semantics。
+
+Conformance 只验证合同和 adapter 行为；Always Allow、Multi-Action Turn、Conversation file search、Code Interpreter Context Pack 的真实 ChatGPT 行为仍由 Carrier E2E Gate 判定。

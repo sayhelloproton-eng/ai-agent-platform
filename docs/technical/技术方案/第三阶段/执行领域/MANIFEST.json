@@ -7,8 +7,8 @@
   "files": [
     {
       "name": "00-完整技术方案与上下文真源.md",
-      "bytes": 22710,
-      "sha256": "ac5fde7f2e37625350ec56e7fa281c2f9365ec087b69700c6b4eaefc48e7d205"
+      "bytes": 24009,
+      "sha256": "1922c2b8e59493c905e603bb1dd7f2fc684775c319a435007bb7ec97aea43cad"
     },
     {
       "name": "01-领域职责边界与非目标.md",
@@ -17,43 +17,43 @@
     },
     {
       "name": "02-总体架构-包-服务-运行拓扑.md",
-      "bytes": 3551,
-      "sha256": "1055e7b6536c6a5386de484c5a95f7757377f9f79f234ccfd5f09bc3498c64dc"
+      "bytes": 4007,
+      "sha256": "ea7a2ec4bf1ae6df4d554f23fa25cd895ca42d67f5143c321c9e57da89388647"
     },
     {
       "name": "03-execution-runtime-详细技术方案.md",
-      "bytes": 4323,
-      "sha256": "28b726abd5350d114c26663367e1d3523dd3ed11d0b6538386d249c1b7db68ab"
+      "bytes": 4946,
+      "sha256": "267dcc7ea80c4da0b54f984dd37f18dfeb0adf3793e7519a49c83ccaa618ad4b"
     },
     {
       "name": "04-execution-browser-extension-详细技术方案.md",
-      "bytes": 8152,
-      "sha256": "1704411910325f7497d7403ffd016f50b0f829f1d379cb628679be46daf76bd7"
+      "bytes": 10188,
+      "sha256": "9b6b6e23618c804ab0ab5a8be239e62cd4b7c8583d4f1ad0df9ddf6c70d19f9d"
     },
     {
       "name": "05-execution-local-详细技术方案.md",
-      "bytes": 5177,
-      "sha256": "8dfe4de6814ecaeaf3582fc797c7ac63f001ba472d0bbef1d293b974e2d5d25e"
+      "bytes": 6265,
+      "sha256": "3a02e73b255273f551b50f7808a117ab26696ddfbb42feffddb53a59a7a3ef7c"
     },
     {
       "name": "06-Public-Contract与TypeScript类型规范.md",
-      "bytes": 5504,
-      "sha256": "76e370b5610c7abc3675608ae5b9a06669ff9189030af6297db9718b83ae6614"
+      "bytes": 5934,
+      "sha256": "4b167db130571e7486800b8a6e1920837b8b31e7816a886d20b7be8c5deb9155"
     },
     {
       "name": "07-Execution-Record-持久化-幂等-状态.md",
-      "bytes": 4338,
-      "sha256": "898cafbf246222c25f9f3c5879bfec6856002d834c7114ce20699727cdb24419"
+      "bytes": 4858,
+      "sha256": "cda508d4101a88823f57da85481564849643c3e33365c4edcfd0cabb0a5a6d03"
     },
     {
       "name": "08-Policy-FAST-REASON-Human-Effect-Approval.md",
-      "bytes": 2292,
-      "sha256": "3c11ff8ba10b5812a0897bcb4e36ee1025df8324f6f0ea7a0b6a85929d10437b"
+      "bytes": 2716,
+      "sha256": "6d49db6dfe8729855daed419b03f8d6172184762b7327d8ebc2d986fd4e36105"
     },
     {
       "name": "09-Result-Evidence-UNKNOWN与恢复.md",
-      "bytes": 2764,
-      "sha256": "027eec6f92485ddd5117c8416db6d4a33a74809265b41a30bd520071be271bc8"
+      "bytes": 3451,
+      "sha256": "7500f5e6a0b0b360a3f4c74eef6c2dd80db34451c82e7cafea5a2a64361a4957"
     },
     {
       "name": "10-Side-Panel-System-Observer-日志可观测性.md",
@@ -62,13 +62,13 @@
     },
     {
       "name": "11-跨领域接口依赖矩阵.md",
-      "bytes": 2660,
-      "sha256": "caf6e11d0f972c0b73c055cbddda859602382bfaa67daa5ff2a3f2f86c2c102f"
+      "bytes": 3128,
+      "sha256": "ad8c90e7e7705a8d907d53c01d72ef980365873e9a8ef2b9f808e3cb257c3a8d"
     },
     {
       "name": "12-测试验收-E2E-故障注入.md",
-      "bytes": 3356,
-      "sha256": "ed74bea1745eb234ee367a87b32b12584b2c7767043c05e86587a73f0edcb421"
+      "bytes": 4612,
+      "sha256": "d3d90a061fd7d343ecc854dfa4bd8f41d1f9ffbeb6bb0b57f3ee6328283e0fdf"
     },
     {
       "name": "13-TypeScript-Node20-工程约束.md",
@@ -87,8 +87,8 @@
     },
     {
       "name": "91-聊天讨论主题索引与结论映射.md",
-      "bytes": 5701,
-      "sha256": "a702effc4f64acd570912a6114ce3a09d355ddae15c92888ccb03a9a28a744e5"
+      "bytes": 5884,
+      "sha256": "83892b39f56be7c61b5949f866d69850792eae0ee6323e7e0afd43825fbef441"
     },
     {
       "name": "92-冻结结论覆盖检查表.md",

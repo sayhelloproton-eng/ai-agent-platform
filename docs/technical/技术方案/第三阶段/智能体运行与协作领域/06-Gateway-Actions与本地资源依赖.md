@@ -267,7 +267,131 @@ authorization
 
 Agent 可以请求动作，Execution 决定动作能否真实执行。
 
+OpenAI `x-openai-isConsequential` 只控制 Carrier UI confirmation，不取代 Execution Approval。Routine platform control/intent Action 通过静态 Schema 显式标记 consequential=false；真实副作用仍由 Execution owner 判定。
+
 ---
+
+<!-- OPENAI-CARRIER-ABSORPTION-20260812 -->
+
+# 12. OpenAI Actions Transport Contract
+
+Gateway 是 OpenAI Carrier Anti-Corruption Layer，因此 **GPT-facing DTO 与内部 Domain DTO 可以不同**。Carrier 限制只停留在 Gateway adapter，不污染 Task / Agent / Execution / Model Public Contract。
+
+## 12.1 GPT-facing request 不依赖 Custom Headers
+
+GPT Action 不要求平台自定义 Header。以下字段必须在 typed body/path/query 中表达：
+
+```text
+idempotencyKey
+correlationId
+expectedTaskVersion
+expectedNodeVersion
+taskId
+nodeId
+workerRef
+```
+
+Gateway 完成认证与 normalize 后，再转换为内部 canonical request。Role API-key/Bearer auth 继续由 Action Authentication 配置提供。
+
+## 12.2 Production hard limits
+
+Gateway / Deployment conformance 必须检查：
+
+```text
+45s Action round-trip hard ceiling
+request/response < 100,000 chars
+TLS 1.2+
+public HTTPS port 443
+real HTTP 429/5xx
+structured raw response
+```
+
+长时间 Execution 采用“快速接受/返回 ref → 后续查询/Worker continuation”，不让一个 Action HTTP request 阻塞到真实任务完全结束。
+
+## 12.3 `x-openai-isConsequential`
+
+每个 operation 必须显式声明 `true/false`，禁止依赖 HTTP method 默认值。
+
+平台 query/control/intent operation 若自身不直接完成不可逆真实 Effect，静态 Schema 设为：
+
+```yaml
+x-openai-isConsequential: false
+```
+
+真正 Local/Browser Effect 仍经过 Execution Policy / Approval。若未来存在 Action endpoint 自身直接完成高风险外部 Effect，才把该 operation 设为 `true`。
+
+`Always Allow` 在目标 Custom GPT 主链中的实际稳定行为仍需真实 Preview/E2E；在验证通过前，Browser permission recovery 不能删除。
+
+# 13. GPT Actions File Bridge
+
+## 13.1 Ingress：`openaiFileIdRefs`
+
+Gateway 必须专门 normalize：
+
+```ts
+interface OpenAIActionFileInputRef {
+  name: string;
+  id: string;
+  mime_type: string;
+  download_link: string;
+}
+```
+
+规则：
+
+- 最多 10 个 Conversation 文件；
+- `download_link` 是约 5 分钟瞬时 locator，不持久化；
+- OpenAI file id 只记 provenance/externalRef，不作为领域实体 ID；
+- Gateway 不直接把不受信任 URL bytes 写入业务目录；
+- 需要导入真实 bytes 时通过 Execution 的受控 File/Network mechanics 做 MIME/size/hash/scope 校验。
+
+## 13.2 Egress：`openaiFileResponse`
+
+Gateway 支持：
+
+```text
+inline base64 item
+HTTPS relay URL item
+```
+
+约束：
+
+```text
+最多 10 files
+每文件 <= 10 MB
+不得返回 image/video
+URL fetch 需要 Content-Type + Content-Disposition
+OpenAI 单文件 fetch timeout = 10s
+```
+
+非平凡文件优先短期 opaque relay URL。Relay 只解决 Carrier transport，不拥有 TaskDocument / Execution Artifact 的业务语义。
+
+## 13.3 Ownership
+
+```text
+Gateway   → OpenAI file protocol / normalize / relay
+Task      → TaskDocument truth
+Execution → physical fetch/materialization/hash/evidence
+Agent     → Carrier/Role/Worker/Collaboration
+Deployment→ capability/config/verify
+```
+
+不新增 File Service / Artifact Domain。
+
+## 13.4 Dynamic Context
+
+Custom GPT Worker 的大型 Task Context 优先：
+
+```text
+Worker
+→ getNodeContext / getTaskDocument Action
+→ Gateway
+→ Task Public API
+→ openaiFileResponse
+→ current Conversation
+```
+
+Browser WAKE 只传小型 identity/trigger。File Bridge 失败时允许小型 bounded text fallback，但不得重新把完整 PRD/日志/代码包恢复为 DOM 注入主路径。
 
 <!-- ALIGNMENT-PATCH-20260812 -->
 
@@ -276,4 +400,4 @@ Agent 可以请求动作，Execution 决定动作能否真实执行。
 - Gateway 是 Custom GPT Actions 公网 Anti-Corruption Layer，不拥有下游业务状态，不直接触达 Local/Browser Effect。
 - Dev Tunnel 改由 Deployment External Resource Module 管理；Gateway 只 Requires 一个满足 public ingress capability 的 moduleRef/逻辑能力。
 - 本地/浏览器真实能力统一通过 Execution Public Contract；Gateway 不 import execution-local/browser internal implementation。
-- GPT-facing transport 的 OpenAI 特有限制与 File Bridge 进入 Agent Carrier conformance；未验证项保持 PENDING_SPIKE。
+- GPT-facing transport 的 OpenAI hard limits 与 File Bridge 官方协议进入 Agent Carrier conformance；只有 Always Allow / Multi-Action Turn / Conversation file search / Context Pack 的目标环境行为保持 `PENDING_SPIKE`。

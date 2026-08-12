@@ -336,3 +336,57 @@ next ask only after previous reply DELIVERED
 ```
 
 Product Agent Package 需要在 Task 创建前获得 current workerRef；Carrier Context/current-link Action 只作为 `PENDING_SPIKE` 候选能力，不能预设为稳定 Action。具体来源/operationId 由真实 Custom GPT + Browser Carrier E2E 后冻结。
+
+<!-- OPENAI-CARRIER-ABSORPTION-20260812 -->
+
+# 11. OpenAI Actions transport flags 与 File Bridge
+
+## 11.1 `x-openai-isConsequential`
+
+所有角色包的每个 operation 都必须显式设置该字段。
+
+默认分类：
+
+```text
+query/read/context lookup                  → false
+Task/Agent logical control or intent       → false
+requestExecution（只创建执行意图）          → false
+Gateway 直接完成不可逆外部 Effect           → 禁止；如未来确有此类 operation 才设 true
+```
+
+Execution 的真实 Effect Approval 独立存在，不能用 OpenAI confirmation 替代。
+
+## 11.2 File fields
+
+需要从当前 Conversation 接收文件的 operation 可以声明：
+
+```text
+openaiFileIdRefs
+```
+
+Gateway 负责把 OpenAI runtime object[] normalize 为 canonical file descriptors。
+
+需要向 Conversation 返回文件时使用：
+
+```text
+openaiFileResponse
+```
+
+它是 Action response transport 字段，不新增 `getFileBridge` / `sendFile` 之类业务 Action。
+
+## 11.3 Custom Header 禁止
+
+GPT-facing OpenAPI 不把 `idempotencyKey/correlationId/expectedVersion/workerRef` 放自定义 Header；全部进入 typed body/path/query，再由 Gateway 转为内部合同。
+
+## 11.4 追加 Contract Tests
+
+- [ ] every operation has explicit `x-openai-isConsequential`；
+- [ ] OpenAPI request/response stays under ordinary 100k text budget for non-file payload；
+- [ ] file ingress runtime object shape is validated；
+- [ ] `download_link` is never persisted as durable ref；
+- [ ] `openaiFileResponse` <=10 files and <=10MB/file；
+- [ ] response file rejects image/video；
+- [ ] URL relay returns `Content-Type` + `Content-Disposition` and does not leak local path；
+- [ ] no unsupported custom request headers；
+- [ ] real 429/5xx are preserved；
+- [ ] Preview E2E covers Action auth + file bridge + consequential behavior。

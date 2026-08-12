@@ -426,3 +426,21 @@ workerRef → request + Task binding validation
 - 旧的 Extension Collaboration Delivery API 若直接操作 Browser/Delivery，标记 `Deprecated / Superseded by ALIGN-008/016/079`；物理 delivery 改调用 Execution Public API，Agent 只接收 execution/delivery result。
 - Task binding 只通过 Task Public `bindTaskWorker/getTask(roleBindings)`；Agent 不持久化第二份 binding。
 - 跨域请求/响应遵守统一 contract/version/error envelope 与 runtime validation；Ref 只 opaque 透传。
+
+<!-- OPENAI-CARRIER-ABSORPTION-20260812 -->
+
+# 9. OpenAI Carrier DTO 与 Domain Public Contract 的分层
+
+`openaiFileIdRefs`、`openaiFileResponse`、`x-openai-isConsequential` 都是 **Custom GPT Carrier/OpenAPI transport contract**，不是 Task/Agent/Execution 领域实体字段。
+
+因此：
+
+```text
+Custom GPT OpenAPI
+→ Gateway OpenAI Adapter
+→ canonical Domain Public API
+```
+
+Gateway 可以把 `getNodeContext/getTaskDocument` 的文档结果序列化为 `openaiFileResponse`，也可以把文件型 TaskDocument 写入请求中的 `openaiFileIdRefs` 归一化后再调用 owning domain。
+
+不得为了适配 OpenAI 把 `download_link`、OpenAI file id 或 consequential flag 写入 Task/Execution 业务表。

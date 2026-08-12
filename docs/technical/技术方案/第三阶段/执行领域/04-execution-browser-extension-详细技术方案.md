@@ -157,10 +157,11 @@ open /g/<role>/c/<workerRef>
 ```text
 ensure RESTORE
 → verify page is writable/not BUSY in conflicting action
-→ build explicit trigger payload
+→ build small identity/trigger payload
 → input
 → submit
 → verify message inserted in target conversation
+→ Worker uses Actions/File Bridge for large dynamic context
 → optional observe generation/action signal
 ```
 
@@ -205,20 +206,30 @@ Runtime Stall：page BUSY + 长时间无真实 progress + 排除了模型/Execut
 
 ## 12. GPT Action Permission
 
-Expected managed worker + expected gateway/action/scope + Policy allow：自动 Allow。
+Static OpenAPI 对 routine query/control/intent operation 必须显式 `x-openai-isConsequential:false`。OpenAI Carrier confirmation 与 Execution Approval 是两层独立语义。
 
-异常/不确定：
+目标 happy path：
 
 ```text
-do not Deny first
+routine non-consequential Action
+→ 若目标环境已验证 Always Allow，则不需要 Browser 每次自动点击
+→ Action 直接进入 Gateway
+```
+
+Browser permission handler 保留为 fallback：
+
+```text
+unexpected prompt / changed schema-domain-auth / consequential prompt / Always Allow 尚未验证
+→ do not Deny first
 → preserve page
 → screenshot/log/evidence
-→ lane WAITING_HUMAN
-→ ask user
+→ lane WAITING_HUMAN or bounded known-action handling
 → result returns
 → revalidate page/task/execution/fingerprint
 → resume same continuation
 ```
+
+因此“自动 Allow 每个正常 Action”从目标主路径裁掉，但在 Always Allow Spike 通过前不能删除恢复能力。
 
 ## 13. Human Decision
 
@@ -351,4 +362,21 @@ P0 必须实现，详见 `10`。
 
 ## ALIGN-001～250 增量修复：唯一 Browser Owner
 
-Execution Browser 唯一拥有 CREATE / RESTORE / WAKE / page runtime state / permission / screenshot / click-type-submit / collaboration physical delivery / recovery。Task Driver 只能通过 Task Public API 读取/推进，不得直接写 Task Store；Role/Worker identity 通过 Agent Public API。WAKE 成功不等于 Node/Action/Effect 成功；大型动态上下文不再默认经 DOM 注入，OpenAI File Bridge 留 Agent Carrier Spike。
+Execution Browser 唯一拥有 CREATE / RESTORE / WAKE / page runtime state / permission / screenshot / click-type-submit / collaboration physical delivery / recovery。Task Driver 只能通过 Task Public API 读取/推进，不得直接写 Task Store；Role/Worker identity 通过 Agent Public API。WAKE 成功不等于 Node/Action/Effect 成功；大型动态上下文不再默认经 DOM 注入，GPT Actions File Bridge 已进入 Carrier transport contract；其 Conversation file search/Code Interpreter 使用效果留 Agent Carrier E2E。
+
+<!-- OPENAI-CARRIER-ABSORPTION-20260812 -->
+
+## 20. Browser 与 GPT Actions File Bridge 的职责分层
+
+Browser 不负责大型文件/上下文传输。
+
+```text
+Browser → Conversation identity/lifecycle/page state/submit/recovery
+Gateway → OpenAI Actions/File Bridge protocol
+Task    → TaskDocument
+Execution Local/Network → physical file fetch/materialization
+```
+
+一次 WAKE 只需送达一个小型 trigger；Worker Turn 内可以继续调用多个 Action，Browser 不在每个 Action 之间机械 WAKE。该 Multi-Action 行为需真实 Carrier E2E，但不再把“一 Action 一 WAKE”写成默认流程。
+
+`openaiFileResponse` 不能返回 image/video，因此 Browser screenshot + Model Vision 继续保留，不被 File Bridge 替换。

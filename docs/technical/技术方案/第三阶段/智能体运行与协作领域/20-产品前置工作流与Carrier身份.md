@@ -166,3 +166,24 @@ replyPeer(threadId, content)
 ## ALIGN-001～250 增量修复：Carrier identity 的可靠来源
 
 `workerRef = c-id` 的业务定义保留，但 **不得假设 GPT Action 自动提供稳定 Conversation c-id**。产品 Worker 的当前 c-id 获取继续属于 Carrier E2E 待验证能力；若 Action 无可靠来源，允许使用 Execution Browser 的被动 URL/页面观察取得并验证。Task 只接收最终 opaque product roleRef + workerRef。
+
+<!-- OPENAI-CARRIER-ABSORPTION-20260812 -->
+
+# 8. 产品需求文件进入 Task 的轻量路径
+
+产品 Conversation 可以使用 Code Interpreter 生成 `requirements.md / prd.md` 等文件，并在 createTask/TaskDocument 相关 Action 中通过 `openaiFileIdRefs` 交给 Gateway。
+
+正式边界：
+
+```text
+Product GPT / Code Interpreter
+→ openaiFileIdRefs
+→ Agent Gateway normalize
+→ Execution bounded fetch/verify（需要 bytes 时）
+→ Task Public Contract
+→ TaskDocument
+```
+
+OpenAI file id 只作为 provenance，不替代 TaskDocument identity/version。
+
+这条文件路径 **不解决 workerRef/c-id 身份问题**；产品 Worker 的 c-id 仍不得假设 Action request 自动提供，继续由 Browser/Carrier observation 的真实 E2E 证明。

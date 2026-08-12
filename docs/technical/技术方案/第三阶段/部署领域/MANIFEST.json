@@ -6,9 +6,9 @@
   "files": [
     {
       "name": "00-完整技术方案与上下文真源.md",
-      "sha256": "f5d7a8dc5d98761c08308d8cccad824c5418d05d0dbaaecc70fc75ddad496aae",
-      "bytes": 14003,
-      "lines": 522
+      "sha256": "6d113f0a26eb553c648cae09ffaea84bf107a534a77e52329ad9126fd722a081",
+      "bytes": 14556,
+      "lines": 528
     },
     {
       "name": "01-领域宪章与边界.md",
@@ -30,9 +30,9 @@
     },
     {
       "name": "04-外部资源Module统一治理.md",
-      "sha256": "6c95d3d9673cde08afe98f7bfc81cb6f1e1d9ae34856c6df9aa46482ecb27d64",
-      "bytes": 2936,
-      "lines": 83
+      "sha256": "b55747c426ca3664c09dec844739c811fa13ab49f403fbb56e1f5410ae6bdc05",
+      "bytes": 4091,
+      "lines": 123
     },
     {
       "name": "05-module-template-详细技术方案.md",
@@ -42,9 +42,9 @@
     },
     {
       "name": "06-deployment-conformance-详细技术方案.md",
-      "sha256": "78183733eff24a983bd1ee753e4bc571c6a482ad724958470a9a275f1f49ea67",
-      "bytes": 1847,
-      "lines": 78
+      "sha256": "1064c97d541bd19af19c5cd173175a13113d477288386fd43b4cc10da5ee1d27",
+      "bytes": 3145,
+      "lines": 107
     },
     {
       "name": "07-platform-cli-详细技术方案.md",
@@ -54,9 +54,9 @@
     },
     {
       "name": "08-Deployment-Plan-Apply-ACTION_REQUIRED与恢复.md",
-      "sha256": "2237176607772ecef6a9c50e8c0dd6ba608f14c31d0a4ec0721fa3352c107dea",
-      "bytes": 2543,
-      "lines": 109
+      "sha256": "103b38a01a6413aa3372e117e405d8eb0e3423246c6084421f2b0b7af077819e",
+      "bytes": 3353,
+      "lines": 130
     },
     {
       "name": "09-版本-升级-兼容性-模板迁移.md",
@@ -66,9 +66,9 @@
     },
     {
       "name": "10-Verify-Doctor-Manifest与Platform-READY.md",
-      "sha256": "23b4a1f040dcc83f5851fb208a4d94395c2e05edb82295b3e61460521c1e92f5",
-      "bytes": 2478,
-      "lines": 108
+      "sha256": "65f30a2a58355576baa09e2f5177b7c80719aa1cbdfc663f82ce9884c3e94888",
+      "bytes": 3277,
+      "lines": 139
     },
     {
       "name": "11-部署状态-目录-Secret与安全.md",
@@ -90,9 +90,9 @@
     },
     {
       "name": "14-测试门禁与真实验收.md",
-      "sha256": "fe75f7ae5c6dcbc776eb5063d422f3a88964b0053d40ce6b5db8622a287915a0",
-      "bytes": 2400,
-      "lines": 98
+      "sha256": "198c7f4d726cc459e29f3179c9a02d287c54fbb2c66b8b602d14747c224798aa",
+      "bytes": 3000,
+      "lines": 126
     },
     {
       "name": "15-新仓库实施顺序-停止门与非目标.md",

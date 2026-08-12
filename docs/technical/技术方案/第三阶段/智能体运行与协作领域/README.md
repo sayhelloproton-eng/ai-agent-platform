@@ -321,3 +321,18 @@ Execution Local Resource contract
 Package lifecycle common contract
 Deployment “package self-loop vs planner-owned apply” conflict
 ```
+
+<!-- OPENAI-CARRIER-ABSORPTION-20260812 -->
+
+## Carrier reuse first｜2026-08-12
+
+Custom GPT v1 数据通道收敛为：
+
+```text
+small control JSON → GPT Actions
+documents/files    → GPT Actions File Bridge
+Conversation/page  → Execution Browser
+real effects       → Execution
+```
+
+Gateway 已正式吸收 `openaiFileIdRefs/openaiFileResponse`、Actions hard limits、Custom Header 限制和显式 `x-openai-isConsequential`。Always Allow、Multi-Action Turn、Conversation file search、Code Interpreter Context Pack/Patch 仍以真实 E2E 状态推进，不作为未经验证的业务保证。

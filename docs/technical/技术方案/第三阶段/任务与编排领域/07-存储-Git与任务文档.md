@@ -114,7 +114,7 @@ Plan 使用逻辑类型，不写实际文件路径。
 
 # 9. Node Context
 
-Node 声明 inputDocuments / outputDocuments。Worker 调 `getNodeContext(taskId, nodeId)`；Task Service 查 Task / Node → 读取声明 → 查 task_documents → 安全读取 Markdown → 组合 response。
+Node 声明 inputDocuments / outputDocuments。Worker 调 `getNodeContext(taskId, nodeId)`；Task Service 查 Task / Node → 读取声明 → 查 task_documents → 组合小型 Task/Node facts + document metadata。正文按需通过 `getTaskDocument` 读取；Custom GPT Carrier 由 Gateway 适配为 File Bridge。
 
 Worker 不自己扫描 `.ai-agent-platform`。
 
@@ -170,6 +170,39 @@ Phase 3 正式技术方案仍写入当前源码目录正常的 `docs/technical/�
 
 ---
 
+<!-- OPENAI-CARRIER-ABSORPTION-20260812 -->
+
+# 16. Custom GPT File Bridge 与 TaskDocument
+
+File Bridge 只改变 TaskDocument 的 Carrier transport，不改变 Task ownership。
+
+输入：
+
+```text
+Custom GPT file
+→ openaiFileIdRefs
+→ Gateway normalize
+→ Execution bounded fetch/verify
+→ canonical TaskDocument write
+```
+
+输出：
+
+```text
+getNodeContext 返回小型 Task/Node + document metadata
+→ Gateway 按需读取 TaskDocument
+→ openaiFileResponse
+→ current Worker Conversation
+```
+
+约束：
+
+- OpenAI file id 仅可记 provenance/externalRef；
+- 5 分钟级 `download_link` 不进入 TaskDocument durable metadata；
+- TaskDocument 的 path/hash/version 仍由 Task Domain 定义；
+- Browser 不再承担大型 TaskDocument DOM 注入；
+- 不新增 Task RAG/Vector DB/File Domain。
+
 <!-- ALIGNMENT-PATCH-20260812 -->
 
 ## ALIGN-001～250 增量修复：Document / Artifact / Context 边界
@@ -177,4 +210,4 @@ Phase 3 正式技术方案仍写入当前源码目录正常的 `docs/technical/�
 - TaskDocument 仍是 Task 唯一业务文档真源；Markdown/Git + Task metadata 的原设计保持。
 - Execution 生成的 patch/stdout/download/screenshot 首先是 Execution output/artifact/evidence；只有通过 Task Public Contract 显式接收后才成为 TaskDocument。
 - `getNodeContext` 只组合 Task 已拥有/引用的任务事实与文档，不升级为全平台 Context Aggregator。
-- 大型输出优先传 `documentRef/outputRef/evidenceRef`；OpenAI File Bridge 属于 Agent Carrier 专项，未验证前不改变 TaskDocument 真源。
+- 大型输出优先传 `documentRef/outputRef/evidenceRef`；Custom GPT File Bridge 已作为 Carrier transport 吸收，但不改变 TaskDocument 真源。Conversation-native file search/Code Interpreter 使用效果仍由 Carrier E2E 验证。

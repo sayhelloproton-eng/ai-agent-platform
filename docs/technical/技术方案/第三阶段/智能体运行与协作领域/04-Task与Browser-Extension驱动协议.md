@@ -45,9 +45,10 @@ Collaboration Thread/Message/Delivery
 创建研发/测试 Worker
 识别 c-id
 绑定 Worker 到 Task（通过 Task Public API）
-WORKER_BIND/NODE_READY/REOPEN/PEER_MESSAGE 注入
+WORKER_BIND/NODE_READY/REOPEN/PEER_MESSAGE 小型 trigger 注入
 Collaboration delivery
 真实 Browser Receipt / retry recovery
+不承担大型 Task 文档 / Artifact 的 DOM 传输
 ```
 
 它不能复制 Task eligibility/state machine。
@@ -313,6 +314,39 @@ Browser Extension
 不使用 Role Bearer Key。
 
 ---
+
+<!-- OPENAI-CARRIER-ABSORPTION-20260812 -->
+
+# 14. Carrier reuse 后的 Browser 流程裁剪
+
+Custom GPT 已提供 GPT Actions File Bridge 后，Browser 主链只保留它不可替代的职责：
+
+```text
+Conversation CREATE / RESTORE / WAKE
+g-id / c-id identity observation
+page state / permission UI / screenshot
+真实 Browser submit / delivery / recovery
+```
+
+Task 文档与大型动态上下文改为：
+
+```text
+Worker Action
+→ Gateway
+→ Task/Execution Public API
+→ openaiFileResponse
+→ Conversation
+```
+
+所以以下流程从 v1 happy path 裁掉：
+
+```text
+Browser 注入完整 PRD/技术方案/测试报告
+每个 Action 完成后 Browser 再次 WAKE
+把 Browser permission 自动点击当作所有 routine Action 的必经步骤
+```
+
+静态 OpenAPI 对 routine control/intent operation 显式 `x-openai-isConsequential:false`。`Always Allow` 是否能在目标环境稳定消除后续 routine prompt 仍需 E2E；Browser permission handler 保留为异常/恢复能力，不能提前删除。
 
 <!-- ALIGNMENT-PATCH-20260812 -->
 

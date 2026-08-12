@@ -381,3 +381,9 @@ Production Ready            NO
 9. Gateway / Browser Extension 最小接线
 10. 用平台自身 Phase 3 Task 做真实 dogfooding
 ```
+
+<!-- OPENAI-CARRIER-ABSORPTION-20260812 -->
+
+## Custom GPT 动态文档传输
+
+TaskDocument ownership 不变。对 Custom GPT Carrier，`getNodeContext` 默认保持小型结构化 response，文档正文优先由 Gateway 通过 GPT Actions File Bridge 传入当前 Conversation；`openaiFileIdRefs/openaiFileResponse` 不成为 Task 业务字段。

@@ -102,3 +102,22 @@ STOP / ESCALATE / return unresolved
 ## ALIGN-001～250 增量修复：caller-owned bridge
 
 正式链保持：Model Proposal → caller schema/allowlist/scope/policy/approval → Execution `executeCapability`。Model Runtime 不直接 import/call Execution；一次 infer 最多一个 proposal，caller 控制有限 maxRounds，禁止自主无限 Tool Loop。
+
+<!-- OPENAI-CARRIER-ABSORPTION-20260812 -->
+
+## 9. Carrier Function Calling 与 Model Proposal 分层
+
+Custom GPT 为调用 Gateway 所使用的 native Actions/Function Calling 是 Carrier transport/interaction mechanism；它不是本文件定义的 Capability Proposal。
+
+因此：
+
+```text
+Custom GPT Action selection
+→ Gateway route/domain call
+
+Model Capability Proposal
+→ caller validates
+→ Execution admission/effect
+```
+
+两条链可以在同一 Worker Turn 中先后出现，但不得互相替代。尤其不能因为 Custom GPT 能 native Function Calling，就给本地 FAST/REASON 模型重新开放 autonomous Tool Loop。

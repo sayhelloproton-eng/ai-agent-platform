@@ -76,3 +76,11 @@ Vision 不能因为有图片就回到开放式聊天模式。
 - byte size；
 - fingerprint；
 - 调用领域已有 screenshotRef（如有）。
+
+<!-- OPENAI-CARRIER-ABSORPTION-20260812 -->
+
+## 10. File Bridge 的图像非对称性
+
+OpenAI Action 可以把 Conversation 中的用户图片作为 `openaiFileIdRefs` 输入给平台，但 `openaiFileResponse` 不能向 Conversation 返回 image/video。
+
+因此平台侧 screenshot / Browser page image → Vision 的既有路径继续成立；File Bridge 只减少文档/文件型动态上下文 transport，不替代 Model Vision。

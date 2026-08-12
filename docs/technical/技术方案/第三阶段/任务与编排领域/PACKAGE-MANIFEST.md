@@ -6,17 +6,17 @@ Suggested repository destination:
 
 Files:
 
-- `00-完整技术方案与上下文真源.md` — 91788 bytes — SHA256 `a629037f9a0870691db0e09b520449c533949cb346000c94a0478bae70ce85fc`
-- `01-领域模型与状态语义.md` — 8851 bytes — SHA256 `409aadc99c40cbaead6c4eff8dcd79b420e57ca2584efb268a4112c40b7b4c45`
-- `02-关键流程与状态转换.md` — 5926 bytes — SHA256 `19f651a573320af7647f42b4b22440e0ddf0859aa297352120bd31c42b1308e4`
-- `03-Public-API-契约.md` — 17021 bytes — SHA256 `cbad95d0717bb56d11fbce0a46102b69207bd49ea08e565e6e9ccfc2d936c179`
-- `04-数据模型与SQLite-DDL.md` — 8401 bytes — SHA256 `6e93e4118055c2310a789a283ac1a35367b098a76bc8b5ac4b5f794360999119`
-- `05-事务-版本-幂等与恢复.md` — 5434 bytes — SHA256 `0b28a20ba0cf8f93c76071bf15408e87620513eee5a7d009147700a09e081c32`
-- `06-Service与npm模块设计.md` — 5634 bytes — SHA256 `fe82518089c68382faafaae4c2fc4425eb79eae86d261b686cb33f1cc454b627`
-- `07-存储-Git与任务文档.md` — 4605 bytes — SHA256 `d3e642cde7c6f38d2a8782a7e280a82497fd81afa5401d73b58f34b18a960e37`
-- `08-TODO-实施顺序与验收门禁.md` — 6761 bytes — SHA256 `b8a73d8577a481a1d71dd3ef443e5516ba2293c8dbc5c5494044f87e88303058`
-- `09-设计决策记录与明确非目标.md` — 5789 bytes — SHA256 `61b37bce8138e254da2d7a1ade3429080550cd8e82157362a9c637caed7b6ebd`
+- `00-完整技术方案与上下文真源.md` — 105699 bytes — SHA256 `95a1d763089b79b73a2cb0d269807fc107cf075e8614fb2dd724e5677a9f18b9`
+- `01-领域模型与状态语义.md` — 9660 bytes — SHA256 `112596160ca89476b48303b7270ed22f96ec8fc4a43ba72ba9cb4a476c3df82f`
+- `02-关键流程与状态转换.md` — 6425 bytes — SHA256 `6116a641d8c0c3fc932ee5c7cde50364cdb0726cb0df840ac81ca346353186ac`
+- `03-Public-API-契约.md` — 23972 bytes — SHA256 `7c01314b4fb1e7f76585ae3fed2c398dc5e2c5d6aee0866f17204a0ca7c670db`
+- `04-数据模型与SQLite-DDL.md` — 9705 bytes — SHA256 `621fb9034bf385781f8c695ddb2300f38917b874bf07585d2eb66251a1147354`
+- `05-事务-版本-幂等与恢复.md` — 6032 bytes — SHA256 `8a3e135b20503c84fe72b726b47482665ed68abba5a936987f53f958eecbaee2`
+- `06-Service与npm模块设计.md` — 6546 bytes — SHA256 `7125d27bf7fe6fc73535d64ec693ab66510d8bed9346d130250b2696503d5153`
+- `07-存储-Git与任务文档.md` — 6350 bytes — SHA256 `e574ad6afdfccb67b5e2d59ff2534e3af155e3ee6c50da2606427e07c5fd7104`
+- `08-TODO-实施顺序与验收门禁.md` — 7460 bytes — SHA256 `03bd36ea06bbb11422cae15e6591ff83edaeb7fe85c2a184626839174030701a`
+- `09-设计决策记录与明确非目标.md` — 6429 bytes — SHA256 `949111ba0f66cb48e60d232ad529f7de7938a24e4edcb0219a5996ac231ce9a8`
 - `10-技术选型调研与取舍.md` — 5196 bytes — SHA256 `8135f695104b2e7f305d598c13f2a873b266520916f8ed07b7932b14dc7c6503`
-- `11-上下文继承与跨领域边界.md` — 4529 bytes — SHA256 `658492d748c66f189d5bff3b2b1cb0ddfa1378d6d7a1a1ceecd60124974be1cd`
-- `API-依赖-模块清单.md` — 2270 bytes — SHA256 `7eb1662636abfbed9edf4eb187e22a00929ebe6deb76387b4adfc12755814889`
-- `README.md` — 9846 bytes — SHA256 `d2352c6753b4783692359bc085c857e6fb0835f9bbfd4bc04b50521e55ea5ef2`
+- `11-上下文继承与跨领域边界.md` — 6332 bytes — SHA256 `84a5f4d7e8835dde63d4ce94bfc4589bb8486719a54c6f4a1911b4c9024c7d87`
+- `API-依赖-模块清单.md` — 2651 bytes — SHA256 `34ebb367a664232096e44ee80b6d8eeb50bb5a986c7ec620f84d2cbbbb3be3a7`
+- `README.md` — 10470 bytes — SHA256 `876474ea41f6812a19074c5cbc98014a1cb981670c75f31aef7e0963e4614e5a`

@@ -44,6 +44,21 @@ Adapter 负责翻译，不拥有外部产品。
 
 验证 ChatGPT Web/Custom GPT 使用前置、必要用户登录/账号/载体可达性；不能伪造在线状态。GPT 创建/配置由 Agent Package 部署计划与人工步骤共同完成。
 
+对于 v1 Custom GPT + Actions，Carrier Module/Agent Package requirements 至少能够验证或引导：
+
+```text
+Actions enabled
+static OpenAPI installed
+Action auth valid
+File Bridge required/optional
+Code Interpreter required/optional
+Web Search required/optional
+Apps disabled when Actions are the P0 tool chain
+recommended model only advisory
+```
+
+Role READY 依据真实配置能力 + Action E2E，不依据精确 ChatGPT model id。
+
 ## 4. 生命周期真实主义
 
 External Resource Module 只实现真正能控制的 primitive。
@@ -81,3 +96,28 @@ Platform CLI 不假定所有外部资源都可自动升级。
 ## ALIGN-001～250 增量修复：统一外部依赖
 
 Dev Tunnel、Chrome Runtime、ChatGPT Carrier、Model Provider API 全部必须作为 External Resource Module 纳入同一 Module Graph。External adapter 只暴露现实可观测/可配置/可验证 lifecycle，不伪造无法控制的 start/stop。FAST/REASON 不作为 Provider Module identity；Provider 只提供通用 `model.provider.api` capability。
+
+<!-- OPENAI-CARRIER-ABSORPTION-20260812 -->
+
+## 8. OpenAI Actions / Public Ingress 的外部约束
+
+Custom GPT Carrier 与 public-ingress Module 的 verify 必须覆盖 OpenAI 当前 production hard contract：
+
+```text
+TLS 1.2+
+public HTTPS / port 443
+Action request/response < 100,000 chars
+45s round-trip ceiling
+real 429/5xx
+file relay reachable
+```
+
+Carrier-specific conditional checks：
+
+```text
+Workspace action-domain allowlist（适用工作区时）
+Privacy Policy URL（公开 GPT + Actions 场景需要时）
+Action auth（包括 GPT version restore/upgrade 后重新验证）
+```
+
+这些只进入 ChatGPT Carrier / public-ingress External Resource Module，不扩展成新的 Deployment Service。

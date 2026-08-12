@@ -418,3 +418,19 @@ Machine-readable Schema / Conformance / CI Gate
 ## 2026-08-12 五领域总纲对齐状态
 
 ALIGN-001～250 已完成并冻结为本轮修复目标。平台约定不构成第六领域；`platform-host` 仅是 Composition Root package。后续阶段从“继续设计”切换为文档原位修复 → semantic diff/coverage 审计 → Codex 实施 → 真环境 E2E。
+
+<!-- OPENAI-CARRIER-ABSORPTION-20260812 -->
+
+## Carrier reuse first
+
+跨领域约定新增一条 transport 原则，不新增第六领域：
+
+```text
+small structured control → Carrier JSON
+documents/files/large dynamic context → Carrier-native File Bridge（Custom GPT: GPT Actions）
+Conversation/page lifecycle → Execution Browser
+real effects → Execution
+business facts → owning Domain
+```
+
+Carrier-specific DTO 由边界 adapter 吸收，不能反向污染领域 Public Contract。

@@ -124,3 +124,19 @@ Did it already happen?
 即使 retryable=true，也要在执行前重新校验 scope/precondition/fingerprint。
 
 UNKNOWN 通常 retryable=false，直到 reality reconciliation 把状态转成可安全继续。
+
+<!-- OPENAI-CARRIER-ABSORPTION-20260812 -->
+
+## 10. Carrier File Bridge 的 Result / UNKNOWN 边界
+
+Carrier 文件传输失败与真实 Effect UNKNOWN 必须分开：
+
+```text
+download_link expired / relay fetch timeout / OpenAI 10s file fetch failure
+→ carrier/file transport failure
+→ 不自动推导 UNKNOWN_SIDE_EFFECT
+```
+
+只有真实 Effect 已 `STARTED` 且无法确认现实结果时才进入 Execution UNKNOWN。
+
+若文件 bytes 已成功下载但 TaskDocument 尚未正式接收，Execution 可以保留受控 temporary result/evidence 并由上游重新提交 canonical write；不能因为 OpenAI 临时 URL 过期就重复执行已经发生的真实外部 Effect。

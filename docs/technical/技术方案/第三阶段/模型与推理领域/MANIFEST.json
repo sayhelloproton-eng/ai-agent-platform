@@ -14,13 +14,13 @@
   "files": [
     {
       "path": "00-完整技术方案与上下文真源.md",
-      "sha256": "8500ebfe09f4dd596abab79bf6de6612ce268d6ef88fb852ed6c25a66f16d155",
-      "bytes": 20019
+      "sha256": "8537c6274f45449480e6383faa176c49927368be2af9c9af823d9f0b8d8dfbbd",
+      "bytes": 20547
     },
     {
       "path": "01-领域职责边界与非目标.md",
-      "sha256": "ee8120786f70f684f8043a8dcf241345e059eb6d8837d78d935ff9d58a9ce682",
-      "bytes": 2751
+      "sha256": "25a47d7436ec09ab47c23e4eb4166ec03f52480ec27274c7a5beb20bbd3ea5ae",
+      "bytes": 3481
     },
     {
       "path": "02-总体架构-包-服务-运行拓扑.md",
@@ -54,13 +54,13 @@
     },
     {
       "path": "08-Capability-Proposal与Execution桥接.md",
-      "sha256": "46c601bf4cebec2dcd751dae808c63ae20172453f142df66d92f5c697f1cc04f",
-      "bytes": 2237
+      "sha256": "620d74779f0029163c16d709a5b5ffdac16533ccb7d658d8c134c3e5a87a30b0",
+      "bytes": 2881
     },
     {
       "path": "09-Vision与多模态输入.md",
-      "sha256": "9780a85a2fea4052c8cc0f724654fb222d5fdc18655a6c32bd23c6943c146925",
-      "bytes": 1508
+      "sha256": "c880f635843a7b7171570bb3ecbd55854f151e6261a55251ab08dbc1c6802879",
+      "bytes": 1946
     },
     {
       "path": "10-Runtime-Health与推理可观测性.md",

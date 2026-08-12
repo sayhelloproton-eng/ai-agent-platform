@@ -106,3 +106,34 @@ required dependency/verify/runtime 失败。
 ## ALIGN-001～250 增量修复：Platform READY
 
 Platform READY = required modules 已安装/配置 + logical dependencies resolved + required runtimes 当前 READY + installed version verify PASS + cross-module verification PASS + blocking ACTION_REQUIRED=0。Deployment state.json/last-online 绝不冒充 current reality；Gateway ONLINE 也不等于 Platform READY。
+
+<!-- OPENAI-CARRIER-ABSORPTION-20260812 -->
+
+## 8. ChatGPT Role READY / Doctor
+
+Custom GPT Role/Carrier READY 采用行为验证：
+
+```text
+Role/GPT reachable
+required capabilities configured
+Actions schema current
+Action auth valid
+Gateway/public ingress reachable
+required File Bridge path usable
+Preview/real Action E2E PASS
+```
+
+`recommendedModel` 不作为 READY equality check。
+
+Doctor 在适用场景额外诊断：
+
+```text
+Actions vs Apps conflict
+Code Interpreter/Web Search requirement mismatch
+action-domain allowlist
+public GPT privacy policy requirement
+GPT version restore 后 auth 失效
+File relay/TLS/443 failure
+```
+
+Doctor 默认只报告事实与 repair recommendation；需要改 Web 配置时返回 `ACTION_REQUIRED`（`actionRequired.kind=WEB`）或新的 repair plan。

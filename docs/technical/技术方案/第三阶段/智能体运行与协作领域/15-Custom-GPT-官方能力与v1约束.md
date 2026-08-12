@@ -1,17 +1,25 @@
 # 智能体运行与协作领域｜Custom GPT 官方能力与 v1 Carrier 约束
 
-> 校对日期：2026-08-11。此文件只记录 v1 设计实际依赖的 OpenAI Custom GPT 产品事实，避免未来实现者把“平台决定”和“Carrier 当前能力”混为一谈。产品行为可能变化，Carrier 升级时必须重新核对官方文档。
+> 校对日期：2026-08-12。此文件只记录 v1 设计实际依赖的 OpenAI Custom GPT 产品事实，避免未来实现者把“平台决定”和“Carrier 当前能力”混为一谈。产品行为可能变化，Carrier 升级时必须重新核对官方文档。
 
 ---
 
 # 1. 官方来源
 
-本轮仅以 OpenAI 官方 Help Center 为依据，主要页面：
+本轮只采用 OpenAI 官方 Developers / Help Center 已明确公开的能力，主要页面：
 
 ```text
+Sending and returning files with GPT Actions
+Production notes on GPT Actions
+GPT Action authentication
+Getting started with GPT Actions
+GPT Actions introduction
 Creating and editing GPTs
 Configuring actions in GPTs
+Scheduled Tasks in ChatGPT
 ```
+
+未公开或未形成稳定官方 Contract 的行为，不作为平台硬依赖。
 
 ---
 
@@ -219,8 +227,203 @@ Web Action Schema 是否已更新
 
 ---
 
-<!-- ALIGNMENT-PATCH-20260812 -->
+<!-- OPENAI-CARRIER-ABSORPTION-20260812 -->
 
-## 2026-08-12 OpenAI 官方能力审计增量项
+## 2026-08-12 OpenAI 官方能力吸收：已验证协议、待验证行为、明确非路线
 
-以下不直接升级为 v1 normative contract，统一进入开发测试状态：`openaiFileIdRefs/openaiFileResponse` File Bridge、`x-openai-isConsequential:false` + Always Allow、单 Turn 多 Action、Conversation-native file search、Code Interpreter Context Pack/Patch。状态只能是 `VERIFIED / PENDING_SPIKE / REJECTED_OR_UNSUPPORTED`。已确认的官方硬限制（Actions timeout/payload/auth/file shape 等）可进入 Gateway/Deployment conformance；具体 ChatGPT UI/Conversation 行为必须 Preview/真实 E2E 后冻结。
+这一轮不推翻五领域 Ownership，只把 OpenAI 已经提供的 Carrier 能力纳入现有 Agent/Gateway/Deployment 合同，并裁掉重复自研路径。
+
+### A. VERIFIED_OFFICIAL_CONTRACT｜现在进入 v1 normative Carrier contract
+
+#### A1. `openaiFileIdRefs`：Conversation → Action 文件输入
+
+GPT Action 的文件输入参数名固定为：
+
+```text
+openaiFileIdRefs
+```
+
+单次最多 10 个 Conversation 文件。来源可包括用户上传文件、DALL·E 生成图片、Code Interpreter 创建文件。
+
+Gateway 的 OpenAI transport boundary 必须把该字段先按 `unknown` 接收，再做专门 runtime normalization。ChatGPT 实际运行时对象形状按官方说明为：
+
+```ts
+export interface OpenAIActionFileInputRef {
+  name: string;
+  id: string;
+  mime_type: string;
+  download_link: string;
+}
+
+export type OpenAIFileIdRefsRuntime = OpenAIActionFileInputRef[];
+```
+
+注意：官方 OpenAPI 示例可能把 `openaiFileIdRefs` 声明为 `string[]`，但运行时填充为对象数组。**Gateway 不能用普通静态 DTO 直接假设二者相同。**
+
+约束：
+
+- `download_link` 约 5 分钟有效，只能作为瞬时下载 locator；
+- 不得把 `download_link` 持久化为 TaskDocument / Evidence 的长期地址；
+- OpenAI `id` 只能作为 transport provenance / externalRef，不能成为 TaskDocument、Execution Artifact 或 Worker 的业务主键；
+- 文件 bytes 的真实下载、大小/MIME/hash 校验与材料化属于 Execution mechanics；Gateway 不成为业务文件 Owner。
+
+#### A2. `openaiFileResponse`：Action → Conversation 文件输出
+
+Action 可以返回：
+
+```text
+openaiFileResponse
+```
+
+一次最多 10 个文件；每文件最大 10 MB；不能返回 image/video。
+
+支持两种 item：
+
+```ts
+export type OpenAIFileResponseItem =
+  | {
+      name: string;
+      mime_type: string;
+      content: string; // base64
+    }
+  | string;            // OpenAI 可获取的 HTTPS URL
+
+export interface OpenAIFileResponseEnvelope {
+  openaiFileResponse: OpenAIFileResponseItem[];
+}
+```
+
+URL 模式的文件响应必须包含：
+
+```text
+Content-Type
+Content-Disposition
+```
+
+OpenAI 对每个返回文件的获取超时为 10 秒。
+
+v1 规则：
+
+- 小文件可 inline；
+- 非平凡文件优先使用 Gateway 的短期 opaque relay URL；
+- relay 只是 OpenAI transport adapter，不新建 File Service / Artifact Domain；
+- relay 不暴露真实本机 path、credential 或业务内部 locator。
+
+#### A3. Actions production hard limits
+
+GPT-facing Gateway / OpenAPI conformance 必须纳入：
+
+```text
+45s round-trip hard ceiling
+request < 100,000 chars
+response < 100,000 chars
+TLS 1.2+
+public HTTPS / port 443
+real HTTP 429/5xx
+raw structured response
+```
+
+因此：
+
+- 长任务不能阻塞一个 Action 请求等待全部执行结束；
+- 大型 Task 文档/产物不再默认塞进 Action JSON；
+- Gateway 不用 `200 + error object` 隐藏 overload/server failure；
+- static OpenAPI endpoint summary/description 与 parameter description 必须遵守 OpenAI 当前长度约束并进入 conformance。
+
+#### A4. GPT-facing transport 不依赖 Custom Headers
+
+OpenAI Actions 不支持平台任意自定义 request headers。GPT-facing contract 不得要求：
+
+```text
+Idempotency-Key
+X-Correlation-Id
+X-Task-Version
+X-Node-Version
+X-Worker-Ref
+```
+
+这些平台字段放入 typed body/path/query；Gateway 再转换为内部 canonical request。Authentication header 仍由 OpenAI Action auth 配置负责。
+
+#### A5. `x-openai-isConsequential` 必须显式设置
+
+每一个 GPT Action operation 都必须显式声明：
+
+```yaml
+x-openai-isConsequential: true
+```
+
+或：
+
+```yaml
+x-openai-isConsequential: false
+```
+
+禁止依赖 OpenAI 对 GET / 非 GET 的默认推断。
+
+平台内部 query/control/intent Action 若自身不直接完成不可逆真实 Effect，默认设计为 `false`；真正 Effect 是否允许执行继续由 Execution Policy / Approval 决定。
+
+```text
+OpenAI Carrier confirmation
+!=
+Execution Effect Approval
+```
+
+不得把二者合并，也不得为了同一个真实 Effect设计两套重复审批。
+
+#### A6. Agent Package / Role capability truth
+
+Custom GPT v1 继续使用 Actions；Apps 与 Actions 不同时作为同一个 GPT 的 P0 工具链。
+
+Recommended model 只是 advisory，不是 Role READY 的强绑定；当前带 Actions 的 GPT 还必须使用 Action-compatible model（不把 Pro mode 作为 Actions Carrier 运行前提）。Role READY 应依据：
+
+```text
+GPT/Role exists
+Actions schema installed
+Action auth valid
+required capabilities enabled
+Gateway reachable
+real Preview/E2E PASS
+```
+
+而不是 `recommendedModel == 某精确 model id`。
+
+Custom GPT 创建/编辑仍按 Web-only 流程处理；Deployment 继续使用既有 `ACTION_REQUIRED`，并以 `actionRequired.kind=WEB` 表达 Web 人工步骤，不能承诺 CLI 全自动修改 GPT。
+
+### B. PENDING_SPIKE｜官方能力存在，但本平台使用方式仍需真实 E2E
+
+下面只验证“在我们的 Role / Worker / Task Driver 主链中是否稳定”，不是验证 OpenAI 文档是否存在：
+
+```text
+1. x-openai-isConsequential:false 后选择 Always Allow，后续 routine Actions 是否稳定无确认；
+2. 一次 Worker Turn 内连续 Action A → result → Action B 是否稳定，无需 Browser 中途再次 WAKE；
+3. openaiFileResponse 返回 Task documents 后，Conversation-native file search 是否稳定满足动态 Task Context；
+4. Code Interpreter 读取 bounded Context Pack → 生成 patch/artifact → openaiFileIdRefs 回传是否稳定。
+```
+
+通过后可把 Browser 的 routine permission click、大型上下文注入、逐 Action WAKE、无界逐文件 Action 往返进一步从 happy path 裁掉。
+
+### C. REJECTED_OR_UNSUPPORTED｜明确不作为 v1 主路径
+
+```text
+不得假设 GPT Action request 自动提供稳定 Conversation c-id
+不得用 ChatGPT Scheduled Tasks 替代 GPT Worker Task Driver
+不得用 Code Interpreter 替代真实本机/Browser Execution
+不得因 File Bridge 删除 Browser/Vision
+不得把 Custom GPT native Actions/Function Calling 等同于 Model Runtime native tool_calls
+不得新增 File Domain / Artifact Domain / OpenAI Files DB
+```
+
+平台 → GPT 图片/视频不能依赖 `openaiFileResponse`；Browser screenshot / Model Vision 路径继续保留。
+
+### D. v1 Carrier/Data Movement 原则
+
+```text
+小型结构化控制数据     → GPT Action JSON
+文档 / 文件 / 大型上下文 → GPT Actions File Bridge
+Conversation identity/lifecycle → Execution Browser
+页面真实状态 / screenshot → Execution Browser + Vision
+真实本机 / 浏览器 Effect → Execution
+业务事实               → owning Domain
+```
+
+这条规则的目标是复用 ChatGPT 已有能力并减少自研 transport，而不是新增一层平台架构。

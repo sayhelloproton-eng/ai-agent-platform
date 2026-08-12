@@ -67,7 +67,7 @@ listTaskEvents
 
 默认不修改业务状态。
 
-`getNodeContext` 组合 Task + Node + inputDocuments + TaskDocumentService 读取的 Markdown。Worker 不直接访问 SQLite。
+`getNodeContext` 组合 Task + Node + inputDocuments + TaskDocument metadata；正文由 `getTaskDocument` 按需读取。Custom GPT Carrier 需要大文档时由 Gateway 适配为 File Bridge。Worker 不直接访问 SQLite。
 
 ---
 
