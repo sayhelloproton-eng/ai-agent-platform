@@ -1,0 +1,340 @@
+{
+  "contract": "phase3.preimplementation-test-plan-index.v1",
+  "sourceBaselineSha256": "69fdfbac8a5ee36b700bcb10c0b8a9a61f0a5aa3367386cb5bc7e98118a4a875",
+  "status": "FINAL_FROZEN",
+  "documents": [
+    {
+      "path": "任务与编排领域/07-测试计划/00-领域测试总计划.md",
+      "docId": "TP-TASK-ORCHESTRATION-00",
+      "title": "Task & Orchestration｜领域测试总计划",
+      "domain": "task-orchestration",
+      "moduleRef": null,
+      "implementationWave": null,
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "任务与编排领域/07-测试计划/README.md",
+      "docId": "TP-TASK-ORCHESTRATION-README",
+      "title": "Task & Orchestration｜测试计划导航",
+      "domain": "task-orchestration",
+      "moduleRef": null,
+      "implementationWave": null,
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "任务与编排领域/07-测试计划/modules/task-migration-runner.md",
+      "docId": "TP-MODULE-TASK-MIGRATION-RUNNER",
+      "title": "task-migration-runner｜开发前 Module Test Plan",
+      "domain": "task-orchestration",
+      "moduleRef": "task-migration-runner",
+      "implementationWave": "Wave 1",
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "任务与编排领域/07-测试计划/modules/task-orchestration.md",
+      "docId": "TP-MODULE-TASK-ORCHESTRATION",
+      "title": "task-orchestration｜开发前 Module Test Plan",
+      "domain": "task-orchestration",
+      "moduleRef": "task-orchestration",
+      "implementationWave": "Wave 1",
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "任务与编排领域/07-测试计划/modules/task-store-sqlite.md",
+      "docId": "TP-MODULE-TASK-STORE-SQLITE",
+      "title": "task-store-sqlite｜开发前 Module Test Plan",
+      "domain": "task-orchestration",
+      "moduleRef": "task-store-sqlite",
+      "implementationWave": "Wave 1",
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "平台架构与公共约定/06-测试计划/00-Phase3测试总计划.md",
+      "docId": "TP-PLATFORM-00",
+      "title": "Phase 3 测试总计划",
+      "domain": "platform",
+      "moduleRef": null,
+      "implementationWave": null,
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "平台架构与公共约定/06-测试计划/01-跨领域Contract与Integration测试计划.md",
+      "docId": "TP-PLATFORM-01",
+      "title": "跨领域 Contract 与 Integration 测试计划",
+      "domain": "platform",
+      "moduleRef": null,
+      "implementationWave": null,
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "平台架构与公共约定/06-测试计划/02-真实E2E与故障恢复测试计划.md",
+      "docId": "TP-PLATFORM-02",
+      "title": "真实 E2E 与故障恢复测试计划",
+      "domain": "platform",
+      "moduleRef": null,
+      "implementationWave": null,
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "平台架构与公共约定/06-测试计划/03-安全边界与稳定性测试计划.md",
+      "docId": "TP-PLATFORM-03",
+      "title": "安全边界与稳定性测试计划",
+      "domain": "platform",
+      "moduleRef": null,
+      "implementationWave": null,
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "平台架构与公共约定/06-测试计划/04-证据与停止门.md",
+      "docId": "TP-PLATFORM-04",
+      "title": "测试证据与停止门",
+      "domain": "platform",
+      "moduleRef": null,
+      "implementationWave": null,
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "平台架构与公共约定/06-测试计划/05-实施Wave与测试Gate.md",
+      "docId": "TP-PLATFORM-05",
+      "title": "实施 Wave 与测试 Gate",
+      "domain": "platform",
+      "moduleRef": null,
+      "implementationWave": null,
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "平台架构与公共约定/06-测试计划/README.md",
+      "docId": "TP-PLATFORM-README",
+      "title": "Phase 3 开发前测试计划｜导航",
+      "domain": "platform",
+      "moduleRef": null,
+      "implementationWave": null,
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "平台架构与公共约定/06-测试计划/modules/platform-host.md",
+      "docId": "TP-MODULE-PLATFORM-HOST",
+      "title": "platform-host｜开发前 Module Test Plan",
+      "domain": "platform",
+      "moduleRef": "platform-host",
+      "implementationWave": "Wave 6",
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "执行领域/07-测试计划/00-领域测试总计划.md",
+      "docId": "TP-EXECUTION-00",
+      "title": "Execution｜领域测试总计划",
+      "domain": "execution",
+      "moduleRef": null,
+      "implementationWave": null,
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "执行领域/07-测试计划/README.md",
+      "docId": "TP-EXECUTION-README",
+      "title": "Execution｜测试计划导航",
+      "domain": "execution",
+      "moduleRef": null,
+      "implementationWave": null,
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "执行领域/07-测试计划/modules/execution-browser-extension.md",
+      "docId": "TP-MODULE-EXECUTION-BROWSER-EXTENSION",
+      "title": "execution-browser-extension｜开发前 Module Test Plan",
+      "domain": "execution",
+      "moduleRef": "execution-browser-extension",
+      "implementationWave": "Wave 5",
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "执行领域/07-测试计划/modules/execution-contracts.md",
+      "docId": "TP-MODULE-EXECUTION-CONTRACTS",
+      "title": "execution-contracts｜开发前 Module Test Plan",
+      "domain": "execution",
+      "moduleRef": "execution-contracts",
+      "implementationWave": "Wave 3",
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "执行领域/07-测试计划/modules/execution-local.md",
+      "docId": "TP-MODULE-EXECUTION-LOCAL",
+      "title": "execution-local｜开发前 Module Test Plan",
+      "domain": "execution",
+      "moduleRef": "execution-local",
+      "implementationWave": "Wave 3",
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "执行领域/07-测试计划/modules/execution-runtime.md",
+      "docId": "TP-MODULE-EXECUTION-RUNTIME",
+      "title": "execution-runtime｜开发前 Module Test Plan",
+      "domain": "execution",
+      "moduleRef": "execution-runtime",
+      "implementationWave": "Wave 3",
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "智能体运行与协作领域/07-测试计划/00-领域测试总计划.md",
+      "docId": "TP-AGENT-RUNTIME-COLLABORATION-00",
+      "title": "Agent Runtime & Collaboration｜领域测试总计划",
+      "domain": "agent-runtime-collaboration",
+      "moduleRef": null,
+      "implementationWave": null,
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "智能体运行与协作领域/07-测试计划/README.md",
+      "docId": "TP-AGENT-RUNTIME-COLLABORATION-README",
+      "title": "Agent Runtime & Collaboration｜测试计划导航",
+      "domain": "agent-runtime-collaboration",
+      "moduleRef": null,
+      "implementationWave": null,
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "智能体运行与协作领域/07-测试计划/modules/agent-controller-dev.md",
+      "docId": "TP-MODULE-AGENT-CONTROLLER-DEV",
+      "title": "agent-controller-dev｜开发前 Module Test Plan",
+      "domain": "agent-runtime-collaboration",
+      "moduleRef": "agent-controller-dev",
+      "implementationWave": "Wave 4",
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "智能体运行与协作领域/07-测试计划/modules/agent-gateway.md",
+      "docId": "TP-MODULE-AGENT-GATEWAY",
+      "title": "agent-gateway｜开发前 Module Test Plan",
+      "domain": "agent-runtime-collaboration",
+      "moduleRef": "agent-gateway",
+      "implementationWave": "Wave 4",
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "智能体运行与协作领域/07-测试计划/modules/agent-product.md",
+      "docId": "TP-MODULE-AGENT-PRODUCT",
+      "title": "agent-product｜开发前 Module Test Plan",
+      "domain": "agent-runtime-collaboration",
+      "moduleRef": "agent-product",
+      "implementationWave": "Wave 4",
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "智能体运行与协作领域/07-测试计划/modules/agent-runtime.md",
+      "docId": "TP-MODULE-AGENT-RUNTIME",
+      "title": "agent-runtime｜开发前 Module Test Plan",
+      "domain": "agent-runtime-collaboration",
+      "moduleRef": "agent-runtime",
+      "implementationWave": "Wave 4",
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "智能体运行与协作领域/07-测试计划/modules/agent-test-ops.md",
+      "docId": "TP-MODULE-AGENT-TEST-OPS",
+      "title": "agent-test-ops｜开发前 Module Test Plan",
+      "domain": "agent-runtime-collaboration",
+      "moduleRef": "agent-test-ops",
+      "implementationWave": "Wave 4",
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "模型与推理领域/07-测试计划/00-领域测试总计划.md",
+      "docId": "TP-MODEL-REASONING-00",
+      "title": "Model & Reasoning｜领域测试总计划",
+      "domain": "model-reasoning",
+      "moduleRef": null,
+      "implementationWave": null,
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "模型与推理领域/07-测试计划/README.md",
+      "docId": "TP-MODEL-REASONING-README",
+      "title": "Model & Reasoning｜测试计划导航",
+      "domain": "model-reasoning",
+      "moduleRef": null,
+      "implementationWave": null,
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "模型与推理领域/07-测试计划/modules/model-contracts.md",
+      "docId": "TP-MODULE-MODEL-CONTRACTS",
+      "title": "model-contracts｜开发前 Module Test Plan",
+      "domain": "model-reasoning",
+      "moduleRef": "model-contracts",
+      "implementationWave": "Wave 2",
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "模型与推理领域/07-测试计划/modules/model-runtime.md",
+      "docId": "TP-MODULE-MODEL-RUNTIME",
+      "title": "model-runtime｜开发前 Module Test Plan",
+      "domain": "model-reasoning",
+      "moduleRef": "model-runtime",
+      "implementationWave": "Wave 2",
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "部署领域/07-测试计划/00-领域测试总计划.md",
+      "docId": "TP-DEPLOYMENT-GOVERNANCE-00",
+      "title": "Deployment｜领域测试总计划",
+      "domain": "deployment-governance",
+      "moduleRef": null,
+      "implementationWave": null,
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "部署领域/07-测试计划/README.md",
+      "docId": "TP-DEPLOYMENT-GOVERNANCE-README",
+      "title": "Deployment｜测试计划导航",
+      "domain": "deployment-governance",
+      "moduleRef": null,
+      "implementationWave": null,
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "部署领域/07-测试计划/modules/deployment-conformance.md",
+      "docId": "TP-MODULE-DEPLOYMENT-CONFORMANCE",
+      "title": "deployment-conformance｜开发前 Module Test Plan",
+      "domain": "deployment-governance",
+      "moduleRef": "deployment-conformance",
+      "implementationWave": "Wave 0",
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "部署领域/07-测试计划/modules/module-contract.md",
+      "docId": "TP-MODULE-MODULE-CONTRACT",
+      "title": "module-contract｜开发前 Module Test Plan",
+      "domain": "deployment-governance",
+      "moduleRef": "module-contract",
+      "implementationWave": "Wave 0",
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "部署领域/07-测试计划/modules/module-skill.md",
+      "docId": "TP-MODULE-MODULE-SKILL",
+      "title": "module-skill｜开发前 Module Test Plan",
+      "domain": "deployment-governance",
+      "moduleRef": "module-skill",
+      "implementationWave": "Wave 6",
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "部署领域/07-测试计划/modules/module-template.md",
+      "docId": "TP-MODULE-MODULE-TEMPLATE",
+      "title": "module-template｜开发前 Module Test Plan",
+      "domain": "deployment-governance",
+      "moduleRef": "module-template",
+      "implementationWave": "Wave 0",
+      "testPlanStatus": "FINAL_FROZEN"
+    },
+    {
+      "path": "部署领域/07-测试计划/modules/platform-cli.md",
+      "docId": "TP-MODULE-PLATFORM-CLI",
+      "title": "platform-cli｜开发前 Module Test Plan",
+      "domain": "deployment-governance",
+      "moduleRef": "platform-cli",
+      "implementationWave": "Wave 6",
+      "testPlanStatus": "FINAL_FROZEN"
+    }
+  ]
+}
